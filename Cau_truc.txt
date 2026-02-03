@@ -1,8 +1,11 @@
 
 api/      # Backend
-Tạo 1 file .env 
+Tạo 1 file .env dán 
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/base_test_db (mọi ng đặt tên là gì thì viết y như vậy nhé)
+JWT_SECRET=your_secret_here
 packages/ 
-    types/       type dùng chung ( interface)
+    types/       type dùng chung ( interface, Zoi .... )
 
 giữ nguyên terminal base và npm i hoặc npm install
 test db bằng cách kết nối compass check = postman
@@ -33,3 +36,7 @@ components/           Component dùng chung (Button, Modal…)
 ├── utils/
 ├── App.tsx
 └── main.tsx
+
+
+Lấy nhanh git nhánh Main khi đã review code 
+git pull origin main
