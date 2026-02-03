@@ -1,0 +1,35 @@
+
+api/      # Backend
+Tạo 1 file .env 
+packages/ 
+    types/       type dùng chung ( interface)
+
+giữ nguyên terminal base và npm i hoặc npm install
+test db bằng cách kết nối compass check = postman
+web/      # Frontend
+
+components/           Component dùng chung (Button, Modal…)
+├── layouts/             
+│   ├── ClientLayout.tsx
+│   └── AdminLayout.tsx
+├── pages/
+│   ├── client/          
+│   │   ├── Home.tsx
+│   │   └── Profile.tsx
+│   ├── admin/          
+│   │   ├── Dashboard.tsx
+│   │   ├── Users.tsx
+│   │   └── Products.tsx
+│   └── auth/            
+│       └── Login / Register dùng chung
+├── routes/
+│   ├── client.routes.tsx
+│   └── admin.routes.tsx
+├── services/
+│   ├── api.ts
+│   ├── auth.service.ts
+│   └── user.service.ts
+├── hooks/
+├── utils/
+├── App.tsx
+└── main.tsx
