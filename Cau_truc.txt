@@ -40,3 +40,14 @@ components/           Component dùng chung (Button, Modal…)
 
 Lấy nhanh git nhánh Main khi đã review code 
 git pull origin main
+
+
+# Tạo nhánh phụ 
+git checkout -b thanh
+
+# commit 
+git commit -m "ABC XYZ ....."
+
+# push theo tên nhánh bạn đặt -b 
+git push origin thanh
+
