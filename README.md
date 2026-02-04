@@ -28,9 +28,11 @@ Chỉ leader được merge vào main
 
 
 👨‍💻 Quy trình làm việc cho thành viên
+
 1️⃣ Lấy code mới nhất từ main
 git checkout an
 git pull origin main
+
 2️⃣ Code & commit
 git add .
 git commit -m "[AN] feat: login UI"
