@@ -1,5 +1,40 @@
 
 api/      # Backend
+
+src/
+    ├── config/
+    │   └── db.ts
+    │ 
+    ├── middlewares/
+    │   ├── auth.middleware.ts
+    │   └── error.middleware.ts
+    │ 
+    ├── modules/
+    │   ├── auth/
+    │   │   ├── auth.route.ts
+    │   │   ├── auth.controller.ts
+    │   │   └── auth.service.ts
+    │   │ 
+    │   ├── user/
+    │   │   ├── user.model.ts
+    │   │   ├── user.route.ts
+    │   │   ├── user.controller.ts
+    │   │   └── user.service.ts
+    │   │ 
+    │   ├── movie/
+    │   │   ├── movie.model.ts
+    │   │   ├── movie.route.ts
+    │   │   ├── movie.controller.ts
+    │   │   └── movie.service.ts
+    │   │
+    │   └── booking/
+    │       ├── booking.model.ts
+    │       ├── booking.route.ts
+    │       ├── booking.controller.ts
+    │       └── booking.service.ts
+    ├── app.ts
+    └── index.ts
+
 Tạo 1 file .env dán 
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/base_test_db (mọi ng đặt tên là gì thì viết y như vậy nhé)
@@ -8,8 +43,13 @@ packages/
     types/       type dùng chung ( interface, Zoi .... )
 
 giữ nguyên terminal base và npm i hoặc npm install
-test db bằng cách kết nối compass check = postman
+
+test db bằng cách kết nối compass - check  request = postman 
+
+demo nếu ổn thì tôi chuyển hết sang Cloudinary và atlas nhé mọi người chỉ 1 dùng env và url tối ưu web nhẹ và mượt mà 
+
 web/      # Frontend
+mọi người code được gì điền vào Cấu trúc này của tôi nhé, dễ tìm code và debugs hơn 
 
 components/           Component dùng chung (Button, Modal…)
 ├── layouts/             
@@ -37,15 +77,19 @@ components/           Component dùng chung (Button, Modal…)
 ├── App.tsx
 └── main.tsx
 
+lấy base nhớ add or clone link git sẽ hiện ra graph timeline của tôi là được nhé 
+khi mỗi lần chạy code sẽ check lại merge trên graph và lấy git đã review về xong rồi code tránh loạn comit nha
 
 Lấy nhanh git nhánh Main khi đã review code 
-git pull origin main
+git merge main
 
+# Tạo nhánh phụ 1 lần là được rồi
+git checkout -b thanh ( tên mọi người đặt )
 
-# Tạo nhánh phụ 
-git checkout -b thanh
+# Lệnh gọi nhanh phụ ( đừng viết thêm -b nhé)
+git checkout thanh
 
-# commit 
+# commit hoặc dùng comit bên trái trong SOURCE CONTROL
 git commit -m "ABC XYZ ....."
 
 # push theo tên nhánh bạn đặt -b 
