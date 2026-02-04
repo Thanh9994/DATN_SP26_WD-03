@@ -13,10 +13,15 @@ WEB vé xem phim
 
 🧱 Cấu trúc branch
 main      → nhánh chính (PRODUCTION)
+
 thanh     → branch của leader
+
 A        → branch A
+
 B      → branch B
+
 C    → branch C
+
 
 📌 Quy tắc bắt buộc:
 
