@@ -1,13 +1,12 @@
 // import { useRoutes } from 'react-router-dom';
 import "antd/dist/reset.css"; // Ant Design 5.x
+import { useRoutes } from "react-router-dom";
+import { ClientRoutes } from "./routes/Client.routes";
+import { AdminRoutes } from "./routes/admin.routes";
 
 function App() {
-  return (
-    <div>
-      <h1>Web App</h1>
-      <p>App đang chạy thành công!</p>
-    </div>
-  );
+  const element = useRoutes([ClientRoutes, AdminRoutes]);
+  return element;
 }
 
 export default App
