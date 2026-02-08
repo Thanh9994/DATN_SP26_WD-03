@@ -9,23 +9,27 @@ src/
     │   ├── auth.middleware.ts
     │   └── error.middleware.ts
     │ 
-    ├── modules/
+    ├── modules/    Route → Controller → Service → Model
     │   ├── auth/
-    │   │   ├── auth.route.ts
-    │   │   ├── auth.controller.ts
-    │   │   └── auth.service.ts
+    │   │   ├── auth.route.ts - Chỉ định nghĩa routes
+    │   │   ├── auth.controller.ts - Xử lý logic request/response
+    │   │   └── auth.service.ts  - Xử lý business logic và database
     │   │ 
     │   ├── user/
-    │   │   ├── user.model.ts
-    │   │   ├── user.route.ts
-    │   │   ├── user.controller.ts
-    │   │   └── user.service.ts
+    │   │   ├── user.model.ts - Định nghĩa schema
+    │   │   ├── user.route.ts  - Chỉ định nghĩa routes
+    │   │   ├── user.controller.ts - Xử lý logic request/response
+    │   │   └── user.service.ts - Xử lý business logic và database
     │   │ 
     │   ├── movie/
     │   │   ├── movie.model.ts
     │   │   ├── movie.route.ts
     │   │   ├── movie.controller.ts
     │   │   └── movie.service.ts
+    │   │
+    │   ├── genre/ Thể loại phim
+    │   │   ├── genre.model.ts
+    │   │   ├── genre.route.ts        
     │   │
     │   └── booking/
     │       ├── booking.model.ts
