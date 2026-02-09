@@ -1,4 +1,4 @@
-import { AdminLayout } from '@/layouts/AdminLayout'
+import { AdminLayout } from '@web/layouts/AdminLayout'
 import { RouteObject } from 'react-router-dom'
 
 export const AdminRoutes: RouteObject = {

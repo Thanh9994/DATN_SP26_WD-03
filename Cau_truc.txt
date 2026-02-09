@@ -29,11 +29,12 @@ src/
     │   │
     │   ├── genre/ Thể loại phim
     │   │   ├── genre.model.ts
-    │   │   ├── genre.route.ts
+    │   │   └── genre.route.ts
     │   │
     │   ├── cinema/ Rạp chiếu phim
-    │   │   ├── genre.model.ts
-    │   │   ├── genre.route.ts              
+    │   │   ├── cinema.model.ts
+    │   │   ├── cinema.controller.ts
+    │   │   └── cinem.route.ts              
     │   │
     │   └── booking/
     │       ├── booking.model.ts
@@ -80,8 +81,7 @@ components/           Component dùng chung (Button, Modal…)
 │   ├── api.ts
 │   ├── auth.service.ts
 │   └── user.service.ts
-├── hooks/
-├── utils/
+├── hooks/ call api 1 lần và dùng cho các component khác nhé mọi người cho gọn code
 ├── App.tsx
 └── main.tsx
 
