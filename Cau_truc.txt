@@ -32,8 +32,9 @@ src/
     │   │   └── genre.route.ts
     │   │
     │   ├── cinema/ Rạp chiếu phim
-    │   │   ├── genre.model.ts
-    │   │   ├── genre.route.ts              
+    │   │   ├── cinema.model.ts
+    │   │   ├── cinema.conttroller.ts
+    │   │   ├── cinema.route.ts              
     │   │
     │   └── booking/
     │       ├── booking.model.ts
