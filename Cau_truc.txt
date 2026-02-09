@@ -29,7 +29,12 @@ src/
     │   │
     │   ├── genre/ Thể loại phim
     │   │   ├── genre.model.ts
-    │   │   ├── genre.route.ts        
+    │   │   ├── genre.route.ts
+    │   │
+    │   ├── cinema/ Rạp chiếu phim
+    │   │   ├── cinema.model.ts
+    │   │   ├── cinema.conttroller.ts
+    │   │   ├── cinema.route.ts              
     │   │
     │   └── booking/
     │       ├── booking.model.ts
