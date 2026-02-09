@@ -4,23 +4,24 @@
   "version": "0.0.1",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "eslint ."
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
-    "cloudinary": "^1.41.3",
     "mongoose": "^8.19.1",
     "morgan": "^1.10.0",
-    "zod": "^4.1.12",
     "multer": "^2.0.2",
-    "multer-storage-cloudinary": "^4.0.0"
+    "multer-storage-cloudinary": "^4.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
