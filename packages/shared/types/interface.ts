@@ -18,3 +18,13 @@ export interface ICinema {
 export interface IGenre {
   name: string;
 }
+
+export interface ICloudinaryImage {
+  public_id: string;
+  url: string;
+}
+
+export interface IUploadParams {
+  file: File;
+  customName: string;
+}
