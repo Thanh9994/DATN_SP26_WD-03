@@ -37,3 +37,5 @@ const MovieSchema = new mongoose.Schema<IMovie> (
     },
     { timestamps: true }
 )
+
+export default mongoose.model("movie", MovieSchema)

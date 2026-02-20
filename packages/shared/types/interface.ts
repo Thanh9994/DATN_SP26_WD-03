@@ -41,7 +41,13 @@ export interface IMovie {
   trailer: string;
   danh_gia: number;
   trang_thai: 'sap_chieu' | 'dang_chieu' | 'ngung_chieu';
-  
+
   the_loai: IGenre[];
   rap_chieu?: ICinema[];
+}
+
+export interface ISnackDrink {
+  name: string;
+  price: number;
+  image: ICloudinaryImage;
 }
