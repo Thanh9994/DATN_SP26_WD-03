@@ -87,8 +87,10 @@ components/           Component dùng chung (Button, Modal…)
 
 lấy base nhớ add or clone link git sẽ hiện ra graph timeline của tôi là được nhé 
 khi mỗi lần chạy code sẽ check lại merge trên graph và lấy git đã review về xong rồi code tránh loạn comit nha
+# Tải và gộp nhánh main từ remote origin vào nhánh hiện tại.
+git pull origin main
 
-Lấy nhanh git nhánh Main khi đã review code 
+# Lấy nhanh git nhánh Main khi đã review code 
 git merge main
 
 # Tạo nhánh phụ 1 lần là được rồi
