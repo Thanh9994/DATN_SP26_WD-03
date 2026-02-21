@@ -42,12 +42,14 @@ src/
     │       ├── booking.controller.ts
     │       └── booking.service.ts
     ├── app.ts
+    ├── .env
     └── index.ts
 
 Tạo 1 file .env dán 
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/base_test_db (mọi ng đặt tên là gì thì viết y như vậy nhé)
 JWT_SECRET=your_secret_here
+
 packages/ 
     types/       type dùng chung ( interface, Zoi .... )
 
@@ -83,15 +85,13 @@ components/           Component dùng chung (Button, Modal…)
 │   └── user.service.ts
 ├── hooks/ call api 1 lần và dùng cho các component khác nhé mọi người cho gọn code
 ├── App.tsx
+├── .env #Dán đoạn code vào file này VITE_API_URL=http://localhost:5000
 └── main.tsx
 
 lấy base nhớ add or clone link git sẽ hiện ra graph timeline của tôi là được nhé 
 khi mỗi lần chạy code sẽ check lại merge trên graph và lấy git đã review về xong rồi code tránh loạn comit nha
 # Tải và gộp nhánh main từ remote origin vào nhánh hiện tại.
 git pull origin main
-
-# Lấy nhanh git nhánh Main khi đã review code 
-git merge main
 
 # Tạo nhánh phụ 1 lần là được rồi
 git checkout -b thanh ( tên mọi người đặt )

@@ -44,6 +44,13 @@ export interface IMovie {
 
   the_loai: IGenre[];
   rap_chieu?: ICinema[];
+
+  quoc_gia: string;
+  dao_dien: string;
+  dien_vien: string[];
+  do_tuoi: 'P' | 'C13' | 'C16' | 'C18';
+  ngon_ngu: string;
+  phu_de: string[];
 }
 
 export interface ISnackDrink {

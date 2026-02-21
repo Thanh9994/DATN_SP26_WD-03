@@ -1,8 +1,52 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* body{
+  margin: 0 auto;
+  width: 1280px;
+} */
+ *,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Be Vietnam Pro", sans-serif;
+  background-color: #120a0a; /* background-dark */
+}
+
+/* ================= SCROLLBAR HIDE ================= */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ================= GLASS EFFECT ================= */
+.glass-nav {
+  backdrop-filter: blur(12px);
+  background-color: rgba(18, 10, 10, 0.707);
+}
+
 .glass-nav {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   background: rgba(10, 10, 10, 0.55);
+}
+
+/* ================= CUSTOM TAILWIND UTILITIES ================= */
+@layer utilities {
+  .container-app {
+    @apply max-w-[1280px] mx-auto px-6;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent;
+  }
 }
