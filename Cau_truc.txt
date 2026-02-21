@@ -93,9 +93,6 @@ khi mỗi lần chạy code sẽ check lại merge trên graph và lấy git đ�
 # Tải và gộp nhánh main từ remote origin vào nhánh hiện tại.
 git pull origin main
 
-# Lấy nhanh git nhánh Main khi đã review code 
-git merge main
-
 # Tạo nhánh phụ 1 lần là được rồi
 git checkout -b thanh ( tên mọi người đặt )
 
