@@ -15,7 +15,10 @@ const MovieSchema = new mongoose.Schema<IMovie> (
             url: String,
         },
         trailer: String,
-        danh_gia: Number,
+        danh_gia: { 
+            type: Number, 
+            default: 0 
+        },
 
         trang_thai: {
             type: String,
@@ -23,7 +26,9 @@ const MovieSchema = new mongoose.Schema<IMovie> (
             default: 'sap_chieu',
         },
         the_loai: [
-            { name: String }
+            {
+                name: String,
+            },
         ],
 
         rap_chieu: [
@@ -34,8 +39,19 @@ const MovieSchema = new mongoose.Schema<IMovie> (
                 phong_chieu: Array,
             },
         ],
+        
+        quoc_gia: String,
+        dao_dien: String,
+        dien_vien: [ String ],
+        do_tuoi: {
+            type: String,
+            enum: ['P', 'C13', 'C16', 'C18']
+        },
+
+        ngon_ngu: String,
+        phu_de: [ String ],
     },
     { timestamps: true }
 )
 
-export default mongoose.model("movie", MovieSchema)
+export default mongoose.model<IMovie>("movie", MovieSchema)
