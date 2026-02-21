@@ -6,7 +6,7 @@ export const Header = () => {
           <div className="flex items-center group cursor-pointer">
             <div className="rounded-lg flex items-center justify-center gap-2">
               <img
-                src="https://res.cloudinary.com/dcyzkqb1r/image/upload/t_PVM3/f_webp/q_40/H%E1%BB%8Ba_T%E1%BB%91c_fh4emr"
+                src="https://res.cloudinary.com/dcyzkqb1r/image/upload/v1770562320/H%E1%BB%8Fa_T%E1%BB%91c_fh4emr.png"
                 alt="Cinema logo"
                 className="w-[55px] h-[55px] object-cover"
               />
