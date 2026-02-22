@@ -130,12 +130,40 @@ export const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="mt-6 pt-10 border-t border-white/5 text-center">
-          <p className="text-white/20 text-[10px] font-bold uppercase tracking-[0.3em]">
+        <div className="mt-6 pt-6 border-t border-white/5 text-center">
+          <p className="text-white/30 text-[10px] font-bold uppercase tracking-[0.3em]">
             © 2026 PVMCinema Entertainment
           </p>
         </div>
 
+      </footer>
+      <footer className="md:hidden ">
+        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/10 px-8 py-3 pb-6 flex items-center justify-between z-[60]">
+          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ff000d] transition-colors">
+            <span className="material-symbols-outlined text-[24px]">home</span>
+            <span className="text-[10px] font-medium text-white">Home</span>
+          </button>
+
+          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ff000d] transition-colors">
+            <span className="material-symbols-outlined text-[24px] filled">confirmation_number</span>
+            <span className="text-[10px] font-medium text-white">Events</span>
+          </button>
+
+          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ea2a33] transition-colors">
+            <span className="material-symbols-outlined text-[24px] filled">confirmation_number</span>
+            <span className="text-[10px] font-medium text-white">Ticket</span>
+          </button>
+
+          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ea2a33] transition-colors">
+            <span className="material-symbols-outlined text-[24px]">live_tv</span>
+            <span className="text-[10px] font-medium text-white">Streams</span>
+          </button>
+
+          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ea2a33] transition-colors">
+            <span className="material-symbols-outlined text-[24px]">person</span>
+            <span className="text-[10px] font-medium text-white">Profile</span>
+          </button>
+        </nav>
       </footer>
     </div>
   );
