@@ -1,10 +1,13 @@
+import { useNavigate } from "react-router-dom";
+
 export const Header = () => {
+  const navigate = useNavigate();
   return (
     <header className="fixed top-0 w-full z-50 border-b border-white/10 glass-nav">
       <div className="mx-auto px-6 lg:px-10 py-4 flex items-center justify-between gap-8">
         <div className="flex items-center gap-12">
           <div className="flex items-center group cursor-pointer">
-            <div className="rounded-lg flex items-center justify-center gap-2">
+            <div className="rounded-lg flex items-center justify-center gap-2" onClick={() => navigate('/')}>
               <img
                 src="https://res.cloudinary.com/dcyzkqb1r/image/upload/t_PVM3/f_webp/q_40/H%E1%BB%8Fa_T%E1%BB%91c_fh4emr"
                 alt="Cinema logo"
@@ -19,31 +22,31 @@ export const Header = () => {
           <nav className="hidden md:flex items-center gap-8">
             <a
               className="text-white text-sm font-semibold hover:text-primary transition-colors"
-              href="#"
+              href="*"
             >
               Movies
             </a>
             <a
               className="text-white/70 text-sm font-medium hover:text-white transition-colors"
-              href="#"
+              href="*"
             >
               Cinemas
             </a>
             <a
               className="text-white/70 text-sm font-medium hover:text-white transition-colors"
-              href="#"
+              href="*"
             >
               About Us
             </a>
             <a
               className="text-white/70 text-sm font-medium hover:text-white transition-colors"
-              href="#"
+              href="*"
             >
               Contact
             </a>
             <a
               className="text-white/70 text-sm font-medium hover:text-white transition-colors"
-              href="#"
+              href="*"
             >
               Event
             </a>
