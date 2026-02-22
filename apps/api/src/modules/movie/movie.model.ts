@@ -1,5 +1,5 @@
+import { AgeRating, IMovie, MovieStatus } from "@shared/schemas";
 import mongoose from "mongoose";
-import { IMovie } from "@shared/types/interface";
 
 const MovieSchema = new mongoose.Schema<IMovie> ( 
     {
@@ -22,7 +22,7 @@ const MovieSchema = new mongoose.Schema<IMovie> (
 
         trang_thai: {
             type: String,
-            enum: ["sap_chieu", "dang_chieu", "ngung_chieu"],
+            enum: MovieStatus.options,
             default: 'sap_chieu',
         },
         the_loai: [
@@ -45,7 +45,7 @@ const MovieSchema = new mongoose.Schema<IMovie> (
         dien_vien: [ String ],
         do_tuoi: {
             type: String,
-            enum: ['P', 'C13', 'C16', 'C18']
+            enum: AgeRating.options,
         },
 
         ngon_ngu: String,

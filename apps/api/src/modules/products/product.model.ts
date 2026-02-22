@@ -1,5 +1,5 @@
+import { ISnackDrink } from "@shared/schemas";
 import mongoose from "mongoose";
-import { ISnackDrink } from "@shared/types/interface";
 
 const snackDrinkSchema = new mongoose.Schema<ISnackDrink>({
     name: String,

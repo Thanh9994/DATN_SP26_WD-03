@@ -1,15 +1,15 @@
+import { ICinema, IPhong, ISeats, RoomType, SeatType } from "@shared/schemas";
 import mongoose from "mongoose";
-import { ICinema, IPhong, ISeats } from "@shared/types/interface";
 
 const SeatsSchema = new mongoose.Schema<ISeats>({
     hang_ghe: String,
     so_ghe: Number,
-    loai_ghe: { type: String, enum: ['thuong', 'vip', 'couple'] }
+    loai_ghe: { type: String, enum: SeatType.options }
 })
 
 const phongSchema = new mongoose.Schema<IPhong>({
     ten_phong: String,
-    loai_phong: { type: String, enum: ['2D', '3D', 'IMAX', '4DX'] },
+    loai_phong: { type: String, enum: RoomType.options },
     ghe: [SeatsSchema],
 })
 
