@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 export const Footer = () => {
+  const navigate = useNavigate()
   return (
     <div>
       <footer className="bg-background-dark py-14 px-6 lg:px-10 border-t border-white/5 md:m-auto mt-20 max-sm:hidden">
@@ -7,7 +10,7 @@ export const Footer = () => {
           {/* Logo + Description */}
           <div className="col-span-1">
             <div className="flex items-center gap-1 mb-2">
-              <div className="rounded-lg flex items-center justify-center gap-2">
+              <div className="rounded-lg flex items-center justify-center gap-2" onClick={() => navigate('/')}>
                 <img
                   src="https://res.cloudinary.com/dcyzkqb1r/image/upload/t_PVM3/f_webp/q_40/H%E1%BB%8Fa_T%E1%BB%91c_fh4emr"
                   alt="Cinema logo"
@@ -139,7 +142,7 @@ export const Footer = () => {
       </footer>
       <footer className="md:hidden ">
         <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/10 px-8 py-3 pb-6 flex items-center justify-between z-[60]">
-          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ff000d] transition-colors">
+          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ff000d] transition-colors" onClick={() => navigate('/')}>
             <span className="material-symbols-outlined text-[24px]">home</span>
             <span className="text-[10px] font-medium text-white">Home</span>
           </button>
