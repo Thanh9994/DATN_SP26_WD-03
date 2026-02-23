@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
 
-=======
->>>>>>> 65704c3c14b615f1a7562088916ab4c373cf035a
 export const Footer = () => {
   const navigate = useNavigate()
   return (
@@ -13,11 +10,7 @@ export const Footer = () => {
           {/* Logo + Description */}
           <div className="col-span-1">
             <div className="flex items-center gap-1 mb-2">
-<<<<<<< HEAD
               <div className="rounded-lg flex items-center justify-center gap-2" onClick={() => navigate('/')}>
-=======
-              <div className="rounded-lg flex items-center justify-center gap-2">
->>>>>>> 65704c3c14b615f1a7562088916ab4c373cf035a
                 <img
                   src="https://res.cloudinary.com/dcyzkqb1r/image/upload/t_PVM3/f_webp/q_40/H%E1%BB%8Fa_T%E1%BB%91c_fh4emr"
                   alt="Cinema logo"
@@ -140,19 +133,13 @@ export const Footer = () => {
         </div>
 
         {/* Copyright */}
-<<<<<<< HEAD
         <div className="mt-6 pt-6 border-t border-white/5 text-center">
           <p className="text-white/30 text-[10px] font-bold uppercase tracking-[0.3em]">
-=======
-        <div className="mt-6 pt-10 border-t border-white/5 text-center">
-          <p className="text-white/20 text-[10px] font-bold uppercase tracking-[0.3em]">
->>>>>>> 65704c3c14b615f1a7562088916ab4c373cf035a
             © 2026 PVMCinema Entertainment
           </p>
         </div>
 
       </footer>
-<<<<<<< HEAD
       <footer className="md:hidden ">
         <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/10 px-8 py-3 pb-6 flex items-center justify-between z-[60]">
           <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ff000d] transition-colors" onClick={() => navigate('/')}>
@@ -181,8 +168,6 @@ export const Footer = () => {
           </button>
         </nav>
       </footer>
-=======
->>>>>>> 65704c3c14b615f1a7562088916ab4c373cf035a
     </div>
   );
 };
