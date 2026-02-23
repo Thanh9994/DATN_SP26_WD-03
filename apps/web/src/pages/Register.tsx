@@ -1,7 +1,7 @@
 import { useState, FormEvent, ChangeEvent } from "react";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
-import "../../components/Register.css";
+import "../components/Register.css";
+
+
 interface RegisterFormState {
   email: string;
   password: string;
@@ -102,7 +102,7 @@ const Register = (): JSX.Element => {
 
   return (
     <>
-      <Header />
+      
 
       <div className="register-container">
         {/* Background Image */}
@@ -122,24 +122,7 @@ const Register = (): JSX.Element => {
         <div className="register-content">
           {/* Left Section */}
           <div className="register-left">
-            <div className="brand-section">
-              <div className="brand-logo">
-                <svg className="cinema-icon" viewBox="0 0 100 100" fill="none">
-                  <rect width="100" height="100" rx="12" fill="#FF000D" />
-                  <rect x="20" y="35" width="15" height="30" rx="3" fill="white" />
-                  <rect
-                    x="42.5"
-                    y="30"
-                    width="15"
-                    height="40"
-                    rx="3"
-                    fill="white"
-                  />
-                  <rect x="65" y="35" width="15" height="30" rx="3" fill="white" />
-                </svg>
-                <span className="brand-name">CINESTREAM</span>
-              </div>
-            </div>
+            
 
             <div className="brand-tagline">
               <h1 className="tagline-title">JOIN THE CINEMA REVOLUTION.</h1>
@@ -362,8 +345,6 @@ const Register = (): JSX.Element => {
           </div>
         </div>
       </div>
-
-      <Footer />
     </>
   );
 };

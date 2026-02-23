@@ -1,11 +1,11 @@
-// import { Upload } from '@web/components/admin/Upload'
-import { AdminLayout } from '@web/layouts/AdminLayout'
+import { Upload } from '@web/components/admin/Upload'
+import { AdminLayouts } from '@web/layouts/AdminLayout'
 import { RouteObject } from 'react-router-dom'
 
 export const AdminRoutes: RouteObject = {
     path: '/admin',
-    element: <AdminLayout/>,
+    element: <AdminLayouts />,
     children: [
-        // {path: 'upload', element: <Upload />},
+        {path: 'upload', element: <Upload />},
     ]
 }
