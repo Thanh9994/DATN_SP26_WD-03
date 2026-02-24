@@ -84,8 +84,13 @@ export const AdminLayouts = () => {
             {
               key: "upload",
               icon: <UploadOutlined />,
+<<<<<<< HEAD
               label: "Media",
               onClick: () => navigate("/admin/media"),
+=======
+              label: "Upload",
+              onClick: () => navigate("/admin/upload"),
+>>>>>>> dba53994a05ee8c5cefe2eea3e2eae60b01d591c
             },
           ]}
         />
