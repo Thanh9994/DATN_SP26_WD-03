@@ -1,13 +1,14 @@
 
 import { NotFound } from "@web/components/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
+import About from "@web/pages/About";
+import Event from "@web/pages/Event";
 import { ForgotPassword } from "@web/pages/ForgotPassword";
 import { Home } from "@web/pages/Home";
-import { Login } from "@web/pages/Login";
+import Login from "@web/pages/Login";
 import Register from "@web/pages/Register";
 import { RouteObject } from "react-router-dom";
-import About from "@web/layouts/client/About";
-import Event from "@web/layouts/client/Event";
+
 export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
