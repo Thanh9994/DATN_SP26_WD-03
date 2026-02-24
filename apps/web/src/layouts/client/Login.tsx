@@ -46,7 +46,7 @@ const Login = () => {
                   <rect x="42.5" y="30" width="15" height="40" rx="3" fill="white" />
                   <rect x="65" y="35" width="15" height="30" rx="3" fill="white" />
                 </svg>
-                <span className="brand-name">CINESTREAM</span>
+                <span className="brand-name">PVM CIMEMA</span>
               </div>
             </div>
 

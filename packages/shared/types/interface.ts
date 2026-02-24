@@ -5,6 +5,8 @@
 // export type UserRole = 'admin' | 'nhan_vien' | 'khach_hang';
 // export type UserStatus = 'active' | 'inactive' | 'banned';
 
+
+
 // export interface ICloudinaryImage {
 //   public_id: string;
 //   url: string;
@@ -89,3 +91,4 @@
 //   role?: UserRole
 //   trang_thai?: UserStatus;
 // }
+
