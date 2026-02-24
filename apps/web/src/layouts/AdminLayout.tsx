@@ -84,8 +84,8 @@ export const AdminLayouts = () => {
             {
               key: "upload",
               icon: <UploadOutlined />,
-              label: "Upload",
-              onClick: () => navigate("/admin/upload"),
+              label: "Media",
+              onClick: () => navigate("/admin/media"),
             },
           ]}
         />

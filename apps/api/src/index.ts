@@ -10,6 +10,7 @@ import cinemaRouter from "./modules/cinema/cinema.route";
 import uploadRouter from "./middlewares/upload";
 import movieRouter from "./modules/movie/movie.route";
 import productRouter from "./modules/products/product.route";
+import usersRouter from "./modules/auth/user.route";
 
 
 
@@ -26,6 +27,7 @@ app.use("/api/cinemas", cinemaRouter);
 app.use("/api/uploads", uploadRouter);
 app.use("/api/movie", movieRouter);
 app.use("/api/product", productRouter);
+app.use("/api/users", usersRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`🚀 API running at http://localhost:${process.env.PORT}`);
