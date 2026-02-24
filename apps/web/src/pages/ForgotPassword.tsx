@@ -1,6 +1,6 @@
-import AuthLayout from "@web/layouts/AuthLayout"
-import { ArrowLeft } from "lucide-react"
-import { Link } from "react-router-dom"
+import AuthLayout from "@web/layouts/AuthLayout";
+import { ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const ForgotPassword = () => {
   return (
@@ -11,13 +11,15 @@ export const ForgotPassword = () => {
       lsTitle="Relive the Magic."
       lsSubtitle="Don't let a forgotten password stand between you and your next favorite story."
     >
-        <Link
+      <Link
         to="/signin"
         className="inline-flex items-center gap-2 text-white/40 hover:text-primary transition-colors mb-12 group"
-        >
-            <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-            <span className="font-bold text-sm uppercase tracking-widest">Back to Login</span>
-        </Link>
+      >
+        <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+        <span className="font-bold text-sm uppercase tracking-widest">
+          Back to Login
+        </span>
+      </Link>
     </AuthLayout>
-  )
-}
+  );
+};
