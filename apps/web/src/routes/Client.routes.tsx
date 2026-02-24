@@ -17,7 +17,7 @@ export const ClientRoutes: RouteObject = {
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "about", element: <About /> },
-    { path: "*", element: <NotFound /> },
     { path: "event", element: <Event /> },
+    { path: "*", element: <NotFound /> },
   ],
 };
