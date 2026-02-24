@@ -113,13 +113,3 @@ export const deleteCinema = async (req: Request, res: Response) => {
     res.status(400).json({ message: error });
   }
 };
-  try {
-    const { id } = req.params;
-    await cinemaModel.findByIdAndDelete(id);
-    res.status(200).json({
-      message: "Xóa rạp thành công",
-    });
-  } catch (error) {
-    res.status(400).json({ message: error });
-  }
-};
