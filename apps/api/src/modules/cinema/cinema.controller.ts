@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import cinemaModel from "./cinema.model";
 
-export const AllCinemas = async (req: Request, res: Response) => {
+export const AllCinemas = async (_req: Request, res: Response) => {
   try {
     const cinemas = await cinemaModel.find();
     res.status(200).json({

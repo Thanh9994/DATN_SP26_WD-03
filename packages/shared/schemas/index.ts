@@ -81,6 +81,10 @@ export const User = Base.extend({
   trang_thai: UserStatus.default('active'),
 });
 
+export const UpdateUser = z.object({
+  role: UserRole.optional(),
+  trang_thai: UserStatus.optional(),
+})
 export const UserLog = User.pick({
   ho_ten: true,
   phone: true,
@@ -103,6 +107,7 @@ export type ICinema = z.infer<typeof Cinema>;
 export type IMovie = z.infer<typeof Movie>;
 export type ISnackDrink = z.infer<typeof SnackDrink>;
 export type IUser = z.infer<typeof User>;
+export type IUpdateUser = z.infer<typeof UpdateUser>
 export type IUserLog = z.infer<typeof UserLog>;
 export type IUploadParams = z.infer<typeof UploadParams>;
 
