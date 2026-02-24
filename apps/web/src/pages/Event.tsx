@@ -1,8 +1,5 @@
-import React, { useState } from "react";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
-import "../../components/Event.css";
-
+import { useState } from "react";
+import '@web/components/Event.css'
 interface EventData {
   id: number;
   title: string;
@@ -131,7 +128,6 @@ const Event = (): JSX.Element => {
 
   return (
     <>
-      <Header />
 
       <main className="event-container">
         {/* Hero Section */}

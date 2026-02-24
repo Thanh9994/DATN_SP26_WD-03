@@ -1,7 +1,5 @@
-import React from "react";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
-import "../../components/About.css";
+
+import "@web/components/About.css";
 
 interface TimelineItem {
   year: string;
@@ -78,7 +76,6 @@ const About = (): JSX.Element => {
 
   return (
     <>
-      <Header />
 
       <main className="home-container">
         {/* Hero Section */}
@@ -205,7 +202,6 @@ const About = (): JSX.Element => {
         </section>
       </main>
 
-      {/* <Footer /> */}
     </>
   );
 };
