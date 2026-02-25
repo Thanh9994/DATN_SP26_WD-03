@@ -6,6 +6,8 @@ import { Genre } from "@web/pages/admin/Genre";
 import { Movie } from "@web/pages/admin/Movie";
 import { User } from "@web/pages/admin/User";
 import { AdminGuard } from "@web/components/AdminGuard";
+import Cinemas from "@web/pages/admin/Cinemas";
+import Product from "@web/pages/admin/Product";
 
 export const AdminRoutes: RouteObject = {
   path: "/admin",
@@ -19,6 +21,8 @@ export const AdminRoutes: RouteObject = {
         { path: "genres", element: <Genre /> },
         { path: "media", element: <Upload /> },
         { path: "users", element: <User /> },
+        { path: "cinemas", element: <Cinemas /> },
+        { path: "product", element: <Product /> }
       ],
     },
   ],
