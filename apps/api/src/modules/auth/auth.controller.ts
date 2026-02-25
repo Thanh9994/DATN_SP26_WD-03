@@ -1,17 +1,15 @@
-import { message } from 'antd';
 import { UpdateUser } from '@shared/schemas';
 import { Request, Response } from "express";
 import { UserModel } from "./user.model";
 import bcrypt from 'bcryptjs'
 import  Jwt  from "jsonwebtoken";
-import z from 'zod';
 
 export const Register = async (req: Request, res: Response) => {
   try {
     const { email, password, ho_ten, phone } = req.body;
     const exitUser = await UserModel.findOne({ email });
     if (!exitUser) {
-      return res.status(400).json({ message: "Email này đã được đăng ký!" })
+      return res.status(400).json({ message: "Email này đã được đăng ký!" });
     }
 
     const salt = await bcrypt.genSalt(10);

@@ -67,13 +67,13 @@ export const AdminLayouts = () => {
               key: "theloai",
               icon: <ContainerOutlined />,
               label: "Thể Loại",
-              onClick: () => navigate("/admin/theloai"),
+              onClick: () => navigate("/admin/genres"),
             },
             {
               key: "phim",
               icon: <ShoppingOutlined />,
               label: "Phim",
-              onClick: () => navigate("/admin/phim"),
+              onClick: () => navigate("/admin/movies"),
             },
             {
               key: "users",

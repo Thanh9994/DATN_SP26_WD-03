@@ -25,7 +25,7 @@ app.use("/api/test", testRoute);
 app.use("/api/genres", genreRouter);
 app.use("/api/cinemas", cinemaRouter);
 app.use("/api/uploads", uploadRouter);
-app.use("/api/movie", movieRouter);
+app.use("/api/movies", movieRouter);
 app.use("/api/product", productRouter);
 app.use("/api/users", usersRouter);
 

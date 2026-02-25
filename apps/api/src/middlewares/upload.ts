@@ -9,16 +9,15 @@ uploadRouter.post('/', upload.single('image'), (req: Request , res: Response) =>
     }
     
     res.status(200).json({ 
-      message: 'File uploaded Thành Công',
       url: req.file.path, 
-      public_id: req.file.filename 
+      public_id: req.file.filename,
     });
   } catch (error) {
     res.status(500).json({ message: "Không upload được ảnh", error });
   }
 });
 
-uploadRouter.get('/', async (req, res) => {
+uploadRouter.get('/', async (_req, res) => {
   try {
     const result = await cloudinary.search
       .expression("folder:cinema_app/*") // đổi folder nếu cần
