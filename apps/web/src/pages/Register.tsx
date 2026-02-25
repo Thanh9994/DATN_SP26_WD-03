@@ -1,350 +1,171 @@
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Button from "@web/components/Button";
+import Input from "@web/components/Input";
+import AuthLayout from "@web/layouts/AuthLayout";
+import { Lock, Mail, Phone, User } from "lucide-react";
+import { useAuth } from "@web/hooks/useAuth";
 
-interface RegisterFormState {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  showPassword: boolean;
-  showConfirmPassword: boolean;
-  agreeTerms: boolean;
-  loading: boolean;
-  error: string;
-}
+export const Register = () => {
+  const navigate = useNavigate();
+  const { register, isRegistering } = useAuth();
 
-const Register = (): JSX.Element => {
-  const [formState, setFormState] = useState<RegisterFormState>({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    showPassword: false,
-    showConfirmPassword: false,
-    agreeTerms: false,
-    loading: false,
-    error: "",
-  });
+  const [ho_ten, setHoten] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const { name, value, type, checked } = e.currentTarget;
-    setFormState((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-      error: "", // Clear error when user starts typing
-    }));
-  };
-
-  const handleTogglePassword = (field: "password" | "confirmPassword"): void => {
-    if (field === "password") {
-      setFormState((prev) => ({
-        ...prev,
-        showPassword: !prev.showPassword,
-      }));
-    } else {
-      setFormState((prev) => ({
-        ...prev,
-        showConfirmPassword: !prev.showConfirmPassword,
-      }));
-    }
-  };
-
-  const validateForm = (): boolean => {
-    if (formState.password !== formState.confirmPassword) {
-      setFormState((prev) => ({
-        ...prev,
-        error: "Passwords do not match",
-      }));
-      return false;
-    }
-
-    if (formState.password.length < 8) {
-      setFormState((prev) => ({
-        ...prev,
-        error: "Password must be at least 8 characters",
-      }));
-      return false;
-    }
-
-    if (!formState.agreeTerms) {
-      setFormState((prev) => ({
-        ...prev,
-        error: "You must agree to the terms and conditions",
-      }));
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
+    if (!acceptTerms) {
+      alert("Bạn phải đồng ý điều khoản!");
       return;
     }
-
-    setFormState((prev) => ({
-      ...prev,
-      loading: true,
-    }));
-
-    setTimeout(() => {
-      console.log("Register attempt:", {
-        email: formState.email,
-        password: formState.password,
-      });
-      setFormState((prev) => ({
-        ...prev,
-        loading: false,
-      }));
-    }, 1500);
+    try {
+      await register({ ho_ten, email, password, phone });
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+      // alert(err.message || "Register failed");
+    }
   };
 
   return (
-    <>
-      
+    <AuthLayout
+      title="Create Account"
+      subtitle="Start your cinematic journey with us today."
+      imageSrc="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1771986794776-register"
+      lsTitle={
+        <>
+          Join the Ultimate <br /> Movie Experience
+        </>
+      }
+      lsSubtitle="Stream the latest blockbusters and book tickets for exclusive premieres at your favorite local cinemas."
+    >
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        <Input
+          label="Full Name"
+          type="text"
+          id="name"
+          placeholder="John Doe"
+          icon={<User size={20} />}
+          value={ho_ten}
+          onChange={(e) => setHoten(e.target.value)}
+        />
 
-      <div className="register-container">
-        {/* Background Image */}
-        <div
-          className="register-background"
-          style={{
-            backgroundImage:
-              "url('https://cdn.dribbble.com/userupload/10095233/file/original-82adc2e9b4a55e76fef5a580ae36b701.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="register-overlay"></div>
+        <Input
+          label="Email Address"
+          type="email"
+          id="email"
+          placeholder="name@company.com"
+          icon={<Mail size={20} />}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <Input
+          label="Phone Number"
+          type="phone"
+          id="phone"
+          placeholder="+84 or 09********"
+          icon={<Phone size={20} />}
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+
+        <div className="space-y-3">
+          <Input
+            label="Password"
+            type="password"
+            id="password"
+            placeholder="••••••••"
+            icon={<Lock size={20} />}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <div className="px-1">
+            <div className="flex gap-1.5 mb-2">
+              <div className="h-1 flex-1 bg-primary rounded-full"></div>
+              <div className="h-1 flex-1 bg-primary rounded-full"></div>
+              <div className="h-1 flex-1 bg-white/10 rounded-full"></div>
+              <div className="h-1 flex-1 bg-white/10 rounded-full"></div>
+            </div>
+            <p className="text-[10px] font-bold text-white/40 uppercase tracking-tighter">
+              Password Strength: <span className="text-primary">Medium</span>
+            </p>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="register-content">
-          {/* Left Section */}
-          <div className="register-left">
-            
+        <div className="flex items-start gap-3 px-1">
+          <input
+            type="checkbox"
+            id="acceptTerms"
+            checked={acceptTerms}
+            className="w-5 h-5 mt-0.5 rounded border-white/10 bg-white/5 text-primary focus:ring-offset-background-dark focus:ring-primary transition-all cursor-pointer"
+            onChange={(e) => setAcceptTerms(e.target.checked)}
+          />
+          <label
+            htmlFor="terms"
+            className="text-xs text-white/40 leading-tight cursor-pointer"
+          >
+            By creating an account, I agree to the{" "}
+            <a
+              href="#"
+              className="text-white/60 underline hover:text-primary transition-colors"
+            >
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a
+              href="#"
+              className="text-white/60 underline hover:text-primary transition-colors"
+            >
+              Privacy Policy
+            </a>
+            .
+          </label>
+        </div>
 
-            <div className="brand-tagline">
-              <h1 className="tagline-title">JOIN THE CINEMA REVOLUTION.</h1>
-              <p className="tagline-description">
-                Create your account and unlock access to thousands of movies,
-                exclusive deals, and premium cinematic experiences.
-              </p>
-            </div>
+        <Button type="submit" disabled={isRegistering}>
+          {isRegistering ? "Creating..." : "Create Account"}
+        </Button>
+      </form>
 
-            <div className="community-badge">
-              <div className="badge-avatar">
-                <img
-                  src="https://picsum.photos/seed/user2/40/40"
-                  alt="User"
-                  className="avatar-img"
-                />
-              </div>
-              <span className="badge-text">+2M movie lovers already joined</span>
-            </div>
-          </div>
-
-          {/* Right Section - Register Form */}
-          <div className="register-right">
-            <div className="register-form-wrapper">
-              <div className="register-header">
-                <h2 className="register-title">Create Account</h2>
-                <p className="register-subtitle">Start your movie journey today.</p>
-              </div>
-
-              {formState.error && (
-                <div className="error-message">{formState.error}</div>
-              )}
-
-              <form onSubmit={handleSubmit} className="register-form">
-                {/* Email Field */}
-                <div className="form-group">
-                  <label className="form-label">EMAIL ADDRESS</label>
-                  <div className="input-wrapper">
-                    <svg
-                      className="input-icon"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                    >
-                      <rect x="2" y="4" width="20" height="16" rx="2" />
-                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                    </svg>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="name@example.com"
-                      value={formState.email}
-                      onChange={handleInputChange}
-                      className="form-input"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Password Field */}
-                <div className="form-group">
-                  <label className="form-label">PASSWORD</label>
-                  <div className="input-wrapper">
-                    <svg
-                      className="input-icon"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                    >
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                    <input
-                      type={formState.showPassword ? "text" : "password"}
-                      name="password"
-                      placeholder="••••••••"
-                      value={formState.password}
-                      onChange={handleInputChange}
-                      className="form-input"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleTogglePassword("password")}
-                      className="password-toggle"
-                    >
-                      <svg
-                        className="toggle-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                      >
-                        {formState.showPassword ? (
-                          <>
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </>
-                        ) : (
-                          <>
-                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                            <line x1="1" y1="1" x2="23" y2="23" />
-                          </>
-                        )}
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Confirm Password Field */}
-                <div className="form-group">
-                  <label className="form-label">CONFIRM PASSWORD</label>
-                  <div className="input-wrapper">
-                    <svg
-                      className="input-icon"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                    >
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                    <input
-                      type={formState.showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      placeholder="••••••••"
-                      value={formState.confirmPassword}
-                      onChange={handleInputChange}
-                      className="form-input"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleTogglePassword("confirmPassword")}
-                      className="password-toggle"
-                    >
-                      <svg
-                        className="toggle-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                      >
-                        {formState.showConfirmPassword ? (
-                          <>
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </>
-                        ) : (
-                          <>
-                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                            <line x1="1" y1="1" x2="23" y2="23" />
-                          </>
-                        )}
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Terms & Conditions */}
-                <div className="checkbox-group">
-                  <input
-                    type="checkbox"
-                    id="agreeTerms"
-                    name="agreeTerms"
-                    checked={formState.agreeTerms}
-                    onChange={handleInputChange}
-                    className="custom-checkbox"
-                  />
-                  <label htmlFor="agreeTerms" className="checkbox-label">
-                    I agree to the <a href="#">Terms & Conditions</a>
-                  </label>
-                </div>
-
-                {/* Sign Up Button */}
-                <button
-                  type="submit"
-                  className={`sign-up-button ${formState.loading ? "loading" : ""}`}
-                  disabled={formState.loading}
-                >
-                  {formState.loading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
-                </button>
-              </form>
-
-              {/* Divider */}
-              <div className="divider">
-                <span>OR CONTINUE WITH</span>
-              </div>
-
-              {/* Social Login */}
-              <div className="social-login">
-                <button type="button" className="social-button google">
-                  <svg className="social-icon" viewBox="0 0 24 24">
-                    <text
-                      x="50%"
-                      y="50%"
-                      dominantBaseline="middle"
-                      textAnchor="middle"
-                      fontSize="16"
-                      fontWeight="bold"
-                      fill="white"
-                    >
-                      G
-                    </text>
-                  </svg>
-                  <span>Google</span>
-                </button>
-                <button type="button" className="social-button apple">
-                  <svg className="social-icon" viewBox="0 0 24 24" fill="white">
-                    <path d="M18.71 19.71a6 6 0 0 1-9.52-7.34 6 6 0 1 1 9.52 7.34zm-12-12a8 8 0 1 0 16 0 8 8 0 0 0-16 0z" />
-                  </svg>
-                  <span>Apple ID</span>
-                </button>
-              </div>
-
-              {/* Sign In Link */}
-              <div className="signin-link">
-                <span>Already have an account?</span>
-                <a href="#">Sign in</a>
-              </div>
-            </div>
-          </div>
+      <div className="relative my-8">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-white/10"></div>
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background-dark px-4 text-white/30 font-bold tracking-widest">
+            Or continue with
+          </span>
         </div>
       </div>
-    </>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Button variant="secondary" className="!py-3">
+          <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            className="w-5 h-5"
+            alt="Google"
+          />
+          <span className="text-xs font-bold text-white/70">Google</span>
+        </Button>
+        <Button variant="secondary" className="!py-3">
+          <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.75.9-.01 2.1-.82 3.54-.69 1.69.15 2.96.83 3.67 2.06-3.48 1.93-2.92 6.09.53 7.51-.71 1.81-1.63 3.5-2.82 4.34zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+          </svg>
+          <span className="text-xs font-bold text-white/70">Apple</span>
+        </Button>
+      </div>
+
+      <p className="mt-8 text-center text-sm text-white/40 font-medium">
+        Already have an account?{" "}
+        <Link to="/login" className="text-primary font-bold hover:underline">
+          Sign In
+        </Link>
+      </p>
+    </AuthLayout>
   );
 };
-
-export default Register;

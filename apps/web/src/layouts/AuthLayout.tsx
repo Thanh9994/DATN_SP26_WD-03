@@ -10,7 +10,7 @@ interface AuthLayoutProps {
 }
 export default function AuthLayout  ({children, title, subtitle, imageSrc, lsTitle, lsSubtitle }: AuthLayoutProps)  {
   return (
-    <div className="flex h-screen w-full mx-auto overflow-hidden">
+    <div className="flex h-screen-auto w-full mx-auto my-5 overflow-hidden">
       {/* Left Section - Hero */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden slide-left">
         <div className="absolute inset-0 z-0">
@@ -52,7 +52,7 @@ export default function AuthLayout  ({children, title, subtitle, imageSrc, lsTit
       </div>
 
       {/* Right Section - Form */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 lg:p-24 bg-background-dark relative slide-right">
+      <div className="w-full  lg:w-1/2 flex flex-col items-center justify-center p-8 lg:p-24 bg-background-dark relative slide-right">
         <div className="absolute top-1/4 right-0 w-64 h-64 bg-primary/10 blur-[120px] rounded-full"></div>
         <div className="absolute bottom-1/4 left-0 w-64 h-64 bg-primary/5 blur-[120px] rounded-full"></div>
         
