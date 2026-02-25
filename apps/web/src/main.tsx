@@ -10,7 +10,6 @@ import './styles/About.css'
 import './styles/Event.css'
 import './styles/Register.css'
 
-
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(

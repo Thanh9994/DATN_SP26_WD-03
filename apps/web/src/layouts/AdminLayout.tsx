@@ -73,7 +73,7 @@ export const AdminLayouts = () => {
               key: "phim",
               icon: <ShoppingOutlined />,
               label: "Phim",
-              onClick: () => navigate("/admin/phim"),
+              onClick: () => navigate("/admin/movies"),
             },
             {
               key: "users",
