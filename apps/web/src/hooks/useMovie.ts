@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import type { IMovie } from "@shared/schemas";
+import type { ICreateMovie, IMovie, IUpdateMovie } from "@shared/schemas";
 import { message } from "antd";
 
 const API_URL = "http://localhost:5000/api/movies";
@@ -23,7 +23,7 @@ export const useMovies = () => {
   });
 
   const { mutate: createMovie, isPending: isAdding } = useMutation({
-    mutationFn: async (movie: IMovie) => {
+    mutationFn: async (movie: ICreateMovie) => {
       const { data } = await axios.post(API_URL, movie);
       return data;
     },
@@ -35,7 +35,7 @@ export const useMovies = () => {
   });
 
   const { mutate: updateMovie, isPending: isUpdating } = useMutation({
-    mutationFn: async ({ id, movie }: { id: string; movie: IMovie }) => {
+    mutationFn: async ({ id, movie }: { id: string; movie: IUpdateMovie }) => {
       const { data } = await axios.put(`${API_URL}/${id}`, movie);
       return data;
     },
