@@ -1,57 +1,60 @@
+import { CloudinaryImage } from "./../../../../../packages/shared/schemas/index";
 import { AgeRating, IMovie, MovieStatus } from "@shared/schemas";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
-const MovieSchema = new mongoose.Schema<IMovie> ( 
-    {
-        ten_phim: String,
-        mo_ta: String,
-        thoi_luong: Number,
+const MovieSchema = new mongoose.Schema<IMovie>(
+  {
+    ten_phim: String,
+    mo_ta: String,
+    thoi_luong: Number,
 
-        ngay_cong_chieu: Date,
-        ngay_ket_thuc: Date,
+    ngay_cong_chieu: Date,
+    ngay_ket_thuc: Date,
 
-        poster: {
-            public_id: String,
-            url: String,
-        },
-        trailer: String,
-        danh_gia: { 
-            type: Number, 
-            default: 0 
-        },
-
-        trang_thai: {
-            type: String,
-            enum: MovieStatus.options,
-            default: 'sap_chieu',
-        },
-        the_loai: [
-            {
-                name: String,
-            },
-        ],
-
-        rap_chieu: [
-            {
-                name: String,
-                address: String,
-                city: String,
-                phong_chieu: Array,
-            },
-        ],
-        
-        quoc_gia: String,
-        dao_dien: String,
-        dien_vien: [ String ],
-        do_tuoi: {
-            type: String,
-            enum: AgeRating.options,
-        },
-
-        ngon_ngu: String,
-        phu_de: [ String ],
+    poster: {
+        url: String,
+        public_id: String,
     },
-    { timestamps: true }
-)
+    trailer: String,
+    danh_gia: {
+      type: Number,
+      default: 0,
+    },
 
-export default mongoose.model<IMovie>("movie", MovieSchema)
+    trang_thai: {
+      type: String,
+      enum: MovieStatus.options,
+      default: "sap_chieu",
+    },
+    the_loai: [
+      {
+        type: Types.ObjectId,
+        ref: "genre",
+        required: true,
+      },
+    ],
+
+    rap_chieu: [
+      {
+        name: String,
+        address: String,
+        city: String,
+        phong_chieu: Array,
+      },
+    ],
+
+    quoc_gia: String,
+    dao_dien: String,
+    dien_vien: [String],
+    do_tuoi: {
+      type: String,
+      enum: AgeRating.options,
+    },
+
+    ngon_ngu: String,
+    phu_de: [String],
+  },
+  { timestamps: true },
+);
+
+export default mongoose.model<IMovie>("movie", MovieSchema);

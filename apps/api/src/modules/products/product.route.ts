@@ -1,33 +1,12 @@
 import { Router } from "express";
-import productModel from "./product.model";
+import { create, getAll, getOne, remove, update } from "./product.controller";
 
-const productRouter = Router()
+const productRouter = Router();
 
-productRouter .get('/', async (_req, res) =>{
-    try {
-        const snackDrink = await productModel.find()
-        res.json(snackDrink)
-    } catch (error) {
-        res.status(500).json({ error: "Không thấy sản phẩm"})
-    }
-});
-productRouter .post('/', async(req, res) =>{
-    try {
-        const snackDrink = new productModel(req.body);
-        await snackDrink.save()
-        res.status(201).json(snackDrink)
-    } catch (error) {
-        res.status(400).json({ error: "Không thêm được sản phẩm"})
-    }
-});
-productRouter .delete('/:id', async(req, res) =>{
-    try {
-        const snackDrink = await productModel.findByIdAndDelete(req.params.id);
-        if(!snackDrink) return res.status(404).json({ error: "Không thấy product"})
-        res.json({ message: "Xóa thành công"})
-    } catch (error) {
-        res.status(500).json({ error: "Xóa không thành công" });
-    }
-});
+productRouter.get("/", getAll);
+productRouter.get("/:id", getOne);
+productRouter.post("/", create);
+productRouter.put("/:id", update); // Thêm route update
+productRouter.delete("/:id", remove);
 
 export default productRouter;

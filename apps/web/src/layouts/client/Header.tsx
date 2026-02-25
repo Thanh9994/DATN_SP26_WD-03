@@ -34,7 +34,7 @@ export const Header = () => {
             </a>
             <a
               className="text-white/70 text-sm font-medium hover:text-white transition-colors"
-              href="*"
+              href="/about"
             >
               About Us
             </a>
@@ -46,7 +46,7 @@ export const Header = () => {
             </a>
             <a
               className="text-white/70 text-sm font-medium hover:text-white transition-colors"
-              href="*"
+              href="/event"
             >
               Event
             </a>

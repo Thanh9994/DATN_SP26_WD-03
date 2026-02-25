@@ -18,6 +18,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 connectDB();
 
@@ -25,9 +26,9 @@ app.use("/api/test", testRoute);
 app.use("/api/genres", genreRouter);
 app.use("/api/cinemas", cinemaRouter);
 app.use("/api/uploads", uploadRouter);
-app.use("/api/movie", movieRouter);
+app.use("/api/movies", movieRouter);
 app.use("/api/product", productRouter);
-app.use("/api/users", usersRouter);
+app.use("/api/auth", usersRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`🚀 API running at http://localhost:${process.env.PORT}`);

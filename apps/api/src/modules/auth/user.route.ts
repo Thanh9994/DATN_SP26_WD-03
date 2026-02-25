@@ -1,12 +1,15 @@
-import { Router } from "express";
-import { deleteUser, getAllUsers, Login, Register, updateUser } from "./auth.controller";
+    import { Router } from "express";
+    import { deleteUser, getAllUsers, Login, me, Register, updateUser } from "./auth.controller";
+    import { authenticate, authorize } from "@api/middlewares/auth.middleware";
 
-const usersRouter = Router();
+    const usersRouter = Router();
 
-usersRouter.get ("/", getAllUsers);
-usersRouter.post ("/register", Register);
-usersRouter.post ("/login", Login);
-usersRouter.patch ("/:id", updateUser);
-usersRouter.delete ("/:id", deleteUser);
+    usersRouter.post ("/register", Register);
+    usersRouter.post ("/login", Login);
+    usersRouter.get("/me", authenticate, me);
+    
+    usersRouter.get ("/",authenticate, authorize(["admin"]), getAllUsers);
+    usersRouter.patch ("/:id",authenticate, authorize(["admin"]), updateUser);
+    usersRouter.delete ("/:id",authenticate, authorize(["admin"]), deleteUser);
 
-export default usersRouter;
+    export default usersRouter;

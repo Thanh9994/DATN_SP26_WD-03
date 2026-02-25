@@ -1,5 +1,4 @@
-
-
+import { Home } from "lucide-react"
 
 export const NotFound = () => {
   return (
@@ -38,8 +37,8 @@ export const NotFound = () => {
               <a 
                 className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white px-8 md:px-10 py-4 md:py-5 rounded-full font-bold flex items-center justify-center gap-3 transition-all hover:scale-105 shadow-2xl shadow-primary/40" 
                 href="/"
-              >
-                <p className="size-5" />
+              > 
+                <Home className="size-5" />
                 Back to Home
               </a>
               {/* <a 

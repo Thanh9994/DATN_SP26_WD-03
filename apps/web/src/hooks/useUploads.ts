@@ -48,7 +48,7 @@ export const useUpload = () => {
     images,
     isLoading,
     isError,
-    upload: uploadMutation.mutate,
+    upload: uploadMutation.mutateAsync,
     isUploading: uploadMutation.isPending,
     deleteImage: deleteMutation.mutate,
     isDeleting: deleteMutation.isPending,
