@@ -4,6 +4,7 @@ import { Dashboard } from "@web/pages/admin/Dashboard";
 import { Upload } from "@web/pages/admin/Upload";
 import { Genre } from "@web/pages/admin/Genre";
 import { Movie } from "@web/pages/admin/Movie";
+import { User } from "@web/pages/admin/User";
 
 export const AdminRoutes: RouteObject = {
   path: "/admin",
@@ -13,5 +14,6 @@ export const AdminRoutes: RouteObject = {
     { path: 'movies', element: <Movie /> },
     { path: "genres", element: <Genre /> },
     { path: "media", element: <Upload/> },
+    { path: "users", element: <User/> },
   ],
 };

@@ -3,6 +3,7 @@ import {
   ILoginPayload,
   IRegisterPayload,
   IAuthResponse,
+  IUpdateUser,
 } from "@shared/schemas";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
@@ -39,7 +40,7 @@ export const useAuth = () => {
     mutationFn: async (payload) => {
       const { data } = await axios.post<IAuthResponse>(
         `${API_URL}/login`,
-        payload
+        payload,
       );
       return data;
     },
@@ -53,7 +54,6 @@ export const useAuth = () => {
       message.error(err.message || "Đăng nhập thất bại");
     },
   });
-
 
   const registerMutation = useMutation<any, Error, IRegisterPayload>({
     mutationFn: async (payload) => {
@@ -75,10 +75,41 @@ export const useAuth = () => {
     message.success("Đã đăng xuất");
   };
 
+  const { data: users, isLoading: isLoadingUsers } = useQuery<IUser[]>({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const { data } = await axiosAuth.get(`${API_URL}/`);
+      return data;
+    },
+    enabled: !!localStorage.getItem("token") && user?.role === "admin",
+  });
+  const updateMutation = useMutation({
+    mutationFn: async ({
+      id,
+      datas,
+    }: {
+      id: string;
+      datas: Partial<IUpdateUser>;
+    }) => {
+      const { data } = await axiosAuth.patch(`${API_URL}/${id}`, datas);
+      return data;
+    },
+    onSuccess: () => {
+      message.success("Cập nhật người dùng thành công");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (err) => {
+      message.error(err.message || "Cập nhật thất bại");
+    },
+
+  });
   return {
     user,
+    users,
     isLoading,
+    isLoadingUsers,
     isError,
+    updateMutation: updateMutation.mutateAsync,
     login: loginMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,
     register: registerMutation.mutateAsync,
