@@ -29,6 +29,9 @@ const storage = new CloudinaryStorage({
       folder: "cinema_app",
       public_id: `${Date.now()}-${cleanName}`,
       format: "webp",
+      transformation: [
+        { quality: 60 },
+      ]
     };
   },
 });
