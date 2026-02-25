@@ -1,6 +1,4 @@
 
-import "@web/components/About.css";
-
 interface TimelineItem {
   year: string;
   title: string;

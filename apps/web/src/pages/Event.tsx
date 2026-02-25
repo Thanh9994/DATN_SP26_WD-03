@@ -1,5 +1,5 @@
 import { useState } from "react";
-import '@web/components/Event.css'
+
 interface EventData {
   id: number;
   title: string;

@@ -1,6 +1,4 @@
 import { useState, FormEvent, ChangeEvent } from "react";
-import "../components/Register.css";
-
 
 interface RegisterFormState {
   email: string;

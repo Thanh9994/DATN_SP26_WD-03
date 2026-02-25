@@ -9,13 +9,13 @@ export const UserStatus = z.enum(['active', 'inactive', 'banned']);
 
 export const Base = z.object({
   _id: z.string().optional(),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
 });
 
 export const CloudinaryImage = z.object({
   public_id: z.string(),
-  url: z.url("Định dạng ảnh không hợp lệ"),
+  url: z.string().url("Định dạng ảnh không hợp lệ"),
 });
 
 export const UploadParams = z.object({
@@ -74,7 +74,7 @@ export const SnackDrink = Base.extend({
 
 export const User = Base.extend({
   ho_ten: z.string().min(2),
-  email: z.email("Email không hợp lệ"),
+  email: z.string().email("Email không hợp lệ"),
   password: z.string().min(6, "Mật khẩu ít nhất 6 ký tự"),
   phone: z.string().regex(/^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ"),
   role: UserRole.default('khach_hang'),
