@@ -51,7 +51,8 @@ export const useAuth = () => {
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },
     onError: (err) => {
-      message.error(err.message || "Đăng nhập thất bại");
+      message.error("Đăng nhập thất bại")
+      console.log(err.message || "Đăng nhập thất bại");
     },
   });
 
@@ -109,7 +110,7 @@ export const useAuth = () => {
     isLoading,
     isLoadingUsers,
     isError,
-    updateMutation: updateMutation.mutateAsync,
+    updateMutation,
     login: loginMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,
     register: registerMutation.mutateAsync,

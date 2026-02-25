@@ -1,10 +1,47 @@
-import { Table, Tag, Space, Button, Popconfirm, message } from "antd";
+import {
+  Table,
+  Tag,
+  Space,
+  Button,
+  Popconfirm,
+  message,
+  Modal,
+  Form,
+  Select,
+} from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useAuth } from "@web/hooks/useAuth";
-// import { IUser } from "@shared/schemas";
+import { useState } from "react";
+import { IUser } from "@shared/schemas";
 
 export const User = () => {
   const { users, isLoadingUsers, updateMutation } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<IUser | null>(null);
+  const [form] = Form.useForm();
+
+  const handleEdit = (record: IUser) => {
+    setEditingUser(record);
+    form.setFieldsValue({
+      role: record.role,
+      trang_thai: record.trang_thai,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      const values = await form.validateFields();
+      if (!editingUser?._id) {
+        message.error("Không tìm thấy ID người dùng!");
+        return;
+      }
+      await updateMutation.mutateAsync({ id: editingUser._id, datas: values });
+      setIsModalOpen(false);
+    } catch (error) {
+      console.log("Validate Failed:", error);
+    }
+  };
 
   const columns = [
     {
@@ -46,7 +83,7 @@ export const User = () => {
           <Button
             type="link"
             icon={<EditOutlined />}
-            onClick={() => updateMutation(record._id)}
+            onClick={() => handleEdit(record)}
           >
             Sửa
           </Button>
@@ -67,25 +104,42 @@ export const User = () => {
   ];
 
   return (
-    <div style={{ padding: "24px" }}>
-      <div
-        style={{
-          marginBottom: 16,
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <h2 className="text-xl font-bold">Quản lý người dùng</h2>
-      </div>
-
+    <div style={{ padding: 24 }}>
+      <h2 className="mb-4 text-xl font-bold">Quản lý người dùng</h2>
       <Table
-        columns={columns}
         dataSource={users}
+        columns={columns}
         loading={isLoadingUsers}
-        rowKey="_id" 
-        pagination={{ pageSize: 10 }}
-        bordered
+        rowKey="_id"
       />
+
+      <Modal
+        title="Cập nhật quyền & trạng thái"
+        open={isModalOpen}
+        onOk={handleSave}
+        onCancel={() => setIsModalOpen(false)}
+        confirmLoading={updateMutation.isPending}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="role" label="Vai trò">
+            <Select
+              options={[
+                { value: "admin", label: "Admin" },
+                { value: "khach_hang", label: "Khách hàng" },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item name="trang_thai" label="Trạng thái">
+            <Select
+              options={[
+                { value: "active", label: "Hoạt động" },
+                { value: "inactive", label: "Khóa" },
+              ]}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
