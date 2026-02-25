@@ -1,11 +1,11 @@
-import { z } from 'zod'
+import { z } from "zod";
 
-export const RoomType = z.enum(['2D', '3D', 'IMAX', '4DX']);
-export const SeatType = z.enum(['thuong', 'vip', 'couple']);
-export const MovieStatus = z.enum(['sap_chieu', 'dang_chieu', 'ngung_chieu']);
-export const AgeRating = z.enum(['P', 'C13', 'C16', 'C18']);
-export const UserRole = z.enum(['admin', 'nhan_vien', 'khach_hang']);
-export const UserStatus = z.enum(['active', 'inactive', 'banned']);
+export const RoomType = z.enum(["2D", "3D", "IMAX", "4DX"]);
+export const SeatType = z.enum(["thuong", "vip", "couple"]);
+export const MovieStatus = z.enum(["sap_chieu", "dang_chieu", "ngung_chieu"]);
+export const AgeRating = z.enum(["P", "C13", "C16", "C18"]);
+export const UserRole = z.enum(["admin", "nhan_vien", "khach_hang"]);
+export const UserStatus = z.enum(["active", "inactive", "banned"]);
 
 export const Base = z.object({
   _id: z.string().optional(),
@@ -16,6 +16,7 @@ export const Base = z.object({
 export const CloudinaryImage = z.object({
   public_id: z.string(),
   url: z.string().url("Định dạng ảnh không hợp lệ"),
+  customName: z.string().optional(),
 });
 
 export const UploadParams = z.object({
@@ -50,18 +51,18 @@ export const Movie = Base.extend({
   ten_phim: z.string().min(1, "Tên phim là bắt buộc"),
   mo_ta: z.string(),
   thoi_luong: z.number().positive(),
-  ngay_cong_chieu: z.coerce.date(), 
+  ngay_cong_chieu: z.coerce.date(),
   ngay_ket_thuc: z.coerce.date(),
   poster: CloudinaryImage,
-  trailer: z.url(),
+  trailer: z.string().url().optional(),
   danh_gia: z.number().min(0).max(10).default(0),
   trang_thai: MovieStatus,
-  the_loai: z.array(Genre),
+  the_loai: z.array(z.string()),
   rap_chieu: z.array(Cinema).optional(),
   quoc_gia: z.string(),
   dao_dien: z.string(),
   dien_vien: z.array(z.string()),
-  do_tuoi: AgeRating,
+  do_tuoi: AgeRating.default("P"),
   ngon_ngu: z.string(),
   phu_de: z.array(z.string()),
 });
@@ -76,15 +77,17 @@ export const User = Base.extend({
   ho_ten: z.string().min(2),
   email: z.string().email("Email không hợp lệ"),
   password: z.string().min(6, "Mật khẩu ít nhất 6 ký tự"),
-  phone: z.string().regex(/^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ"),
-  role: UserRole.default('khach_hang'),
-  trang_thai: UserStatus.default('active'),
+  phone: z
+    .string()
+    .regex(/^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ"),
+  role: UserRole.default("khach_hang"),
+  trang_thai: UserStatus.default("active"),
 });
 
 export const UpdateUser = z.object({
   role: UserRole.optional(),
   trang_thai: UserStatus.optional(),
-})
+});
 export const UserLog = User.pick({
   ho_ten: true,
   phone: true,
@@ -107,10 +110,10 @@ export type ICinema = z.infer<typeof Cinema>;
 export type IMovie = z.infer<typeof Movie>;
 export type ISnackDrink = z.infer<typeof SnackDrink>;
 export type IUser = z.infer<typeof User>;
-export type IUpdateUser = z.infer<typeof UpdateUser>
+export type IUpdateUser = z.infer<typeof UpdateUser>;
 export type IUserLog = z.infer<typeof UserLog>;
 export type IUploadParams = z.infer<typeof UploadParams>;
-
-
+export type ICreateMovie = Omit<IMovie, "_id" | "createdAt" | "updatedAt">;
+export type IUpdateMovie = Partial<ICreateMovie>;
 // .optional(): Trường này có thể có hoặc không (tương đương với dấu ? trong Interface).
-// 
+//

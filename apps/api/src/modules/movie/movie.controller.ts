@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { movieService } from "./movie.service";
 import { calcMovieStatus } from "@shared/utils/movieStatus";
+import movieModel from "./movie.model";
 
 export const movieController = {
   async getAllMovie(_req: Request, res: Response) {
@@ -37,7 +38,9 @@ export const movieController = {
 
   async createMovie(req: Request, res: Response) {
     try {
-      const newMovie = await movieService.createMovie(req.body);
+      //   console.log("REQ BODY POSTER:", req.body.poster);
+      const movieData = req.body;
+      const newMovie = await movieService.createMovie(movieData);
       res.status(201).json({
         message: "Tạo phim mới thành công",
         data: newMovie,
@@ -49,15 +52,16 @@ export const movieController = {
 
   async updateMovie(req: Request, res: Response) {
     try {
-      const updatedMovie = await movieService.updateMovie(
-        req.params.id,
-        req.body,
-      );
-      if (!updatedMovie) {
-        return res
-          .status(404)
-          .json({ message: "Không tìm thấy phim để cập nhật" });
+      const movie = await movieService.getMovieById(req.params.id);
+      if (!movie) {
+        return res.status(404).json({ message: "Không tìm thấy phim" });
       }
+      const data = {
+        ...req.body,
+        poster: req.body.poster || movie.poster,
+      };
+      const updatedMovie = await movieService.updateMovie(req.params.id, data);
+
       res.status(200).json({
         message: "Cập nhật phim thành công",
         data: updatedMovie,

@@ -20,10 +20,11 @@ import {
   UploadOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
+import dayjs from "dayjs";
 import { useMovies } from "@web/hooks/useMovie";
 import { useGenres } from "@web/hooks/useGenre";
-import dayjs from "dayjs";
 import { useUpload } from "@web/hooks/useUploads";
+import { ICloudinaryImage } from "@shared/schemas";
 
 export const Movie = () => {
   const { movies, isLoading, createMovie, updateMovie, deleteMovie } =
@@ -31,76 +32,72 @@ export const Movie = () => {
   const { genres } = useGenres();
   const { upload, isUploading } = useUpload();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [posterOld, setPosterOld] = useState<ICloudinaryImage | null>(null);
   const [form] = Form.useForm();
 
   const handleSubmit = async (values: any) => {
     try {
-      let posterData = values.poster?.[0]?.url
-        ? { url: values.poster[0].url, public_id: "manual" }
-        : null;
+      let posterData: ICloudinaryImage | null = posterOld;
 
       if (values.poster?.[0]?.originFileObj) {
-        await upload(
-          { file: values.poster[0].originFileObj, customName: values.ten_phim },
-          {
-            onSuccess: (data: any) => {
-              posterData = data; // { public_id, url }
-            },
-          },
-        );
+        posterData = await upload({
+          file: values.poster[0].originFileObj,
+          customName: values.ten_phim,
+        });
+      } else if (!values.poster || values.poster.length === 0) {
+        // Nếu người dùng xóa ảnh trong form (fileList rỗng)
+        posterData = null;
       }
 
       const payload = {
         ...values,
+        thoi_luong: values.Number(),
         ngay_cong_chieu: values.ngay_cong_chieu?.toISOString(),
         ngay_ket_thuc: values.ngay_ket_thuc?.toISOString(),
         poster: posterData,
-        the_loai: values.genre_id || [],
+        the_loai: values.genre_id,
+        dien_vien: values.dien_vien || [],
+        phu_de: values.phu_de || [],
+        do_tuoi: values.do_tuoi || "P",
       };
+      console.log("UPLOAD RESULT", posterData);
+      console.log("FINAL PAYLOAD", payload);
 
       if (editingId) {
-        updateMovie({ id: editingId, movie: payload });
-        message.success("Cập nhật phim thành công");
+        await updateMovie({ id: editingId, movie: payload });
       } else {
-        createMovie(payload);
-        message.success("Thêm phim mới thành công");
+        await createMovie(payload);
       }
 
-      handleCancel();
-    } catch (err) {
-      console.error(err);
-      message.error("Upload poster thất bại");
+      message.success(editingId ? "Đã cập nhật phim" : "Đã thêm phim");
+      closeModal();
+    } catch (error) {
+      console.error("Lỗi khi lưu phim:", error);
+      message.error("Thao tác thất bại, vui lòng thử lại.");
     }
   };
 
-  const handleEdit = (record: any) => {
-    setEditingId(record._id);
+  const handleEdit = (r: any) => {
+    setEditingId(r._id);
+    setPosterOld(r.poster);
     form.setFieldsValue({
-      ...record,
-      ngay_cong_chieu: record.ngay_cong_chieu
-        ? dayjs(record.ngay_cong_chieu)
-        : null,
-      ngay_ket_thuc: record.ngay_ket_thuc ? dayjs(record.ngay_ket_thuc) : null,
-      poster: record.poster?.url
-        ? [
-            {
-              uid: "-1",
-              name: "poster",
-              status: "done",
-              url: record.poster.url,
-            },
-          ]
+      ...r,
+      ngay_cong_chieu: r.ngay_cong_chieu ? dayjs(r.ngay_cong_chieu) : null,
+      ngay_ket_thuc: r.ngay_ket_thuc ? dayjs(r.ngay_ket_thuc) : null,
+      poster: r.poster?.url
+        ? [{ uid: "-1", name: r.ten_phim, status: "done", url: r.poster.url }]
         : [],
-      genre_id: record.genre_id?._id || record.genre_id, // Xử lý trường hợp genre là object hoặc id
+      genre_id: r.the_loai?.map((g: any) => g._id),
     });
-    setIsModalOpen(true);
+    setOpen(true);
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const closeModal = () => {
+    setOpen(false);
     setEditingId(null);
+    setPosterOld(null);
     form.resetFields();
   };
 
@@ -108,61 +105,36 @@ export const Movie = () => {
     {
       title: "Poster",
       dataIndex: "poster",
-      key: "poster",
-      render: (poster: any) => (
+      render: (p: any) => (
         <Image
-          src={poster?.url}
+          src={p?.url}
           width={50}
-          height={75}
-          style={{ objectFit: "cover", borderRadius: 4 }}
+          height={70}
+          style={{ objectFit: "cover" }}
         />
       ),
     },
-    {
-      title: "Tên phim",
-      dataIndex: "ten_phim",
-      key: "ten_phim",
-    },
-    {
-      title: "Đạo diễn",
-      dataIndex: "dao_dien",
-      key: "dao_dien",
-    },
+    { title: "Tên phim", dataIndex: "ten_phim" },
+    { title: "Đạo diễn", dataIndex: "dao_dien" },    
+    { title: "Độ tuổi", dataIndex: "do_tuoi" },
     {
       title: "Thời lượng",
       dataIndex: "thoi_luong",
-      key: "thoi_luong",
-      render: (min: number) => `${min} phút`,
+      render: (m: number) => `${m} phút`,
     },
     {
       title: "Ngày chiếu",
       dataIndex: "ngay_cong_chieu",
-      key: "ngay_cong_chieu",
-      render: (date: string) =>
-        date ? dayjs(date).format("DD/MM/YYYY") : "N/A",
+      render: (d: string) => (d ? dayjs(d).format("DD/MM/YYYY") : "-"),
     },
+    { title: "Trạng Thái", dataIndex: "trang_thai" },
     {
-      title: "Trạng Thái",
-      dataIndex: "trang_thai",
-      key: "trang_thai",
-    },
-    {
-      title: "Hành động",
-      key: "action",
-      render: (_: any, record: any) => (
-        <Space size="middle">
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-            type="default"
-          />
-          <Popconfirm
-            title="Bạn có chắc chắn muốn xóa phim này?"
-            onConfirm={() => deleteMovie(record._id)}
-            okText="Có"
-            cancelText="Không"
-          >
-            <Button icon={<DeleteOutlined />} danger />
+      title: "Action",
+      render: (_: any, r: any) => (
+        <Space>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(r)} />
+          <Popconfirm title="Xóa phim?" onConfirm={() => deleteMovie(r._id)}>
+            <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
       ),
@@ -171,48 +143,47 @@ export const Movie = () => {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Quản lý Phim</h1>
+      <div className="flex justify-between mb-4">
+        <h1 className="text-xl font-bold">🎬 Quản lý Phim</h1>
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => setIsModalOpen(true)}
-          size="large"
+          onClick={() => setOpen(true)}
         >
-          Thêm Phim Mới
+          Thêm phim
         </Button>
       </div>
 
       <Table
-        columns={columns}
-        dataSource={movies ?? []}
-        loading={isLoading}
         rowKey="_id"
-        pagination={{ pageSize: 10 }}
+        columns={columns}
+        dataSource={movies}
+        loading={isLoading}
       />
 
       <Modal
         title={editingId ? "Cập nhật phim" : "Thêm phim mới"}
-        open={isModalOpen}
-        onCancel={handleCancel}
+        open={open}
+        onCancel={closeModal}
         onOk={() => form.submit()}
         width={800}
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <Form.Item
               name="ten_phim"
               label="Tên phim"
-              rules={[{ required: true, message: "Vui lòng nhập tên phim" }]}
+              rules={[{ required: true }]}
             >
-              <Input placeholder="Nhập tên phim..." />
+              <Input />
             </Form.Item>
+
             <Form.Item
               name="genre_id"
               label="Thể loại"
-              rules={[{ required: true, message: "Vui lòng chọn thể loại" }]}
+              rules={[{ required: true }]}
             >
-              <Select mode="multiple" placeholder="Chọn thể loại">
+              <Select mode="multiple" allowClear placeholder="Chọn thể loại">
                 {genres?.map((g: any) => (
                   <Select.Option key={g._id} value={g._id}>
                     {g.name}
@@ -220,47 +191,54 @@ export const Movie = () => {
                 ))}
               </Select>
             </Form.Item>
+
             <Form.Item name="dao_dien" label="Đạo diễn">
-              <Input placeholder="Tên đạo diễn" />
+              <Input />
             </Form.Item>
-            <Form.Item name="thoi_luong" label="Thời lượng (phút)">
-              <InputNumber min={1} className="w-full" />
-            </Form.Item>
-            <Form.Item name="danh_gia" label="Đánh Giá">
-              <InputNumber className="w-full" />
-            </Form.Item>
-            <Form.Item name="quoc_gia" label="Quốc gia">
-              <Input placeholder="Việt Nam, Mỹ..." />
-            </Form.Item>
-            <Form.Item name="ngon_ngu" label="Ngôn ngữ">
-              <Input placeholder="Tiếng Việt, Tiếng Anh..." />
-            </Form.Item>
-            <Form.Item name="do_tuoi" label="Độ tuổi giới hạn">
-              <InputNumber min={0} className="w-full" />
-            </Form.Item>
-            <Form.Item name="trailer" label="Trailer URL">
-              <Input placeholder="https://youtube.com/..." />
-            </Form.Item>
+
             <Form.Item name="dien_vien" label="Diễn viên">
               <Select mode="tags" placeholder="Nhập tên diễn viên" />
             </Form.Item>
+
             <Form.Item name="phu_de" label="Phụ đề">
-              <Select mode="tags" placeholder="Nhập phụ đề" />
+              <Select mode="tags" placeholder="Tiếng Việt, Tiếng Anh..." />
             </Form.Item>
-            <Form.Item name="ngay_cong_chieu" label="Ngày công chiếu">
+
+            <Form.Item name="thoi_luong" label="Thời lượng">
+              <InputNumber min={1} className="w-full" />
+            </Form.Item>
+
+            <Form.Item name="quoc_gia" label="Quốc gia">
+              <Input />
+            </Form.Item>
+
+            <Form.Item name="ngon_ngu" label="Ngôn ngữ">
+              <Input />
+            </Form.Item>
+
+            <Form.Item name="do_tuoi" label="Độ tuổi" initialValue="P">
+              <Select
+                options={["P", "C13", "C16", "C18"].map((v) => ({ value: v }))}
+              />
+            </Form.Item>
+
+            <Form.Item name="trailer" label="Trailer">
+              <Input />
+            </Form.Item>
+
+            <Form.Item name="ngay_cong_chieu" label="Ngày chiếu">
               <DatePicker className="w-full" />
             </Form.Item>
+
             <Form.Item name="ngay_ket_thuc" label="Ngày kết thúc">
               <DatePicker className="w-full" />
             </Form.Item>
+
             <Form.Item
-              label="Poster"
               name="poster"
+              label="Poster"
               valuePropName="fileList"
-              getValueFromEvent={(e) => {
-                if (Array.isArray(e)) return e;
-                return e?.fileList;
-              }}
+              getValueFromEvent={(e) => e?.fileList}
             >
               <Upload
                 beforeUpload={() => false}
@@ -268,13 +246,14 @@ export const Movie = () => {
                 listType="picture"
               >
                 <Button icon={<UploadOutlined />} loading={isUploading}>
-                  Upload Poster
+                  Upload
                 </Button>
               </Upload>
             </Form.Item>
           </div>
+
           <Form.Item name="mo_ta" label="Mô tả">
-            <Input.TextArea rows={4} />
+            <Input.TextArea rows={3} />
           </Form.Item>
         </Form>
       </Modal>
