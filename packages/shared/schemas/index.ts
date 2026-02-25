@@ -80,6 +80,7 @@ export const User = Base.extend({
   phone: z
     .string()
     .regex(/^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ"),
+  avatar: CloudinaryImage.optional(),
   role: UserRole.default("khach_hang"),
   trang_thai: UserStatus.default("active"),
 });

@@ -1,143 +1,79 @@
-import { Layout, Menu, Input, Avatar, Dropdown } from "antd";
+import { Layout, Input, Avatar, Dropdown } from "antd";
 import {
-  DashboardOutlined,
-  ShoppingOutlined,
   UserOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  ContainerOutlined,
-  UploadOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Sidebar } from "./admin/Navbar";
+import { useAuth } from "@web/hooks/useAuth";
 
-const { Sider, Content, Header } = Layout;
+const { Content, Header } = Layout;
 
 export const AdminLayouts = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const toggleCollapsed = () => setCollapsed(!collapsed);
+  const { user, logout } = useAuth();
 
-  const user = { username: "Admin", avatar: null };
-
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   const menuItems = [
     {
-        key: "logout",
-        label: "Logout",
-        onClick: () => navigate("/login"),
+      key: "profile",
+      label: "Thông tin cá nhân",
+      icon: <UserOutlined />,
+    },
+    {
+      key: "logout",
+      danger: true,
+      label: "Đăng xuất",
+      icon: <LogoutOutlined />,
+      onClick: handleLogout,
     },
   ];
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-        <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={setCollapsed}
-        width={260}
-        style={{ background: "#001529" }}
-        >
-        <div
-          style={{
-            height: 64,
-            margin: 16,
-            color: "#fff",
-            textAlign: "center",
-            fontWeight: "bold",
-            fontSize: 18,
-            userSelect: "none",
-          }}
-        >
-          <Link to={"/admin"}>Admin</Link>
-        </div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["dashboard"]}
-          items={[
-            {
-              key: "dashboard",
-              icon: <DashboardOutlined />,
-              label: "Dashboard",
-              onClick: () => navigate("/admin"),
-            },
-            {
-              key: "theloai",
-              icon: <ContainerOutlined />,
-              label: "Thể Loại",
-              onClick: () => navigate("/admin/genres"),
-            },
-            {
-              key: "phim",
-              icon: <ShoppingOutlined />,
-              label: "Phim",
-              onClick: () => navigate("/admin/movies"),
-            },
-            {
-              key: "users",
-              icon: <UserOutlined />,
-              label: "Users",
-              onClick: () => navigate("/admin/users"),
-            },
-            {
-              key: "upload",
-              icon: <UploadOutlined />,
-              label: "Media",
-              onClick: () => navigate("/admin/media"),
-            },
-          ]}
-        />
-      </Sider>
+      <Sidebar collapsed={collapsed} />
 
       <Layout>
-        <Header
-          style={{
-            background: "transparent",
-            padding: "0 16px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <Header style={{ background: "#fff", padding: "0 16px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 4px rgba(0,21,41,.08)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {collapsed ? (
-              <MenuUnfoldOutlined
-                onClick={toggleCollapsed}
-                style={{ fontSize: 20, cursor: "pointer" }}
-              />
+              <MenuUnfoldOutlined onClick={() => setCollapsed(false)} style={{ fontSize: 18, cursor: "pointer" }} />
             ) : (
-              <MenuFoldOutlined
-                onClick={toggleCollapsed}
-                style={{ fontSize: 20, cursor: "pointer" }}
-              />
+              <MenuFoldOutlined onClick={() => setCollapsed(true)} style={{ fontSize: 18, cursor: "pointer" }} />
             )}
             <Input.Search
-              placeholder="Tìm kiếm..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ width: 350 }}
+              placeholder="Tìm kiếm nhanh..."
+              onSearch={(value) => setSearch(value)}
+              style={{ width: 300 }}
               allowClear
             />
           </div>
 
-          {user ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontWeight: 500 }}>{user?.ho_ten || "Đang tải..."}</span>
             <Dropdown menu={{ items: menuItems }} placement="bottomRight" arrow>
               <Avatar
-                src={user.avatar || undefined}
                 size="large"
-                style={{ cursor: "pointer", userSelect: "none" }}
+                src={user?.avatar?.url} // Dùng ảnh từ Cloudinary nếu có
+                icon={!user?.avatar && <UserOutlined />}
+                style={{ cursor: "pointer", backgroundColor: "#1890ff" }}
               >
-                {!user.avatar && user.username?.[0].toUpperCase()}
+                {user?.ho_ten?.[0].toUpperCase()}
               </Avatar>
             </Dropdown>
-          ) : (
-            <Avatar size="large" icon={<UserOutlined />} />
-          )}
+          </div>
         </Header>
 
-        <Content style={{ margin: 16, padding: 24, background: "#f0f2f5" }}>
+        <Content style={{ margin: "24px 16px", padding: 24, background: "#fff", borderRadius: 8, minHeight: 280 }}>
           <Outlet context={{ search }} />
         </Content>
       </Layout>
