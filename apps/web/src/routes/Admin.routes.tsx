@@ -4,14 +4,26 @@ import { Dashboard } from "@web/pages/admin/Dashboard";
 import { Upload } from "@web/pages/admin/Upload";
 import { Genre } from "@web/pages/admin/Genre";
 import { Movie } from "@web/pages/admin/Movie";
+import { User } from "@web/pages/admin/User";
+import { AdminGuard } from "@web/components/AdminGuard";
+import Cinemas from "@web/pages/admin/Cinemas";
+import Product from "@web/pages/admin/Product";
 
 export const AdminRoutes: RouteObject = {
   path: "/admin",
-  element: <AdminLayouts />,
+  element: <AdminGuard />,
   children: [
-    { index: true, element: <Dashboard /> },
-    { path: 'movies', element: <Movie /> },
-    { path: "genres", element: <Genre /> },
-    { path: "media", element: <Upload/> },
+    {
+      element: <AdminLayouts />,
+      children: [
+        { index: true, element: <Dashboard /> },
+        { path: "movies", element: <Movie /> },
+        { path: "genres", element: <Genre /> },
+        { path: "media", element: <Upload /> },
+        { path: "users", element: <User /> },
+        { path: "cinemas", element: <Cinemas /> },
+        { path: "product", element: <Product /> }
+      ],
+    },
   ],
 };

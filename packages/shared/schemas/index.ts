@@ -57,7 +57,12 @@ export const Movie = Base.extend({
   trailer: z.string().url().optional(),
   danh_gia: z.number().min(0).max(10).default(0),
   trang_thai: MovieStatus,
-  the_loai: z.array(z.string()),
+  the_loai: z.array(
+    z.object({
+      _id: z.string().optional(),
+      name: z.string(),
+    }),
+  ),
   rap_chieu: z.array(Cinema).optional(),
   quoc_gia: z.string(),
   dao_dien: z.string(),
@@ -80,6 +85,7 @@ export const User = Base.extend({
   phone: z
     .string()
     .regex(/^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ"),
+  avatar: CloudinaryImage.optional(),
   role: UserRole.default("khach_hang"),
   trang_thai: UserStatus.default("active"),
 });
@@ -94,6 +100,25 @@ export const UserLog = User.pick({
   role: true,
   trang_thai: true,
 }).partial();
+
+export const LoginPayload = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+export const RegisterPayload = z.object({
+  ho_ten: z.string().min(2),
+  email: z.string().email(),
+  password: z.string().min(6),
+  phone: z
+    .string()
+    .regex(/^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ"),
+});
+
+export const AuthResponse = z.object({
+  user: User,
+  token: z.string(),
+});
 
 export type IRoomType = z.infer<typeof RoomType>;
 export type ISeatType = z.infer<typeof SeatType>;
@@ -113,7 +138,13 @@ export type IUser = z.infer<typeof User>;
 export type IUpdateUser = z.infer<typeof UpdateUser>;
 export type IUserLog = z.infer<typeof UserLog>;
 export type IUploadParams = z.infer<typeof UploadParams>;
+
 export type ICreateMovie = Omit<IMovie, "_id" | "createdAt" | "updatedAt">;
 export type IUpdateMovie = Partial<ICreateMovie>;
+
+export type ILoginPayload = z.infer<typeof LoginPayload>;
+export type IRegisterPayload = z.infer<typeof RegisterPayload>;
+export type IAuthResponse = z.infer<typeof AuthResponse>;
+
 // .optional(): Trường này có thể có hoặc không (tương đương với dấu ? trong Interface).
 //

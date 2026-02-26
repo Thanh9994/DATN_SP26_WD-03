@@ -1,20 +1,42 @@
 import Button from "@web/components/Button";
 import Input from "@web/components/Input";
+import { useAuth } from "@web/hooks/useAuth";
 import AuthLayout from "@web/layouts/AuthLayout";
 import { Lock, Mail } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const handleSubmit = () => {
-    
-  }
+  const navigate = useNavigate();
+  const { login, isLoggingIn } = useAuth();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      await login({ email, password });
+      // console.log(token);
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <AuthLayout
       title="Sign In"
       subtitle="Welcome back! Please enter your details."
       imageSrc="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1771951849120-lgon"
-      lsTitle={<>Your Front Row <br />Seat Awaits.</>}
+      lsTitle={
+        <>
+          Your Front Row <br />
+          Seat Awaits.
+        </>
+      }
       lsSubtitle="Stream the latest blockbusters and book tickets for the premium cinematic experience in one place."
     >
       <form className="space-y-6" onSubmit={handleSubmit}>
@@ -24,8 +46,8 @@ const Login = () => {
           id="email"
           placeholder="name@example.com"
           icon={<Mail size={20} />}
-          // value={email}
-          // onChange={(e) => setEmail(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <div className="space-y-2">
           <div className="flex justify-between items-center">
@@ -45,6 +67,8 @@ const Login = () => {
             id="password"
             placeholder="••••••••"
             icon={<Lock size={20} />}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
         <div className="flex items-center gap-3 py-2">
@@ -52,13 +76,20 @@ const Login = () => {
             type="checkbox"
             id="remember"
             className="w-5 h-5 rounded border-white/10 bg-white/5 text-primary focus:ring-offset-background-dark focus:ring-primary transition-all cursor-pointer"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
           />
-          <label htmlFor="remember" className="text-sm text-white/60 cursor-pointer select-none font-medium">
+          <label
+            htmlFor="remember"
+            className="text-sm text-white/60 cursor-pointer select-none font-medium"
+          >
             Keep me signed in
           </label>
         </div>
 
-        <Button type="submit">Sign In</Button>
+        <Button type="submit" disabled={isLoggingIn}>
+          {isLoggingIn ? "Signing In..." : "Sign In"}
+        </Button>
       </form>
 
       <div className="relative my-10">
@@ -74,7 +105,11 @@ const Login = () => {
 
       <div className="grid grid-cols-2 gap-4">
         <Button variant="secondary" className="!py-3.5">
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />
+          <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            className="w-5 h-5"
+            alt="Google"
+          />
           <span className="text-sm font-bold text-white/80">Google</span>
         </Button>
         <Button variant="secondary" className="!py-3.5">
@@ -86,7 +121,7 @@ const Login = () => {
       </div>
 
       <p className="mt-10 text-center text-sm text-white/40 font-medium">
-        Don't have an account?{' '}
+        Don't have an account?{" "}
         <Link to="/register" className="text-primary font-bold hover:underline">
           Create an account
         </Link>

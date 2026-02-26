@@ -8,12 +8,11 @@ export const Register = async (req: Request, res: Response) => {
   try {
     const { email, password, ho_ten, phone } = req.body;
     const exitUser = await UserModel.findOne({ email });
-    if (!exitUser) {
+    if (exitUser) {
       return res.status(400).json({ message: "Email này đã được đăng ký!" });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await UserModel.create({
       ho_ten,
@@ -34,7 +33,7 @@ export const Register = async (req: Request, res: Response) => {
 export const Login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({ email }).select("+password");
 
     if (!user) {
       return res.status(404).json({ message: "Tài khoản không tồn tại." });
@@ -73,6 +72,10 @@ export const getAllUsers = async (_req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Không thể lấy danh sách người dùng", error });
   }
+};
+
+export const me = async (req: Request, res: Response) => {
+  res.json(req.user);
 };
 
 export const updateUser = async (req: Request, res: Response) => {
