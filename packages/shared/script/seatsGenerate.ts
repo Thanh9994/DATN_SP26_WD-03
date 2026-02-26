@@ -1,9 +1,11 @@
-import { ISeats, ISeatType } from '../schemas/index';
+import { SeatTime } from "@api/modules/showtime/showtimeSeat.model";
+import { IPhong, ISeats, ISeatType, IShowTime } from "@shared/schemas";
+
 export const generateSeats = (
   rows: string[],
   seatsPerRow: number,
   vipRows: string[] = [],
-  coupleLastSeats: number = 2
+  coupleLastSeats: number = 2,
 ): ISeats[] => {
   const seats: ISeats[] = [];
 
@@ -28,10 +30,11 @@ export const generateSeats = (
         hang_ghe: row,
         so_ghe: i,
         loai_ghe: type,
-        trang_thai: "trong",
+        trang_thai: "empty",
       });
     }
   });
 
   return seats;
 };
+

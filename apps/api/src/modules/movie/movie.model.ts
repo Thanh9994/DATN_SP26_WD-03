@@ -1,4 +1,3 @@
-import { CloudinaryImage } from "./../../../../../packages/shared/schemas/index";
 import { AgeRating, IMovie, MovieStatus } from "@shared/schemas";
 import mongoose, { Types } from "mongoose";
 
@@ -57,4 +56,4 @@ const MovieSchema = new mongoose.Schema<IMovie>(
   { timestamps: true },
 );
 
-export default mongoose.model<IMovie>("Movie", MovieSchema);
+export const Movie = mongoose.model<IMovie>("Movie", MovieSchema);
