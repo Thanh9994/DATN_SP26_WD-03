@@ -3,7 +3,7 @@ import movieModel from "./movie.model";
 
 export const movieService = {
   async getAllMovie() {
-    return await movieModel.find().populate("the_loai");
+    return await movieModel.find().populate("the_loai", "name");
   },
   async getMovieById(id: string) {
     return await movieModel.findById(id);
