@@ -7,9 +7,8 @@ import { ForgotPassword } from "@web/pages/ForgotPassword";
 import { Home } from "@web/pages/Home";
 import Login from "@web/pages/Login";
 import { Register } from "@web/pages/Register";
+import SeatBooking from "@web/pages/SeatBooking";
 import { RouteObject } from "react-router-dom";
-import About from "@web/layouts/client/About";
-import Event from "@web/layouts/client/Event";
 export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
@@ -21,5 +20,6 @@ export const ClientRoutes: RouteObject = {
     { path: "about", element: <About /> },
     { path: "*", element: <NotFound /> },
     { path: "event", element: <Event /> },
+    { path: "booking", element: <SeatBooking /> },
   ],
 };
