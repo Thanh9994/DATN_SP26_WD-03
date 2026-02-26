@@ -18,3 +18,43 @@ export interface ICinema {
 export interface IGenre {
   name: string;
 }
+
+export interface ICloudinaryImage {
+  public_id: string;
+  url: string;
+}
+
+export interface IUploadParams {
+  file: File;
+  customName: string;
+}
+
+export interface IMovie {
+  ten_phim: string;
+  mo_ta: string;
+  thoi_luong: number;
+
+  ngay_cong_chieu: Date;
+  ngay_ket_thuc: Date;
+
+  poster: ICloudinaryImage;
+  trailer: string;
+  danh_gia: number;
+  trang_thai: 'sap_chieu' | 'dang_chieu' | 'ngung_chieu';
+
+  the_loai: IGenre[];
+  rap_chieu?: ICinema[];
+
+  quoc_gia: string;
+  dao_dien: string;
+  dien_vien: string[];
+  do_tuoi: 'P' | 'C13' | 'C16' | 'C18';
+  ngon_ngu: string;
+  phu_de: string[];
+}
+
+export interface ISnackDrink {
+  name: string;
+  price: number;
+  image: ICloudinaryImage;
+}
