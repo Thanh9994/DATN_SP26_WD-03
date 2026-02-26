@@ -68,7 +68,7 @@ export default function SeatBooking() {
   );
 
   return (
-    <div className="min-h-screen bg-[#07070b] text-white">
+    <div className="min-h-screen mx-auto bg-[#07070b] text-white">
       <div className="mx-auto max-w-6xl px-6 py-10 grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
 
         {/* LEFT MOVIE CARD */}
