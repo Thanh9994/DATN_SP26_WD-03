@@ -19,6 +19,7 @@ export const ClientRoutes: RouteObject = {
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "about", element: <About /> },
     { path: "event", element: <Event /> },
+    { path: "booking", element: <SeatBooking /> },
     { path: "*", element: <NotFound /> },
   ],
 };
