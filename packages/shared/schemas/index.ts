@@ -6,6 +6,7 @@ export const MovieStatus = z.enum(["sap_chieu", "dang_chieu", "ngung_chieu"]);
 export const AgeRating = z.enum(["P", "C13", "C16", "C18"]);
 export const UserRole = z.enum(["admin", "nhan_vien", "khach_hang"]);
 export const UserStatus = z.enum(["active", "inactive", "banned"]);
+export const SeatsStatus = z.enum(["trong", "da_dat", "dang_giu"])
 
 export const Base = z.object({
   _id: z.string().optional(),
@@ -32,12 +33,28 @@ export const Seats = z.object({
   hang_ghe: z.string(),
   so_ghe: z.number(),
   loai_ghe: SeatType,
+  trang_thai: SeatsStatus.default("trong"),
 });
 
 export const Room = z.object({
   ten_phong: z.string(),
   loai_phong: RoomType,
   ghe: z.array(Seats),
+});
+
+export const CreateRoom = z.object({
+  ten_phong: z.string(),
+  loai_phong: RoomType,
+  rows: z.array(z.string()),
+  seatsPerRow: z.number().positive(),
+  vipRows: z.array(z.string()).optional(),
+});
+
+export const CreateCinema = z.object({
+  name: z.string(),
+  address: z.string(),
+  city: z.string(),
+  phong_chieu: z.array(CreateRoom),
 });
 
 export const Cinema = Base.extend({
@@ -63,7 +80,7 @@ export const Movie = Base.extend({
       name: z.string(),
     }),
   ),
-  rap_chieu: z.array(Cinema).optional(),
+  rap_chieu: z.array(z.string()).optional(),
   quoc_gia: z.string(),
   dao_dien: z.string(),
   dien_vien: z.array(z.string()),
@@ -130,6 +147,7 @@ export type IUserStatus = z.infer<typeof UserStatus>;
 export type ICloudinaryImage = z.infer<typeof CloudinaryImage>;
 export type IGenre = z.infer<typeof Genre>;
 export type ISeats = z.infer<typeof Seats>;
+export type ISeatsStatus = z.infer<typeof SeatsStatus>;
 export type IPhong = z.infer<typeof Room>;
 export type ICinema = z.infer<typeof Cinema>;
 export type IMovie = z.infer<typeof Movie>;
@@ -145,6 +163,6 @@ export type IUpdateMovie = Partial<ICreateMovie>;
 export type ILoginPayload = z.infer<typeof LoginPayload>;
 export type IRegisterPayload = z.infer<typeof RegisterPayload>;
 export type IAuthResponse = z.infer<typeof AuthResponse>;
-
+export type ICreateCinema = z.infer<typeof CreateCinema>;
 // .optional(): Trường này có thể có hoặc không (tương đương với dấu ? trong Interface).
 //
