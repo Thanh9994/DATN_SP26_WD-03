@@ -6,7 +6,7 @@ export const movieService = {
     return await Movie.find().populate("the_loai", "name");
   },
   async getMovieById(id: string) {
-    return await Movie.findById(id);
+    return await Movie.findById(id).populate("the_loai", "name");
   },
   async createMovie(data: IMovie) {
     const movie = new Movie(data);
