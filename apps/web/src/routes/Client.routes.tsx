@@ -1,4 +1,3 @@
-
 import { NotFound } from "@web/components/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
 import About from "@web/pages/About";
@@ -8,6 +7,7 @@ import { Home } from "@web/pages/Home";
 import Login from "@web/pages/Login";
 import { Register } from "@web/pages/Register";
 import SeatBooking from "@web/pages/SeatBooking";
+import Showtime from "@web/pages/ShowTime";
 import { RouteObject } from "react-router-dom";
 
 export const ClientRoutes: RouteObject = {
@@ -21,6 +21,7 @@ export const ClientRoutes: RouteObject = {
     { path: "about", element: <About /> },
     { path: "event", element: <Event /> },
     { path: "booking", element: <SeatBooking /> },
+    { path: "showtime", element: <Showtime /> },
     { path: "*", element: <NotFound /> },
   ],
 };
