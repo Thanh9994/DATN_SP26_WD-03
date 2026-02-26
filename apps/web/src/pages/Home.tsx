@@ -1,3 +1,5 @@
+import PhimCard from "@web/components/PhimCard";
+
 export const Home = () => {
   return <div>
     <div className="bg-background-dark text-white min-h-screen">
@@ -39,7 +41,7 @@ export const Home = () => {
 
         {/* Movie List */}
         <div className="px-2 lg:px-1 pb-14">
-          {/* <PhimCard /> */}
+          <PhimCard />
         </div>
       </section>
     </div>

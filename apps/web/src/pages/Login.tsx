@@ -18,14 +18,8 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const res = await login({ email, password });
-      console.log(res.token);
-      // lưu token
-      // if (remember) {
-      //   localStorage.setItem("token", res.token);
-      // } else {
-      //   sessionStorage.setItem("token", res.token);
-      // }
+      await login({ email, password });
+      // console.log(token);
       navigate("/");
     } catch (err) {
       console.error(err);
