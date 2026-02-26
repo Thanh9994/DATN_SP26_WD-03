@@ -1,22 +1,24 @@
+import { generateSeats } from "@shared/script/seatsGenerate";
 import { Request, Response } from "express";
-import cinemaModel from "./cinema.model";
+import { CreateCinema } from "@shared/schemas";
+import { Cinemas } from "./cinema.model";
 
 export const AllCinemas = async (_req: Request, res: Response) => {
   try {
-    const cinemas = await cinemaModel.find();
+    const cinemas = await Cinemas.find();
     res.status(200).json({
       message: "Lấy danh sách rạp thành công",
       data: cinemas,
     });
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: "Lỗi server", error });
   }
 };
 
 export const getCinemaById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const cinema = await cinemaModel.findById(id);
+    const cinema = await Cinemas.findById(id);
     if (!cinema) {
       return res.status(404).json({ message: "Rạp không tồn tại" });
     }
@@ -25,91 +27,68 @@ export const getCinemaById = async (req: Request, res: Response) => {
       data: cinema,
     });
   } catch (error) {
-    res.status(500).json({ message: error });
-  }
-  try {
-    const { id } = req.params;
-    const cinema = await cinemaModel.findById(id);
-    if (!cinema) {
-      return res.status(404).json({ message: "Rạp không tồn tại" });
-    }
-    res.status(200).json({
-      message: "Lấy thông tin rạp thành công",
-      data: cinema,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: "Lỗi server", error });
   }
 };
 
 export const createCinema = async (req: Request, res: Response) => {
   try {
-    const newCinema = await cinemaModel.create(req.body);
+    const cinemaPayload = CreateCinema.parse(req.body);
+
+    const newCinema = await Cinemas.create({
+      name: cinemaPayload.name,
+      address: cinemaPayload.address,
+      city: cinemaPayload.city,
+      phong_chieu: cinemaPayload.phong_chieu.map((room) => ({
+        ten_phong: room.ten_phong,
+        loai_phong: room.loai_phong,
+        rows: room.rows,
+        seatsPerRow: room.seatsPerRow,
+        vipRows: room.vipRows || [],
+      })),
+    });
+
+
     res.status(201).json({
-      message: "Tạo rạp mới thành công",
+      message: "Tạo rạp thành công",
       data: newCinema,
     });
   } catch (error) {
-    res.status(400).json({ message: error });
-  }
-  try {
-    const newCinema = await cinemaModel.create(req.body);
-    res.status(201).json({
-      message: "Tạo rạp mới thành công",
-      data: newCinema,
+    res.status(400).json({
+      message: "Dữ liệu không hợp lệ",
+      error,
     });
-  } catch (error) {
-    res.status(400).json({ message: error });
   }
 };
 
 export const updateCinema = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
-    const updatedCinema = await cinemaModel.findByIdAndUpdate(
+    const updatedCinemas = await Cinemas.findByIdAndUpdate(
       id,
-      { ...updateData, $inc: { views: 1 } },
+      req.body,
       { new: true },
     );
-    if (!updatedCinema) {
+    if (!updatedCinemas) {
       return res.status(404).json({ message: "Rạp không tồn tại" });
     }
     res.status(200).json({
       message: "Cập nhật rạp thành công",
-      data: updatedCinema,
+      data: updatedCinemas,
     });
   } catch (error) {
-    res.status(400).json({ message: error });
-  }
-  try {
-    const { id } = req.params;
-    const updateData = req.body;
-    const updatedCinema = await cinemaModel.findByIdAndUpdate(
-      id,
-      { ...updateData, $inc: { views: 1 } },
-      { new: true },
-    );
-    if (!updatedCinema) {
-      return res.status(404).json({ message: "Rạp không tồn tại" });
-    }
-    res.status(200).json({
-      message: "Cập nhật rạp thành công",
-      data: updatedCinema,
-    });
-  } catch (error) {
-    res.status(400).json({ message: error });
+    res.status(400).json({ message: "Cập nhật thất bại", error });
   }
 };
 
 export const deleteCinema = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    await cinemaModel.findByIdAndDelete(id);
+    await Cinemas.findByIdAndDelete(id);
     res.status(200).json({
       message: "Xóa rạp thành công",
     });
   } catch (error) {
-    res.status(400).json({ message: error });
+    res.status(400).json({ message: "Xóa thất bại", error });
   }
 };

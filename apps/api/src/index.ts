@@ -11,6 +11,8 @@ import uploadRouter from "./middlewares/upload";
 import movieRouter from "./modules/movie/movie.route";
 import productRouter from "./modules/products/product.route";
 import usersRouter from "./modules/auth/user.route";
+import roomRouter from "./modules/room/room.route";
+import showTimeRouter from "./modules/showtime/showtime.route";
 
 
 
@@ -29,6 +31,8 @@ app.use("/api/uploads", uploadRouter);
 app.use("/api/movies", movieRouter);
 app.use("/api/product", productRouter);
 app.use("/api/auth", usersRouter);
+app.use("/api/rooms", roomRouter);
+app.use("/api/showtimes", showTimeRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`🚀 API running at http://localhost:${process.env.PORT}`);

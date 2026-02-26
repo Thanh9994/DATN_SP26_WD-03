@@ -10,4 +10,4 @@ const snackDrinkSchema = new mongoose.Schema<ISnackDrink>({
   },
 });
 
-export default mongoose.model("product", snackDrinkSchema);
+export default mongoose.model("Product", snackDrinkSchema);

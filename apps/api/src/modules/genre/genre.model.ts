@@ -8,4 +8,4 @@ const genreSchema = new mongoose.Schema<IGenre>(
     { timestamps: true }
 );
 
-export default mongoose.model<IGenre>("genre", genreSchema);
+export const Genre = mongoose.model<IGenre>("genre", genreSchema);

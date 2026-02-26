@@ -1,13 +1,13 @@
 import cron from "node-cron";
 import { calcMovieStatus } from "@shared/utils/movieStatus";
-import movieModel from "./movie.model";
+import { Movie } from "./movie.model";
 
 export const startMovieStatusCron = () => {
   cron.schedule("0 0 * * *", async () => {
     try {
       console.log("🔄 Đang cập nhật trạng thái phim...");
 
-      const movies = await movieModel.find();
+      const movies = await Movie.find();
 
       for (const movie of movies) {
         const newStatus = calcMovieStatus(
