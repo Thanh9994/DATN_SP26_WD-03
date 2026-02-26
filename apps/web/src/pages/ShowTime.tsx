@@ -88,7 +88,7 @@ export default function Showtime() {
 
   const estimatedPrice = 18.5;
 
-  // ✅ Không dùng useMemo nữa: tìm thẳng khi cần
+  
   const handleSelectSeats = () => {
     const selectedCinema = cinemas.find((c) => c.id === selectedCinemaId) ?? cinemas[0];
     alert(`Selected: ${selectedCinema.name} • ${selectedTime}`);
