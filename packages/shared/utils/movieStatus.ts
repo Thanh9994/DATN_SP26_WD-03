@@ -19,3 +19,18 @@ export const calcMovieStatus = (
 
   return "dang_chieu";
 };
+
+export const MOVIE_BADGE: Record<IMovieStatus, { text: string; color: string }> = {
+  dang_chieu: {
+    text: "Đang Chiếu",
+    color: "bg-green-500",
+  },
+  sap_chieu: {
+    text: "Sắp Chiếu",
+    color: "bg-yellow-500",
+  },
+  ngung_chieu: {
+    text: "Ended",
+    color: "bg-gray-500",
+  },
+};

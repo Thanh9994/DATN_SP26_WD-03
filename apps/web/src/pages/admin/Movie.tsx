@@ -53,7 +53,7 @@ export const Movie = () => {
 
       const payload = {
         ...values,
-        thoi_luong: values.Number(),
+        thoi_luong: Number(values.thoi_luong),
         ngay_cong_chieu: values.ngay_cong_chieu?.toISOString(),
         ngay_ket_thuc: values.ngay_ket_thuc?.toISOString(),
         poster: posterData,
@@ -62,16 +62,14 @@ export const Movie = () => {
         phu_de: values.phu_de || [],
         do_tuoi: values.do_tuoi || "P",
       };
-      console.log("UPLOAD RESULT", posterData);
-      console.log("FINAL PAYLOAD", payload);
+      // console.log("UPLOAD RESULT", posterData);
+      // console.log("FINAL PAYLOAD", payload);
 
       if (editingId) {
         await updateMovie({ id: editingId, movie: payload });
       } else {
         await createMovie(payload);
       }
-
-      message.success(editingId ? "Đã cập nhật phim" : "Đã thêm phim");
       closeModal();
     } catch (error) {
       console.error("Lỗi khi lưu phim:", error);
