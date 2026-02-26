@@ -1,4 +1,3 @@
-
 import { NotFound } from "@web/components/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
 import About from "@web/pages/About";
