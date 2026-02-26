@@ -8,8 +8,7 @@ import { Home } from "@web/pages/Home";
 import Login from "@web/pages/Login";
 import Register from "@web/pages/Register";
 import { RouteObject } from "react-router-dom";
-import About from "@web/layouts/client/About";
-import Event from "@web/layouts/client/Event";
+import Ticket from "@web/pages/Ticket";
 export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
@@ -21,5 +20,6 @@ export const ClientRoutes: RouteObject = {
     { path: "about", element: <About /> },
     { path: "*", element: <NotFound /> },
     { path: "event", element: <Event /> },
+    { path: "ticket", element: <Ticket /> },
   ],
 };
