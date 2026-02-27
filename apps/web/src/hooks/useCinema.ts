@@ -14,8 +14,8 @@ export const useCinemas = () => {
       const { data } = await axios.get(API_URL_CINEMAS);
       return data.data;
     },
-    staleTime: 1000 * 60 * 15,
-    gcTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 15, // 15p gọi lại dữ liệu từ api
+    gcTime: 1000 * 60 * 60, // 60p xóa dữ liệu khỏi cache làm mới lại
   });
 
   const createCinema = useMutation({
@@ -45,6 +45,29 @@ export const useCinemas = () => {
     },
   });
 
+  const addRoomsToCinema = useMutation({
+    mutationFn: async ({
+      cinemaId,
+      phongIds,
+    }: {
+      cinemaId: string;
+      phongIds: string[];
+    }) => {
+      const { data } = await axios.patch(
+        `${API_URL_CINEMAS}/${cinemaId}/add-rooms`,
+        { phongIds },
+      );
+      return data;
+    },
+    onSuccess: () => {
+      message.success("Thêm phòng vào rạp thành công!");
+      queryClient.invalidateQueries({ queryKey: ["cinemas"] });
+    },
+    onError: () => {
+      message.error("Thêm phòng thất bại!");
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => axios.delete(`${API_URL_CINEMAS}/${id}`),
     onSuccess: () => {
@@ -58,7 +81,9 @@ export const useCinemas = () => {
     createCinema: createCinema.mutateAsync,
     updateCinema: updateCinema.mutateAsync,
     deleteCinema: deleteMutation.mutate,
+    addRoomsToCinema: addRoomsToCinema.mutateAsync,
     isProcessing: createCinema.isPending || updateCinema.isPending,
+    isAddingRooms: addRoomsToCinema.isPending,
   };
 };
 
@@ -111,5 +136,5 @@ export const useRooms = () => {
     deleteRoom: deleteRoom.mutate,
     isCreating: createRoom.isPending,
     isDeleting: deleteRoom.isPending,
-  }
+  };
 };

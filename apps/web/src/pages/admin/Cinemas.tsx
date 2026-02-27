@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Popconfirm,
@@ -9,12 +13,13 @@ import {
   Input,
   Select,
   Typography,
-  Table, // Sửa: Import từ antd
+  Table,
   Space,
-  Tag, // Sửa: Import từ antd
+  Tag,
+  message,
 } from "antd";
-import { useCinemas } from "@web/hooks/useCinema";
-import { ICinema, ICreateCinema } from "@shared/schemas";
+import { useCinemas, useRooms } from "@web/hooks/useCinema";
+import { ICinema, IPhong } from "@shared/schemas";
 
 const { Title } = Typography;
 
@@ -23,6 +28,12 @@ export const Cinema = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  // States cho Modal quản lý phòng riêng biệt (nếu vẫn muốn dùng)
+  // const [roomModalOpen, setRoomModalOpen] = useState(false);
+  // const [selectedCinemaId, setSelectedCinemaId] = useState<string | null>(null);
+  // const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
+
+  const { rooms } = useRooms();
   const {
     cinemas,
     isLoading,
@@ -30,12 +41,17 @@ export const Cinema = () => {
     updateCinema,
     deleteCinema,
     isProcessing,
+    // addRoomsToCinema,
+    // isAddingRooms
   } = useCinemas();
 
   const handleOpenModal = (record?: ICinema) => {
     if (record && record._id) {
       setEditingId(record._id);
-      form.setFieldsValue(record); // Ant Design Form sẽ tự nhặt các trường name, address, city
+      form.setFieldsValue({
+        ...record,
+        phong_chieu: record.danh_sach_phong?.map((p) => p._id || p) || [],
+      });
     } else {
       setEditingId(null);
       form.resetFields();
@@ -43,64 +59,52 @@ export const Cinema = () => {
     setIsModalOpen(true);
   };
 
-  const onFinish = async (values: ICreateCinema) => {
+  const onFinish = async (values: any) => {
     try {
+      const payload = {
+        ...values,
+        // phongIds: values.danh_sach_phong
+      };
+      // console.log("Dữ liệu gửi lên server:", values);
       if (editingId) {
-        // Lưu ý: data truyền vào mutation nên khớp với hook useCinemas của bạn
-        await updateCinema({ id: editingId, cinema: values });
+        await updateCinema({ id: editingId, cinema: payload });
+        message.success("Cập nhật rạp thành công");
       } else {
-        await createCinema(values);
+        await createCinema(payload);
       }
-      form.resetFields();
       setIsModalOpen(false);
     } catch (error) {
-      console.error("Submission failed:", error);
+      message.error("Thao tác thất bại");
     }
   };
 
   const columns = [
     {
       title: "Tên rạp",
-      dataIndex: "name", // Khớp với Schema: Cinema { name: string }
+      dataIndex: "name",
       key: "name",
+      render: (text: string) => <Text strong>{text}</Text>,
     },
     {
       title: "Địa chỉ",
-      dataIndex: "address",
-      key: "address",
+      render: (_: any, record: ICinema) => `${record.address}, ${record.city}`,
     },
     {
-      title: "Thành phố",
-      dataIndex: "city",
-      key: "city",
-    },
-    {
-      title: "Phòng chiếu",
-      key: "rooms",
-      render: (_: any, record: ICinema) => (
-        <Space direction="vertical">
-          {/* Render danh sách tag phòng hiện có */}
-          <div style={{ maxWidth: 200 }}>
-            {record.danh_sach_phong?.map((room: any) => (
-              <Tag
-                color="blue"
-                key={room._id}
-                closable
-                // onClose={() => handleDeleteRoom(room._id)} // Gọi hàm xóa phòng
-              >
-                {room.ten_phong}
+      title: "Danh sách phòng",
+      dataIndex: "danh_sach_phong",
+      key: "danh_sach_phong",
+      width: 300,
+      render: (phong_list: IPhong[]) => (
+        <Space wrap>
+          {phong_list?.length > 0 ? (
+            phong_list.map((p) => (
+              <Tag color="cyan" key={p._id}>
+                {p.ten_phong} - {p.loai_phong}
               </Tag>
-            ))}
-          </div>
-          {/* Nút mở Modal thêm phòng mới cho Rạp này */}
-          <Button
-            type="dashed"
-            size="small"
-            icon={<PlusOutlined />}
-            // onClick={() => handleOpenAddRoomModal(record._id)}
-          >
-            Thêm phòng
-          </Button>
+            ))
+          ) : (
+            <span style={{ color: "#ccc", fontStyle: "italic" }}>Trống</span>
+          )}
         </Space>
       ),
     },
@@ -118,8 +122,6 @@ export const Cinema = () => {
           <Popconfirm
             title="Xác nhận xóa rạp này?"
             onConfirm={() => deleteCinema(record._id!)}
-            okText="Xóa"
-            cancelText="Hủy"
             okButtonProps={{ danger: true }}
           >
             <Button type="text" danger icon={<DeleteOutlined />} />
@@ -129,13 +131,15 @@ export const Cinema = () => {
     },
   ];
 
+  const { Text } = Typography;
+
   return (
-    <Card style={{ margin: "24px", borderRadius: "8px" }}>
+    <Card style={{ margin: "24px", borderRadius: "12px" }}>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          marginBottom: 20,
+          marginBottom: 24,
         }}
       >
         <Title level={4}>Quản lý hệ thống rạp</Title>
@@ -153,49 +157,74 @@ export const Cinema = () => {
         columns={columns}
         rowKey="_id"
         loading={isLoading}
-        pagination={{ pageSize: 8 }}
+        pagination={{ pageSize: 5 }}
       />
 
       <Modal
-        title={editingId ? "Cập nhật thông tin rạp" : "Đăng ký rạp mới"}
+        title={editingId ? "Cập nhật rạp" : "Thêm rạp mới & Gán phòng"}
         open={isModalOpen}
         onOk={() => form.submit()}
         onCancel={() => setIsModalOpen(false)}
         confirmLoading={isProcessing}
-        destroyOnHidden
-        okText={editingId ? "Cập nhật" : "Tạo mới"}
+        width={600}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-          initialValues={{ city: "Hồ Chí Minh" }}
-        >
-          <Form.Item
-            name="name"
-            label="Tên hệ thống rạp"
-            rules={[{ required: true, message: "Vui lòng nhập tên rạp" }]}
-          >
-            <Input placeholder="Ví dụ: CGV Vincom Center" />
+        <Form form={form} layout="vertical" onFinish={onFinish}>
+          <Form.Item name="name" label="Tên rạp" rules={[{ required: true }]}>
+            <Input placeholder="Tên rạp chiếu..." />
           </Form.Item>
 
-          <Form.Item
-            name="address"
-            label="Địa chỉ chi tiết"
-            rules={[{ required: true, message: "Vui lòng nhập địa chỉ" }]}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "16px",
+            }}
           >
-            <Input placeholder="Số 72 Lê Thánh Tôn..." />
-          </Form.Item>
+            <Form.Item
+              name="address"
+              label="Địa chỉ"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="Số nhà, tên đường..." />
+            </Form.Item>
+            <Form.Item
+              name="city"
+              label="Thành phố"
+              rules={[{ required: true }]}
+            >
+              <Select placeholder="Chọn thành phố">
+                <Select.Option value="Hà Nội">Hà Nội</Select.Option>
+                <Select.Option value="Hồ Chí Minh">Hồ Chí Minh</Select.Option>
+                <Select.Option value="Đà Nẵng">Đà Nẵng</Select.Option>
+              </Select>
+            </Form.Item>
+          </div>
 
           <Form.Item
-            name="city"
-            label="Thành phố"
-            rules={[{ required: true, message: "Vui lòng chọn thành phố" }]}
+            name="danh_sach_phong"
+            label="Chọn phòng chiếu cho rạp"
+            extra="Bạn có thể chọn nhiều phòng cùng lúc"
           >
-            <Select placeholder="Chọn tỉnh/thành">
-              <Select.Option value="Hà Nội">Hà Nội</Select.Option>
-              <Select.Option value="Hồ Chí Minh">Hồ Chí Minh</Select.Option>
-              <Select.Option value="Đà Nẵng">Đà Nẵng</Select.Option>
+            <Select
+              mode="multiple"
+              placeholder="Nhấn để chọn các phòng đã tạo"
+              allowClear
+              optionFilterProp="label"
+            >
+              {rooms?.map((room: IPhong) => (
+                <Select.Option
+                  key={room._id}
+                  value={room._id}
+                  label={room.ten_phong}
+                >
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <span>{room.ten_phong}</span>
+                    <Tag color="geekblue">{room.loai_phong}</Tag>
+                  </div>
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
         </Form>
