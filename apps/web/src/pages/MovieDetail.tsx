@@ -68,7 +68,7 @@ const MovieDetail = () => {
             width={1280}
             centered
             styles={{ body: { padding: 0, backgroundColor: "black" } }}
-            destroyOnClose // Tự động tắt video khi đóng modal
+            destroyOnHidden // Tự động tắt video khi đóng modal
           >
             <div className="aspect-video">
               {isPlayerReady && (

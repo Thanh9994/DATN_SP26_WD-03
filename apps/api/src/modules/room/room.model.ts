@@ -1,4 +1,4 @@
-import { SeatType } from "@shared/schemas";
+import { RoomType, SeatType } from "@shared/schemas";
 import mongoose from "mongoose";
 
 const SeatSchema = new mongoose.Schema(
@@ -11,7 +11,7 @@ const SeatSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const RoomSchema = new mongoose.Schema(
@@ -24,11 +24,22 @@ const RoomSchema = new mongoose.Schema(
     },
 
     ten_phong: { type: String, required: true },
-    loai_phong: { type: String, required: true },
-
-    ghe_layout: [SeatSchema], // layout ghế gốc
+    loai_phong: {
+      type: String,
+      enum: RoomType.options,
+      required: true,
+    },
+    rows: [
+      {
+        row: { type: String, required: true },
+        seats: { type: Number, required: true },
+      },
+    ],
+    vipRows: { type: [String], default: [] },
+    coupleRows: { type: [String], default: [] },
+    // ghe_layout: [SeatSchema], // layout ghế gốc
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const Room = mongoose.model("Room", RoomSchema);

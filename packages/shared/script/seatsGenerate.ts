@@ -1,40 +1,32 @@
-import { SeatTime } from "@api/modules/showtime/showtimeSeat.model";
-import { IPhong, ISeats, ISeatType, IShowTime } from "@shared/schemas";
+import { IRow, ISeatsStatus, ISeatType} from "@shared/schemas"
 
-export const generateSeats = (
-  rows: string[],
-  seatsPerRow: number,
-  vipRows: string[] = [],
-  coupleLastSeats: number = 2,
-): ISeats[] => {
-  const seats: ISeats[] = [];
+interface ISeat {
+  seatNumber: string
+  row: string
+  type: ISeatType
+  priceMultiplier: number
+  isActive: ISeatsStatus
+}
 
-  rows.forEach((row, rowIndex) => {
-    for (let i = 1; i <= seatsPerRow; i++) {
-      let type: ISeatType = "thuong";
+export const generateSeats = (rows: IRow[]): ISeat[] => {
+  const seats: ISeat[] = []
 
-      // VIP row
-      if (vipRows.includes(row)) {
-        type = "vip";
-      }
-
-      // Couple seats (hàng cuối)
-      const isLastRow = rowIndex === rows.length - 1;
-      const isCoupleSeat = i > seatsPerRow - coupleLastSeats;
-
-      if (isLastRow && isCoupleSeat) {
-        type = "couple";
-      }
-
+  rows.forEach((row) => {
+    for (let i = 1; i <= row.seats; i++) {
       seats.push({
-        hang_ghe: row,
-        so_ghe: i,
-        loai_ghe: type,
-        trang_thai: "empty",
-      });
+        seatNumber: `${row.name}${i}`,
+        row: row.name,
+        type: row.type,
+        priceMultiplier:
+          row.type === "vip"
+            ? 1.5
+            : row.type === "couple"
+            ? 2
+            : 1,
+        isActive: "empty"
+      })
     }
-  });
+  })
 
-  return seats;
-};
-
+  return seats
+}

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const RoomType = z.enum(["2D", "3D", "IMAX", "4DX"]);
-export const SeatType = z.enum(["thuong", "vip", "couple"]);
+export const SeatType = z.enum(["normal", "vip", "couple"]);
 export const MovieStatus = z.enum(["sap_chieu", "dang_chieu", "ngung_chieu"]);
 export const AgeRating = z.enum(["P", "C13", "C16", "C18"]);
 export const UserRole = z.enum(["admin", "nhan_vien", "khach_hang"]);
@@ -40,20 +40,25 @@ export const Seats = z.object({
   so_ghe: z.number(),
   loai_ghe: SeatType,
   trang_thai: SeatsStatus.default("empty"),
+  seatCode: z.string(),
 });
 
 export const ShowTime = Base.extend({
-  movieId: z.string(),
-  roomId: z.string(),
+  movieId: z.union([z.string(), z.any()]),
+  roomId: z.union([z.string(), z.any()]),
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
   priceNormal: z.number().nonnegative(),
   priceVip: z.number().nonnegative(),
   priceCouple: z.number().nonnegative(),
+}).refine((data) => data.endTime > data.startTime, {
+  message: " endTime lớn hơn startTime",
+  path: ["endTime"],
 });
 
 export const ShowTimeSeat = Base.extend({
-  showTimeId: z.string(),
+  showTimeId: z.union([z.string(), z.any()]),
+  bookingId: z.union([z.string(), z.any()]),
   seatCode: z.string(),
   row: z.string(),
   number: z.number(),
@@ -66,19 +71,30 @@ export const ShowTimeSeat = Base.extend({
 
 export const Room = Base.extend({
   ten_phong: z.string(),
-  loai_phong: RoomType,
-  rows: z.array(z.string()),
-  seatsPerRow: z.number().positive(),
-  vipRows: z.array(z.string()).optional(),
+  loai_phong: RoomType.default("2D"),
+  rows: z.array(
+    z.object({
+      name: z.string(), // A, B, C...
+      seats: z.number().positive(), // số ghế của row đó
+      type: SeatType.default("normal")
+    })
+  )
+});
+
+export const Row = z.object({
+  name: z.string(),
+  seats: z.number(),
+  type: SeatType,
 });
 
 export const Booking = Base.extend({
   userId: z.string(),
   showTimeId: z.string(),
-  seats: z.array(z.string()), // ["A1","A2"]
+  seats: z.array(z.string()).min(1, "Phải chọn ít nhất 1 ghế"), // ["A1","A2"]
   totalAmount: z.number(),
   status: BookingStatus.default("pending"),
   paymentId: z.string().optional(),
+  expiresAt: z.coerce.date().optional(),
 });
 
 export const CreateRoom = z.object({
@@ -86,7 +102,7 @@ export const CreateRoom = z.object({
   loai_phong: RoomType,
   rows: z.array(z.string()),
   seatsPerRow: z.number().positive(),
-  vipRows: z.array(z.string()).optional(),
+  vipRows: z.array(z.string()).default([]),
 });
 
 export const CreateCinema = z.object({
@@ -202,6 +218,7 @@ export type IAuthResponse = z.infer<typeof AuthResponse>;
 export type ICinema = z.infer<typeof Cinema>;
 export type ICreateCinema = z.infer<typeof CreateCinema>;
 export type ISeats = z.infer<typeof Seats>;
+export type IRow = z.infer<typeof Row>;
 export type IPhong = z.infer<typeof Room>;
 export type IShowTime = z.infer<typeof ShowTime>;
 export type IShowTimeSeat = z.infer<typeof ShowTimeSeat>;

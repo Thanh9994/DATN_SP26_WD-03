@@ -14,18 +14,23 @@ export const createShowTime = async (req: Request, res: Response) => {
     if (!cinema)
       return res.status(404).json({ message: "Không tìm thấy phòng" });
 
-    const roomDoc = cinema.phong_chieu.id(payload.roomId);
+    const roomDoc = cinema.phong_chieu.find(
+      (r) => r._id?.toString() === payload.roomId,
+    );
     if (!roomDoc)
       return res.status(404).json({ message: "Phòng không tồn tại" });
 
-    const room = roomDoc.toObject();
     const newShowTime = await ShowTimeM.create(payload);
-    await generateShowTimeSeats(newShowTime.toObject(), room);
-
-    return res.status(201).json({
-      message: "Tạo suất chiếu thành công",
-      data: newShowTime,
-    });
+    try {
+      await generateShowTimeSeats(newShowTime.toObject(), roomDoc);
+      return res.status(201).json({
+        message: "Tạo suất chiếu thành công",
+        data: newShowTime,
+      });
+    } catch (error) {
+      await ShowTimeM.findByIdAndDelete(newShowTime._id);
+      return res.status(400).json({ message: "Xuất chiếu đã bị xóa"})
+    }
   } catch (error) {
     return res.status(400).json({
       message: "Dữ liệu không hợp lệ",
@@ -37,7 +42,7 @@ export const createShowTime = async (req: Request, res: Response) => {
 export const getShowTimeByMovie = async (req: Request, res: Response) => {
   try {
     const { movieId } = req.params;
-    const showtimes = await ShowTimeM.find({ movieId });
+    const showtimes = await ShowTimeM.find({ movieId }).sort({ startTime: 1 });;
 
     return res.json({
       message: "Lấy suất chiếu thành công",
@@ -73,7 +78,7 @@ export const getShowTimeDetail = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteShowTime = async ( req: Request, res: Response ) => {
+export const deleteShowTime = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 

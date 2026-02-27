@@ -1,5 +1,5 @@
-import mongoose, { Schema, Types } from "mongoose";
-import { RoomType } from "@shared/schemas";
+import mongoose, { InferSchemaType, Schema} from "mongoose";
+import { ICinema, RoomType } from "@shared/schemas";
 
 const phongSchema = new Schema(
   {
@@ -12,6 +12,7 @@ const phongSchema = new Schema(
     rows: { type: [String], required: true },
     seatsPerRow: { type: Number, required: true },
     vipRows: { type: [String], default: [] },
+    coupleRows: { type: [String], default: [] },
   },
   { _id: true },
 );
@@ -21,19 +22,14 @@ const cinemaSchema = new Schema(
     name: { type: String, required: true },
     address: { type: String, required: true },
     city: { type: String, required: true },
-    phong_chieu: { type: [phongSchema], default: [] },
   },
   { timestamps: true },
 );
 
-export interface CinemaDocument extends mongoose.Document {
-  name: string;
-  address: string;
-  city: string;
-  phong_chieu: Types.DocumentArray<any>;
-}
+// export type IPhong = InferSchemaType<typeof phongSchema>;
+// export type ICinema = InferSchemaType<typeof cinemaSchema>;
 
-export const Cinemas = mongoose.model<CinemaDocument>(
+export const Cinemas = mongoose.model<ICinema>(
   "Cinema",
   cinemaSchema,
 );
