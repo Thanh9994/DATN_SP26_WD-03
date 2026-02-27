@@ -1,8 +1,17 @@
 import { generateSeats } from '@shared/script/seatsGenerate';
-import { createRoomS, getRoomsByCinemaS } from './room.service';
+import { createRoomS, getAllRooms, getRoomsByCinemaS } from './room.service';
 import { Request, Response } from "express";
 import { Cinemas } from '../cinema/cinema.model';
 import { Room } from './room.model';
+
+export const AllRooms = async (_req: Request, res: Response) => {
+  try {
+    const rooms = await getAllRooms()
+    res.status(200).json(rooms);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server", error });
+  }
+}
 
 export const createRoom = async (req: Request, res: Response) => {
   try {

@@ -107,7 +107,7 @@ export const useRooms = () => {
     rooms,
     isLoading,
     isError,
-    createRoom: createRoom.mutate,
+    createRoom: createRoom.mutateAsync,
     deleteRoom: deleteRoom.mutate,
     isCreating: createRoom.isPending,
     isDeleting: deleteRoom.isPending,

@@ -85,6 +85,28 @@ export const Room = Base.extend({
   couple: z.array(z.string()).default([])
 });
 
+export const RoomCreate = z.object({
+  ten_phong: z.string().min(1, "Tên phòng là bắt buộc"),
+  loai_phong: RoomType,
+  rows: z.array(
+    z.object({
+      name: z.string(), // A, B, C...
+      seats: z.number().positive(), // số ghế của row đó
+    })
+  ),
+  vip: z.array(z.string()).default([]),
+  couple: z.array(z.string()).default([])
+});
+
+export const RoomFormSchema = RoomCreate.extend({
+  vip: z.string().or(z.array(z.string())), // Chấp nhận cả 2 ở Form
+  couple: z.string().or(z.array(z.string())),
+}).transform((data) => ({
+  ...data,
+  vip: typeof data.vip === "string" ? data.vip.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) : data.vip,
+  couple: typeof data.couple === "string" ? data.couple.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) : data.couple,
+}));
+
 export const Row = z.object({
   name: z.string(),
   seats: z.number(),
@@ -218,7 +240,7 @@ export type ICreateCinema = z.infer<typeof CreateCinema>;
 export type ISeats = z.infer<typeof Seats>;
 export type IRow = z.infer<typeof Row>;
 export type IPhong = z.infer<typeof Room>;
-export type IPhongCreate = Omit<IPhong, "_id" | "createdAt" | "updatedAt">;
+export type IPhongCreate = z.infer<typeof RoomCreate>;
 
 export type IShowTime = z.infer<typeof ShowTime>;
 export type IShowTimeSeat = z.infer<typeof ShowTimeSeat>;
