@@ -1,27 +1,12 @@
-import mongoose, { InferSchemaType, Schema} from "mongoose";
-import { ICinema, RoomType } from "@shared/schemas";
-
-const phongSchema = new Schema(
-  {
-    ten_phong: { type: String, required: true },
-    loai_phong: {
-      type: String,
-      enum: RoomType.options,
-      required: true,
-    },
-    rows: { type: [String], required: true },
-    seatsPerRow: { type: Number, required: true },
-    vipRows: { type: [String], default: [] },
-    coupleRows: { type: [String], default: [] },
-  },
-  { _id: true },
-);
+import mongoose, { Schema} from "mongoose";
+import { ICinema} from "@shared/schemas";
 
 const cinemaSchema = new Schema(
   {
     name: { type: String, required: true },
     address: { type: String, required: true },
     city: { type: String, required: true },
+    danh_sach_phong: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
   },
   { timestamps: true },
 );

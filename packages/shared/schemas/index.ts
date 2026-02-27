@@ -6,7 +6,7 @@ export const MovieStatus = z.enum(["sap_chieu", "dang_chieu", "ngung_chieu"]);
 export const AgeRating = z.enum(["P", "C13", "C16", "C18"]);
 export const UserRole = z.enum(["admin", "nhan_vien", "khach_hang"]);
 export const UserStatus = z.enum(["active", "inactive", "banned"]);
-export const SeatsStatus = z.enum(["empty", "booked", "hold"]);
+export const SeatsStatus = z.enum(["empty", "booked", "hold", "fix"]); // "trống", Đã đặt, giữ ghế, sửa ghế
 export const BookingStatus = z.enum([
   "pending",
   "paid",
@@ -59,6 +59,7 @@ export const ShowTime = Base.extend({
 export const ShowTimeSeat = Base.extend({
   showTimeId: z.union([z.string(), z.any()]),
   bookingId: z.union([z.string(), z.any()]),
+  ten_phong: z.string(),
   seatCode: z.string(),
   row: z.string(),
   number: z.number(),
@@ -70,15 +71,18 @@ export const ShowTimeSeat = Base.extend({
 });
 
 export const Room = Base.extend({
-  ten_phong: z.string(),
-  loai_phong: RoomType.default("2D"),
+  cinema_id: z.string(),
+  ten_phong: z.string().min(1, "Tên phòng là bắt buộc"),
+  loai_phong: RoomType,
   rows: z.array(
     z.object({
       name: z.string(), // A, B, C...
       seats: z.number().positive(), // số ghế của row đó
       type: SeatType.default("normal")
     })
-  )
+  ),
+  vip: z.array(z.string()).default([]),
+  couple: z.array(z.string()).default([])
 });
 
 export const Row = z.object({
@@ -97,26 +101,22 @@ export const Booking = Base.extend({
   expiresAt: z.coerce.date().optional(),
 });
 
-export const CreateRoom = z.object({
-  ten_phong: z.string(),
-  loai_phong: RoomType,
-  rows: z.array(z.string()),
-  seatsPerRow: z.number().positive(),
-  vipRows: z.array(z.string()).default([]),
-});
+// export const CreateRoom = z.object({
+  
+// });
 
 export const CreateCinema = z.object({
-  name: z.string(),
+  name: z.string().min(1, "Tên rạp không được để trống"),
   address: z.string(),
   city: z.string(),
-  phong_chieu: z.array(CreateRoom),
+  // phong_chieu: z.array(CreateRoom),
 });
 
 export const Cinema = Base.extend({
   name: z.string().min(1, "Tên rạp không được để trống"),
   address: z.string(),
   city: z.string(),
-  phong_chieu: z.array(Room),
+  danh_sach_phong: z.array(Room),
 });
 
 export const Movie = Base.extend({
@@ -216,7 +216,7 @@ export type IRegisterPayload = z.infer<typeof RegisterPayload>;
 export type IAuthResponse = z.infer<typeof AuthResponse>;
 
 export type ICinema = z.infer<typeof Cinema>;
-export type ICreateCinema = z.infer<typeof CreateCinema>;
+// export type ICreateCinema = z.infer<typeof CreateCinema>;
 export type ISeats = z.infer<typeof Seats>;
 export type IRow = z.infer<typeof Row>;
 export type IPhong = z.infer<typeof Room>;

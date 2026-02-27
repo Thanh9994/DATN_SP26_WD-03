@@ -12,30 +12,37 @@ export const generateShowTimeSeats = async (
   const existing = await SeatTime.countDocuments({
     showTimeId: showTime._id,
   });
-
+  
   if (existing > 0) return;
 
   const seats = [];
+  const vipRows = room.vip || [];
+  const coupleRows = room.couple || [];
 
   for (const row of room.rows) {
+    const rowNameUp = row.name.trim().toUpperCase();
     for (let i = 1; i <= row.seats; i++) {
 
       let seatPrice = showTime.priceNormal;
+      let seatType = "normal";
 
-      if (row.type === "vip") {
+      if (vipRows.some(r => r.toUpperCase() === rowNameUp)) {
         seatPrice = showTime.priceVip;
+        seatType = "vip";
       }
 
-      if (row.type === "couple") {
+      else if (coupleRows.some(r => r.toUpperCase() === rowNameUp)) {
         seatPrice = showTime.priceCouple;
+        seatType = "couple";
       }
 
       seats.push({
         showTimeId: showTime._id,
-        seatCode: `${row.name}${i}`,
-        row: row.name,
+        ten_phong: room.ten_phong,
+        seatCode: `${rowNameUp}${i}`,
+        row: rowNameUp,
         number: i,
-        loai_ghe: row.type,
+        loai_ghe: seatType,
         price: seatPrice,
         trang_thai: "empty",
       });

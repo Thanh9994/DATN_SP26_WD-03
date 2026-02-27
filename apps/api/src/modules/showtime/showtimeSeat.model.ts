@@ -9,6 +9,7 @@ const showTimeSeatSchema = new Schema<IShowTimeSeat>(
       required: true,
       index: true,
     },
+    ten_phong: {type: String, require: true},
     seatCode: { type: String, required: true },
     row: { type: String, required: true },
     number: { type: Number, required: true },
