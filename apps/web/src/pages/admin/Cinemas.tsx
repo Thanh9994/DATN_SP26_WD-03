@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   Popconfirm,
@@ -29,7 +25,6 @@ export const Cinema = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   // States cho Modal quản lý phòng riêng biệt (nếu vẫn muốn dùng)
-  // const [roomModalOpen, setRoomModalOpen] = useState(false);
   // const [selectedCinemaId, setSelectedCinemaId] = useState<string | null>(null);
   // const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
 
@@ -41,8 +36,6 @@ export const Cinema = () => {
     updateCinema,
     deleteCinema,
     isProcessing,
-    // addRoomsToCinema,
-    // isAddingRooms
   } = useCinemas();
 
   const handleOpenModal = (record?: ICinema) => {
@@ -50,7 +43,7 @@ export const Cinema = () => {
       setEditingId(record._id);
       form.setFieldsValue({
         ...record,
-        phong_chieu: record.danh_sach_phong?.map((p) => p._id || p) || [],
+        danh_sach_phong: record.danh_sach_phong?.map((p) => p._id || p) || [],
       });
     } else {
       setEditingId(null);
@@ -68,7 +61,6 @@ export const Cinema = () => {
       // console.log("Dữ liệu gửi lên server:", values);
       if (editingId) {
         await updateCinema({ id: editingId, cinema: payload });
-        message.success("Cập nhật rạp thành công");
       } else {
         await createCinema(payload);
       }
