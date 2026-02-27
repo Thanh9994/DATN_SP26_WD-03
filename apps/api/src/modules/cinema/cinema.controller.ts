@@ -1,11 +1,9 @@
-import { generateSeats } from "@shared/script/seatsGenerate";
 import { Request, Response } from "express";
-import { CreateCinema } from "@shared/schemas";
 import { Cinemas } from "./cinema.model";
 
 export const AllCinemas = async (_req: Request, res: Response) => {
   try {
-    const cinemas = await Cinemas.find();
+    const cinemas = await Cinemas.find().populate("danh_sach_phong");
     res.status(200).json({
       message: "Lấy danh sách rạp thành công",
       data: cinemas,
@@ -33,22 +31,8 @@ export const getCinemaById = async (req: Request, res: Response) => {
 
 export const createCinema = async (req: Request, res: Response) => {
   try {
-    const cinemaPayload = CreateCinema.parse(req.body);
 
-    const newCinema = await Cinemas.create({
-      name: cinemaPayload.name,
-      address: cinemaPayload.address,
-      city: cinemaPayload.city,
-      phong_chieu: cinemaPayload.phong_chieu.map((room) => ({
-        ten_phong: room.ten_phong,
-        loai_phong: room.loai_phong,
-        rows: room.rows,
-        seatsPerRow: room.seatsPerRow,
-        vipRows: room.vipRows || [],
-      })),
-    });
-
-
+    const newCinema = await Cinemas.create(req.body);
     res.status(201).json({
       message: "Tạo rạp thành công",
       data: newCinema,
@@ -64,9 +48,11 @@ export const createCinema = async (req: Request, res: Response) => {
 export const updateCinema = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { _id, ...updateData } = req.body;
+
     const updatedCinemas = await Cinemas.findByIdAndUpdate(
       id,
-      req.body,
+      updateData,
       { new: true },
     );
     if (!updatedCinemas) {
@@ -78,6 +64,30 @@ export const updateCinema = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(400).json({ message: "Cập nhật thất bại", error });
+  }
+};
+
+export const addRoomsToCinema = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params; 
+    const { phongIds } = req.body; 
+
+    const updatedCinema = await Cinemas.findByIdAndUpdate(
+      id,
+      { $addToSet: { danh_sach_phong: { $each: phongIds } } }, // Tránh add trùng ID phòng
+      { new: true }
+    ).populate("danh_sach_phong");
+
+    if (!updatedCinema) {
+      return res.status(404).json({ message: "Rạp không tồn tại" });
+    }
+
+    res.status(200).json({
+      message: "Đã thêm phòng vào rạp thành công",
+      data: updatedCinema,
+    });
+  } catch (error) {
+    res.status(400).json({ message: "Lỗi khi thêm phòng", error });
   }
 };
 

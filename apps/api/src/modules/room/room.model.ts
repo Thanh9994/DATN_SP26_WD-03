@@ -1,34 +1,33 @@
-import { SeatType } from "@shared/schemas";
+import { RoomType, IPhong } from "@shared/schemas";
 import mongoose from "mongoose";
-
-const SeatSchema = new mongoose.Schema(
-  {
-    hang_ghe: String,
-    so_ghe: Number,
-    loai_ghe: {
-      type: String,
-      enum: SeatType.options,
-      required: true,
-    },
-  },
-  { _id: false }
-);
 
 const RoomSchema = new mongoose.Schema(
   {
     cinema_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Cinema",
-      required: true,
+      // required: true,
       index: true,
     },
 
     ten_phong: { type: String, required: true },
-    loai_phong: { type: String, required: true },
-
-    ghe_layout: [SeatSchema], // layout ghế gốc
+    loai_phong: {
+      type: String,
+      enum: RoomType.options,
+      required: true,
+    },
+    rows: [
+      {
+        name: { type: String, required: true },
+        seats: { type: Number, required: true },
+        _id: false,
+      },
+    ],
+    vip: { type: [String], default: [] },
+    couple: { type: [String], default: [] },
+    // ghe_layout: [SeatSchema], // layout ghế gốc
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export const Room = mongoose.model("Room", RoomSchema);
+export const Room = mongoose.model<IPhong>("Room", RoomSchema);

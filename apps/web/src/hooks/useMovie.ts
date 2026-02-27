@@ -68,3 +68,16 @@ export const useMovies = () => {
     isDeleting,
   };
 };
+
+export const useMovie = (id?: string) => {
+  return useQuery<IMovie>({
+    queryKey: ["movie", id],
+    queryFn: async () => {
+      const { data } = await axios.get(`${API_URL}/${id}`);
+      return data.data;
+    },
+    enabled: !!id, 
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 60,
+  });
+};

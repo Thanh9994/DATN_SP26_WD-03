@@ -30,7 +30,7 @@ export const authenticate = async (
       id: string;
     };
 
-    const user = await UserModel.findById(decoded.id).select("-password");
+    const user = await UserModel.findById(decoded.id).select("-password -__v -updatedAt");
     if (!user) {
       return res.status(404).json({ message: "Người dùng không tồn tại" });
     }

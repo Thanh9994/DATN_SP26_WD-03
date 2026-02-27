@@ -1,39 +1,20 @@
-import mongoose, { Schema, Types } from "mongoose";
-import { RoomType } from "@shared/schemas";
-
-const phongSchema = new Schema(
-  {
-    ten_phong: { type: String, required: true },
-    loai_phong: {
-      type: String,
-      enum: RoomType.options,
-      required: true,
-    },
-    rows: { type: [String], required: true },
-    seatsPerRow: { type: Number, required: true },
-    vipRows: { type: [String], default: [] },
-  },
-  { _id: true },
-);
+import mongoose, { Schema} from "mongoose";
+import { ICinema} from "@shared/schemas";
 
 const cinemaSchema = new Schema(
   {
     name: { type: String, required: true },
     address: { type: String, required: true },
     city: { type: String, required: true },
-    phong_chieu: { type: [phongSchema], default: [] },
+    danh_sach_phong: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
   },
   { timestamps: true },
 );
 
-export interface CinemaDocument extends mongoose.Document {
-  name: string;
-  address: string;
-  city: string;
-  phong_chieu: Types.DocumentArray<any>;
-}
+// export type IPhong = InferSchemaType<typeof phongSchema>;
+// export type ICinema = InferSchemaType<typeof cinemaSchema>;
 
-export const Cinemas = mongoose.model<CinemaDocument>(
+export const Cinemas = mongoose.model<ICinema>(
   "Cinema",
   cinemaSchema,
 );
