@@ -35,6 +35,8 @@ export const useAuth = () => {
       return data;
     },
     enabled: !!localStorage.getItem("token"),
+     staleTime: Infinity, // Dữ liệu "me" không bao giờ cũ
+     gcTime: 1000 * 60 * 60 * 2, // Giữ trong cache 24h
   });
 
   const loginMutation = useMutation<IAuthResponse, Error, ILoginPayload>({
@@ -83,7 +85,8 @@ export const useAuth = () => {
       const { data } = await axiosAuth.get(`${API_URL}/`);
       return data;
     },
-    enabled: !!localStorage.getItem("token") && user?.role === "admin",
+    enabled: !!localStorage.getItem("token") && user?.role === "admin", // Chỉ gọi khi có token và là admin
+     staleTime: 1000 * 60 * 5,
   });
   const updateMutation = useMutation({
     mutationFn: async ({

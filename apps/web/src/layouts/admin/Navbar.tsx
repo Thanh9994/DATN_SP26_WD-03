@@ -45,22 +45,28 @@ export const Sidebar = ({ collapsed }: { collapsed: boolean }) => {
       onClick: () => navigate("/admin/users"),
     },
     {
-      key: "media",
-      icon: <CloudUploadOutlined />,
-      label: "Media",
-      onClick: () => navigate("/admin/media"),
-    },
-    {
       key: "cinemas",
       icon: <VideoCameraAddOutlined />,
       label: "Cinemas",
       onClick: () => navigate("/admin/cinemas"),
     },
     {
+      key: "rooms",
+      icon: <VideoCameraAddOutlined />,
+      label: "Phòng Chiếu",
+      onClick: () => navigate("/admin/rooms"),
+    },
+    {
       key: "product",
       icon: <ProductOutlined />,
       label: "Product",
       onClick: () => navigate("/admin/product"),
+    },
+    {
+      key: "media",
+      icon: <CloudUploadOutlined />,
+      label: "Media",
+      onClick: () => navigate("/admin/media"),
     },
   ];
 

@@ -9,6 +9,7 @@ import { Register } from "@web/pages/Register";
 import SeatBooking from "@web/pages/SeatBooking";
 import Showtime from "@web/pages/ShowTime";
 import { RouteObject } from "react-router-dom";
+import MovieDetail from "@web/pages/MovieDetail";
 import Ticket from "@web/pages/Ticket";
 import Checkout from "@web/pages/CheckOut";
 export const ClientRoutes: RouteObject = {
@@ -22,10 +23,10 @@ export const ClientRoutes: RouteObject = {
     { path: "about", element: <About /> },
     { path: "event", element: <Event /> },
     { path: "booking", element: <SeatBooking /> },
+    { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
-    { path: "*", element: <NotFound /> },
-    { path: "event", element: <Event /> },
     { path: "ticket", element: <Ticket /> },
+    { path: "*", element: <NotFound /> },
     { path: "checkout", element: <Checkout /> },
   ],
 };

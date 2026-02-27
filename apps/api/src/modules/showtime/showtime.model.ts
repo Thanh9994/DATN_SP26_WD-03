@@ -3,8 +3,16 @@ import { IShowTime } from "@shared/schemas";
 
 const showTimeSchema = new Schema<IShowTime>(
   {
-    movieId: { type: String, required: true },
-    roomId: { type: String, required: true },
+    movieId: {
+      type: Schema.Types.ObjectId,
+      ref: "Movie",
+      required: true,
+    },
+    roomId: {
+      type: Schema.Types.ObjectId, 
+      ref: "Room", 
+      required: true,
+    },
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
     priceNormal: { type: Number, required: true },

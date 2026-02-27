@@ -1,40 +1,39 @@
-import { SeatTime } from "@api/modules/showtime/showtimeSeat.model";
-import { IPhong, ISeats, ISeatType, IShowTime } from "@shared/schemas";
+import { IPhong, ISeatsStatus, ISeatType } from "@shared/schemas";
 
-export const generateSeats = (
-  rows: string[],
-  seatsPerRow: number,
-  vipRows: string[] = [],
-  coupleLastSeats: number = 2,
-): ISeats[] => {
-  const seats: ISeats[] = [];
+export interface ISeatResult {
+  seatNumber: string;
+  row: string;
+  type: ISeatType;
+  priceMultiplier: number;
+  isActive: ISeatsStatus;
+}
 
-  rows.forEach((row, rowIndex) => {
-    for (let i = 1; i <= seatsPerRow; i++) {
-      let type: ISeatType = "thuong";
+export const generateSeats = (room: IPhong): ISeatResult[] => {
+  const seats: ISeatResult[] = [];
 
-      // VIP row
-      if (vipRows.includes(row)) {
-        type = "vip";
-      }
+  room.rows.forEach((rowObj: { name: string; seats: number }) => {
+    for (let i = 1; i <= rowObj.seats; i++) {
+      let seatType: ISeatType = "normal";
+      let multiplier = 1;
 
-      // Couple seats (hàng cuối)
-      const isLastRow = rowIndex === rows.length - 1;
-      const isCoupleSeat = i > seatsPerRow - coupleLastSeats;
-
-      if (isLastRow && isCoupleSeat) {
-        type = "couple";
+      // Logic xác định loại ghế dựa trên các mảng vipRows/coupleRows
+      if (room.couple?.includes(rowObj.name)) {
+        seatType = "couple";
+        multiplier = 2;
+      } else if (room.vip?.includes(rowObj.name)) {
+        seatType = "vip";
+        multiplier = 1.5;
       }
 
       seats.push({
-        hang_ghe: row,
-        so_ghe: i,
-        loai_ghe: type,
-        trang_thai: "empty",
+        seatNumber: `${rowObj.name}${i}`,
+        row: rowObj.name,
+        type: seatType,
+        priceMultiplier: multiplier,
+        isActive: "empty"
       });
     }
   });
 
   return seats;
 };
-
