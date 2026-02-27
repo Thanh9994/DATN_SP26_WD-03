@@ -101,10 +101,6 @@ export const Booking = Base.extend({
   expiresAt: z.coerce.date().optional(),
 });
 
-// export const CreateRoom = z.object({
-  
-// });
-
 export const CreateCinema = z.object({
   name: z.string().min(1, "Tên rạp không được để trống"),
   address: z.string(),
@@ -207,6 +203,7 @@ export type IGenre = z.infer<typeof Genre>;
 export type IMovie = z.infer<typeof Movie>;
 export type IUpdateMovie = Partial<ICreateMovie>;
 export type ICreateMovie = Omit<IMovie, "_id" | "createdAt" | "updatedAt">;
+export type ICinemaForm = Omit<ICinema, "danh_sach_phong" | "createdAt" | "updatedAt">;
 
 export type IUser = z.infer<typeof User>;
 export type IUserLog = z.infer<typeof UserLog>;
@@ -216,7 +213,7 @@ export type IRegisterPayload = z.infer<typeof RegisterPayload>;
 export type IAuthResponse = z.infer<typeof AuthResponse>;
 
 export type ICinema = z.infer<typeof Cinema>;
-// export type ICreateCinema = z.infer<typeof CreateCinema>;
+export type ICreateCinema = z.infer<typeof CreateCinema>;
 export type ISeats = z.infer<typeof Seats>;
 export type IRow = z.infer<typeof Row>;
 export type IPhong = z.infer<typeof Room>;
