@@ -10,7 +10,8 @@ import {
   Select,
   Typography,
   Table, // Sửa: Import từ antd
-  Space, // Sửa: Import từ antd
+  Space,
+  Tag, // Sửa: Import từ antd
 } from "antd";
 import { useCinemas } from "@web/hooks/useCinema";
 import { ICinema, ICreateCinema } from "@shared/schemas";
@@ -75,10 +76,33 @@ export const Cinema = () => {
     },
     {
       title: "Phòng chiếu",
-      dataIndex: "danh_sach_phong",
-      key: "danh_sach_phong",
-      // Render an toàn khi danh_sach_phong có thể undefined
-      render: (rooms: any[]) => rooms?.length || 0,
+      key: "rooms",
+      render: (_: any, record: ICinema) => (
+        <Space direction="vertical">
+          {/* Render danh sách tag phòng hiện có */}
+          <div style={{ maxWidth: 200 }}>
+            {record.danh_sach_phong?.map((room: any) => (
+              <Tag
+                color="blue"
+                key={room._id}
+                closable
+                // onClose={() => handleDeleteRoom(room._id)} // Gọi hàm xóa phòng
+              >
+                {room.ten_phong}
+              </Tag>
+            ))}
+          </div>
+          {/* Nút mở Modal thêm phòng mới cho Rạp này */}
+          <Button
+            type="dashed"
+            size="small"
+            icon={<PlusOutlined />}
+            // onClick={() => handleOpenAddRoomModal(record._id)}
+          >
+            Thêm phòng
+          </Button>
+        </Space>
+      ),
     },
     {
       title: "Hành động",

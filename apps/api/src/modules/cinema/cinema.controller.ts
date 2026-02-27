@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { Cinemas } from "./cinema.model";
-import { CreateCinema } from "@shared/schemas";
 
 export const AllCinemas = async (_req: Request, res: Response) => {
   try {
