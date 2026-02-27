@@ -57,7 +57,12 @@ export const Movie = Base.extend({
   trailer: z.string().url().optional(),
   danh_gia: z.number().min(0).max(10).default(0),
   trang_thai: MovieStatus,
-  the_loai: z.array(z.string()),
+  the_loai: z.array(
+    z.object({
+      _id: z.string().optional(),
+      name: z.string(),
+    }),
+  ),
   rap_chieu: z.array(Cinema).optional(),
   quoc_gia: z.string(),
   dao_dien: z.string(),
@@ -80,6 +85,7 @@ export const User = Base.extend({
   phone: z
     .string()
     .regex(/^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ"),
+  avatar: CloudinaryImage.optional(),
   role: UserRole.default("khach_hang"),
   trang_thai: UserStatus.default("active"),
 });

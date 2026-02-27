@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type SeatType = "standard" | "premium" | "vip";
 type SeatStatus = "available" | "occupied";
@@ -17,7 +17,8 @@ const PRICE: Record<SeatType, number> = {
   vip: 35,
 };
 
-const formatMoney = (n: number) => `$${n.toFixed(2)}`;
+const formatMoney = (n: number) =>
+  `$${n.toFixed(2)}`;
 
 function createSeats(): Seat[] {
   const data: Seat[] = [];
@@ -47,8 +48,7 @@ function createSeats(): Seat[] {
 }
 
 export default function SeatBooking() {
-  const [seats] = useState<Seat[]>(() => createSeats());
-
+  const seats = useMemo(() => createSeats(), []);
   const [selected, setSelected] = useState<Set<string>>(new Set(["G10", "G11"]));
 
   const toggleSeat = (seat: Seat) => {
@@ -61,11 +61,16 @@ export default function SeatBooking() {
   };
 
   const selectedSeats = seats.filter((s) => selected.has(s.id));
-  const total = selectedSeats.reduce((sum, s) => sum + PRICE[s.type], 0);
+
+  const total = selectedSeats.reduce(
+    (sum, s) => sum + PRICE[s.type],
+    0
+  );
 
   return (
-    <div className="min-h-screen bg-[#07070b] text-white">
+    <div className="min-h-screen mx-auto bg-[#07070b] text-white">
       <div className="mx-auto max-w-6xl px-6 py-10 grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
+
         {/* LEFT MOVIE CARD */}
         <div className="space-y-6">
           <div className="rounded-3xl bg-zinc-900 p-4 border border-white/10">
@@ -93,6 +98,7 @@ export default function SeatBooking() {
 
         {/* SEAT AREA */}
         <div className="bg-zinc-900 rounded-3xl p-8 border border-white/10">
+
           {/* SCREEN */}
           <div className="mb-10 relative">
             <div className="h-12 w-full rounded-t-full bg-red-600/20 border border-red-500 shadow-[0_0_40px_rgba(239,68,68,0.3)]" />

@@ -105,13 +105,13 @@ export const Footer = () => {
           </div>
 
           {/* Get our App */}
-          <div>
+          <div className="mx-auto">
             <h4 className="text-white font-bold mb-4 uppercase tracking-widest text-xs">
               Get our App
             </h4>
             <div className="space-y-2">
-              <button className="w-2/3 bg-white/5 hover:bg-white/10 rounded-2xl px-4 py-4 flex items-center">
-                <span className="material-symbols-outlined text-4xl">
+              <button className="w-full bg-white/5 hover:bg-white/10 rounded-2xl px-4 py-4 flex items-center">
+                <span className="material-symbols-outlined text-3xl px-2">
                   shop
                 </span>
                 <p className="m-auto text-base font-bold text-white">
@@ -119,8 +119,8 @@ export const Footer = () => {
                 </p>
               </button>
 
-              <button className="w-2/3 bg-white/5 hover:bg-white/10 rounded-2xl px-4 py-4 flex items-center">
-                <span className="material-symbols-outlined text-4xl">
+              <button className="w-full bg-white/5 hover:bg-white/10 rounded-2xl px-4 py-4 flex items-center">
+                <span className="material-symbols-outlined text-3xl px-2">
                   smartphone
                 </span>
                 <p className="m-auto text-base font-bold text-white">

@@ -10,6 +10,7 @@ import { Register } from "@web/pages/Register";
 import SeatBooking from "@web/pages/SeatBooking";
 import Showtime from "@web/pages/ShowTime";
 import { RouteObject } from "react-router-dom";
+
 export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
