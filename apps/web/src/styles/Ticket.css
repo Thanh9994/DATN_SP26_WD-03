@@ -1,0 +1,563 @@
+/* ============================================
+   TICKET PAGE STYLES
+   ============================================ */
+
+.ticket-container {
+  width: 100%;
+  background: #0a0a0a;
+  color: #ffffff;
+  padding: 70px 40px 60px;
+  min-height: 100vh;
+}
+
+.ticket-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 60px;
+  align-items: start;
+}
+
+/* ============================================
+   BUTTONS (Reusable)
+   ============================================ */
+
+.btn {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: #FF000D;
+  color: white;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background: #FF3333;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 0, 13, 0.3);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+}
+
+.btn-secondary:hover {
+  border-color: #FF000D;
+  color: #FF000D;
+  background: rgba(255, 0, 13, 0.05);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   MOVIE CARD
+   ============================================ */
+
+.movie-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: slideInLeft 0.6s ease-out;
+  position: sticky;
+  top: 90px;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.movie-image {
+  position: relative;
+  width: 100%;
+  padding-bottom: 140%;
+  overflow: hidden;
+}
+
+.movie-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.movie-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #FF000D;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+.movie-info {
+  padding: 24px;
+}
+
+.movie-title {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.5px;
+  white-space: pre-line;
+}
+
+.movie-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.movie-rating {
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFB800;
+}
+
+.movie-genres {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.movie-duration {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+}
+
+/* ============================================
+   BOOKING FORM
+   ============================================ */
+
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  animation: slideInRight 0.6s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-section:last-of-type {
+  margin-bottom: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.advanced-filters {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #FF000D;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.advanced-filters:hover {
+  color: #FF3333;
+}
+
+/* Date Selection */
+.dates-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+
+.date-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: white;
+}
+
+.date-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.date-btn.active {
+  background: #FF000D;
+  border-color: #FF000D;
+}
+
+.date-month {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.date-btn.active .date-month {
+  color: white;
+}
+
+.date-number {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.date-day {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.date-btn.active .date-day {
+  color: white;
+}
+
+/* Cinema Locations */
+.cinemas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cinema-item {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+}
+
+.cinema-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 0, 13, 0.3);
+}
+
+.cinema-header {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cinema-icon {
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.cinema-details {
+  flex: 1;
+}
+
+.cinema-name {
+  font-size: 16px;
+  font-weight: 800;
+  margin: 0 0 6px 0;
+}
+
+.cinema-location {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.expand-icon {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.expand-icon.open {
+  transform: rotate(180deg);
+}
+
+/* Showtimes */
+.showtimes-section {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.showtimes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.showtime-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.format-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.showtime-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.showtime-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.showtime-btn.selected {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.showtime-btn.highlight-red {
+  border-color: rgba(255, 0, 13, 0.4);
+  color: #FF000D;
+}
+
+.showtime-btn.highlight-red:hover {
+  border-color: #FF000D;
+  background: rgba(255, 0, 13, 0.1);
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .ticket-wrapper {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .movie-card {
+    position: static;
+  }
+
+  .dates-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .showtimes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .ticket-container {
+    padding: 60px 24px 40px;
+  }
+
+  .ticket-wrapper {
+    gap: 30px;
+  }
+
+  .movie-title {
+    font-size: 24px;
+  }
+
+  .dates-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .date-btn {
+    padding: 12px 6px;
+  }
+
+  .date-number {
+    font-size: 20px;
+  }
+
+  .cinema-header {
+    padding: 16px;
+  }
+
+  .cinema-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+
+  .cinema-name {
+    font-size: 14px;
+  }
+
+  .showtimes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .ticket-container {
+    padding: 60px 16px 40px;
+  }
+
+  .ticket-wrapper {
+    gap: 24px;
+  }
+
+  .movie-title {
+    font-size: 20px;
+  }
+
+  .movie-info {
+    padding: 16px;
+  }
+
+  .section-title {
+    font-size: 11px;
+  }
+
+  .dates-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .date-btn {
+    padding: 10px 4px;
+  }
+
+  .date-number {
+    font-size: 18px;
+  }
+
+  .date-month,
+  .date-day {
+    font-size: 8px;
+  }
+
+  .cinema-header {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .cinema-name {
+    font-size: 13px;
+  }
+
+  .cinema-location {
+    font-size: 11px;
+  }
+
+  .showtimes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-section {
+    gap: 12px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+}
