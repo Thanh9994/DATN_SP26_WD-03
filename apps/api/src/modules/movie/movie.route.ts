@@ -1,12 +1,13 @@
 import { Router } from "express";
-import { AllMovie, createMovie, deleteMovie, getMovieById, updateMovie } from "./movie.controller";
+import { movieController } from "./movie.controller";
+import { upload } from "@api/config/cloudinary";
 
 const movieRouter = Router();
 
-movieRouter .get("/", AllMovie);
-movieRouter .get("/:id", getMovieById);
-movieRouter .post("/", createMovie);
-movieRouter .put("/:id", updateMovie);
-movieRouter .delete("/:id", deleteMovie);
+movieRouter .get("/", movieController.getAllMovie);
+movieRouter .get("/:id", movieController.getMovieById);
+movieRouter .post("/", upload.single("image"), movieController.createMovie);
+movieRouter .put("/:id",movieController.updateMovie);
+movieRouter .delete("/:id", movieController.deleteMovie);
 
 export default movieRouter;

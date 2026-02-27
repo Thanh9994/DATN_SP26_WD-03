@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 export const Footer = () => {
+  const navigate = useNavigate()
   return (
     <div>
       <footer className="bg-background-dark py-14 px-6 lg:px-10 border-t border-white/5 md:m-auto mt-20 max-sm:hidden">
@@ -7,7 +10,7 @@ export const Footer = () => {
           {/* Logo + Description */}
           <div className="col-span-1">
             <div className="flex items-center gap-1 mb-2">
-              <div className="rounded-lg flex items-center justify-center gap-2">
+              <div className="rounded-lg flex items-center justify-center gap-2" onClick={() => navigate('/')}>
                 <img
                   src="https://res.cloudinary.com/dcyzkqb1r/image/upload/t_PVM3/f_webp/q_40/H%E1%BB%8Fa_T%E1%BB%91c_fh4emr"
                   alt="Cinema logo"
@@ -102,13 +105,13 @@ export const Footer = () => {
           </div>
 
           {/* Get our App */}
-          <div>
+          <div className="mx-auto">
             <h4 className="text-white font-bold mb-4 uppercase tracking-widest text-xs">
               Get our App
             </h4>
             <div className="space-y-2">
-              <button className="w-2/3 bg-white/5 hover:bg-white/10 rounded-2xl px-4 py-4 flex items-center">
-                <span className="material-symbols-outlined text-4xl">
+              <button className="w-full bg-white/5 hover:bg-white/10 rounded-2xl px-4 py-4 flex items-center">
+                <span className="material-symbols-outlined text-3xl px-2">
                   shop
                 </span>
                 <p className="m-auto text-base font-bold text-white">
@@ -116,8 +119,8 @@ export const Footer = () => {
                 </p>
               </button>
 
-              <button className="w-2/3 bg-white/5 hover:bg-white/10 rounded-2xl px-4 py-4 flex items-center">
-                <span className="material-symbols-outlined text-4xl">
+              <button className="w-full bg-white/5 hover:bg-white/10 rounded-2xl px-4 py-4 flex items-center">
+                <span className="material-symbols-outlined text-3xl px-2">
                   smartphone
                 </span>
                 <p className="m-auto text-base font-bold text-white">
@@ -130,12 +133,40 @@ export const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="mt-6 pt-10 border-t border-white/5 text-center">
-          <p className="text-white/20 text-[10px] font-bold uppercase tracking-[0.3em]">
+        <div className="mt-6 pt-6 border-t border-white/5 text-center">
+          <p className="text-white/30 text-[10px] font-bold uppercase tracking-[0.3em]">
             © 2026 PVMCinema Entertainment
           </p>
         </div>
 
+      </footer>
+      <footer className="md:hidden ">
+        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/10 px-8 py-3 pb-6 flex items-center justify-between z-[60]">
+          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ff000d] transition-colors" onClick={() => navigate('/')}>
+            <span className="material-symbols-outlined text-[24px]">home</span>
+            <span className="text-[10px] font-medium text-white">Home</span>
+          </button>
+
+          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ff000d] transition-colors">
+            <span className="material-symbols-outlined text-[24px] filled">confirmation_number</span>
+            <span className="text-[10px] font-medium text-white">Events</span>
+          </button>
+
+          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ea2a33] transition-colors">
+            <span className="material-symbols-outlined text-[24px] filled">confirmation_number</span>
+            <span className="text-[10px] font-medium text-white">Ticket</span>
+          </button>
+
+          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ea2a33] transition-colors">
+            <span className="material-symbols-outlined text-[24px]">live_tv</span>
+            <span className="text-[10px] font-medium text-white">Streams</span>
+          </button>
+
+          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ea2a33] transition-colors">
+            <span className="material-symbols-outlined text-[24px]">person</span>
+            <span className="text-[10px] font-medium text-white">Profile</span>
+          </button>
+        </nav>
       </footer>
     </div>
   );

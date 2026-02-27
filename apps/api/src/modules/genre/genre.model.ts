@@ -1,4 +1,4 @@
-import { IGenre } from "@shared/types/interface";
+import { IGenre } from "@shared/schemas";
 import mongoose from "mongoose";
 
 const genreSchema = new mongoose.Schema<IGenre>(
@@ -8,4 +8,4 @@ const genreSchema = new mongoose.Schema<IGenre>(
     { timestamps: true }
 );
 
-export default mongoose.model("Genre", genreSchema);
+export default mongoose.model<IGenre>("genre", genreSchema);
