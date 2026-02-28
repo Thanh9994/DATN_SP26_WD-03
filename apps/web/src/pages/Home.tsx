@@ -54,7 +54,7 @@ export const Home = () => {
         </section>
 
         {/* NOW SHOWING */}
-        <section className="py-12 max-w-7xl mx-auto overflow-hidden">
+        <section className="py-4 max-w-7xl mx-auto overflow-hidden">
           <div className="px-4 lg:px-2 flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-white flex items-center gap-4">
               Now Showing
