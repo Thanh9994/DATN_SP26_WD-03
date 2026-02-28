@@ -12,22 +12,52 @@ export const createShowTime = async (req: Request, res: Response) => {
 
     const movie = await Movie.findById(movieId);
     if (!movie) return res.status(404).json({ message: "Phim không tồn tại" });
+    const room = await Room.findById(roomId);
+    if (!room) return res.status(404).json({ message: "không tồn tại phòng" });
 
-    const [hours, minutes] = timeSlot.split(":").map(Number);
-    const startTime = new Date(date);
-    startTime.setUTCHours(hours, minutes, 0, 0);
+    let startTime: Date;
+    if (req.body.startTime) {
+      startTime = new Date(req.body.startTime);
+    } else if (date && timeSlot) {
+      const [hours, minutes] = timeSlot.split(":").map(Number);
+      startTime = new Date(date);
+      startTime.setHours(hours, minutes, 0, 0);
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Thiếu thông tin thời gian chiếu" });
+    }
 
     const startRelease = new Date(movie.ngay_cong_chieu);
     const endRelease = new Date(movie.ngay_ket_thuc);
 
     if (startTime < startRelease || startTime > endRelease) {
       return res.status(400).json({
-        message: `Ngày chiếu không hợp lệ, Phim chỉ chiếu từ ${startRelease.toLocaleDateString()} đến ${endRelease.toLocaleDateString()}`,
+        message: `Không thể tạo suất chiếu, Phim chỉ chiếu từ ${startRelease.toLocaleDateString()} đến ${endRelease.toLocaleDateString()}`,
       });
     }
 
     const durationInMs = (movie.thoi_luong || 0) * 60000;
     const endTime = new Date(startTime.getTime() + durationInMs);
+
+    const isOver = await ShowTimeM.findOne({
+      roomId: roomId,
+      $or: [
+        {
+          startTime: { $lt: endTime },
+          endTime: { $gt: startTime },
+        },
+      ],
+    });
+    if (isOver) {
+      return res.status(400).json({
+        message: "Phòng này đã có lịch chiếu khác trong khoảng thời gian này!",
+        overlappingWith: {
+          start: isOver.startTime,
+          end: isOver.endTime,
+        },
+      });
+    }
 
     const payload = ShowTimeSchema.parse({
       ...prices,
@@ -37,15 +67,12 @@ export const createShowTime = async (req: Request, res: Response) => {
       endTime,
     });
 
-    const room = await Room.findById(roomId);
-    if (!room) return res.status(404).json({ message: "không tồn tại phòng" });
-
     const newShowTime = await ShowTimeM.create(payload);
     try {
       // console.log("Room structure:", room.rows);
       await generateShowTimeSeats(newShowTime.toObject(), room.toObject());
       return res.status(201).json({
-        message: `Tạo suất chiếu lúc ${timeSlot} ngày ${movie.ngay_cong_chieu.toLocaleDateString()} thành công`,
+        message: `Tạo suất chiếu lúc ${startTime.toLocaleTimeString()} ngày ${startTime.toLocaleDateString()} thành công`,
         data: newShowTime,
       });
     } catch (error) {

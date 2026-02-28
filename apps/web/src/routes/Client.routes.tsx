@@ -12,6 +12,8 @@ import { RouteObject } from "react-router-dom";
 import MovieDetail from "@web/pages/clients/MovieDetail";
 import Ticket from "@web/pages/Ticket";
 import Checkout from "@web/pages/CheckOut";
+import { BookingPage } from "@web/components/mockup";
+
 export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
@@ -21,6 +23,8 @@ export const ClientRoutes: RouteObject = {
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "about", element: <About /> },
+    { path: "seatmap", element: <BookingPage /> },
+    { path: "bookingpage", element: <BookingPage /> },
     { path: "event", element: <Event /> },
     { path: "booking", element: <SeatBooking /> },
     { path: "movie/:id", element: <MovieDetail /> },

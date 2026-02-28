@@ -18,6 +18,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   UploadOutlined,
+  VideoCameraOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
 import dayjs from "dayjs";
@@ -25,6 +26,7 @@ import { useMovies } from "@web/hooks/useMovie";
 import { useGenres } from "@web/hooks/useGenre";
 import { useUpload } from "@web/hooks/useUploads";
 import { ICloudinaryImage } from "@shared/schemas";
+import { ShowTime } from "./Showtime";
 
 export const Movie = () => {
   const { movies, isLoading, createMovie, updateMovie, deleteMovie } =
@@ -34,6 +36,7 @@ export const Movie = () => {
 
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [showtimeMovieId, setShowtimeMovieId] = useState<string | null>(null);
   const [posterOld, setPosterOld] = useState<ICloudinaryImage | null>(null);
   const [form] = Form.useForm();
 
@@ -99,6 +102,13 @@ export const Movie = () => {
     form.resetFields();
   };
 
+  const handleOpenShowtime = (movieId: string) => {
+    setShowtimeMovieId(movieId);
+  };
+  const handleCloseShowtime = () => {
+    setShowtimeMovieId(null);
+  };
+
   const columns = [
     {
       title: "Poster",
@@ -113,7 +123,7 @@ export const Movie = () => {
       ),
     },
     { title: "Tên phim", dataIndex: "ten_phim" },
-    { title: "Đạo diễn", dataIndex: "dao_dien" },    
+    { title: "Đạo diễn", dataIndex: "dao_dien" },
     { title: "Độ tuổi", dataIndex: "do_tuoi" },
     {
       title: "Thời lượng",
@@ -130,6 +140,10 @@ export const Movie = () => {
       title: "Action",
       render: (_: any, r: any) => (
         <Space>
+          <Button
+            icon={<VideoCameraOutlined />}
+            onClick={() => handleOpenShowtime(r._id)}
+          />
           <Button icon={<EditOutlined />} onClick={() => handleEdit(r)} />
           <Popconfirm title="Xóa phim?" onConfirm={() => deleteMovie(r._id)}>
             <Button danger icon={<DeleteOutlined />} />
@@ -254,6 +268,16 @@ export const Movie = () => {
             <Input.TextArea rows={3} />
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title="Quản lý suất chiếu"
+        open={!!showtimeMovieId}
+        onCancel={handleCloseShowtime}
+        footer={null}
+        width={1240}
+      >
+        {showtimeMovieId && <ShowTime movieId={showtimeMovieId} />}
       </Modal>
     </div>
   );

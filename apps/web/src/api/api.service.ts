@@ -8,4 +8,5 @@ export const API = {
   UPLOADS: `${API_URL}/uploads`,
   GENRES: `${API_URL}/content/genres`,
   MOVIES: `${API_URL}/content/movies`,
+  SHOWTIME: `${API_URL}/catalog/showtimes`,
 };

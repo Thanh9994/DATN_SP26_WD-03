@@ -24,7 +24,7 @@ export const AdminRoutes: RouteObject = {
         { path: "users", element: <User /> },
         { path: "cinemas", element: <Cinemas /> },
         { path: "product", element: <Product /> },
-        { path: "rooms", element: <Rooms /> }
+        { path: "rooms", element: <Rooms /> },
       ],
     },
   ],
