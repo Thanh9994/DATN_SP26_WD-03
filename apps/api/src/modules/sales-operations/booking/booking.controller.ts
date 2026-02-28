@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import { SeatTime } from "../cinema-catalog/showtime/showtimeSeat.model";
+import { SeatTime } from "../../cinema-catalog/showtime/showtimeSeat.model";
 import { Booking } from "./booking.model";
 
 export const holdSeats = async (req: Request, res: Response) => {

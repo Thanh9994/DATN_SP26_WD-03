@@ -4,8 +4,7 @@ import genreRouter from "./genre/genre.route";
 
 const contentRouter = Router();
 
-contentRouter.use("/movies", movieRouter)
-contentRouter.use("/genres", genreRouter)
-contentRouter.use()
+contentRouter.use("/movies", movieRouter);
+contentRouter.use("/genres", genreRouter);
 
 export default contentRouter;

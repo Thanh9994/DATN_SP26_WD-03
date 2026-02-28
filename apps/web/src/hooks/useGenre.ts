@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/genres";
+const API_URL = "http://localhost:5000/api/content/genres";
 
 export const useGenres = () => {
   const queryClient = useQueryClient();

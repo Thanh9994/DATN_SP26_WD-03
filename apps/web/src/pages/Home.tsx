@@ -75,7 +75,7 @@ export const Home = () => {
           </div>
 
           {/* Movie List */}
-          <div className="px-2 lg:px-1 pb-14">
+          <div className="px-4 lg:px-1 pb-14">
             <PhimCard />
           </div>
         </section>

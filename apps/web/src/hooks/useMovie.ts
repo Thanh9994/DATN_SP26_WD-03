@@ -3,7 +3,7 @@ import axios from "axios";
 import type { ICreateMovie, IMovie, IUpdateMovie } from "@shared/schemas";
 import { message } from "antd";
 
-const API_URL = "http://localhost:5000/api/movies";
+const API_URL = "http://localhost:5000/api/content/movies";
 
 export const useMovies = () => {
   const queryClient = useQueryClient();
@@ -76,7 +76,7 @@ export const useMovie = (id?: string) => {
       const { data } = await axios.get(`${API_URL}/${id}`);
       return data.data;
     },
-    enabled: !!id, 
+    enabled: !!id,
     staleTime: 1000 * 60 * 10,
     gcTime: 1000 * 60 * 60,
   });
