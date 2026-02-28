@@ -3,9 +3,9 @@ import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { Request } from "express";
 
-console.log("[ENV CHECK] ✅", {
-  CLOUD_NAME: process.env.CLOUD_NAME ? "Connected" : "Missing",
-});
+// console.log("[ENV CHECK]", {
+//   CLOUD_NAME: process.env.CLOUD_NAME ? "Connected" : "Missing",
+// });
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,

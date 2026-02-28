@@ -11,7 +11,7 @@ export const BookingStatus = z.enum([
   "pending", //Chờ thanh toán
   "paid", //Đã thanh toán
   "cancelled", //Đã hủy
-  "expired", //Hết hạn thanh toán
+  "expired", //Hết hạn thanh toán và reset trạng thái
 ]);
 
 export const Base = z.object({
@@ -78,11 +78,11 @@ export const Room = Base.extend({
     z.object({
       name: z.string(), // A, B, C...
       seats: z.number().positive(), // số ghế của row đó
-      type: SeatType.default("normal")
-    })
+      type: SeatType.default("normal"),
+    }),
   ),
   vip: z.array(z.string()).default([]),
-  couple: z.array(z.string()).default([])
+  couple: z.array(z.string()).default([]),
 });
 
 export const RoomCreate = z.object({
@@ -92,10 +92,10 @@ export const RoomCreate = z.object({
     z.object({
       name: z.string(), // A, B, C...
       seats: z.number().positive(), // số ghế của row đó
-    })
+    }),
   ),
   vip: z.array(z.string()).default([]),
-  couple: z.array(z.string()).default([])
+  couple: z.array(z.string()).default([]),
 });
 
 export const RoomFormSchema = RoomCreate.extend({
@@ -103,8 +103,20 @@ export const RoomFormSchema = RoomCreate.extend({
   couple: z.string().or(z.array(z.string())),
 }).transform((data) => ({
   ...data,
-  vip: typeof data.vip === "string" ? data.vip.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) : data.vip,
-  couple: typeof data.couple === "string" ? data.couple.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) : data.couple,
+  vip:
+    typeof data.vip === "string"
+      ? data.vip
+          .split(",")
+          .map((s) => s.trim().toUpperCase())
+          .filter(Boolean)
+      : data.vip,
+  couple:
+    typeof data.couple === "string"
+      ? data.couple
+          .split(",")
+          .map((s) => s.trim().toUpperCase())
+          .filter(Boolean)
+      : data.couple,
 }));
 
 export const Row = z.object({

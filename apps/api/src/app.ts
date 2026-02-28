@@ -9,7 +9,7 @@ import testRoute from "./modules/test/test.route";
 
 const app = express();
 
-// Middlewares
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

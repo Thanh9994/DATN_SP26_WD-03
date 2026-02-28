@@ -1,5 +1,5 @@
 const Showtime = () => {
-  return <div>ádasdâssdfàasfdsfasdfasdfadsff</div>;
+  return <div>ádasdâsfádasdasdasdf</div>;
 };
 
 export default Showtime;

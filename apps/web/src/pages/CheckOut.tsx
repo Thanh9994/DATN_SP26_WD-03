@@ -69,7 +69,7 @@ const IconLock = () => (
 
 export default function Checkout() {
   const [method, setMethod] = useState<PayMethod>("card");
-  
+
   const ticketTotal = 44.0;
   const comboTotal = 25.0;
   const serviceFee = 2.5;
@@ -92,7 +92,9 @@ export default function Checkout() {
               <span className="cursor-pointer hover:text-white">Movies</span>
               <span className="cursor-pointer hover:text-white">Cinemas</span>
               <span className="cursor-pointer hover:text-white">Offers</span>
-              <span className="cursor-pointer hover:text-white">My Tickets</span>
+              <span className="cursor-pointer hover:text-white">
+                My Tickets
+              </span>
             </nav>
           </div>
 
@@ -108,8 +110,8 @@ export default function Checkout() {
           {/* LEFT */}
           <div>
             <div className="text-3xl font-extrabold">Checkout</div>
-            <div className="mt-1 text-sm text-zinc-400">
-              Complete your booking for Dune: Part Two
+            <div className="mt-2 text-sm text-zinc-400">
+              Complete your booking for Dune: Part
             </div>
 
             {/* PAYMENT METHOD */}
@@ -123,7 +125,7 @@ export default function Checkout() {
                 </div>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="mt-1 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <button
                   type="button"
                   onClick={() => setMethod("card")}
@@ -131,7 +133,7 @@ export default function Checkout() {
                     "rounded-2xl border px-5 py-4 text-left bg-white/5 hover:bg-white/10 transition",
                     method === "card"
                       ? "border-red-500/60 shadow-[0_0_40px_rgba(239,68,68,0.18)]"
-                      : "border-white/10"
+                      : "border-white/10",
                   )}
                 >
                   <div className="flex items-center gap-3 text-zinc-200">
@@ -147,7 +149,9 @@ export default function Checkout() {
                   onClick={() => setMethod("paypal")}
                   className={cn(
                     "rounded-2xl border px-5 py-4 text-left bg-white/5 hover:bg-white/10 transition",
-                    method === "paypal" ? "border-red-500/40" : "border-white/10"
+                    method === "paypal"
+                      ? "border-red-500/40"
+                      : "border-white/10",
                   )}
                 >
                   <div className="flex items-center gap-3 text-zinc-200">
@@ -161,7 +165,9 @@ export default function Checkout() {
                   onClick={() => setMethod("applepay")}
                   className={cn(
                     "rounded-2xl border px-5 py-4 text-left bg-white/5 hover:bg-white/10 transition",
-                    method === "applepay" ? "border-red-500/40" : "border-white/10"
+                    method === "applepay"
+                      ? "border-red-500/40"
+                      : "border-white/10",
                   )}
                 >
                   <div className="flex items-center gap-3 text-zinc-200">
@@ -236,7 +242,8 @@ export default function Checkout() {
                     <span className="text-red-400">
                       <IconLock />
                     </span>
-                    Your payment information is processed securely. We do not store your full card details.
+                    Your payment information is processed securely. We do not
+                    store your full card details.
                   </div>
                 </div>
               </div>
@@ -259,10 +266,14 @@ export default function Checkout() {
                     <div className="h-8 w-8 rounded-2xl bg-red-600/15 border border-red-500/20" />
                     <div>
                       <div className="font-semibold">Tickets (2x)</div>
-                      <div className="text-xs text-zinc-500 mt-1">PREMIUM IMAX</div>
+                      <div className="text-xs text-zinc-500 mt-1">
+                        PREMIUM IMAX
+                      </div>
                     </div>
                   </div>
-                  <div className="text-zinc-200 font-semibold">{money(ticketTotal)}</div>
+                  <div className="text-zinc-200 font-semibold">
+                    {money(ticketTotal)}
+                  </div>
                 </div>
 
                 <div className="flex items-start justify-between">
@@ -270,10 +281,14 @@ export default function Checkout() {
                     <div className="h-8 w-8 rounded-2xl bg-red-600/15 border border-red-500/20" />
                     <div>
                       <div className="font-semibold">Mega Movie Combo</div>
-                      <div className="text-xs text-zinc-500 mt-1">LIMITED OFFER</div>
+                      <div className="text-xs text-zinc-500 mt-1">
+                        LIMITED OFFER
+                      </div>
                     </div>
                   </div>
-                  <div className="text-zinc-200 font-semibold">{money(comboTotal)}</div>
+                  <div className="text-zinc-200 font-semibold">
+                    {money(comboTotal)}
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between text-xs text-zinc-500 pt-2">
@@ -288,7 +303,9 @@ export default function Checkout() {
                     <div className="text-[10px] tracking-[0.25em] text-red-400 font-semibold">
                       TOTAL AMOUNT
                     </div>
-                    <div className="mt-1 text-3xl font-extrabold">{money(total)}</div>
+                    <div className="mt-1 text-3xl font-extrabold">
+                      {money(total)}
+                    </div>
                   </div>
                   <div className="text-[10px] text-zinc-500 border border-white/10 bg-white/5 px-2 py-1 rounded-full">
                     USD
@@ -304,7 +321,9 @@ export default function Checkout() {
 
                 <div className="text-[10px] text-zinc-500 text-center leading-relaxed">
                   By clicking complete purchase, you agree to our{" "}
-                  <span className="text-zinc-400 underline underline-offset-2">Terms of Service</span>
+                  <span className="text-zinc-400 underline underline-offset-2">
+                    Terms of Service
+                  </span>
                 </div>
               </div>
             </div>
@@ -313,7 +332,9 @@ export default function Checkout() {
             <div className="rounded-[26px] border border-white/10 bg-white/5 p-4 flex items-center gap-3">
               <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-cyan-700/60 to-orange-600/60 border border-white/10" />
               <div className="min-w-0">
-                <div className="font-semibold text-sm truncate">Dune: Part Two</div>
+                <div className="font-semibold text-sm truncate">
+                  Dune: Part Two
+                </div>
                 <div className="text-[11px] text-zinc-500 mt-1">
                   Tonight • 2:30 PM
                 </div>
