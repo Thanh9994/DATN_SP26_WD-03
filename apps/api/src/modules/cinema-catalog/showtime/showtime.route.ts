@@ -4,10 +4,12 @@ import {
   getShowTimeByMovie,
   getShowTimeDetail,
   deleteShowTime,
+  getAllShowTimes,
 } from "./showtime.controller";
 
 const showTimeRouter = Router();
 
+showTimeRouter.get("/", getAllShowTimes);
 showTimeRouter.post("/", createShowTime);
 showTimeRouter.get("/movie/:movieId", getShowTimeByMovie);
 showTimeRouter.get("/:id", getShowTimeDetail);

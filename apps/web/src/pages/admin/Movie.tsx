@@ -275,7 +275,7 @@ export const Movie = () => {
         open={!!showtimeMovieId}
         onCancel={handleCloseShowtime}
         footer={null}
-        width={1240}
+        width={1440}
       >
         {showtimeMovieId && <ShowTime movieId={showtimeMovieId} />}
       </Modal>

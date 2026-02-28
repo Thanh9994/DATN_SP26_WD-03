@@ -5,6 +5,10 @@ import { ShowTimeM } from "./showtime.model";
 import { SeatTime } from "./showtimeSeat.model";
 import { Room } from "../room/room.model";
 import { Movie } from "../../movie-content/movie/movie.model";
+import {
+  CalculateShowTimeStatus,
+  ShowTimeDisplay,
+} from "@api/utils/showtime.util";
 
 export const createShowTime = async (req: Request, res: Response) => {
   try {
@@ -26,6 +30,14 @@ export const createShowTime = async (req: Request, res: Response) => {
       return res
         .status(400)
         .json({ message: "Thiếu thông tin thời gian chiếu" });
+    }
+    //Chặn suất chiếu ngày hôm nay
+    const now = new Date();
+    if (startTime <= now) {
+      return res.status(400).json({
+        message:
+          "Ngày chiếu không hợp lệ. Chỉ có thể tạo suất chiếu từ ngày mai trở đi!",
+      });
     }
 
     const startRelease = new Date(movie.ngay_cong_chieu);
@@ -65,6 +77,7 @@ export const createShowTime = async (req: Request, res: Response) => {
       roomId,
       startTime,
       endTime,
+      status: "upcoming",
     });
 
     const newShowTime = await ShowTimeM.create(payload);
@@ -87,14 +100,75 @@ export const createShowTime = async (req: Request, res: Response) => {
   }
 };
 
+export const getAllShowTimes = async (req: Request, res: Response) => {
+  try {
+    const { date } = req.query;
+    let query = {};
+
+    if (date) {
+      const startOfDay = new Date(date as string);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date as string);
+      endOfDay.setHours(23, 59, 59, 999);
+      query = { startTime: { $gte: startOfDay, $lte: endOfDay } };
+    }
+
+    const showtimes = await ShowTimeM.find(query)
+      .populate("movieId", "ten_phim thoi_luong")
+      // LIÊN KẾT PHÒNG -> RẠP -> KHU VỰC
+      .populate({
+        path: "roomId",
+        select: "ten_phong cinema_id",
+        populate: {
+          path: "cinema_id",
+          select: "name city address",
+        },
+      })
+      .sort({ startTime: 1 });
+
+    const dataWithStatus = showtimes.map((st) => {
+      const item = st.toObject();
+      const status = CalculateShowTimeStatus(item);
+      return {
+        ...item,
+        status: status,
+        display: ShowTimeDisplay(status),
+      };
+    });
+
+    return res.json({
+      message: "Lấy danh sách suất chiếu thành công",
+      data: dataWithStatus,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Lỗi server", error });
+  }
+};
+
 export const getShowTimeByMovie = async (req: Request, res: Response) => {
   try {
     const { movieId } = req.params;
-    const showtimes = await ShowTimeM.find({ movieId }).sort({ startTime: 1 });
+    const showtimes = await ShowTimeM.find({ movieId })
+      .populate({
+        path: "roomId",
+        select: "ten_phong cinema_id",
+        populate: { path: "cinema_id", select: "name city address" },
+      })
+      .sort({ startTime: 1 });
+
+    const dataWithStatus = showtimes.map((st) => {
+      const item = st.toObject();
+      const status = CalculateShowTimeStatus(item);
+      return {
+        ...item,
+        status,
+        display: ShowTimeDisplay(status),
+      };
+    });
 
     return res.json({
       message: "Lấy suất chiếu thành công",
-      data: showtimes,
+      data: dataWithStatus,
     });
   } catch {
     return res.status(500).json({ message: "Lỗi server" });

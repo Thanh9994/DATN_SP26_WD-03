@@ -1,7 +1,7 @@
 import {
   IUser,
-  ILoginPayload,
-  IRegisterPayload,
+  ILogin,
+  IRegister,
   IAuthResponse,
   IUpdateUser,
 } from "@shared/schemas";
@@ -10,7 +10,6 @@ import { API } from "@web/api/api.service";
 import { showNotify } from "@web/components/AppNotification";
 import { message } from "antd";
 import axios from "axios";
-
 
 // Axios instance có gắn token
 export const axiosAuth = axios.create();
@@ -35,11 +34,11 @@ export const useAuth = () => {
       return data;
     },
     enabled: !!localStorage.getItem("token"),
-     staleTime: Infinity, // Dữ liệu "me" không bao giờ cũ
-     gcTime: 1000 * 60 * 60 * 2, // Giữ trong cache 24h
+    staleTime: Infinity, // Dữ liệu "me" không bao giờ cũ
+    gcTime: 1000 * 60 * 60 * 2, // Giữ trong cache 24h
   });
 
-  const loginMutation = useMutation<IAuthResponse, Error, ILoginPayload>({
+  const loginMutation = useMutation<IAuthResponse, Error, ILogin>({
     mutationFn: async (payload) => {
       const { data } = await axios.post<IAuthResponse>(
         `${API.AUTH}/login`,
@@ -50,16 +49,16 @@ export const useAuth = () => {
     onSuccess: (data) => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      showNotify("success","Đăng Nhập Thành Công","");
+      showNotify("success", "Đăng Nhập Thành Công", "");
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },
     onError: (err) => {
-      message.error("Đăng nhập thất bại")
+      message.error("Đăng nhập thất bại");
       console.log(err.message || "Đăng nhập thất bại");
     },
   });
 
-  const registerMutation = useMutation<any, Error, IRegisterPayload>({
+  const registerMutation = useMutation<any, Error, IRegister>({
     mutationFn: async (payload) => {
       const { data } = await axios.post(`${API.AUTH}/register`, payload);
       return data;
@@ -76,7 +75,7 @@ export const useAuth = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     queryClient.removeQueries({ queryKey: ["me"] });
-    showNotify("success","Đăng Xuất Thành Công","");
+    showNotify("success", "Đăng Xuất Thành Công", "");
   };
 
   const { data: users, isLoading: isLoadingUsers } = useQuery<IUser[]>({
@@ -86,7 +85,7 @@ export const useAuth = () => {
       return data;
     },
     enabled: !!localStorage.getItem("token") && user?.role === "admin", // Chỉ gọi khi có token và là admin
-     staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5,
   });
   const updateMutation = useMutation({
     mutationFn: async ({
@@ -106,7 +105,6 @@ export const useAuth = () => {
     onError: (err) => {
       message.error(err.message || "Cập nhật thất bại");
     },
-
   });
   return {
     user,

@@ -1,6 +1,9 @@
+import { ShowTimeDashboard } from "./dashboard/ShowtimeDashboard";
 
 export const Dashboard = () => {
   return (
-    <div>Dashboard</div>
-  )
-}
+    <div>
+      <ShowTimeDashboard />
+    </div>
+  );
+};

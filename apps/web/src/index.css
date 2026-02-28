@@ -64,3 +64,10 @@ body {
 .ant-notification-notice-pure-panel {
   background: transparent !important;
 }
+
+.custom-datepicker-popup
+  .ant-picker-cell:not(.ant-picker-cell-disabled)
+  .ant-picker-cell-inner {
+  background-color: #4190ff !important;
+  color: #ffffff !important;
+}

@@ -1,13 +1,15 @@
+import dayjs from "dayjs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { message } from "antd";
 import { API } from "@web/api/api.service";
+import { ICreateShowTimePl, ShowTime, IShowTime } from "@shared/schemas";
 
 export const useShowTime = (movieId?: string) => {
   const queryClient = useQueryClient();
 
-  const { data: showtimes = [], isLoading } = useQuery({
-    queryKey: ["showtimes", movieId],
+  const { data: showtimes = [], isLoading } = useQuery<IShowTime[]>({
+    queryKey: ["showtimes", "movie", movieId],
     queryFn: async () => {
       if (!movieId) return [];
       const { data } = await axios.get(`${API.SHOWTIME}/movie/${movieId}`);
@@ -17,16 +19,28 @@ export const useShowTime = (movieId?: string) => {
   });
 
   const { mutate: createShowTime, isPending: isCreating } = useMutation({
-    mutationFn: async (payload: any) => {
-      const { data } = await axios.post(API.SHOWTIME, payload);
+    mutationFn: async (payload: ICreateShowTimePl) => {
+      const validatedData = ShowTime.parse(payload);
+      const { data } = await axios.post(API.SHOWTIME, validatedData);
       return data;
     },
     onSuccess: () => {
       message.success("Tạo suất chiếu thành công!");
       queryClient.invalidateQueries({ queryKey: ["showtimes"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-showtimes"] });
     },
     onError: (error: any) => {
-      message.error(error.response?.data?.message || "Lỗi tạo suất chiếu");
+      const serverMessage = error.response?.data?.message;
+      const overlap = error.response?.data?.overlappingWith;
+
+      if (overlap) {
+        // 2. Nếu có thông tin trùng lịch, hiển thị chi tiết giờ trùng
+        const start = dayjs(overlap.start).format("HH:mm");
+        const end = dayjs(overlap.end).format("HH:mm");
+        message.error(`${serverMessage} (Trùng từ ${start} - ${end})`, 4); //4 giây
+      } else {
+        message.error(serverMessage || "Lỗi tạo suất chiếu");
+      }
     },
   });
 
@@ -38,9 +52,10 @@ export const useShowTime = (movieId?: string) => {
     onSuccess: () => {
       message.success("Đã xóa suất chiếu");
       queryClient.invalidateQueries({ queryKey: ["showtimes"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-showtimes"] });
     },
     onError: (error: any) => {
-      message.error(error.response?.data?.message || "Không thể xóa");
+      message.error(error.message || "Không thể xóa");
     },
   });
 
@@ -52,4 +67,18 @@ export const useShowTime = (movieId?: string) => {
     deleteShowTime,
     isDeleting,
   };
+};
+
+export const useDashboardShowTimes = (date: string) => {
+  return useQuery({
+    queryKey: ["dashboard-showtimes", date],
+    queryFn: async () => {
+      const { data } = await axios.get(`${API.SHOWTIME}`, {
+        params: { date },
+      });
+      return data.data;
+    },
+    enabled: !!date,
+    staleTime: 1000 * 60 * 10,
+  });
 };

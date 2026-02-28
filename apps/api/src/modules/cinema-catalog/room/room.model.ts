@@ -6,7 +6,7 @@ const RoomSchema = new mongoose.Schema(
     cinema_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Cinema",
-      // required: true,
+      required: true,
       index: true,
     },
 

@@ -13,6 +13,13 @@ export const BookingStatus = z.enum([
   "cancelled", //Đã hủy
   "expired", //Hết hạn thanh toán và reset trạng thái
 ]);
+export const ShowTimeStatus = z.enum([
+  "upcoming", //Sắp diễn ra
+  "ongoing", //Đang chiếu
+  "finished", //Kết thúc
+  "sold_out", //Hết vé
+  "cancelled", //Đã Hủy
+]);
 
 export const Base = z.object({
   _id: z.string().optional(),
@@ -51,6 +58,7 @@ export const ShowTime = Base.extend({
   priceNormal: z.number().nonnegative(),
   priceVip: z.number().nonnegative(),
   priceCouple: z.number().nonnegative(),
+  status: ShowTimeStatus.default("upcoming"),
 }).refine((data) => data.endTime > data.startTime, {
   message: " endTime lớn hơn startTime",
   path: ["endTime"],
@@ -84,6 +92,15 @@ export const Room = Base.extend({
   vip: z.array(z.string()).default([]),
   couple: z.array(z.string()).default([]),
 });
+
+export type IPopulatedRoom = Omit<IPhong, "cinema_id"> & {
+  cinema_id: {
+    _id: string;
+    name: string;
+    city: string;
+    address: string;
+  } | null;
+};
 
 export const RoomCreate = z.object({
   ten_phong: z.string().min(1, "Tên phòng là bắt buộc"),
@@ -141,12 +158,18 @@ export const CreateCinema = z.object({
   city: z.string(),
   // phong_chieu: z.array(CreateRoom),
 });
-
+export const CinemaWeb = z.object({
+  _id: z.string().optional(),
+  name: z.string().min(1, "Tên rạp không được để trống"),
+  address: z.string(),
+  city: z.string(),
+  // phong_chieu: z.array(CreateRoom),
+});
 export const Cinema = Base.extend({
   name: z.string().min(1, "Tên rạp không được để trống"),
   address: z.string(),
   city: z.string(),
-  danh_sach_phong: z.array(Room),
+  danh_sach_phong: z.array(z.union([z.string(), z.any()])),
 });
 
 export const Movie = Base.extend({
@@ -203,12 +226,12 @@ export const UserLog = User.pick({
   trang_thai: true,
 }).partial();
 
-export const LoginPayload = z.object({
+export const Login = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 });
 
-export const RegisterPayload = z.object({
+export const Register = z.object({
   ho_ten: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(6),
@@ -222,6 +245,10 @@ export const AuthResponse = z.object({
   token: z.string(),
 });
 
+export type IPopulatedShowTime = Omit<IShowTime, "roomId" | "movieId"> & {
+  movieId: IMovie;
+  roomId: IPopulatedRoom;
+};
 export type IRoomType = z.infer<typeof RoomType>;
 export type ISeatType = z.infer<typeof SeatType>;
 export type IMovieStatus = z.infer<typeof MovieStatus>;
@@ -229,6 +256,7 @@ export type IAgeRating = z.infer<typeof AgeRating>;
 export type IUserRole = z.infer<typeof UserRole>;
 export type IUserStatus = z.infer<typeof UserStatus>;
 export type ISeatsStatus = z.infer<typeof SeatsStatus>;
+export type IShowTimeStatus = z.infer<typeof ShowTimeStatus>;
 
 export type ICloudinaryImage = z.infer<typeof CloudinaryImage>;
 export type IUploadParams = z.infer<typeof UploadParams>;
@@ -242,20 +270,34 @@ export type ICreateMovie = Omit<IMovie, "_id" | "createdAt" | "updatedAt">;
 export type IUser = z.infer<typeof User>;
 export type IUserLog = z.infer<typeof UserLog>;
 export type IUpdateUser = z.infer<typeof UpdateUser>;
-export type ILoginPayload = z.infer<typeof LoginPayload>;
-export type IRegisterPayload = z.infer<typeof RegisterPayload>;
+export type ILogin = z.infer<typeof Login>;
+export type IRegister = z.infer<typeof Register>;
 export type IAuthResponse = z.infer<typeof AuthResponse>;
 
 export type ICinema = z.infer<typeof Cinema>;
 export type ICreateCinema = z.infer<typeof CreateCinema>;
+export type ICinemaWeb = z.infer<typeof CinemaWeb>;
+export type IPopulatedCinema = Omit<ICinema, "danh_sach_phong"> & {
+  danh_sach_phong: IPhong[];
+};
 
 export type ISeats = z.infer<typeof Seats>;
 export type IRow = z.infer<typeof Row>;
 export type IPhong = z.infer<typeof Room>;
 export type IPhongCreate = z.infer<typeof RoomCreate>;
+// export type IPopulatedBooking = Omit<IBooking, "showTimeId"> & {
+//   showTimeId: IPopulatedShowTime;
+// };
 
 export type IShowTime = z.infer<typeof ShowTime>;
 export type IShowTimeSeat = z.infer<typeof ShowTimeSeat>;
+export type ICreateShowTimePl = Omit<
+  z.infer<typeof ShowTime>,
+  "_id" | "createdAt" | "updatedAt"
+> & {
+  movieId: string;
+  roomId: string;
+};
 export type ISnackDrink = z.infer<typeof SnackDrink>;
 
 // .optional(): Trường này có thể có hoặc không (tương đương với dấu ? trong Interface).

@@ -1,5 +1,5 @@
-import mongoose, { Schema} from "mongoose";
-import { ICinema} from "@shared/schemas";
+import mongoose, { Schema } from "mongoose";
+import { ICinema } from "@shared/schemas";
 
 const cinemaSchema = new Schema(
   {
@@ -11,10 +11,4 @@ const cinemaSchema = new Schema(
   { timestamps: true },
 );
 
-// export type IPhong = InferSchemaType<typeof phongSchema>;
-// export type ICinema = InferSchemaType<typeof cinemaSchema>;
-
-export const Cinemas = mongoose.model<ICinema>(
-  "Cinema",
-  cinemaSchema,
-);
+export const Cinemas = mongoose.model<ICinema>("Cinema", cinemaSchema);

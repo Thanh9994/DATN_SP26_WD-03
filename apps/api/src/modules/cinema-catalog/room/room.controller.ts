@@ -15,7 +15,13 @@ export const AllRooms = async (_req: Request, res: Response) => {
 
 export const createRoom = async (req: Request, res: Response) => {
   try {
-    const room = await createRoomS(req.body);
+    const { cinema_id, ...roomData } = req.body;
+
+    const room = await Room.create({ ...roomData, cinema_id });
+
+    await Cinemas.findByIdAndUpdate(cinema_id, {
+      $push: { danh_sach_phong: room._id },
+    });
 
     const layout = generateSeats(req.body);
     res.status(201).json({
@@ -31,7 +37,10 @@ export const RoomsByCinema = async (req: Request, res: Response) => {
   try {
     const { cinemaId } = req.params;
 
-    const rooms = await getRoomsByCinemaS(cinemaId);
+    const rooms = await Room.find({ cinema_id: cinemaId }).populate(
+      "cinema_id",
+      "name city address",
+    );
 
     res.json({
       message: "Danh sách phòng",
@@ -54,9 +63,11 @@ export const deleteRoom = async (req: Request, res: Response) => {
     await Room.findByIdAndDelete(id);
 
     //Xóa ID phòng khỏi mảng danh_sach_phong của Cinema (Đồng bộ dữ liệu)
-    await Cinemas.findByIdAndUpdate(cinemaId, {
-      $pull: { danh_sach_phong: id },
-    });
+    if (cinemaId) {
+      await Cinemas.findByIdAndUpdate(cinemaId, {
+        $pull: { danh_sach_phong: id },
+      });
+    }
 
     res.json({ message: "Xóa phòng và cập nhật rạp thành công" });
   } catch (error) {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Table,
   Button,
@@ -12,36 +12,44 @@ import {
   Card,
   InputNumber,
   Spin,
+  Tag,
 } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useShowTime } from "@web/hooks/useShowTime";
 import { useRooms } from "@web/hooks/useCinema";
-import { IPhong } from "@shared/schemas";
+import { ICreateShowTimePl, IPhong } from "@shared/schemas";
 import { useMovie } from "@web/hooks/useMovie";
 
-interface ShowTimeProps {
-  movieId: string;
+interface ShowTimeFormValues {
+  roomId: string;
+  date: dayjs.Dayjs;
+  timeSlot: dayjs.Dayjs;
+  priceNormal: number;
+  priceVip: number;
+  priceCouple: number;
 }
 
-export const ShowTime: React.FC<ShowTimeProps> = ({ movieId }) => {
+export const ShowTime = ({ movieId }: { movieId: string }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<ShowTimeFormValues>();
   const { rooms } = useRooms();
   const { data: movie, isLoading: isMovieLoading } = useMovie(movieId);
   const { showtimes, isLoading, createShowTime, isCreating, deleteShowTime } =
     useShowTime(movieId);
 
-  const handleSubmit = (values: any) => {
-    const startTime = values.date
+  const handleSubmit = (values: ShowTimeFormValues) => {
+    const startDayjs = values.date
       .hour(values.timeSlot.hour())
       .minute(values.timeSlot.minute())
       .second(0);
 
-    const payload = {
+    const payload: ICreateShowTimePl = {
       movieId,
       roomId: values.roomId,
-      startTime: startTime.toISOString(),
+      startTime: startDayjs.toDate(),
+      endTime: startDayjs.add(movie?.thoi_luong || 120, "minute").toDate(),
+      status: "upcoming",
       priceNormal: values.priceNormal,
       priceVip: values.priceVip,
       priceCouple: values.priceCouple,
@@ -56,6 +64,25 @@ export const ShowTime: React.FC<ShowTimeProps> = ({ movieId }) => {
   };
 
   const columns = [
+    {
+      title: "Rạp / Phòng chiếu",
+      key: "room_cinema",
+      render: (_: any, record: any) => {
+        const room = record.roomId;
+        const cinema = record?.cinema_id;
+        return (
+          <Space direction="vertical" size={0}>
+            <div style={{ fontWeight: "bold", color: "#1890ff" }}>
+              {/* Sửa từ cinemaId thành cinema_id */}
+              {cinema?.name || "N/A (Lỗi liên kết rạp)"}
+            </div>
+            <div style={{ fontSize: "12px", color: "#8c8c8c" }}>
+              {room?.ten_phong} - {cinema?.city || "Chưa rõ khu vực"}
+            </div>
+          </Space>
+        );
+      },
+    },
     {
       title: "Phòng",
       dataIndex: "roomId",
@@ -97,6 +124,18 @@ export const ShowTime: React.FC<ShowTimeProps> = ({ movieId }) => {
       render: (val: number) => val.toLocaleString() + "đ",
     },
     {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      render: (_: any, record: any) => {
+        const { label, color } = record.display || {
+          text: "N/A",
+          color: "default",
+        };
+        return <Tag color={color}>{label}</Tag>;
+      },
+    },
+    {
       title: "Thao tác",
       key: "action",
       render: (_: any, record: any) => (
@@ -112,7 +151,12 @@ export const ShowTime: React.FC<ShowTimeProps> = ({ movieId }) => {
             cancelText="Hủy"
             okButtonProps={{ danger: true }}
           >
-            <Button danger icon={<DeleteOutlined />} size="small" />
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              size="small"
+              disabled={record.status === "finished"}
+            />
           </Popconfirm>
         </Space>
       ),
@@ -166,6 +210,7 @@ export const ShowTime: React.FC<ShowTimeProps> = ({ movieId }) => {
         ) : (
           <Form
             form={form}
+            preserve={false}
             layout="vertical"
             onFinish={handleSubmit}
             className="mt-4"
@@ -198,6 +243,11 @@ export const ShowTime: React.FC<ShowTimeProps> = ({ movieId }) => {
               >
                 <DatePicker
                   className="w-full"
+                  classNames={{
+                    popup: {
+                      root: "custom-datepicker-popup",
+                    },
+                  }}
                   format="DD/MM/YYYY"
                   disabledDate={(current) => {
                     if (!movie) return false;

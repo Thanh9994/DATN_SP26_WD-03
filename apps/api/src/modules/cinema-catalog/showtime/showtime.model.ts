@@ -1,3 +1,4 @@
+import { ShowTimeStatus } from "@shared/schemas";
 import mongoose, { Schema } from "mongoose";
 import { IShowTime } from "@shared/schemas";
 
@@ -9,8 +10,15 @@ const showTimeSchema = new Schema<IShowTime>(
       required: true,
     },
     roomId: {
-      type: Schema.Types.ObjectId, 
-      ref: "Room", 
+      type: Schema.Types.ObjectId,
+      ref: "Room",
+      required: true,
+    },
+    status: {
+      type: String,
+      // Ép kiểu enum để chỉ nhận các giá trị trong IShowTimeStatus
+      enum: ShowTimeStatus.options,
+      default: "upcoming",
       required: true,
     },
     startTime: { type: Date, required: true },

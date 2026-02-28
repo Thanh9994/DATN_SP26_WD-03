@@ -61,6 +61,7 @@ export const useCinemas = () => {
     onSuccess: () => {
       message.success("Thêm phòng vào rạp thành công!");
       queryClient.invalidateQueries({ queryKey: ["cinemas"] });
+      queryClient.invalidateQueries({ queryKey: ["rooms"] });
     },
     onError: () => {
       message.error("Thêm phòng thất bại!");
