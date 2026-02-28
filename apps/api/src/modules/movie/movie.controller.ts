@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { movieService } from "./movie.service";
 import { calcMovieStatus } from "@shared/utils/movieStatus";
-import movieModel from "./movie.model";
 
 export const movieController = {
   async getAllMovie(_req: Request, res: Response) {

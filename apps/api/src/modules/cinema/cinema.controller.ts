@@ -1,22 +1,22 @@
 import { Request, Response } from "express";
-import cinemaModel from "./cinema.model";
+import { Cinemas } from "./cinema.model";
 
 export const AllCinemas = async (_req: Request, res: Response) => {
   try {
-    const cinemas = await cinemaModel.find();
+    const cinemas = await Cinemas.find().populate("danh_sach_phong");
     res.status(200).json({
       message: "Lấy danh sách rạp thành công",
       data: cinemas,
     });
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: "Lỗi server", error });
   }
 };
 
 export const getCinemaById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const cinema = await cinemaModel.findById(id);
+    const cinema = await Cinemas.findById(id);
     if (!cinema) {
       return res.status(404).json({ message: "Rạp không tồn tại" });
     }
@@ -25,91 +25,80 @@ export const getCinemaById = async (req: Request, res: Response) => {
       data: cinema,
     });
   } catch (error) {
-    res.status(500).json({ message: error });
-  }
-  try {
-    const { id } = req.params;
-    const cinema = await cinemaModel.findById(id);
-    if (!cinema) {
-      return res.status(404).json({ message: "Rạp không tồn tại" });
-    }
-    res.status(200).json({
-      message: "Lấy thông tin rạp thành công",
-      data: cinema,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: "Lỗi server", error });
   }
 };
 
 export const createCinema = async (req: Request, res: Response) => {
   try {
-    const newCinema = await cinemaModel.create(req.body);
+
+    const newCinema = await Cinemas.create(req.body);
     res.status(201).json({
-      message: "Tạo rạp mới thành công",
+      message: "Tạo rạp thành công",
       data: newCinema,
     });
   } catch (error) {
-    res.status(400).json({ message: error });
-  }
-  try {
-    const newCinema = await cinemaModel.create(req.body);
-    res.status(201).json({
-      message: "Tạo rạp mới thành công",
-      data: newCinema,
+    res.status(400).json({
+      message: "Dữ liệu không hợp lệ",
+      error,
     });
-  } catch (error) {
-    res.status(400).json({ message: error });
   }
 };
 
 export const updateCinema = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
-    const updatedCinema = await cinemaModel.findByIdAndUpdate(
+    const { _id, ...updateData } = req.body;
+
+    const updatedCinemas = await Cinemas.findByIdAndUpdate(
       id,
-      { ...updateData, $inc: { views: 1 } },
+      updateData,
       { new: true },
     );
-    if (!updatedCinema) {
+    if (!updatedCinemas) {
       return res.status(404).json({ message: "Rạp không tồn tại" });
     }
     res.status(200).json({
       message: "Cập nhật rạp thành công",
-      data: updatedCinema,
+      data: updatedCinemas,
     });
   } catch (error) {
-    res.status(400).json({ message: error });
+    res.status(400).json({ message: "Cập nhật thất bại", error });
   }
+};
+
+export const addRoomsToCinema = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const updateData = req.body;
-    const updatedCinema = await cinemaModel.findByIdAndUpdate(
+    const { id } = req.params; 
+    const { phongIds } = req.body; 
+
+    const updatedCinema = await Cinemas.findByIdAndUpdate(
       id,
-      { ...updateData, $inc: { views: 1 } },
-      { new: true },
-    );
+      { $addToSet: { danh_sach_phong: { $each: phongIds } } }, // Tránh add trùng ID phòng
+      { new: true }
+    ).populate("danh_sach_phong");
+
     if (!updatedCinema) {
       return res.status(404).json({ message: "Rạp không tồn tại" });
     }
+
     res.status(200).json({
-      message: "Cập nhật rạp thành công",
+      message: "Đã thêm phòng vào rạp thành công",
       data: updatedCinema,
     });
   } catch (error) {
-    res.status(400).json({ message: error });
+    res.status(400).json({ message: "Lỗi khi thêm phòng", error });
   }
 };
 
 export const deleteCinema = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    await cinemaModel.findByIdAndDelete(id);
+    await Cinemas.findByIdAndDelete(id);
     res.status(200).json({
       message: "Xóa rạp thành công",
     });
   } catch (error) {
-    res.status(400).json({ message: error });
+    res.status(400).json({ message: "Xóa thất bại", error });
   }
 };

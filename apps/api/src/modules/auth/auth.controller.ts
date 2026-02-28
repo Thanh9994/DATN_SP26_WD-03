@@ -67,7 +67,7 @@ export const Login = async (req: Request, res: Response) => {
 };
 export const getAllUsers = async (_req: Request, res: Response) => {
   try {
-    const users = await UserModel.find().select("-password").sort({ createdAt: -1 });
+    const users = await UserModel.find().select("ho_ten email role trang_thai phone").sort({ createdAt: -1 });
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Không thể lấy danh sách người dùng", error });
@@ -75,7 +75,9 @@ export const getAllUsers = async (_req: Request, res: Response) => {
 };
 
 export const me = async (req: Request, res: Response) => {
-  res.json(req.user);
+  if (!req.user) return res.status(404).json({ message: "Không tìm thấy user" });
+  const { ho_ten, email, role, phone, _id } = req.user;
+  res.json({ _id, ho_ten, email, role, phone });
 };
 
 export const updateUser = async (req: Request, res: Response) => {

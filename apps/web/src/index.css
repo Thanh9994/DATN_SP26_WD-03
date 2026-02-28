@@ -51,3 +51,16 @@ body {
   }
 }
 
+.custom-notification .ant-notification-notice-message {
+  margin-bottom: 4px !important;
+}
+
+.custom-notification .ant-notification-notice-close {
+  top: 12px !important;
+  right: 12px !important;
+}
+
+/* Hiệu ứng trượt nhẹ */
+.ant-notification-notice-pure-panel {
+  background: transparent !important;
+}

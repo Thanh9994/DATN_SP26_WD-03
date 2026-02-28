@@ -1,26 +1,20 @@
-import { ICinema, IPhong, ISeats, RoomType, SeatType } from "@shared/schemas";
-import mongoose from "mongoose";
+import mongoose, { Schema} from "mongoose";
+import { ICinema} from "@shared/schemas";
 
-const SeatsSchema = new mongoose.Schema<ISeats>({
-  hang_ghe: String,
-  so_ghe: Number,
-  loai_ghe: { type: String, enum: SeatType.options },
-});
-
-const phongSchema = new mongoose.Schema<IPhong>({
-  ten_phong: String,
-  loai_phong: { type: String, enum: RoomType.options },
-  ghe: [SeatsSchema],
-});
-
-const cinemaSchema = new mongoose.Schema<ICinema>(
+const cinemaSchema = new Schema(
   {
-    name: String,
-    address: String,
-    city: String,
-    phong_chieu: [phongSchema],
+    name: { type: String, required: true },
+    address: { type: String, required: true },
+    city: { type: String, required: true },
+    danh_sach_phong: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
   },
   { timestamps: true },
 );
 
-export default mongoose.model("cinema", cinemaSchema);
+// export type IPhong = InferSchemaType<typeof phongSchema>;
+// export type ICinema = InferSchemaType<typeof cinemaSchema>;
+
+export const Cinemas = mongoose.model<ICinema>(
+  "Cinema",
+  cinemaSchema,
+);

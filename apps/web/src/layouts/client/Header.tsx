@@ -8,7 +8,7 @@ export const Header = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    navigate("/");
   };
 
   const items: MenuProps["items"] = [

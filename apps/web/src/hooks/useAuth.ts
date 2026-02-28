@@ -6,6 +6,7 @@ import {
   IUpdateUser,
 } from "@shared/schemas";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { showNotify } from "@web/components/AppNotification";
 import { message } from "antd";
 import axios from "axios";
 
@@ -34,6 +35,8 @@ export const useAuth = () => {
       return data;
     },
     enabled: !!localStorage.getItem("token"),
+    staleTime: Infinity, // Dữ liệu "me" không bao giờ cũ
+    gcTime: 1000 * 60 * 60 * 2, // Giữ trong cache 24h
   });
 
   const loginMutation = useMutation<IAuthResponse, Error, ILoginPayload>({
@@ -47,7 +50,7 @@ export const useAuth = () => {
     onSuccess: (data) => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      message.success("Đăng nhập thành công");
+      showNotify("success", "Đăng Nhập Thành Công", "");
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },
     onError: (err) => {
@@ -73,7 +76,7 @@ export const useAuth = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     queryClient.removeQueries({ queryKey: ["me"] });
-    message.success("Đã đăng xuất");
+    showNotify("success", "Đăng Xuất Thành Công", "");
   };
 
   const { data: users, isLoading: isLoadingUsers } = useQuery<IUser[]>({
@@ -82,7 +85,8 @@ export const useAuth = () => {
       const { data } = await axiosAuth.get(`${API_URL}/`);
       return data;
     },
-    enabled: !!localStorage.getItem("token") && user?.role === "admin",
+    enabled: !!localStorage.getItem("token") && user?.role === "admin", // Chỉ gọi khi có token và là admin
+    staleTime: 1000 * 60 * 5,
   });
   const updateMutation = useMutation({
     mutationFn: async ({

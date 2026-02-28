@@ -1,9 +1,11 @@
-import { MOVIE_BADGE } from "@shared/utils/movieStatus";
 import { useMovies } from "@web/hooks/useMovie";
+import { MOVIE_BADGE } from "@shared/utils/movieStatus";
 import { Spin } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const PhimCard = () => {
   const { movies, isLoading, isError } = useMovies();
+  const navigate = useNavigate();
   if (isLoading) {
     return (
       <div className="h-[300px] flex items-center justify-center">
@@ -16,12 +18,15 @@ const PhimCard = () => {
   if (isError)
     return <p className="text-red-500">❌ Không tải được danh sách phim</p>;
 
+  
+
   return (
     <div className="flex gap-6 overflow-x-auto overflow-y-visible scroll-smooth snap-x snap-mandatory no-scrollbar pb-4 px-1">
       {movies?.map((movie) => {
         const badge = MOVIE_BADGE[movie.trang_thai];
         return (
           <div
+            onClick={() => navigate(`/movie/${movie._id}`)}
             key={movie._id}
             className="relative w-full min-w-[235px] snap-start group cursor-pointer transition hover:z-30"
           >
