@@ -2,8 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import type { ICreateMovie, IMovie, IUpdateMovie } from "@shared/schemas";
 import { message } from "antd";
-
-const API_URL = "http://localhost:5000/api/content/movies";
+import { API } from "@web/api/api.service";
 
 export const useMovies = () => {
   const queryClient = useQueryClient();
@@ -15,7 +14,7 @@ export const useMovies = () => {
   } = useQuery<IMovie[]>({
     queryKey: ["movies"],
     queryFn: async () => {
-      const { data } = await axios.get(API_URL);
+      const { data } = await axios.get(API.MOVIES);
       return data.data;
     },
     staleTime: 1000 * 60 * 10,
@@ -24,7 +23,7 @@ export const useMovies = () => {
 
   const { mutate: createMovie, isPending: isAdding } = useMutation({
     mutationFn: async (movie: ICreateMovie) => {
-      const { data } = await axios.post(API_URL, movie);
+      const { data } = await axios.post(API.MOVIES, movie);
       return data;
     },
     onSuccess: () => {
@@ -36,7 +35,7 @@ export const useMovies = () => {
 
   const { mutate: updateMovie, isPending: isUpdating } = useMutation({
     mutationFn: async ({ id, movie }: { id: string; movie: IUpdateMovie }) => {
-      const { data } = await axios.put(`${API_URL}/${id}`, movie);
+      const { data } = await axios.put(`${API.MOVIES}/${id}`, movie);
       return data;
     },
     onSuccess: () => {
@@ -47,13 +46,13 @@ export const useMovies = () => {
 
   const { mutate: deleteMovie, isPending: isDeleting } = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`${API_URL}/${id}`);
+      await axios.delete(`${API.MOVIES}/${id}`);
     },
     onSuccess: () => {
       message.success("Xóa phim thành công");
       queryClient.invalidateQueries({ queryKey: ["movies"] });
     },
-    onError: () => message.error("Xóa phim thất bại"),
+    onError: () => message.error("Xóa thất bại"),
   });
 
   return {
@@ -73,7 +72,7 @@ export const useMovie = (id?: string) => {
   return useQuery<IMovie>({
     queryKey: ["movie", id],
     queryFn: async () => {
-      const { data } = await axios.get(`${API_URL}/${id}`);
+      const { data } = await axios.get(`${API.MOVIES}/${id}`);
       return data.data;
     },
     enabled: !!id,

@@ -18,8 +18,6 @@ const PhimCard = () => {
   if (isError)
     return <p className="text-red-500">❌ Không tải được danh sách phim</p>;
 
-  
-
   return (
     <div className="flex gap-6 overflow-x-auto overflow-y-visible scroll-smooth snap-x snap-mandatory no-scrollbar pb-4 px-1">
       {movies?.map((movie) => {

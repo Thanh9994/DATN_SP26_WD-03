@@ -3,10 +3,6 @@ import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { Request } from "express";
 
-// console.log("[ENV CHECK]", {
-//   CLOUD_NAME: process.env.CLOUD_NAME ? "Connected" : "Missing",
-// });
-
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -15,7 +11,7 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: async (req: Request , file: Express.Multer.File) => {
+  params: async (req: Request, file: Express.Multer.File) => {
     // console.log("Dữ liệu body nhận được:", req.body);
     const customName = req.body.customName || "image";
     const cleanName = customName
@@ -29,9 +25,7 @@ const storage = new CloudinaryStorage({
       folder: "cinema_app",
       public_id: `${Date.now()}-${cleanName}`,
       format: "webp",
-      transformation: [
-        { quality: 60 },
-      ]
+      transformation: [{ quality: 60 }],
     };
   },
 });

@@ -7,5 +7,7 @@ connectDB();
 const cloudStatus = process.env.CLOUD_NAME ? "Connected" : "Missing";
 
 app.listen(process.env.PORT, () => {
-  console.log(`🚀 API Ready |🌐 Port: ${process.env.PORT} |🔗 MongoDB: Connected |🖼️  Cloudinary: ${cloudStatus}`);
+  console.log(
+    `🚀 API Ready |🌐 Port: ${process.env.PORT} |🔗 MongoDB: Connected |🖼️  Cloudinary: ${cloudStatus}`,
+  );
 });

@@ -6,12 +6,11 @@ import {
   IUpdateUser,
 } from "@shared/schemas";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { API } from "@web/api/api.service";
 import { showNotify } from "@web/components/AppNotification";
 import { message } from "antd";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/access/auth";
-const API_URL_USER = "http://localhost:5000/api/access/users";
 
 // Axios instance có gắn token
 export const axiosAuth = axios.create();
@@ -32,7 +31,7 @@ export const useAuth = () => {
   } = useQuery<IUser>({
     queryKey: ["me"],
     queryFn: async () => {
-      const { data } = await axiosAuth.get<IUser>(`${API_URL_USER}/me`);
+      const { data } = await axiosAuth.get<IUser>(`${API.USERS}/me`);
       return data;
     },
     enabled: !!localStorage.getItem("token"),
@@ -43,7 +42,7 @@ export const useAuth = () => {
   const loginMutation = useMutation<IAuthResponse, Error, ILoginPayload>({
     mutationFn: async (payload) => {
       const { data } = await axios.post<IAuthResponse>(
-        `${API_URL}/login`,
+        `${API.AUTH}/login`,
         payload,
       );
       return data;
@@ -62,7 +61,7 @@ export const useAuth = () => {
 
   const registerMutation = useMutation<any, Error, IRegisterPayload>({
     mutationFn: async (payload) => {
-      const { data } = await axios.post(`${API_URL}/register`, payload);
+      const { data } = await axios.post(`${API.AUTH}/register`, payload);
       return data;
     },
     onSuccess: () => {
@@ -83,7 +82,7 @@ export const useAuth = () => {
   const { data: users, isLoading: isLoadingUsers } = useQuery<IUser[]>({
     queryKey: ["users"],
     queryFn: async () => {
-      const { data } = await axiosAuth.get(`${API_URL_USER}/`);
+      const { data } = await axiosAuth.get(`${API.USERS}/`);
       return data;
     },
     enabled: !!localStorage.getItem("token") && user?.role === "admin", // Chỉ gọi khi có token và là admin
@@ -97,7 +96,7 @@ export const useAuth = () => {
       id: string;
       datas: Partial<IUpdateUser>;
     }) => {
-      const { data } = await axiosAuth.patch(`${API_URL_USER}/${id}`, datas);
+      const { data } = await axiosAuth.patch(`${API.USERS}/${id}`, datas);
       return data;
     },
     onSuccess: () => {

@@ -1,9 +1,8 @@
+import { API } from "@web/api/api.service";
 import { ICinema, ICreateCinema, IPhong, IPhongCreate } from "@shared/schemas";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
 import axios from "axios";
-const API_URL_CINEMAS = "http://localhost:5000/api/catalog/cinemas";
-const API_URL_ROOMS = "http://localhost:5000/api/catalog/rooms";
 
 export const useCinemas = () => {
   const queryClient = useQueryClient();
@@ -11,7 +10,7 @@ export const useCinemas = () => {
   const { data: cinemas, isLoading } = useQuery<ICinema[]>({
     queryKey: ["cinemas"],
     queryFn: async () => {
-      const { data } = await axios.get(API_URL_CINEMAS);
+      const { data } = await axios.get(API.CINEMAS);
       return data.data;
     },
     staleTime: 1000 * 60 * 15, // 15p gọi lại dữ liệu từ api
@@ -20,7 +19,7 @@ export const useCinemas = () => {
 
   const createCinema = useMutation({
     mutationFn: (newCinema: ICreateCinema) =>
-      axios.post(API_URL_CINEMAS, newCinema),
+      axios.post(API.CINEMAS, newCinema),
     onSuccess: () => {
       message.success("Thêm rạp thành công!");
       queryClient.invalidateQueries({ queryKey: ["cinemas"] });
@@ -36,7 +35,7 @@ export const useCinemas = () => {
       id: string;
       cinema: ICreateCinema;
     }) => {
-      const { data } = await axios.put(`${API_URL_CINEMAS}/${id}`, cinema);
+      const { data } = await axios.put(`${API.CINEMAS}/${id}`, cinema);
       return data;
     },
     onSuccess: () => {
@@ -54,7 +53,7 @@ export const useCinemas = () => {
       phongIds: string[];
     }) => {
       const { data } = await axios.patch(
-        `${API_URL_CINEMAS}/${cinemaId}/add-rooms`,
+        `${API.CINEMAS}/${cinemaId}/add-rooms`,
         { phongIds },
       );
       return data;
@@ -69,7 +68,7 @@ export const useCinemas = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => axios.delete(`${API_URL_CINEMAS}/${id}`),
+    mutationFn: (id: string) => axios.delete(`${API.CINEMAS}/${id}`),
     onSuccess: () => {
       message.success("Đã xóa rạp");
       queryClient.invalidateQueries({ queryKey: ["cinemas"] });
@@ -91,7 +90,7 @@ export const useMovie = (id: string) => {
   return useQuery<ICinema>({
     queryKey: ["movie", id],
     queryFn: async () => {
-      const { data } = await axios.get(`${API_URL_CINEMAS}/${id}`);
+      const { data } = await axios.get(`${API.CINEMAS}/${id}`);
       return data;
     },
     enabled: !!id,
@@ -109,20 +108,20 @@ export const useRooms = () => {
   } = useQuery<IPhong[]>({
     queryKey: ["rooms"],
     queryFn: async () => {
-      const data = await axios.get(API_URL_ROOMS);
+      const data = await axios.get(API.ROOMS);
       return data.data;
     },
   });
 
   const createRoom = useMutation({
-    mutationFn: (newRoom: IPhongCreate) => axios.post(API_URL_ROOMS, newRoom),
+    mutationFn: (newRoom: IPhongCreate) => axios.post(API.ROOMS, newRoom),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rooms"] }); // Load lại danh sách khi thêm xong
     },
   });
 
   const deleteRoom = useMutation({
-    mutationFn: (id: string) => axios.delete(`${API_URL_ROOMS}/${id}`),
+    mutationFn: (id: string) => axios.delete(`${API.ROOMS}/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rooms"] });
     },

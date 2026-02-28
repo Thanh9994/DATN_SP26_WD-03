@@ -1,5 +1,5 @@
-import React from 'react';
-import { Input as AntInput } from 'antd';
+import React from "react";
+import { Input as AntInput } from "antd";
 
 interface InputProps {
   label: string;
@@ -19,12 +19,12 @@ export default function Input({
   label,
   icon,
   rightElement,
-  className = '',
+  className = "",
   id,
-  type = 'text',
+  type = "text",
   ...props
 }: InputProps) {
-  const isPassword = type === 'password';
+  const isPassword = type === "password";
   const InputComponent = isPassword ? AntInput.Password : AntInput;
 
   return (
