@@ -4,7 +4,7 @@ import { generateShowTimeSeats } from "./showtime.service";
 import { ShowTimeM } from "./showtime.model";
 import { SeatTime } from "./showtimeSeat.model";
 import { Room } from "../room/room.model";
-import { Movie } from "../movie/movie.model";
+import { Movie } from "../../movie-content/movie/movie.model";
 
 export const createShowTime = async (req: Request, res: Response) => {
   try {
@@ -110,7 +110,7 @@ export const deleteShowTime = async (req: Request, res: Response) => {
 
     const hasActiveSeats = await SeatTime.exists({
       showTimeId: id,
-      trang_thai: { $in: ["booked","hold"]}
+      trang_thai: { $in: ["booked", "hold"] },
     });
 
     if (hasActiveSeats) {
@@ -126,7 +126,8 @@ export const deleteShowTime = async (req: Request, res: Response) => {
     });
 
     return res.json({
-      message: "Xoá suất chiếu và toàn bộ ghế trống thành công",  totalSeats: totalToDelete
+      message: "Xoá suất chiếu và toàn bộ ghế trống thành công",
+      totalSeats: totalToDelete,
     });
   } catch {
     return res.status(400).json({

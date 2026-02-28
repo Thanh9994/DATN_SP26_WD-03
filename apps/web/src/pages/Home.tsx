@@ -197,160 +197,290 @@ export const Home = () => {
         </section>
 
         <section className="py-20 sm:py-24">
-            <div className="max-w-7xl mx-auto overflow-hidden">
-                <div className="px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row lg:items-end justify-between mb-10 sm:mb-12 gap-6">
-                    <div>
-                        <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">Events</h2>
-                    </div>
-                    <button className="px-4 sm:px-6 py-2 sm:py-3 bg-white/5 border border-white/10 text-white rounded-full font-semibold hover:bg-white/10 transition-all text-xs sm:text-sm uppercase tracking-wider">All Events</button>
-                </div>
-                <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
-                    <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
-                        <div className="h-32 sm:h-36 relative overflow-hidden">
-                            <img alt="Film Festival" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"/>
-                            <div className="absolute top-1 left-1">
-                                <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">Film Festival</span>
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                        </div>
-                        <div className="p-3 sm:p-5">
-                            <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
-                                <span className="material-symbols-outlined text-xs">calendar_month</span>
-                                Nov 12 - 18, 2024
-                            </div>
-                            <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">Metropolis Indie Film Festival</h3>
-                            <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">Experience a week-long celebration of independent storytelling with over 50 exclusive premieres and director Q&As.</p>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
-                                    <span className="material-symbols-outlined text-sm">location_on</span>
-                                    Grand Theater
-                                </div>
-                                <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">Register <span className="material-symbols-outlined text-xs">arrow_forward</span></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
-                        <div className="h-32 sm:h-36 relative overflow-hidden">
-                            <img alt="Film Festival" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"/>
-                            <div className="absolute top-1 left-1">
-                                <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">Film Festival</span>
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                        </div>
-                        <div className="p-3 sm:p-5">
-                            <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
-                                <span className="material-symbols-outlined text-xs">calendar_month</span>
-                                Nov 12 - 18, 2024
-                            </div>
-                            <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">Metropolis Indie Film Festival</h3>
-                            <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">Experience a week-long celebration of independent storytelling with over 50 exclusive premieres and director Q&As.</p>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
-                                    <span className="material-symbols-outlined text-sm">location_on</span>
-                                    Grand Theater
-                                </div>
-                                <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">Register <span className="material-symbols-outlined text-xs">arrow_forward</span></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
-                        <div className="h-32 sm:h-36 relative overflow-hidden">
-                            <img alt="Film Festival" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"/>
-                            <div className="absolute top-1 left-1">
-                                <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">Film Festival</span>
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                        </div>
-                        <div className="p-3 sm:p-5">
-                            <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
-                                <span className="material-symbols-outlined text-xs">calendar_month</span>
-                                Nov 12 - 18, 2024
-                            </div>
-                            <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">Metropolis Indie Film Festival</h3>
-                            <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">Experience a week-long celebration of independent storytelling with over 50 exclusive premieres and director Q&As.</p>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
-                                    <span className="material-symbols-outlined text-sm">location_on</span>
-                                    Grand Theater
-                                </div>
-                                <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">Register <span className="material-symbols-outlined text-xs">arrow_forward</span></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
-                        <div className="h-32 sm:h-36 relative overflow-hidden">
-                            <img alt="Film Festival" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"/>
-                            <div className="absolute top-1 left-1">
-                                <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">Film Festival</span>
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                        </div>
-                        <div className="p-3 sm:p-5">
-                            <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
-                                <span className="material-symbols-outlined text-xs">calendar_month</span>
-                                Nov 12 - 18, 2024
-                            </div>
-                            <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">Metropolis Indie Film Festival</h3>
-                            <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">Experience a week-long celebration of independent storytelling with over 50 exclusive premieres and director Q&As.</p>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
-                                    <span className="material-symbols-outlined text-sm">location_on</span>
-                                    Grand Theater
-                                </div>
-                                <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">Register <span className="material-symbols-outlined text-xs">arrow_forward</span></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
-                        <div className="h-32 sm:h-36 relative overflow-hidden">
-                            <img alt="Film Festival" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"/>
-                            <div className="absolute top-1 left-1">
-                                <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">Film Festival</span>
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                        </div>
-                        <div className="p-3 sm:p-5">
-                            <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
-                                <span className="material-symbols-outlined text-xs">calendar_month</span>
-                                Nov 12 - 18, 2024
-                            </div>
-                            <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">Metropolis Indie Film Festival</h3>
-                            <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">Experience a week-long celebration of independent storytelling with over 50 exclusive premieres and director Q&As.</p>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
-                                    <span className="material-symbols-outlined text-sm">location_on</span>
-                                    Grand Theater
-                                </div>
-                                <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">Register <span className="material-symbols-outlined text-xs">arrow_forward</span></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
-                        <div className="h-32 sm:h-36 relative overflow-hidden">
-                            <img alt="Film Festival" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"/>
-                            <div className="absolute top-1 left-1">
-                                <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">Film Festival</span>
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                        </div>
-                        <div className="p-3 sm:p-5">
-                            <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
-                                <span className="material-symbols-outlined text-xs">calendar_month</span>
-                                Nov 12 - 18, 2024
-                            </div>
-                            <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">Metropolis Indie Film Festival</h3>
-                            <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">Experience a week-long celebration of independent storytelling with over 50 exclusive premieres and director Q&As.</p>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
-                                    <span className="material-symbols-outlined text-sm">location_on</span>
-                                    Grand Theater
-                                </div>
-                                <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">Register <span className="material-symbols-outlined text-xs">arrow_forward</span></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          <div className="max-w-7xl mx-auto overflow-hidden">
+            <div className="px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row lg:items-end justify-between mb-10 sm:mb-12 gap-6">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
+                  Events
+                </h2>
+              </div>
+              <button className="px-4 sm:px-6 py-2 sm:py-3 bg-white/5 border border-white/10 text-white rounded-full font-semibold hover:bg-white/10 transition-all text-xs sm:text-sm uppercase tracking-wider">
+                All Events
+              </button>
             </div>
+            <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+              <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
+                <div className="h-32 sm:h-36 relative overflow-hidden">
+                  <img
+                    alt="Film Festival"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
+                  />
+                  <div className="absolute top-1 left-1">
+                    <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">
+                      Film Festival
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
+                </div>
+                <div className="p-3 sm:p-5">
+                  <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
+                    <span className="material-symbols-outlined text-xs">
+                      calendar_month
+                    </span>
+                    Nov 12 - 18, 2024
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">
+                    Metropolis Indie Film Festival
+                  </h3>
+                  <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">
+                    Experience a week-long celebration of independent
+                    storytelling with over 50 exclusive premieres and director
+                    Q&As.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
+                      <span className="material-symbols-outlined text-sm">
+                        location_on
+                      </span>
+                      Grand Theater
+                    </div>
+                    <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">
+                      Register{" "}
+                      <span className="material-symbols-outlined text-xs">
+                        arrow_forward
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
+                <div className="h-32 sm:h-36 relative overflow-hidden">
+                  <img
+                    alt="Film Festival"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
+                  />
+                  <div className="absolute top-1 left-1">
+                    <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">
+                      Film Festival
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
+                </div>
+                <div className="p-3 sm:p-5">
+                  <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
+                    <span className="material-symbols-outlined text-xs">
+                      calendar_month
+                    </span>
+                    Nov 12 - 18, 2024
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">
+                    Metropolis Indie Film Festival
+                  </h3>
+                  <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">
+                    Experience a week-long celebration of independent
+                    storytelling with over 50 exclusive premieres and director
+                    Q&As.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
+                      <span className="material-symbols-outlined text-sm">
+                        location_on
+                      </span>
+                      Grand Theater
+                    </div>
+                    <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">
+                      Register{" "}
+                      <span className="material-symbols-outlined text-xs">
+                        arrow_forward
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
+                <div className="h-32 sm:h-36 relative overflow-hidden">
+                  <img
+                    alt="Film Festival"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
+                  />
+                  <div className="absolute top-1 left-1">
+                    <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">
+                      Film Festival
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
+                </div>
+                <div className="p-3 sm:p-5">
+                  <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
+                    <span className="material-symbols-outlined text-xs">
+                      calendar_month
+                    </span>
+                    Nov 12 - 18, 2024
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">
+                    Metropolis Indie Film Festival
+                  </h3>
+                  <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">
+                    Experience a week-long celebration of independent
+                    storytelling with over 50 exclusive premieres and director
+                    Q&As.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
+                      <span className="material-symbols-outlined text-sm">
+                        location_on
+                      </span>
+                      Grand Theater
+                    </div>
+                    <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">
+                      Register{" "}
+                      <span className="material-symbols-outlined text-xs">
+                        arrow_forward
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
+                <div className="h-32 sm:h-36 relative overflow-hidden">
+                  <img
+                    alt="Film Festival"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
+                  />
+                  <div className="absolute top-1 left-1">
+                    <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">
+                      Film Festival
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
+                </div>
+                <div className="p-3 sm:p-5">
+                  <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
+                    <span className="material-symbols-outlined text-xs">
+                      calendar_month
+                    </span>
+                    Nov 12 - 18, 2024
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">
+                    Metropolis Indie Film Festival
+                  </h3>
+                  <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">
+                    Experience a week-long celebration of independent
+                    storytelling with over 50 exclusive premieres and director
+                    Q&As.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
+                      <span className="material-symbols-outlined text-sm">
+                        location_on
+                      </span>
+                      Grand Theater
+                    </div>
+                    <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">
+                      Register{" "}
+                      <span className="material-symbols-outlined text-xs">
+                        arrow_forward
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
+                <div className="h-32 sm:h-36 relative overflow-hidden">
+                  <img
+                    alt="Film Festival"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
+                  />
+                  <div className="absolute top-1 left-1">
+                    <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">
+                      Film Festival
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
+                </div>
+                <div className="p-3 sm:p-5">
+                  <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
+                    <span className="material-symbols-outlined text-xs">
+                      calendar_month
+                    </span>
+                    Nov 12 - 18, 2024
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">
+                    Metropolis Indie Film Festival
+                  </h3>
+                  <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">
+                    Experience a week-long celebration of independent
+                    storytelling with over 50 exclusive premieres and director
+                    Q&As.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
+                      <span className="material-symbols-outlined text-sm">
+                        location_on
+                      </span>
+                      Grand Theater
+                    </div>
+                    <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">
+                      Register{" "}
+                      <span className="material-symbols-outlined text-xs">
+                        arrow_forward
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="group relative bg-white/5 border border-white/10 rounded-lg overflow-hidden transition-all hover:border-primary/50">
+                <div className="h-32 sm:h-36 relative overflow-hidden">
+                  <img
+                    alt="Film Festival"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
+                  />
+                  <div className="absolute top-1 left-1">
+                    <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-lg">
+                      Film Festival
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
+                </div>
+                <div className="p-3 sm:p-5">
+                  <div className="flex items-center gap-1 text-primary font-semibold text-[10px] mb-2 uppercase tracking-widest">
+                    <span className="material-symbols-outlined text-xs">
+                      calendar_month
+                    </span>
+                    Nov 12 - 18, 2024
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-tight">
+                    Metropolis Indie Film Festival
+                  </h3>
+                  <p className="text-white/50 text-[11px] sm:text-xs mb-3 sm:mb-4 leading-relaxed">
+                    Experience a week-long celebration of independent
+                    storytelling with over 50 exclusive premieres and director
+                    Q&As.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-white/70 text-[10px] sm:text-xs">
+                      <span className="material-symbols-outlined text-sm">
+                        location_on
+                      </span>
+                      Grand Theater
+                    </div>
+                    <button className="text-primary font-semibold text-[10px] sm:text-xs hover:underline flex items-center gap-1">
+                      Register{" "}
+                      <span className="material-symbols-outlined text-xs">
+                        arrow_forward
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
     </div>

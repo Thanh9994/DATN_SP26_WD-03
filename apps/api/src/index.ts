@@ -5,16 +5,13 @@ import express from "express";
 import cors from "cors";
 import { connectDB } from "./config/db";
 import testRoute from "./modules/test/test.route";
-import genreRouter from "./modules/genre/genre.route";
-import cinemaRouter from "./modules/cinema/cinema.route";
+import genreRouter from "./modules/movie-content/genre/genre.route";
 import uploadRouter from "./middlewares/upload";
-import movieRouter from "./modules/movie/movie.route";
+import movieRouter from "./modules/movie-content/movie/movie.route";
 import productRouter from "./modules/products/product.route";
-import usersRouter from "./modules/auth/user.route";
-import roomRouter from "./modules/room/room.route";
-import showTimeRouter from "./modules/showtime/showtime.route";
-
-
+import catalogRouter from "./modules/cinema-catalog";
+import accessRouter from "./modules/access-control";
+import contentRouter from "./modules/movie-content";
 
 const app = express();
 
@@ -25,14 +22,11 @@ app.use(express.urlencoded({ extended: true }));
 connectDB();
 
 app.use("/api/test", testRoute);
-app.use("/api/genres", genreRouter);
-app.use("/api/cinemas", cinemaRouter);
 app.use("/api/uploads", uploadRouter);
-app.use("/api/movies", movieRouter);
 app.use("/api/product", productRouter);
-app.use("/api/auth", usersRouter);
-app.use("/api/rooms", roomRouter);
-app.use("/api/showtimes", showTimeRouter);
+app.use("/api/access", accessRouter);
+app.use("/api/catalog", catalogRouter);
+app.use("/api/content", contentRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`🚀 API running at http://localhost:${process.env.PORT}`);

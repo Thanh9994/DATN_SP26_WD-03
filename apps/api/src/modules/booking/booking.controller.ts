@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
+import { Request, Response } from "express";
 import mongoose from "mongoose";
-import { SeatTime } from "../showtime/showtimeSeat.model";
-import { Booking } from './booking.model';
+import { SeatTime } from "../cinema-catalog/showtime/showtimeSeat.model";
+import { Booking } from "./booking.model";
 
 export const holdSeats = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();

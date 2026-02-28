@@ -1,5 +1,5 @@
 import { AgeRating, IMovie, MovieStatus } from "@shared/schemas";
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 
 const MovieSchema = new mongoose.Schema<IMovie>(
   {
@@ -27,7 +27,7 @@ const MovieSchema = new mongoose.Schema<IMovie>(
     },
     the_loai: [
       {
-        type: Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "genre",
         required: true,
       },

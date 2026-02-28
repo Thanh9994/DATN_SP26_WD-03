@@ -2,14 +2,14 @@ import { NotFound } from "@web/components/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
 import About from "@web/pages/About";
 import Event from "@web/pages/Event";
-import { ForgotPassword } from "@web/pages/ForgotPassword";
+import { ForgotPassword } from "@web/pages/clients/ForgotPassword";
 import { Home } from "@web/pages/Home";
-import Login from "@web/pages/Login";
-import { Register } from "@web/pages/Register";
+import Login from "@web/pages/clients/Login";
+import { Register } from "@web/pages/clients/Register";
 import SeatBooking from "@web/pages/SeatBooking";
 import Showtime from "@web/pages/ShowTime";
 import { RouteObject } from "react-router-dom";
-import MovieDetail from "@web/pages/MovieDetail";
+import MovieDetail from "@web/pages/clients/MovieDetail";
 import Ticket from "@web/pages/Ticket";
 import Checkout from "@web/pages/CheckOut";
 export const ClientRoutes: RouteObject = {

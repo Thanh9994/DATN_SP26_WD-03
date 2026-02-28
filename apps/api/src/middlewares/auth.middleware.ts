@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { UserModel } from "../modules/auth/user.model";
 import { IUser } from "@shared/schemas";
+import { User } from "@api/modules/access-control/user/user.model";
 
 // Mở rộng interface Request của Express để có thể chứa thông tin user
 declare global {
@@ -12,17 +12,19 @@ declare global {
   }
 }
 
+type UserRole = IUser["role"];
+
 export const authenticate = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res
         .status(401)
-        .json({ message: "Yêu cầu xác thực, vui lòng cung cấp token" });
+        .json({ message: "Vui lòng đăng nhập để tiếp tục" });
     }
 
     const token = authHeader.split(" ")[1];
@@ -30,27 +32,34 @@ export const authenticate = async (
       id: string;
     };
 
-    const user = await UserModel.findById(decoded.id).select("-password -__v -updatedAt");
+    const user = await User.findById(decoded.id).select("-password -__v");
     if (!user) {
       return res.status(404).json({ message: "Người dùng không tồn tại" });
+    }
+
+    if (user.trang_thai !== "active") {
+      return res
+        .status(403)
+        .json({ message: `Tài khoản của bạn đã bị ${user.trang_thai}` });
     }
 
     req.user = user;
     next();
   } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(401).json({ message: "Token không hợp lệ" });
-    }
-    res.status(500).json({ message: "Lỗi xác thực từ server" });
+    const message =
+      error instanceof jwt.TokenExpiredError
+        ? "Token đã hết hạn"
+        : "Xác thực không hợp lệ";
+    res.status(401).json({ message });
   }
 };
 
-export const authorize = (roles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction ) => {
-    if (!req.user || !roles.includes(req.user.role)) {
-      return res
-        .status(403)
-        .json({ message: "Bạn không có quyền truy cập tài nguyên này" });
+export const authorize = (roles: UserRole[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const userRole = req.user?.role as UserRole;
+
+    if (!req.user || !roles.includes(userRole)) {
+      return res.status(403).json({ message: "Quyền truy cập bị từ chối" });
     }
     next();
   };

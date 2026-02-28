@@ -8,10 +8,10 @@ export const UserRole = z.enum(["admin", "nhan_vien", "khach_hang"]);
 export const UserStatus = z.enum(["active", "inactive", "banned"]);
 export const SeatsStatus = z.enum(["empty", "booked", "hold", "fix"]); // "trống", Đã đặt, giữ ghế, sửa ghế
 export const BookingStatus = z.enum([
-  "pending",
-  "paid",
-  "cancelled",
-  "expired",
+  "pending", //Chờ thanh toán
+  "paid", //Đã thanh toán
+  "cancelled", //Đã hủy
+  "expired", //Hết hạn thanh toán
 ]);
 
 export const Base = z.object({

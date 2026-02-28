@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { calcMovieStatus } from "@shared/utils/movieStatus";
-import { Movie } from "../modules/movie/movie.model";
+import { Movie } from "../modules/movie-content/movie/movie.model";
 
 export const startMovieStatusCron = () => {
   cron.schedule("0 0 * * *", async () => {
