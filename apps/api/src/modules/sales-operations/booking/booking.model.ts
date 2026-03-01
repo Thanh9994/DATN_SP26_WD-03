@@ -31,7 +31,7 @@ const bookingSchema = new mongoose.Schema(
       default: "pending",
     },
     paymentId: {
-      type: String, // Mã giao dịch từ Stripe/ZaloPay/Momo
+      type: String,
     },
   },
   { timestamps: true },

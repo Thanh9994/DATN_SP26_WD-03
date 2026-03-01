@@ -72,7 +72,10 @@ export const addRoomsToCinema = async (req: Request, res: Response) => {
 
     const conflict = await Room.find({
       _id: { $in: phongIds },
-      cinema_id: { $exists: true, $nin: [id, null] },
+      cinema_id: {
+        $exists: true,
+        $nin: [id, null],
+      },
     }).populate("cinema_id", "name");
 
     if (conflict.length > 0) {
@@ -108,6 +111,7 @@ export const deleteCinema = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     await Cinemas.findByIdAndDelete(id);
+    await Room.updateMany({ cinema_id: id }, { $unset: { cinema_id: "" } });
     res.status(200).json({
       message: "Xóa rạp thành công",
     });

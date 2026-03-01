@@ -13,6 +13,7 @@ import {
   InputNumber,
   Spin,
   Tag,
+  Progress,
 } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -33,7 +34,7 @@ interface ShowTimeFormValues {
 export const ShowTime = ({ movieId }: { movieId: string }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm<ShowTimeFormValues>();
-  const { rooms } = useRooms();
+  const { rooms = [] } = useRooms();
   const { data: movie, isLoading: isMovieLoading } = useMovie(movieId);
   const { showtimes, isLoading, createShowTime, isCreating, deleteShowTime } =
     useShowTime(movieId);
@@ -68,27 +69,28 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
       title: "Rạp / Phòng chiếu",
       key: "room_cinema",
       render: (_: any, record: any) => {
-        const room = record.roomId;
-        const cinema = record?.cinema_id;
+        // Ưu tiên lấy dữ liệu đã populate sẵn trong record.roomId
+        // Nếu record.roomId là string (chưa populate), mới tìm trong danh sách rooms
+        const roomData =
+          (typeof record.roomId === "object" ? record.roomId : null) ||
+          rooms?.find((r) => r._id === record.roomId);
+
+        // Truy xuất thông tin rạp an toàn hơn
+        const cinema = roomData?.cinema_id;
+        const cinemaName =
+          cinema && typeof cinema === "object" ? (cinema as any).name : "---";
+
         return (
           <Space direction="vertical" size={0}>
             <div style={{ fontWeight: "bold", color: "#1890ff" }}>
-              {/* Sửa từ cinemaId thành cinema_id */}
-              {cinema?.name || "N/A (Lỗi liên kết rạp)"}
+              {cinemaName}
             </div>
             <div style={{ fontSize: "12px", color: "#8c8c8c" }}>
-              {room?.ten_phong} - {cinema?.city || "Chưa rõ khu vực"}
+              {roomData?.ten_phong || "Không xác định"}
             </div>
           </Space>
         );
       },
-    },
-    {
-      title: "Phòng",
-      dataIndex: "roomId",
-      key: "room",
-      render: (id: string) =>
-        rooms?.find((r: IPhong) => r._id === id)?.ten_phong || "N/A",
     },
     {
       title: "Ngày chiếu",
@@ -122,6 +124,23 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
       title: "Vé (Couple)",
       dataIndex: "priceCouple",
       render: (val: number) => val.toLocaleString() + "đ",
+    },
+    {
+      title: "Tình trạng ghế",
+      key: "seats",
+      width: 150,
+      render: (_: any, record: any) => {
+        const { booked = 0, total = 0 } = record.seatInfo || {};
+        const percent = total > 0 ? Math.round((booked / total) * 100) : 0;
+        return (
+          <Progress
+            percent={percent}
+            size="small"
+            format={() => `${booked}/${total}`}
+            status={percent >= 100 ? "exception" : "active"}
+          />
+        );
+      },
     },
     {
       title: "Trạng thái",
@@ -277,6 +296,7 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
                 rules={[{ required: true }]}
               >
                 <InputNumber
+                  min={0}
                   className="w-full"
                   formatter={(v) =>
                     `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -291,6 +311,7 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
                 rules={[{ required: true }]}
               >
                 <InputNumber
+                  min={0}
                   className="w-full"
                   formatter={(v) =>
                     `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -305,6 +326,7 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
                 rules={[{ required: true }]}
               >
                 <InputNumber
+                  min={0}
                   className="w-full"
                   formatter={(v) =>
                     `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")

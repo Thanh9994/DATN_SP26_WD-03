@@ -9,11 +9,7 @@ export const generateShowTimeSeats = async (
     throw new Error("ShowTime ID không tồn tại");
   }
 
-  const existing = await SeatTime.countDocuments({
-    showTimeId: showTime._id,
-  });
-
-  if (existing > 0) return;
+  await SeatTime.deleteMany({ showTimeId: showTime._id });
 
   const seats = [];
   const vipRows = room.vip || [];
@@ -46,5 +42,9 @@ export const generateShowTimeSeats = async (
     }
   }
 
-  await SeatTime.insertMany(seats);
+  try {
+    await SeatTime.insertMany(seats, { ordered: false });
+  } catch (error) {
+    console.error("Lỗi duplicate khi insertMany:", error);
+  }
 };

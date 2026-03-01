@@ -93,6 +93,27 @@ export const Room = Base.extend({
   couple: z.array(z.string()).default([]),
 });
 
+export const RoomWeb = Base.extend({
+  cinema_id: z.array(
+    z.object({
+      _id: z.string().optional(),
+      name: z.string(),
+      city: z.string().optional(),
+    }),
+  ),
+  ten_phong: z.string().min(1, "Tên phòng là bắt buộc"),
+  loai_phong: RoomType,
+  rows: z.array(
+    z.object({
+      name: z.string(), // A, B, C...
+      seats: z.number().positive(), // số ghế của row đó
+      type: SeatType.default("normal"),
+    }),
+  ),
+  vip: z.array(z.string()).default([]),
+  couple: z.array(z.string()).default([]),
+});
+
 export type IPopulatedRoom = Omit<IPhong, "cinema_id"> & {
   cinema_id: {
     _id: string;
@@ -161,7 +182,7 @@ export const CreateCinema = z.object({
 export const CinemaWeb = z.object({
   _id: z.string().optional(),
   name: z.string().min(1, "Tên rạp không được để trống"),
-  address: z.string(),
+  address: z.string().optional(),
   city: z.string(),
   // phong_chieu: z.array(CreateRoom),
 });
@@ -284,6 +305,7 @@ export type IPopulatedCinema = Omit<ICinema, "danh_sach_phong"> & {
 export type ISeats = z.infer<typeof Seats>;
 export type IRow = z.infer<typeof Row>;
 export type IPhong = z.infer<typeof Room>;
+export type IPhongWeb = z.infer<typeof RoomWeb>;
 export type IPhongCreate = z.infer<typeof RoomCreate>;
 // export type IPopulatedBooking = Omit<IBooking, "showTimeId"> & {
 //   showTimeId: IPopulatedShowTime;

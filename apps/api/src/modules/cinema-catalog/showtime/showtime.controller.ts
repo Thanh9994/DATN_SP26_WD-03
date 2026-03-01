@@ -156,15 +156,25 @@ export const getShowTimeByMovie = async (req: Request, res: Response) => {
       })
       .sort({ startTime: 1 });
 
-    const dataWithStatus = showtimes.map((st) => {
-      const item = st.toObject();
-      const status = CalculateShowTimeStatus(item);
-      return {
-        ...item,
-        status,
-        display: ShowTimeDisplay(status),
-      };
-    });
+    const dataWithStatus = await Promise.all(
+      showtimes.map(async (st) => {
+        const item = st.toObject();
+        const status = CalculateShowTimeStatus(item);
+
+        const total = await SeatTime.countDocuments({ showTimeId: item._id });
+        const booked = await SeatTime.countDocuments({
+          showTimeId: item._id,
+          trang_thai: { $in: ["booked", "hold"] },
+        });
+
+        return {
+          ...item,
+          status,
+          display: ShowTimeDisplay(status),
+          seatInfo: { total, booked },
+        };
+      }),
+    );
 
     return res.json({
       message: "Lấy suất chiếu thành công",

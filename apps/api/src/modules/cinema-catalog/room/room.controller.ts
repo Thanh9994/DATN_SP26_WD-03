@@ -7,7 +7,10 @@ import { Room } from "./room.model";
 export const AllRooms = async (_req: Request, res: Response) => {
   try {
     const rooms = await getAllRooms();
-    res.status(200).json(rooms);
+    res.status(200).json({
+      message: "Lấy danh sách phòng thành công",
+      data: rooms,
+    });
   } catch (error) {
     res.status(500).json({ message: "Lỗi server", error });
   }

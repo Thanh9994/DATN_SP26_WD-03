@@ -73,6 +73,7 @@ export const useCinemas = () => {
     onSuccess: () => {
       message.success("Đã xóa rạp");
       queryClient.invalidateQueries({ queryKey: ["cinemas"] });
+      queryClient.invalidateQueries({ queryKey: ["rooms"] });
     },
   });
   return {
@@ -109,7 +110,7 @@ export const useRooms = () => {
   } = useQuery<IPhong[]>({
     queryKey: ["rooms"],
     queryFn: async () => {
-      const data = await axios.get(API.ROOMS);
+      const { data } = await axios.get(API.ROOMS);
       return data.data;
     },
   });
@@ -118,13 +119,16 @@ export const useRooms = () => {
     mutationFn: (newRoom: IPhongCreate) => axios.post(API.ROOMS, newRoom),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rooms"] }); // Load lại danh sách khi thêm xong
+      queryClient.invalidateQueries({ queryKey: ["cinemas"] });
     },
   });
 
   const deleteRoom = useMutation({
     mutationFn: (id: string) => axios.delete(`${API.ROOMS}/${id}`),
     onSuccess: () => {
+      message.success("Đã xóa phòng và cập nhật rạp thành công");
       queryClient.invalidateQueries({ queryKey: ["rooms"] });
+      queryClient.invalidateQueries({ queryKey: ["cinemas"] });
     },
   });
 
