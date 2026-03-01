@@ -28,7 +28,10 @@ export const ShowTimeDashboard: React.FC = () => {
       render: (_: any, record: any) => {
         // Lọc các suất chiếu thuộc về phòng này
         const roomSlots =
-          showtimes?.filter((st: any) => st.roomId === record._id) || [];
+          showtimes?.filter((st: any) => {
+            const stRoomId = st.roomId?._id || st.roomId;
+            return stRoomId === record._id;
+          }) || [];
 
         return (
           <div className="flex gap-2 overflow-x-auto py-2">
@@ -43,7 +46,7 @@ export const ShowTimeDashboard: React.FC = () => {
                     key={slot._id}
                     size="small"
                     className="min-w-[180px] border-l-4 border-l-blue-500 shadow-sm"
-                    bodyStyle={{ padding: "8px" }}
+                    style={{ padding: "8px" }}
                   >
                     <div className="flex flex-col">
                       <Text

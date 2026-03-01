@@ -12,13 +12,14 @@ import {
   DatePicker,
   message,
   Upload,
+  Tag,
 } from "antd";
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   UploadOutlined,
-  VideoCameraOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
 import dayjs from "dayjs";
@@ -27,6 +28,7 @@ import { useGenres } from "@web/hooks/useGenre";
 import { useUpload } from "@web/hooks/useUploads";
 import { ICloudinaryImage } from "@shared/schemas";
 import { ShowTime } from "./Showtime";
+import { useNavigate } from "react-router-dom";
 
 export const Movie = () => {
   const { movies, isLoading, createMovie, updateMovie, deleteMovie } =
@@ -34,10 +36,11 @@ export const Movie = () => {
   const { genres } = useGenres();
   const { upload, isUploading } = useUpload();
 
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [showtimeMovieId, setShowtimeMovieId] = useState<string | null>(null);
   const [posterOld, setPosterOld] = useState<ICloudinaryImage | null>(null);
+  const [bannerOld, setBannerOld] = useState<ICloudinaryImage | null>(null);
   const [form] = Form.useForm();
 
   const handleSubmit = async (values: any) => {
@@ -54,12 +57,24 @@ export const Movie = () => {
         posterData = null;
       }
 
+      let bannerData: ICloudinaryImage | null = bannerOld;
+
+      if (values.banner?.[0]?.originFileObj) {
+        bannerData = await upload({
+          file: values.banner[0].originFileObj,
+          customName: `${values.ten_phim}_banner`,
+        });
+      } else if (!values.banner || values.banner.length === 0) {
+        bannerData = null;
+      }
+
       const payload = {
         ...values,
         thoi_luong: Number(values.thoi_luong),
         ngay_cong_chieu: values.ngay_cong_chieu?.toISOString(),
         ngay_ket_thuc: values.ngay_ket_thuc?.toISOString(),
         poster: posterData,
+        banner: bannerData,
         the_loai: values.genre_id,
         dien_vien: values.dien_vien || [],
         phu_de: values.phu_de || [],
@@ -83,12 +98,16 @@ export const Movie = () => {
   const handleEdit = (r: any) => {
     setEditingId(r._id);
     setPosterOld(r.poster);
+    setBannerOld(r.banner);
     form.setFieldsValue({
       ...r,
       ngay_cong_chieu: r.ngay_cong_chieu ? dayjs(r.ngay_cong_chieu) : null,
       ngay_ket_thuc: r.ngay_ket_thuc ? dayjs(r.ngay_ket_thuc) : null,
       poster: r.poster?.url
         ? [{ uid: "-1", name: r.ten_phim, status: "done", url: r.poster.url }]
+        : [],
+      banner: r.banner?.url
+        ? [{ uid: "-1", name: "Banner", status: "done", url: r.banner.url }]
         : [],
       genre_id: r.the_loai?.map((g: any) => g._id),
     });
@@ -99,14 +118,8 @@ export const Movie = () => {
     setOpen(false);
     setEditingId(null);
     setPosterOld(null);
+    setBannerOld(null);
     form.resetFields();
-  };
-
-  const handleOpenShowtime = (movieId: string) => {
-    setShowtimeMovieId(movieId);
-  };
-  const handleCloseShowtime = () => {
-    setShowtimeMovieId(null);
   };
 
   const columns = [
@@ -135,19 +148,31 @@ export const Movie = () => {
       dataIndex: "ngay_cong_chieu",
       render: (d: string) => (d ? dayjs(d).format("DD/MM/YYYY") : "-"),
     },
-    { title: "Trạng Thái", dataIndex: "trang_thai" },
+    {
+      title: "Ngày kết thúc",
+      dataIndex: "ngay_ket_thuc",
+      render: (d: string) => (d ? dayjs(d).format("DD/MM/YYYY") : "-"),
+    },
+    {
+      title: "Trạng Thái",
+      dataIndex: "trang_thai",
+      render: (status: string) => (
+        <Tag color={status === "Đang chiếu" ? "green" : "red"}>{status}</Tag>
+      ),
+    },
     {
       title: "Action",
       render: (_: any, r: any) => (
-        <Space>
-          <Button
-            icon={<VideoCameraOutlined />}
-            onClick={() => handleOpenShowtime(r._id)}
-          />
+        <Space onClick={(e) => e.stopPropagation()}>
           <Button icon={<EditOutlined />} onClick={() => handleEdit(r)} />
           <Popconfirm title="Xóa phim?" onConfirm={() => deleteMovie(r._id)}>
             <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>
+          <Button
+            type="link"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/movie/${r._id}`)}
+          />
         </Space>
       ),
     },
@@ -171,6 +196,17 @@ export const Movie = () => {
         columns={columns}
         dataSource={movies}
         loading={isLoading}
+        expandable={{
+          expandedRowRender: (record) => (
+            <div className="bg-slate-50 border-t border-slate-100 shadow-inner">
+              <ShowTime movieId={record._id!} />
+            </div>
+          ),
+          rowExpandable: (record) => record.ten_phim !== "Not Expandable",
+          showExpandColumn: false,
+          expandRowByClick: true,
+          columnWidth: 0,
+        }}
       />
 
       <Modal
@@ -262,22 +298,29 @@ export const Movie = () => {
                 </Button>
               </Upload>
             </Form.Item>
+
+            <Form.Item
+              name="banner"
+              label="Banner"
+              valuePropName="fileList"
+              getValueFromEvent={(e) => e?.fileList}
+            >
+              <Upload
+                beforeUpload={() => false}
+                maxCount={1}
+                listType="picture"
+              >
+                <Button icon={<UploadOutlined />} loading={isUploading}>
+                  Upload Banner
+                </Button>
+              </Upload>
+            </Form.Item>
           </div>
 
           <Form.Item name="mo_ta" label="Mô tả">
             <Input.TextArea rows={3} />
           </Form.Item>
         </Form>
-      </Modal>
-
-      <Modal
-        title="Quản lý suất chiếu"
-        open={!!showtimeMovieId}
-        onCancel={handleCloseShowtime}
-        footer={null}
-        width={1440}
-      >
-        {showtimeMovieId && <ShowTime movieId={showtimeMovieId} />}
       </Modal>
     </div>
   );

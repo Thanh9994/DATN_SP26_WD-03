@@ -5,7 +5,7 @@ export const Home = () => {
     <div>
       <div className="bg-background-dark text-white min-h-screen font-display dark:text-white">
         {/* HERO */}
-        <section className="relative h-screen w-full flex items-center overflow-hidden">
+        <section className="relative h-screen w-full flex items-center overflow-hidden ">
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent z-10"></div>
             <img
@@ -14,7 +14,7 @@ export const Home = () => {
               src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772216824375-bannerhome"
             />
           </div>
-          <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 slide-down-fade">
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">
                 <span className="px-3 py-1 bg-primary rounded text-xs font-bold uppercase text-white">

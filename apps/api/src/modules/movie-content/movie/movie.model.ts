@@ -11,10 +11,18 @@ const MovieSchema = new mongoose.Schema<IMovie>(
     ngay_ket_thuc: Date,
 
     poster: {
-        url: String,
-        public_id: String,
+      url: String,
+      public_id: String,
+    },
+    banner: {
+      url: String,
+      public_id: String,
     },
     trailer: String,
+    ratting: {
+      type: Number,
+      default: 0,
+    },
     danh_gia: {
       type: Number,
       default: 0,

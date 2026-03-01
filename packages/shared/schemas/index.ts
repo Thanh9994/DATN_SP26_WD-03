@@ -200,7 +200,9 @@ export const Movie = Base.extend({
   ngay_cong_chieu: z.coerce.date(),
   ngay_ket_thuc: z.coerce.date(),
   poster: CloudinaryImage,
+  banner: CloudinaryImage,
   trailer: z.string().url().optional(),
+  ratting: z.number().min(0).max(5).default(0),
   danh_gia: z.number().min(0).max(10).default(0),
   trang_thai: MovieStatus,
   the_loai: z.array(

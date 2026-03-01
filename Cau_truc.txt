@@ -105,3 +105,4 @@ git commit -m "ABC XYZ ....."
 # push theo tên nhánh bạn đặt -b 
 git push origin thanh
 
+! = = (!==)

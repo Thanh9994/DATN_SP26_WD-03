@@ -9,10 +9,11 @@ import { Register } from "@web/pages/clients/Register";
 import SeatBooking from "@web/pages/SeatBooking";
 import Showtime from "@web/pages/ShowTime";
 import { RouteObject } from "react-router-dom";
-import MovieDetail from "@web/pages/clients/MovieDetail";
 import Ticket from "@web/pages/Ticket";
 import Checkout from "@web/pages/CheckOut";
 import { BookingPage } from "@web/components/mockup";
+import MovieDetail from "@web/pages/clients/MovieDetail";
+import { DemoTrailer } from "@web/pages/Trailer";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -30,7 +31,8 @@ export const ClientRoutes: RouteObject = {
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
     { path: "ticket", element: <Ticket /> },
-    { path: "*", element: <NotFound /> },
     { path: "checkout", element: <Checkout /> },
+    { path: "*", element: <NotFound /> },
+    { path: "demo", element: <DemoTrailer /> },
   ],
 };

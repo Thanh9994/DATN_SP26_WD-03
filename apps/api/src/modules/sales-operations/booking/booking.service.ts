@@ -1,11 +1,8 @@
-import mongoose, { ClientSession } from "mongoose";
+import mongoose from "mongoose";
 import { SeatTime } from "../../cinema-catalog/showtime/showtimeSeat.model";
 import { Booking } from "./booking.model";
 
 export const bookingService = {
-  /**
-   * Giữ ghế tạm thời
-   */
   async holdSeats(showTimeId: string, seatCodes: string[], userId: string) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -28,7 +25,6 @@ export const bookingService = {
         },
         { session },
       );
-
       // Nếu số lượng ghế update không khớp với số lượng yêu cầu -> Có ghế đã bị tranh chấp
       if (result.modifiedCount !== seatCodes.length) {
         throw new Error("Một số ghế đã được chọn hoặc không còn trống.");
@@ -44,9 +40,8 @@ export const bookingService = {
     }
   },
 
-  /**
-   * Xác nhận đặt vé và tạo hóa đơn
-   */
+  //Xác nhận đặt vé và tạo hóa đơn
+
   async confirmBooking(payload: {
     showTimeId: string;
     seatCodes: string[];
@@ -58,7 +53,7 @@ export const bookingService = {
     session.startTransaction();
 
     try {
-      // 1. Kiểm tra và lấy thông tin ghế (đảm bảo vẫn đang được giữ bởi đúng User)
+      // Kiểm tra và lấy thông tin ghế (đảm bảo vẫn đang được giữ bởi đúng User)
       const seatDocs = await SeatTime.find({
         showTimeId,
         seatCode: { $in: seatCodes },
@@ -70,7 +65,7 @@ export const bookingService = {
         throw new Error("Phiên giữ ghế đã hết hạn hoặc không hợp lệ.");
       }
 
-      // 2. Chuyển trạng thái ghế sang 'booked'
+      // Chuyển trạng thái ghế sang 'booked'
       await SeatTime.updateMany(
         { _id: { $in: seatDocs.map((s) => s._id) } },
         {
@@ -80,10 +75,8 @@ export const bookingService = {
         { session },
       );
 
-      // 3. Tính tổng tiền
       const totalAmount = seatDocs.reduce((sum, s) => sum + s.price, 0);
 
-      // 4. Tạo Booking record (Lưu mảng ObjectId của ghế)
       const [newBooking] = await Booking.create(
         [
           {
@@ -108,9 +101,7 @@ export const bookingService = {
     }
   },
 
-  /**
-   * Tự động giải phóng ghế hết hạn (Dùng cho Cron job)
-   */
+  //Tự động giải phóng ghế hết hạn (Dùng cho Cron job)
   async releaseExpiredSeats() {
     const result = await SeatTime.updateMany(
       {

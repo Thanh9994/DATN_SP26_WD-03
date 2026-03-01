@@ -1,5 +1,6 @@
 import { IPhong, IShowTime } from "@shared/schemas";
 import { SeatTime } from "./showtimeSeat.model";
+import { ShowTimeM } from "./showtime.model";
 export const showTimeService = {};
 export const generateShowTimeSeats = async (
   showTime: IShowTime,
@@ -47,4 +48,28 @@ export const generateShowTimeSeats = async (
   } catch (error) {
     console.error("Lỗi duplicate khi insertMany:", error);
   }
+};
+
+export const checkShowTimeOverlap = async (
+  roomId: string,
+  startTime: Date,
+  endTime: Date,
+) => {
+  const overlap = await ShowTimeM.findOne({
+    roomId,
+    status: { $ne: "cancelled" }, // Không tính các suất đã hủy
+    $or: [
+      {
+        startTime: { $lt: endTime },
+        endTime: { $gt: startTime },
+      },
+    ],
+  });
+
+  if (overlap) {
+    throw new Error(
+      `Phòng này đã có lịch chiếu từ ${overlap.startTime.toLocaleTimeString()} đến ${overlap.endTime.toLocaleTimeString()}`,
+    );
+  }
+  return false;
 };

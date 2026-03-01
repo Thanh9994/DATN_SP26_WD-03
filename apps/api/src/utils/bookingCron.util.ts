@@ -1,4 +1,6 @@
 import { SeatTime } from "@api/modules/cinema-catalog/showtime/showtimeSeat.model";
+import { Booking } from "@api/modules/sales-operations/booking/booking.model";
+import mongoose from "mongoose";
 import cron from "node-cron";
 
 /**
@@ -8,33 +10,45 @@ import cron from "node-cron";
 export const initBookingCron = () => {
   // Biểu thức '*/1 * * * *' nghĩa là chạy mỗi phút một lần
   cron.schedule("*/1 * * * *", async () => {
+    const session = await mongoose.startSession();
     try {
+      session.startTransaction();
       const now = new Date();
 
-      // Tìm và cập nhật các ghế đã hết hạn
-      const result = await SeatTime.updateMany(
-        {
-          trang_thai: "hold",
-          holdExpiresAt: { $lt: now },
-        },
-        {
-          $set: {
-            trang_thai: "empty",
-          },
-          $unset: {
-            heldBy: "",
-            holdExpiresAt: "",
-          },
-        },
-      );
+      const expiredBookings = await Booking.find({
+        status: "pending",
+        createdAt: { $lt: new Date(now.getTime() - 5 * 60 * 1000) },
+      }).session(session);
 
-      if (result.modifiedCount > 0) {
-        console.log(
-          `[Cron] Đã giải phóng ${result.modifiedCount} ghế hết hạn.`,
+      if (expiredBookings.length > 0) {
+        const bookingIds = expiredBookings.map((b) => b._id);
+
+        await Booking.updateMany(
+          { _id: { $in: bookingIds } },
+          { $set: { status: "expired" } },
+          { session },
+        );
+        // Tìm và cập nhật các ghế đã hết hạn
+        await SeatTime.updateMany(
+          {
+            showTimeId: { $in: expiredBookings.map((b) => b.showTimeId) },
+            trang_thai: "hold",
+            holdExpiresAt: { $lt: now },
+          },
+          {
+            $set: { trang_thai: "empty" },
+            $unset: { heldBy: "", holdExpiresAt: "" },
+          },
+          { session },
         );
       }
+
+      await session.commitTransaction();
     } catch (error) {
-      console.error("[Cron Error] Lỗi khi giải phóng ghế:", error);
+      await session.abortTransaction();
+      console.error("[Cron Error]:", error);
+    } finally {
+      session.endSession();
     }
   });
 

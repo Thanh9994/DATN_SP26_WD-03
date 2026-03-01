@@ -71,3 +71,38 @@ body {
   background-color: #4190ff !important;
   color: #ffffff !important;
 }
+.ant-table-expanded-row {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Thêm hiệu ứng hover cho hàng để người dùng biết có thể click */
+.ant-table-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px); /* Bắt đầu từ trên cao 30px */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0); /* Kết thúc tại vị trí gốc */
+  }
+}
+
+.slide-down-fade {
+  animation: fadeInDown 1s ease-out forwards;
+}
