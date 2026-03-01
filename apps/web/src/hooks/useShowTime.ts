@@ -13,6 +13,7 @@ export const useShowTime = (movieId?: string) => {
     queryFn: async () => {
       if (!movieId) return [];
       const { data } = await axios.get(`${API.SHOWTIME}/movie/${movieId}`);
+      console.log("Dữ liệu lịch chiếu trả về:", data.data);
       return data.data;
     },
     enabled: !!movieId,
@@ -81,4 +82,42 @@ export const useDashboardShowTimes = (date: string) => {
     enabled: !!date,
     staleTime: 1000 * 60 * 10,
   });
+};
+
+export const useShowTimesByMovie = (movieId?: string) => {
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["movie-showtimes", movieId],
+    queryFn: async () => {
+      if (!movieId) return null;
+      const { data } = await axios.get(`${API.SHOWTIME}/movie/${movieId}`);
+      return data.data; // Mảng showtimes từ backend
+    },
+    enabled: !!movieId,
+  });
+
+  // Logic bổ trợ: Nhóm suất chiếu theo Rạp (Cinema)
+  const groupedByCinema = data?.reduce((acc: any, st: any) => {
+    const cinema = st.roomId?.cinema_id;
+    const cinemaId = cinema?._id;
+
+    if (!cinemaId) return acc;
+
+    if (!acc[cinemaId]) {
+      acc[cinemaId] = {
+        cinemaInfo: cinema,
+        showtimes: [],
+      };
+    }
+
+    acc[cinemaId].showtimes.push(st);
+    return acc;
+  }, {});
+
+  return {
+    showtimes: data || [],
+    groupedByCinema: groupedByCinema ? Object.values(groupedByCinema) : [],
+    isLoading,
+    isError,
+    refetch,
+  };
 };

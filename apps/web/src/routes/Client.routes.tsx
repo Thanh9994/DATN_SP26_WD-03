@@ -14,6 +14,8 @@ import Checkout from "@web/pages/CheckOut";
 import { BookingPage } from "@web/components/mockup";
 import MovieDetail from "@web/pages/clients/MovieDetail";
 import { DemoTrailer } from "@web/pages/Trailer";
+import BookingLayout from "@web/layouts/BookingLayout";
+import { BookingCinema } from "@web/pages/BookingCinema";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -27,7 +29,14 @@ export const ClientRoutes: RouteObject = {
     { path: "seatmap", element: <BookingPage /> },
     { path: "bookingpage", element: <BookingPage /> },
     { path: "event", element: <Event /> },
-    { path: "booking", element: <SeatBooking /> },
+    {
+      path: "booking",
+      element: <BookingLayout />,
+      children: [
+        { index: true, element: <BookingCinema /> },
+        { path: "seats", element: <SeatBooking /> },
+      ],
+    },
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
     { path: "ticket", element: <Ticket /> },
