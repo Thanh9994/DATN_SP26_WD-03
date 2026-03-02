@@ -1,64 +1,264 @@
-import { Row, Col, Card, Statistic } from "antd";
+import { useState } from "react";
 import {
-    UserOutlined,
-    DollarCircleOutlined,
-    ShoppingCartOutlined,
-    UserAddOutlined,
-} from "@ant-design/icons";
+    Layout,
+    Row,
+    Col,
+    Card,
+    Typography,
+    DatePicker,
+    Select,
+    Button,
+    Progress,
+    Divider,
+} from "antd";
+
+import {
+    AreaChart,
+    Area,
+    BarChart,
+    Bar,
+    PieChart,
+    Pie,
+    Cell,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+    Legend,
+} from "recharts";
+
+const { Header, Content } = Layout;
+const { Title, Text } = Typography;
+const { RangePicker } = DatePicker;
+
+/* ================= DATA ================= */
+
+const revenueData = {
+    all: [
+        { month: "Oct", value: 12000 },
+        { month: "Nov", value: 18000 },
+        { month: "Dec", value: 15000 },
+        { month: "Jan", value: 22000 },
+        { month: "Feb", value: 30000 },
+        { month: "Mar", value: 42000 },
+    ],
+    cgv: [
+        { month: "Oct", value: 20000 },
+        { month: "Nov", value: 26000 },
+        { month: "Dec", value: 24000 },
+        { month: "Jan", value: 30000 },
+        { month: "Feb", value: 38000 },
+        { month: "Mar", value: 50000 },
+    ],
+    lotte: [
+        { month: "Oct", value: 8000 },
+        { month: "Nov", value: 12000 },
+        { month: "Dec", value: 10000 },
+        { month: "Jan", value: 15000 },
+        { month: "Feb", value: 18000 },
+        { month: "Mar", value: 25000 },
+    ],
+};
+
+const genreData = [
+    { type: "Tình cảm", tickets: 28000 },
+    { type: "Hành động", tickets: 35000 },
+    { type: "TV Dramas", tickets: 22000 },
+    { type: "Hài", tickets: 18000 },
+];
+
+const GENRE_COLORS = ["#eb2f96", "#f5222d", "#722ed1", "#fa8c16"];
+
+const deviceData = [
+    { name: "Mobile App", value: 50 },
+    { name: "Website", value: 35 },
+    { name: "Counter", value: 15 },
+];
+
+const PIE_COLORS = ["#1677ff", "#52c41a", "#faad14"];
+
+/* 🔥 PHIM VIỆT NAM */
+const topMovies = [
+    { name: "Lật Mặt 7: Một Điều Ước", percent: 92 },
+    { name: "Mai", percent: 90 },
+    { name: "Nhà Bà Nữ", percent: 88 },
+    { name: "Mắt Biếc", percent: 85 },
+];
+
+const totalTickets = genreData.reduce(
+    (sum, item) => sum + item.tickets,
+    0
+);
+
+/* ================= COMPONENT ================= */
 
 const Analytics = () => {
+    const [cinema, setCinema] = useState("all");
+    const [dateRange, setDateRange] = useState<any>(null);
+    const [revenueTrend, setRevenueTrend] = useState(revenueData.all);
+
+    const handleSearch = () => {
+        let data = revenueData[cinema as keyof typeof revenueData];
+
+        if (dateRange) {
+            const [start, end] = dateRange;
+
+            const monthsOrder = ["Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
+
+            const startMonth = start.format("MMM");
+            const endMonth = end.format("MMM");
+
+            const startIndex = monthsOrder.indexOf(startMonth);
+            const endIndex = monthsOrder.indexOf(endMonth);
+
+            if (startIndex !== -1 && endIndex !== -1) {
+                data = data.slice(startIndex, endIndex + 1);
+            }
+        }
+
+        setRevenueTrend(data);
+    };
+
     return (
-        <div className="page">
-            <h2>Analytics</h2>
+        <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+            <Header style={{ background: "#001529", padding: "0 32px" }}>
+                <Title level={3} style={{ color: "#fff", margin: 0 }}>
+                    Movie Analytics Dashboard 🎬
+                </Title>
+            </Header>
 
-            <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12} md={12} lg={6}>
-                    <Card>
-                        <Statistic
-                            title="Total Users"
-                            value={120}
-                            valueStyle={{ color: "#1890ff" }}
-                            prefix={<UserOutlined />}
-                        />
-                    </Card>
-                </Col>
+            <Content style={{ padding: 32 }}>
+                {/* FILTER */}
+                <Card style={{ marginBottom: 24 }}>
+                    <Row gutter={16} align="middle">
+                        <Col>
+                            <Select
+                                value={cinema}
+                                onChange={(value) => setCinema(value)}
+                                style={{ width: 200 }}
+                            >
+                                <Select.Option value="all">All Cinemas</Select.Option>
+                                <Select.Option value="cgv">CGV</Select.Option>
+                                <Select.Option value="lotte">Lotte</Select.Option>
+                            </Select>
+                        </Col>
 
-                <Col xs={24} sm={12} md={12} lg={6}>
-                    <Card>
-                        <Statistic
-                            title="Total Revenue"
-                            value={8500}
-                            precision={2}
-                            prefix={<DollarCircleOutlined />}
-                            suffix="$"
-                            valueStyle={{ color: "#52c41a" }}
-                        />
-                    </Card>
-                </Col>
+                        <Col>
+                            <RangePicker onChange={(dates) => setDateRange(dates)} />
+                        </Col>
 
-                <Col xs={24} sm={12} md={12} lg={6}>
-                    <Card>
-                        <Statistic
-                            title="Total Orders"
-                            value={320}
-                            prefix={<ShoppingCartOutlined />}
-                            valueStyle={{ color: "#fa8c16" }}
-                        />
-                    </Card>
-                </Col>
+                        <Col>
+                            <Button type="primary" onClick={handleSearch}>
+                                Search
+                            </Button>
+                        </Col>
+                    </Row>
+                </Card>
 
-                <Col xs={24} sm={12} md={12} lg={6}>
-                    <Card>
-                        <Statistic
-                            title="New Signups"
-                            value={45}
-                            prefix={<UserAddOutlined />}
-                            valueStyle={{ color: "#722ed1" }}
-                        />
-                    </Card>
-                </Col>
-            </Row>
-        </div>
+                {/* REVENUE + RANKING */}
+                <Row gutter={24}>
+                    <Col span={16}>
+                        <Card title="Revenue Trend">
+                            <ResponsiveContainer width="100%" height={320}>
+                                <AreaChart data={revenueTrend}>
+                                    <XAxis dataKey="month" />
+                                    <YAxis />
+                                    <Tooltip
+                                        formatter={(value: number) =>
+                                            `$${value.toLocaleString()}`
+                                        }
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="value"
+                                        stroke="#1677ff"
+                                        fill="#e6f4ff"
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </Card>
+                    </Col>
+
+                    <Col span={8}>
+                        <Card title="Top Phim Việt Rating Ranking 🇻🇳">
+                            {topMovies.map((movie, index) => (
+                                <div key={index} style={{ marginBottom: 16 }}>
+                                    <Text strong>
+                                        {index + 1}. {movie.name}
+                                    </Text>
+                                    <Progress percent={movie.percent} />
+                                </div>
+                            ))}
+                        </Card>
+                    </Col>
+                </Row>
+
+                {/* SECOND ROW */}
+                <Row gutter={24} style={{ marginTop: 24 }}>
+                    <Col span={8}>
+                        <Card title="Tickets by Genre">
+                            <ResponsiveContainer width="100%" height={280}>
+                                <BarChart data={genreData}>
+                                    <XAxis dataKey="type" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Bar
+                                        dataKey="tickets"
+                                        radius={[8, 8, 0, 0]}
+                                        label={{
+                                            position: "top",
+                                            formatter: (value: number) =>
+                                                `${((value / totalTickets) * 100).toFixed(1)}%`,
+                                        }}
+                                    >
+                                        {genreData.map((entry, index) => (
+                                            <Cell
+                                                key={index}
+                                                fill={GENRE_COLORS[index]}
+                                            />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </Card>
+                    </Col>
+
+                    <Col span={8}>
+                        <Card title="Booking Device Distribution">
+                            <ResponsiveContainer width="100%" height={250}>
+                                <PieChart>
+                                    <Pie
+                                        data={deviceData}
+                                        innerRadius={60}
+                                        outerRadius={90}
+                                        dataKey="value"
+                                    >
+                                        {deviceData.map((_, index) => (
+                                            <Cell
+                                                key={index}
+                                                fill={PIE_COLORS[index]}
+                                            />
+                                        ))}
+                                    </Pie>
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </Card>
+                    </Col>
+
+                    <Col span={8}>
+                        <Card title="Overall System Score">
+                            <Title level={2}>86.2</Title>
+                            <Progress percent={86} />
+                            <Divider />
+                            <p>Average Rating: 7.5</p>
+                            <p>Highest Rating: 9.4</p>
+                            <p>Lowest Rating: 5.4</p>
+                        </Card>
+                    </Col>
+                </Row>
+            </Content>
+        </Layout>
     );
 };
 
