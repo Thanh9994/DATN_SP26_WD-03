@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { Dayjs } from "dayjs";
 import {
     Layout,
     Row,
@@ -31,9 +32,21 @@ const { Header, Content } = Layout;
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
+/* ================= TYPES ================= */
+
+type RevenueItem = {
+    month: string;
+    value: number;
+};
+
+type GenreItem = {
+    type: string;
+    tickets: number;
+};
+
 /* ================= DATA ================= */
 
-const revenueData = {
+const revenueData: Record<string, RevenueItem[]> = {
     all: [
         { month: "Oct", value: 12000 },
         { month: "Nov", value: 18000 },
@@ -60,7 +73,7 @@ const revenueData = {
     ],
 };
 
-const genreData = [
+const genreData: GenreItem[] = [
     { type: "Tình cảm", tickets: 28000 },
     { type: "Hành động", tickets: 35000 },
     { type: "TV Dramas", tickets: 22000 },
@@ -77,7 +90,6 @@ const deviceData = [
 
 const PIE_COLORS = ["#1677ff", "#52c41a", "#faad14"];
 
-/* 🔥 PHIM VIỆT NAM */
 const topMovies = [
     { name: "Lật Mặt 7: Một Điều Ước", percent: 92 },
     { name: "Mai", percent: 90 },
@@ -93,16 +105,17 @@ const totalTickets = genreData.reduce(
 /* ================= COMPONENT ================= */
 
 const Analytics = () => {
-    const [cinema, setCinema] = useState("all");
-    const [dateRange, setDateRange] = useState<any>(null);
-    const [revenueTrend, setRevenueTrend] = useState(revenueData.all);
+    const [cinema, setCinema] = useState<"all" | "cgv" | "lotte">("all");
+    const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
+    const [revenueTrend, setRevenueTrend] = useState<RevenueItem[]>(
+        revenueData.all
+    );
 
     const handleSearch = () => {
-        let data = revenueData[cinema as keyof typeof revenueData];
+        let data = revenueData[cinema];
 
         if (dateRange) {
             const [start, end] = dateRange;
-
             const monthsOrder = ["Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
 
             const startMonth = start.format("MMM");
@@ -137,14 +150,26 @@ const Analytics = () => {
                                 onChange={(value) => setCinema(value)}
                                 style={{ width: 200 }}
                             >
-                                <Select.Option value="all">All Cinemas</Select.Option>
-                                <Select.Option value="cgv">CGV</Select.Option>
-                                <Select.Option value="lotte">Lotte</Select.Option>
+                                <Select.Option value="all">
+                                    All Cinemas
+                                </Select.Option>
+                                <Select.Option value="cgv">
+                                    CGV
+                                </Select.Option>
+                                <Select.Option value="lotte">
+                                    Lotte
+                                </Select.Option>
                             </Select>
                         </Col>
 
                         <Col>
-                            <RangePicker onChange={(dates) => setDateRange(dates)} />
+                            <RangePicker
+                                onChange={(dates) =>
+                                    setDateRange(
+                                        dates as [Dayjs, Dayjs] | null
+                                    )
+                                }
+                            />
                         </Col>
 
                         <Col>
@@ -164,8 +189,10 @@ const Analytics = () => {
                                     <XAxis dataKey="month" />
                                     <YAxis />
                                     <Tooltip
-                                        formatter={(value: number) =>
-                                            `$${value.toLocaleString()}`
+                                        formatter={(value) =>
+                                            typeof value === "number"
+                                                ? `$${value.toLocaleString()}`
+                                                : value
                                         }
                                     />
                                     <Area
@@ -208,11 +235,17 @@ const Analytics = () => {
                                         radius={[8, 8, 0, 0]}
                                         label={{
                                             position: "top",
-                                            formatter: (value: number) =>
-                                                `${((value / totalTickets) * 100).toFixed(1)}%`,
+                                            formatter: (value) =>
+                                                typeof value === "number"
+                                                    ? `${(
+                                                        (value /
+                                                            totalTickets) *
+                                                        100
+                                                    ).toFixed(1)}%`
+                                                    : "",
                                         }}
                                     >
-                                        {genreData.map((entry, index) => (
+                                        {genreData.map((_, index) => (
                                             <Cell
                                                 key={index}
                                                 fill={GENRE_COLORS[index]}
