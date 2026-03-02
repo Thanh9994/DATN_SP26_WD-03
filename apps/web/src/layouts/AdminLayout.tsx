@@ -1,82 +1,81 @@
-import { Layout, Input, Avatar, Dropdown } from "antd";
-import {
-  UserOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  LogoutOutlined,
-} from "@ant-design/icons";
-import { Outlet, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { Sidebar } from "./admin/Navbar";
-import { useAuth } from "@web/hooks/useAuth";
+import { NavLink, Outlet } from "react-router-dom";
+import { Avatar, Typography } from "antd";
+import { UserOutlined } from "@ant-design/icons";
 
-const { Content, Header } = Layout;
+const { Text } = Typography;
 
-export const AdminLayouts = () => {
-  const [collapsed, setCollapsed] = useState(false);
-  const [search, setSearch] = useState("");
-  const navigate = useNavigate();
-
-  const { user, logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-  const menuItems = [
-    {
-      key: "profile",
-      label: "Thông tin cá nhân",
-      icon: <UserOutlined />,
-    },
-    {
-      key: "logout",
-      danger: true,
-      label: "Đăng xuất",
-      icon: <LogoutOutlined />,
-      onClick: handleLogout,
-    },
-  ];
-
+const AdminLayout = () => {
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Sidebar collapsed={collapsed} />
-
-      <Layout>
-        <Header style={{ background: "#fff", padding: "0 16px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 4px rgba(0,21,41,.08)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            {collapsed ? (
-              <MenuUnfoldOutlined onClick={() => setCollapsed(false)} style={{ fontSize: 18, cursor: "pointer" }} />
-            ) : (
-              <MenuFoldOutlined onClick={() => setCollapsed(true)} style={{ fontSize: 18, cursor: "pointer" }} />
-            )}
-            <Input.Search
-              placeholder="Tìm kiếm nhanh..."
-              onSearch={(value) => setSearch(value)}
-              style={{ width: 300 }}
-              allowClear
-            />
+    <div className="admin-container">
+      <aside className="sidebar">
+        {/* ===== SIDEBAR HEADER (ĐÃ SỬA) ===== */}
+        <div
+          style={{
+            padding: "20px 16px",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            borderBottom: "1px solid rgba(255,255,255,0.1)",
+          }}
+        >
+          <Avatar
+            size={44}
+            icon={<UserOutlined />}
+            style={{ backgroundColor: "#1677ff" }}
+          />
+          <div>
+            <Text style={{ color: "#fff", fontWeight: 600 }}>
+              Admin Panel
+            </Text>
+            <br />
+            <Text style={{ color: "#aaa", fontSize: 12 }}>
+              Super Admin
+            </Text>
           </div>
+        </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontWeight: 500 }}>{user?.ho_ten || "Đang tải..."}</span>
-            <Dropdown menu={{ items: menuItems }} placement="bottomRight" arrow>
-              <Avatar
-                size="large"
-                src={user?.avatar?.url} // Dùng ảnh từ Cloudinary nếu có
-                icon={!user?.avatar && <UserOutlined />}
-                style={{ cursor: "pointer", backgroundColor: "#1890ff" }}
-              >
-                {user?.ho_ten?.[0].toUpperCase()}
-              </Avatar>
-            </Dropdown>
-          </div>
-        </Header>
+        {/* ===== MENU ===== */}
+        <nav>
+          <NavLink to="/admin" end className={({ isActive }) => isActive ? "active" : undefined}>
+            Dashboard
+          </NavLink>
+          <NavLink to="/admin/users" className={({ isActive }) => isActive ? "active" : undefined}>
+            Users
+          </NavLink>
+          <NavLink to="/admin/movies" className={({ isActive }) => isActive ? "active" : undefined}>
+            Movies
+          </NavLink>
+          <NavLink to="/admin/settings" className={({ isActive }) => isActive ? "active" : undefined}>
+            Settings
+          </NavLink>
+          <NavLink to="/admin/analytics" className={({ isActive }) => isActive ? "active" : undefined}>
+            Analytics
+          </NavLink>
+          <NavLink to="/admin/reports" className={({ isActive }) => isActive ? "active" : undefined}>
+            Reports
+          </NavLink>
+          <NavLink to="/admin/bookings" className={({ isActive }) => isActive ? "active" : undefined}>
+            Bookings
+          </NavLink>
+          <NavLink to="/admin/cinemas" className={({ isActive }) => isActive ? "active" : undefined}>
+            Cinemas
+          </NavLink>
+        </nav>
+      </aside>
 
-        <Content style={{ margin: "24px 16px", padding: 24, background: "#fff", borderRadius: 8, minHeight: 280 }}>
-          <Outlet context={{ search }} />
-        </Content>
-      </Layout>
-    </Layout>
+      {/* ===== CONTENT ===== */}
+      <div className="content">
+        <header className="header">
+          <span>Xin chào Admin</span>
+          <button>Logout</button>
+        </header>
+
+        <main className="main">
+          <Outlet />
+        </main>
+      </div>
+    </div>
   );
 };
+
+export default AdminLayout;

@@ -35,8 +35,8 @@ export const useAuth = () => {
       return data;
     },
     enabled: !!localStorage.getItem("token"),
-     staleTime: Infinity, // Dữ liệu "me" không bao giờ cũ
-     gcTime: 1000 * 60 * 60 * 2, // Giữ trong cache 24h
+    staleTime: Infinity, // Dữ liệu "me" không bao giờ cũ
+    gcTime: 1000 * 60 * 60 * 2, // Giữ trong cache 24h
   });
 
   const loginMutation = useMutation<IAuthResponse, Error, ILoginPayload>({
@@ -50,7 +50,7 @@ export const useAuth = () => {
     onSuccess: (data) => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      showNotify("success","Đăng Nhập Thành Công","");
+      showNotify("success", "Đăng Nhập Thành Công", "");
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },
     onError: (err) => {
@@ -76,7 +76,7 @@ export const useAuth = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     queryClient.removeQueries({ queryKey: ["me"] });
-    showNotify("success","Đăng Xuất Thành Công","");
+    showNotify("success", "Đăng Xuất Thành Công", "");
   };
 
   const { data: users, isLoading: isLoadingUsers } = useQuery<IUser[]>({
@@ -86,7 +86,7 @@ export const useAuth = () => {
       return data;
     },
     enabled: !!localStorage.getItem("token") && user?.role === "admin", // Chỉ gọi khi có token và là admin
-     staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5,
   });
   const updateMutation = useMutation({
     mutationFn: async ({
