@@ -40,7 +40,7 @@ export default function Input({
         prefix={icon}
         suffix={rightElement}
         type={type}
-        className={`!bg-white/5 !border-white/10 !rounded-xl !py-4 !text-white placeholder:!text-white/30 focus:!ring-2 focus:!ring-primary/50 focus:!border-primary transition-all ${className}`}
+        className={`!bg-white/5 !border-white/10 !rounded-xl !py-4 !text-white placeholder:text-white/40 focus:!ring-2 focus:!ring-primary/50 focus:!border-primary transition-all ${className}`}
         {...props}
       />
     </div>

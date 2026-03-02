@@ -2,6 +2,7 @@ import Button from "@web/components/Button";
 import Input from "@web/components/Input";
 import { useAuth } from "@web/hooks/useAuth";
 import AuthLayout from "@web/layouts/AuthLayout";
+import { Form } from "antd";
 import { Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -39,16 +40,24 @@ const Login = () => {
       }
       lsSubtitle="Stream the latest blockbusters and book tickets for the premium cinematic experience in one place."
     >
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        <Input
-          label="Email Address"
-          type="email"
-          id="email"
-          placeholder="name@example.com"
-          icon={<Mail size={20} />}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <Form className="space-y-6" onFinish={handleSubmit} layout="vertical">
+        <Form.Item
+          name="email"
+          rules={[
+            { required: true, message: "Vui lòng nhập email" },
+            { type: "email", message: "Email không hợp lệ" },
+          ]}
+        >
+          <Input
+            label="Email Address"
+            type="email"
+            id="email"
+            placeholder="name@example.com"
+            icon={<Mail size={20} />}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Form.Item>
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <label className="block text-xs font-bold text-white/40 uppercase tracking-widest">
@@ -61,15 +70,25 @@ const Login = () => {
               Forgot Password?
             </Link>
           </div>
-          <Input
-            label=""
-            type="password"
-            id="password"
-            placeholder="••••••••"
-            icon={<Lock size={20} />}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <Form.Item
+            name="Phone"
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập số điện thoại",
+              },
+            ]}
+          >
+            <Input
+              label=""
+              type="password"
+              id="password"
+              placeholder="••••••••"
+              icon={<Lock size={20} />}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Form.Item>
         </div>
         <div className="flex items-center gap-3 py-2">
           <input
@@ -90,7 +109,7 @@ const Login = () => {
         <Button type="submit" disabled={isLoggingIn}>
           {isLoggingIn ? "Signing In..." : "Sign In"}
         </Button>
-      </form>
+      </Form>
 
       <div className="relative my-10">
         <div className="absolute inset-0 flex items-center">

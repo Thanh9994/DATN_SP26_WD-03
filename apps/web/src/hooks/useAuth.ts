@@ -49,12 +49,12 @@ export const useAuth = () => {
     onSuccess: (data) => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      showNotify("success", "Đăng Nhập Thành Công", "");
+      showNotify("success", "Đăng Nhập Thành Công");
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },
     onError: (err) => {
-      message.error("Đăng nhập thất bại");
-      console.log(err.message || "Đăng nhập thất bại");
+      showNotify("success", "Đăng nhập thất bại");
+      console.error(err.message || "Đăng nhập thất bại");
     },
   });
 
@@ -64,10 +64,11 @@ export const useAuth = () => {
       return data;
     },
     onSuccess: () => {
-      message.success("Đăng ký thành công");
+      showNotify("success", "Đăng Ký Thành Công");
     },
     onError: (err) => {
-      message.error(err.message || "Đăng ký thất bại");
+      showNotify("success", "Đăng Ký thất bại");
+      console.error(err.message || "Đăng ký thất bại");
     },
   });
 

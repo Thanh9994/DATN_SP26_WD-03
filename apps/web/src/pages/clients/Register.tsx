@@ -5,6 +5,7 @@ import Input from "@web/components/Input";
 import AuthLayout from "@web/layouts/AuthLayout";
 import { Lock, Mail, Phone, User } from "lucide-react";
 import { useAuth } from "@web/hooks/useAuth";
+import { Popconfirm, Checkbox, Form } from "antd";
 
 export const Register = () => {
   const navigate = useNavigate();
@@ -15,11 +16,11 @@ export const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
-
+  const [open, setOpen] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!acceptTerms) {
-      alert("Bạn phải đồng ý điều khoản!");
+      setOpen(true);
       return;
     }
     try {
@@ -30,6 +31,29 @@ export const Register = () => {
       // alert(err.message || "Register failed");
     }
   };
+
+  const calculateStrength = (password: string) => {
+    let score = 0;
+
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/\d/.test(password)) score++;
+    if (/[@$!%*?&]/.test(password)) score++;
+
+    return score;
+  };
+
+  const strengthScore = calculateStrength(password);
+
+  const strengthLabel =
+    strengthScore <= 1 ? "Weak" : strengthScore <= 3 ? "Medium" : "Strong";
+
+  const strengthColor =
+    strengthScore <= 1
+      ? "bg-red-500"
+      : strengthScore <= 3
+        ? "bg-yellow-500"
+        : "bg-green-500";
 
   return (
     <AuthLayout
@@ -43,94 +67,178 @@ export const Register = () => {
       }
       lsSubtitle="Stream the latest blockbusters and book tickets for exclusive premieres at your favorite local cinemas."
     >
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        <Input
-          label="Full Name"
-          type="text"
-          id="name"
-          placeholder="John Doe"
-          icon={<User size={20} />}
-          value={ho_ten}
-          onChange={(e) => setHoten(e.target.value)}
-        />
-
-        <Input
-          label="Email Address"
-          type="email"
-          id="email"
-          placeholder="name@company.com"
-          icon={<Mail size={20} />}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <Input
-          label="Phone Number"
-          type="phone"
-          id="phone"
-          placeholder="+84 or 09********"
-          icon={<Phone size={20} />}
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-
-        <div className="space-y-3">
+      <Form className="space-y-4" onFinish={handleSubmit} layout="vertical">
+        <Form.Item
+          name="ho_ten"
+          rules={[{ required: true, message: "Vui lòng nhập họ tên" }]}
+        >
           <Input
-            label="Password"
-            type="password"
-            id="password"
-            placeholder="••••••••"
-            icon={<Lock size={20} />}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            label="Full Name"
+            type="text"
+            id="name"
+            placeholder="John Doe"
+            icon={<User size={20} />}
+            value={ho_ten}
+            onChange={(e) => setHoten(e.target.value)}
           />
-          <div className="px-1">
-            <div className="flex gap-1.5 mb-2">
-              <div className="h-1 flex-1 bg-primary rounded-full"></div>
-              <div className="h-1 flex-1 bg-primary rounded-full"></div>
-              <div className="h-1 flex-1 bg-white/10 rounded-full"></div>
-              <div className="h-1 flex-1 bg-white/10 rounded-full"></div>
-            </div>
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-tighter">
-              Password Strength: <span className="text-primary">Medium</span>
-            </p>
-          </div>
-        </div>
+        </Form.Item>
+        <Form.Item
+          name="email"
+          rules={[
+            { required: true, message: "Vui lòng nhập email" },
+            { type: "email", message: "Email không hợp lệ" },
+          ]}
+        >
+          <Input
+            label="Email Address"
+            type="email"
+            id="email"
+            placeholder="name@company.com"
+            icon={<Mail size={20} />}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item
+          name="Phone"
+          rules={[
+            {
+              required: true,
+              message: "Vui lòng nhập số điện thoại",
+            },
+          ]}
+        >
+          <Input
+            label="Phone Number"
+            type="phone"
+            id="phone"
+            placeholder="+84 or 09********"
+            icon={<Phone size={20} />}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item
+          name="password"
+          rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
+        >
+          <div className="space-y-3">
+            <Input
+              label="Password"
+              type="password"
+              id="password"
+              placeholder="••••••••"
+              icon={<Lock size={20} />}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
+            <div className="px-1">
+              {/* Strength Bar */}
+              <div className="flex gap-1.5 mb-2">
+                {[1, 2, 3, 4].map((level) => (
+                  <div
+                    key={level}
+                    className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                      strengthScore >= level ? strengthColor : "bg-white/10"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {/* Strength Text */}
+              <p className="text-[10px] font-bold uppercase tracking-wider">
+                <span className="text-white/40">Password Strength: </span>
+                <span
+                  className={
+                    strengthScore <= 1
+                      ? "text-red-400"
+                      : strengthScore <= 3
+                        ? "text-yellow-400"
+                        : "text-green-400"
+                  }
+                >
+                  {strengthLabel}
+                </span>
+              </p>
+
+              {/* Requirements */}
+              <ul className="mt-2 text-[11px] text-white/40 flex items-center justify-center gap-4 flex-wrap">
+                <li
+                  className={`flex items-center gap-1 ${password.length >= 8 ? "text-green-400" : ""}`}
+                >
+                  <span>{password.length >= 8 ? "✔" : "•"}</span>
+                  Tối thiểu 8 ký tự
+                </li>
+
+                <li
+                  className={`flex items-center gap-1 ${/[A-Z]/.test(password) ? "text-green-400" : ""}`}
+                >
+                  <span>{/[A-Z]/.test(password) ? "✔" : "•"}</span>
+                  Có 1 chữ hoa
+                </li>
+
+                <li
+                  className={`flex items-center gap-1 ${/\d/.test(password) ? "text-green-400" : ""}`}
+                >
+                  <span>{/\d/.test(password) ? "✔" : "•"}</span>
+                  Có 1 số
+                </li>
+
+                <li
+                  className={`flex items-center gap-1 ${/[@$!%*?&]/.test(password) ? "text-green-400" : ""}`}
+                >
+                  <span>{/[@$!%*?&]/.test(password) ? "✔" : "•"}</span>
+                  Ký tự đặc biệt
+                </li>
+              </ul>
+            </div>
+          </div>
+        </Form.Item>
         <div className="flex items-start gap-3 px-1">
-          <input
-            type="checkbox"
-            id="acceptTerms"
-            checked={acceptTerms}
-            className="w-5 h-5 mt-0.5 rounded border-white/10 bg-white/5 text-primary focus:ring-offset-background-dark focus:ring-primary transition-all cursor-pointer"
-            onChange={(e) => setAcceptTerms(e.target.checked)}
-          />
-          <label
-            htmlFor="terms"
-            className="text-xs text-white/40 leading-tight cursor-pointer"
+          <Popconfirm
+            title="Xác nhận điều khoản"
+            description="Bạn có đồng ý với Terms of Service và Privacy Policy không?"
+            open={open}
+            onConfirm={() => {
+              setAcceptTerms(true);
+              setOpen(false);
+            }}
+            onCancel={() => {
+              setOpen(false);
+            }}
+            okText="Đồng ý"
+            cancelText="Hủy"
           >
-            By creating an account, I agree to the{" "}
-            <a
-              href="#"
-              className="text-white/60 underline hover:text-primary transition-colors"
+            <Checkbox
+              checked={acceptTerms}
+              onChange={(e) => {
+                if (!acceptTerms && e.target.checked) {
+                  setOpen(true);
+                } else {
+                  setAcceptTerms(false);
+                }
+              }}
             >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="#"
-              className="text-white/60 underline hover:text-primary transition-colors"
-            >
-              Privacy Policy
-            </a>
-            .
-          </label>
+              <span className="text-xs text-white/60">
+                By creating an account, I agree to the{" "}
+                <a href="#" className="underline hover:text-primary">
+                  Terms of Service
+                </a>{" "}
+                and{" "}
+                <a href="#" className="underline hover:text-primary">
+                  Privacy Policy
+                </a>
+                .
+              </span>
+            </Checkbox>
+          </Popconfirm>
         </div>
 
         <Button type="submit" disabled={isRegistering}>
           {isRegistering ? "Creating..." : "Create Account"}
         </Button>
-      </form>
+      </Form>
 
       <div className="relative my-8">
         <div className="absolute inset-0 flex items-center">

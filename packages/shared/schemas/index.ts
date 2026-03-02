@@ -255,9 +255,15 @@ export const Login = z.object({
 });
 
 export const Register = z.object({
-  ho_ten: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(6),
+  ho_ten: z.string().min(2, "Họ tên phải ít nhất 2 ký tự"),
+  email: z.string().email("Email không hợp lệ"),
+  password: z
+    .string()
+    .min(8, "Mật khẩu phải tối thiểu 8 ký tự")
+    .regex(/[A-Z]/, "Phải có ít nhất 1 chữ hoa")
+    .regex(/\d/, "Phải có ít nhất 1 số")
+    .regex(/[@$!%*?&]/, "Phải có ít nhất 1 ký tự đặc biệt"),
+
   phone: z
     .string()
     .regex(/^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ"),

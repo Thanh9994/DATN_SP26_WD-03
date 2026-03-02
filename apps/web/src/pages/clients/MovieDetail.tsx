@@ -133,7 +133,15 @@ const MovieDetail = () => {
               </p>
               <div className="pt-10">
                 <button
-                  onClick={() => navigate(`/booking?movieId=${id}`)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const token = localStorage.getItem("token");
+                    if (!token) {
+                      navigate("/login");
+                    } else {
+                      navigate(`/booking?movieId=${movie._id}`);
+                    }
+                  }}
                   className="bg-primary text-white font-bold text-lg uppercase tracking-widest px-8 py-3 rounded-2xl shadow-2xl shadow-primary/40 transform hover:scale-105 transition-all duration-300 ease-in-out animate-pulse hover:animate-none"
                 >
                   <span className="relative z-10 text-white font-black text-xl uppercase tracking-[0.2em]">

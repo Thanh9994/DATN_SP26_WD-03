@@ -52,19 +52,20 @@ export const Home = () => {
             </div>
           </div>
         </section>
-
         {/* NOW SHOWING */}
-        <section className="py-4 max-w-7xl mx-auto overflow-hidden">
-          <div className="px-4 lg:px-2 flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-white flex items-center gap-4">
-              Now Showing
-              <span className="text-xs font-bold px-3 py-1 bg-primary/20 text-primary rounded-full uppercase">
+        <section className="py-6 max-w-7xl mx-auto">
+          <div className="px-4 flex items-center justify-between mb-6">
+            <div className="flex flex-row justify-center items-center sm:flex-row sm:items-center gap-2 sm:gap-4">
+              <h2 className="text-lg md:text-4xl font-bold text-white whitespace-nowrap">
+                Now Showing
+              </h2>
+              <span className="w-full text-[8px] md:text-xs font-bold px-2 md:px-1 py-1 bg-red-500/20 text-red-500 rounded-full uppercase">
                 New Releases
               </span>
-            </h2>
+            </div>
 
             <a
-              className="text-primary text-sm font-bold flex items-center gap-2 hover:underline"
+              className="text-red-500 text-xs md:text-sm font-bold flex items-center gap-1 hover:underline whitespace-nowrap"
               href="#"
             >
               View All
@@ -74,12 +75,10 @@ export const Home = () => {
             </a>
           </div>
 
-          {/* Movie List */}
-          <div className="px-4 lg:px-1 pb-14">
+          <div className="px-0 sm:px-4 lg:px-2 pb-8">
             <PhimCard />
           </div>
         </section>
-
         <section className="py-16 sm:py-20 bg-white/[0.02] border-y border-white/10">
           <div className="max-w-7xl mx-auto">
             <div className="px-4 sm:px-2 lg:flex flex-col sm:flex-row sm:items-center justify-between mb-8 sm:mb-10 gap-4">
@@ -101,8 +100,8 @@ export const Home = () => {
                 </button>
               </div>
             </div>
-            <div className="flex overflow-x-auto no-scrollbar px-4 sm:px-6 lg:gap-3 sm:gap-5">
-              <div className="min-w-[240px] sm:min-w-[300px] relative rounded-md overflow-hidden aspect-video cursor-pointer">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar px-4 sm:px-6 lg:gap-3 sm:gap-5">
+              <div className="min-w-96 sm:min-w-80 relative rounded-md overflow-hidden aspect-video cursor-pointer">
                 <img
                   alt="The Night Agent"
                   className="w-full h-full object-cover"
@@ -195,7 +194,6 @@ export const Home = () => {
             </div>
           </div>
         </section>
-
         <section className="py-20 sm:py-24">
           <div className="max-w-7xl mx-auto overflow-hidden">
             <div className="px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row lg:items-end justify-between mb-10 sm:mb-12 gap-6">

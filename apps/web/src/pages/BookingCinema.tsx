@@ -1,178 +1,147 @@
-import { useShowTime } from "@web/hooks/useShowTime";
-import { useCinemas } from "@web/hooks/useCinema"; // Giả sử bạn có hook này
+import { useShowTimesByMovie } from "@web/hooks/useShowTime";
 import { Spin, Empty } from "antd";
 import dayjs from "dayjs";
-import { useState, useEffect, useMemo } from "react";
-import { useOutletContext, useParams } from "react-router-dom";
-import { IShowTime } from "@shared/schemas";
+import { useState } from "react";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 
 export const BookingCinema = () => {
-  const { id } = useParams();
-  const { showtimes, isLoading: loadingST } = useShowTime(id);
-  const { cinemas, isLoading: loadingCinema } = useCinemas(); // Lấy all rạp
+  const [searchParams] = useSearchParams();
+  const movieId = searchParams.get("movieId");
+
+  // Lấy dữ liệu từ hook. GroupedByCinema lúc này sẽ chứa cinemaInfo và mảng showtimes
+  const { showtimes, groupedByCinema, isLoading } = useShowTimesByMovie(
+    movieId!,
+  );
 
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [selectedCinemaId, setSelectedCinemaId] = useState<string>("all"); // Mặc định là tất cả
+  const { setSelectedShowtime, selectedShowtime } = useOutletContext<any>();
 
-  const { selectedShowtime, setSelectedShowtime } = useOutletContext<any>();
+  // 1. Lấy danh sách các ngày có lịch chiếu (Unique Dates)
+  // Dùng Optional Chaining và Nullish Coalescing để tránh lỗi map trên undefined
+  const uniqueDates = Array.from(
+    new Set(
+      (showtimes ?? []).map((st: any) =>
+        dayjs(st.startTime).format("YYYY-MM-DD"),
+      ),
+    ),
+  ).sort() as string[];
 
-  // 1. Lấy danh sách các ngày duy nhất
-  const uniqueDates = useMemo(() => {
-    if (!showtimes) return [];
-    return Array.from(
-      new Set(showtimes.map((st) => dayjs(st.startTime).format("YYYY-MM-DD"))),
-    ).sort();
-  }, [showtimes]);
+  // Xác định ngày đang chọn (Mặc định là ngày đầu tiên nếu user chưa click)
+  const activeDate =
+    selectedDate || (uniqueDates.length > 0 ? uniqueDates[0] : "");
 
-  useEffect(() => {
-    if (uniqueDates.length > 0 && !selectedDate)
-      setSelectedDate(uniqueDates[0]);
-  }, [uniqueDates, selectedDate]);
+  // 2. Lọc dữ liệu hiển thị theo ngày
+  // Chúng ta lặp qua groupedByCinema (đã được group ở useShowTime.ts)
+  const filteredData = (groupedByCinema ?? [])
+    .map((item: any) => ({
+      ...item,
+      // Lọc lại danh sách suất chiếu của rạp này, chỉ giữ lại các suất chiếu trong ngày activeDate
+      showtimesInDate: item.showtimes.filter(
+        (st: any) => dayjs(st.startTime).format("YYYY-MM-DD") === activeDate,
+      ),
+    }))
+    // Chỉ hiển thị những rạp nào CÓ suất chiếu trong ngày đó
+    .filter((item: any) => item.showtimesInDate.length > 0);
 
-  // 2. Lọc suất chiếu theo Ngày VÀ Rạp
-  const showtimesByCinema = useMemo(() => {
-    if (!selectedDate || !showtimes) return {};
-
-    return showtimes
-      .filter((st) => {
-        const matchDate =
-          dayjs(st.startTime).format("YYYY-MM-DD") === selectedDate;
-        const cinemaId = (st.roomId as any)?.cinema_id?._id;
-        const matchCinema =
-          selectedCinemaId === "all" || cinemaId === selectedCinemaId;
-        return matchDate && matchCinema;
-      })
-      .reduce((acc: Record<string, IShowTime[]>, st) => {
-        const cinemaName =
-          (st.roomId as any)?.cinema_id?.name || "Rạp chưa xác định";
-        if (!acc[cinemaName]) acc[cinemaName] = [];
-        acc[cinemaName].push(st);
-        return acc;
-      }, {});
-  }, [showtimes, selectedDate, selectedCinemaId]);
-
-  if (loadingST || loadingCinema)
+  if (isLoading)
     return (
       <div className="h-64 flex items-center justify-center">
-        <Spin size="large" />
+        <Spin size="large" tip="Đang tải lịch chiếu..." />
       </div>
     );
 
   return (
-    <div className="pb-32 px-4 md:px-0 animate-slide-down">
-      {/* SECTION: CHỌN NGÀY (Giữ nguyên của bạn) */}
-      <section className="mb-10">
+    <div className="w-full space-y-8 animate-slide-down">
+      {/* KHỐI CHỌN NGÀY */}
+      <section className="">
         <h3 className="text-sm font-black uppercase tracking-[0.2em] text-[#b89d9f] mb-6">
           Select Date
         </h3>
-        <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
-          {uniqueDates.map((date) => (
-            <button
-              key={date}
-              onClick={() => setSelectedDate(date)}
-              className={`flex flex-col items-center justify-center min-w-[90px] py-5 rounded-[2rem] transition-all ${
-                date === selectedDate
-                  ? "bg-primary text-white scale-105 shadow-lg shadow-primary/30"
-                  : "bg-white/5 text-[#b89d9f]"
-              }`}
-            >
-              <span className="text-[10px] font-bold uppercase">
-                {dayjs(date).format("MMM")}
-              </span>
-              <span className="text-3xl font-black">
-                {dayjs(date).format("DD")}
-              </span>
-            </button>
-          ))}
+        <div className="flex mx-3 gap-4 overflow-x-auto no-scrollbar pb-4">
+          {uniqueDates.length > 0 ? (
+            uniqueDates.map((date) => (
+              <button
+                key={date}
+                onClick={() => setSelectedDate(date)}
+                className={`flex flex-col items-center justify-center min-w-[90px] m-3 p-5 rounded-[2rem] transition-all ${
+                  date === activeDate
+                    ? "bg-primary text-white scale-105 shadow-lg"
+                    : "bg-white/5 text-[#b89d9f]"
+                }`}
+              >
+                <span className="text-[10px] font-bold uppercase">
+                  {dayjs(date).format("MMM")}
+                </span>
+                <span className="text-3xl font-black">
+                  {dayjs(date).format("DD")}
+                </span>
+              </button>
+            ))
+          ) : (
+            <div className="text-[#b89d9f] italic">
+              Hiện tại chưa có lịch chiếu cho phim này.
+            </div>
+          )}
         </div>
       </section>
 
-      {/* SECTION: CHỌN RẠP (Mới thêm) */}
-      <section className="mb-10">
-        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-[#b89d9f] mb-6">
-          Cinemas
-        </h3>
-        <div className="flex gap-3 overflow-x-auto hide-scrollbar">
-          <button
-            onClick={() => setSelectedCinemaId("all")}
-            className={`px-6 py-3 rounded-full text-xs font-bold transition-all shrink-0 border ${
-              selectedCinemaId === "all"
-                ? "bg-white text-black border-white"
-                : "bg-transparent border-white/10 text-white"
-            }`}
-          >
-            Tất cả rạp
-          </button>
-          {cinemas?.map((cinema: any) => (
-            <button
-              key={cinema._id}
-              onClick={() => setSelectedCinemaId(cinema._id)}
-              className={`px-6 py-3 rounded-full text-xs font-bold transition-all shrink-0 border ${
-                selectedCinemaId === cinema._id
-                  ? "bg-white text-black border-white"
-                  : "bg-transparent border-white/10 text-white"
-              }`}
-            >
-              {cinema.name}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* SECTION: DANH SÁCH SUẤT CHIẾU (Đã lọc) */}
+      {/* KHỐI DANH SÁCH RẠP */}
       <section className="space-y-6">
-        {Object.keys(showtimesByCinema).length === 0 ? (
+        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-[#b89d9f]">
+          Cinema Locations
+        </h3>
+
+        {filteredData.length === 0 ? (
           <Empty
             description={
               <span className="text-[#b89d9f]">
-                Không có suất chiếu phù hợp
+                Không tìm thấy suất chiếu nào cho ngày này
               </span>
             }
-            className="py-10"
           />
         ) : (
-          Object.entries(showtimesByCinema).map(([cinemaName, times]) => (
+          filteredData.map((item: any) => (
             <div
-              key={cinemaName}
+              key={item.cinemaInfo?._id}
               className="bg-[#1a1a1a] rounded-[2rem] border border-white/5 overflow-hidden"
             >
               <div className="p-6 flex items-center gap-4">
-                <span className="material-symbols-outlined text-primary text-2xl">
-                  theaters
-                </span>
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined">
+                    theater_comedy
+                  </span>
+                </div>
                 <div>
                   <h4 className="font-black text-xl text-white">
-                    {cinemaName}
+                    {item.cinemaInfo?.name}
                   </h4>
                   <p className="text-xs text-[#b89d9f]">
-                    {(times[0].roomId as any)?.cinema_id?.address}
+                    {item.cinemaInfo?.address}
                   </p>
                 </div>
               </div>
-              <div className="px-6 pb-6 pt-4 border-t border-white/5 grid grid-cols-3 sm:grid-cols-5 gap-3">
-                {times
-                  .sort(
-                    (a, b) =>
-                      dayjs(a.startTime).unix() - dayjs(b.startTime).unix(),
-                  )
-                  .map((st: any) => (
+
+              <div className="px-6 pb-6 pt-4 border-t border-white/5">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                  {item.showtimesInDate.map((st: any) => (
                     <button
                       key={st._id}
                       onClick={() => setSelectedShowtime(st)}
                       className={`py-4 rounded-2xl text-center transition-all border ${
                         selectedShowtime?._id === st._id
-                          ? "bg-primary border-primary text-white"
-                          : "bg-white/5 border-transparent text-white"
+                          ? "bg-primary border-primary text-white shadow-lg shadow-primary/30"
+                          : "bg-white/5 border-transparent text-white hover:bg-white/10"
                       }`}
                     >
-                      <span className="block text-base font-black">
+                      <span className="block text-lg font-black">
                         {dayjs(st.startTime).format("HH:mm")}
                       </span>
                       <span className="text-[10px] opacity-60 uppercase">
-                        {st.roomId?.loai_phong || "2D"}
+                        {st.roomId?.ten_phong || "2D"}
                       </span>
                     </button>
                   ))}
+                </div>
               </div>
             </div>
           ))
