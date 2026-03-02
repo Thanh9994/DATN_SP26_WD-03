@@ -1,104 +1,98 @@
-import { Card, Row, Col, Statistic, Table, Tag } from "antd";
 import {
-    DollarOutlined,
-    ShoppingCartOutlined,
-    UserOutlined,
-} from "@ant-design/icons";
+    Card,
+    Table,
+    Tag,
+    Typography,
+    Input,
+    Breadcrumb,
+} from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { useState } from "react";
+
+const { Title } = Typography;
 
 const Reports = () => {
+    const [searchText, setSearchText] = useState("");
+
+    const data = [
+        {
+            key: "1",
+            bookingNo: "#8238283",
+            guest: "John Mark",
+            total: 16000,
+            status: "Booked",
+        },
+        {
+            key: "2",
+            bookingNo: "#8238275",
+            guest: "Robert Fox",
+            total: 21000,
+            status: "Booked",
+        },
+        {
+            key: "3",
+            bookingNo: "#8238270",
+            guest: "Janny Wilson",
+            total: 24500,
+            status: "Refund",
+        },
+    ];
+
+    const filteredData = data.filter((item) =>
+        item.guest.toLowerCase().includes(searchText.toLowerCase()) ||
+        item.bookingNo.toLowerCase().includes(searchText.toLowerCase())
+    );
+
     const columns = [
         {
-            title: "Report Name",
-            dataIndex: "name",
-            key: "name",
+            title: "Booking No",
+            dataIndex: "bookingNo",
+            key: "bookingNo",
         },
         {
-            title: "Date",
-            dataIndex: "date",
-            key: "date",
+            title: "Guest",
+            dataIndex: "guest",
+            key: "guest",
         },
         {
-            title: "Type",
-            dataIndex: "type",
-            key: "type",
-            render: (type: string) => (
-                <Tag color={type === "Revenue" ? "green" : "blue"}>{type}</Tag>
-            ),
+            title: "Total",
+            dataIndex: "total",
+            key: "total",
         },
         {
             title: "Status",
             dataIndex: "status",
             key: "status",
             render: (status: string) =>
-                status === "Completed" ? (
-                    <Tag color="green">Completed</Tag>
+                status === "Booked" ? (
+                    <Tag color="green">Booked</Tag>
                 ) : (
-                    <Tag color="orange">Pending</Tag>
+                    <Tag color="orange">Refund</Tag>
                 ),
-        },
-    ];
-
-    const dataSource = [
-        {
-            key: "1",
-            name: "Monthly Revenue Report",
-            date: "2025-02-01",
-            type: "Revenue",
-            status: "Completed",
-        },
-        {
-            key: "2",
-            name: "User Activity Report",
-            date: "2025-02-05",
-            type: "User",
-            status: "Pending",
         },
     ];
 
     return (
         <div style={{ padding: 24 }}>
-            <h2>Reports</h2>
+            <Breadcrumb style={{ marginBottom: 16 }}>
+                <Breadcrumb.Item>Report</Breadcrumb.Item>
+                <Breadcrumb.Item>Booking Report</Breadcrumb.Item>
+            </Breadcrumb>
 
-            {/* SUMMARY */}
-            <Row gutter={16} style={{ marginBottom: 24 }}>
-                <Col span={8}>
-                    <Card>
-                        <Statistic
-                            title="Total Revenue"
-                            value={12500}
-                            prefix={<DollarOutlined />}
-                            suffix="$"
-                        />
-                    </Card>
-                </Col>
+            <Title level={3}>Booking Report</Title>
 
-                <Col span={8}>
-                    <Card>
-                        <Statistic
-                            title="Total Orders"
-                            value={420}
-                            prefix={<ShoppingCartOutlined />}
-                        />
-                    </Card>
-                </Col>
+            <Input
+                placeholder="Search guest or booking no..."
+                prefix={<SearchOutlined />}
+                style={{ width: 300, marginBottom: 20 }}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+            />
 
-                <Col span={8}>
-                    <Card>
-                        <Statistic
-                            title="New Users"
-                            value={78}
-                            prefix={<UserOutlined />}
-                        />
-                    </Card>
-                </Col>
-            </Row>
-
-            {/* REPORT TABLE */}
-            <Card title="Generated Reports">
+            <Card>
                 <Table
                     columns={columns}
-                    dataSource={dataSource}
-                    bordered
+                    dataSource={filteredData}
                     pagination={false}
                 />
             </Card>
