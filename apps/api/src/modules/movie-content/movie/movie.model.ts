@@ -19,7 +19,7 @@ const MovieSchema = new mongoose.Schema<IMovie>(
       public_id: String,
     },
     trailer: String,
-    ratting: {
+    rateting: {
       type: Number,
       default: 0,
     },

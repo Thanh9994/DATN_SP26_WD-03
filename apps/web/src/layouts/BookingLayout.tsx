@@ -61,7 +61,7 @@ export default function BookingLayout() {
 
   return (
     <div className="bg-[#120a0a] mt-5 min-h-screen text-white">
-      <div className="max-w-7xl mx-auto pt-24 px-8 pb-40 flex flex-col lg:flex-row gap-12">
+      <div className="max-w-7xl mx-auto  px-8 pb-40 flex flex-col lg:flex-row gap-12">
         {/* ASIDE: THÔNG TIN CHI TIẾT PHIM */}
         <aside className="w-full lg:w-1/3 lg:sticky lg:top-24 h-fit space-y-8">
           <div className="relative aspect-[2/3] w-full rounded-[2.5rem] overflow-hidden shadow-2xl group">

@@ -41,24 +41,24 @@ export const ShowTimeDashboard: React.FC = () => {
                   (a: any, b: any) =>
                     dayjs(a.startTime).unix() - dayjs(b.startTime).unix(),
                 )
-                .map((slot: any) => (
+                .map((i: any) => (
                   <Card
-                    key={slot._id}
+                    key={i._id}
                     size="small"
-                    className="min-w-[180px] border-l-4 border-l-blue-500 shadow-sm"
-                    style={{ padding: "8px" }}
+                    className="min-w-[140px] border-l-4 border-l-blue-500 shadow-sm"
+                    style={{ padding: 1 }}
                   >
                     <div className="flex flex-col">
                       <Text
                         ellipsis={{ tooltip: true }}
-                        className="font-bold text-xs"
+                        className="font-bold text-sm"
                       >
-                        {slot.movieId?.ten_phim || "Phim không xác định"}
+                        {i.movieId?.ten_phim || "Phim không xác định"}
                       </Text>
                       <Space className="text-[11px] text-gray-500">
-                        <Tag color="blue" className="mr-0 text-[10px]">
-                          {dayjs(slot.startTime).format("HH:mm")} -{" "}
-                          {dayjs(slot.endTime).format("HH:mm")}
+                        <Tag color="blue" className="mr-0 text-sx">
+                          {dayjs(i.startTime).format("HH:mm")} -{" "}
+                          {dayjs(i.endTime).format("HH:mm")}
                         </Tag>
                       </Space>
                     </div>

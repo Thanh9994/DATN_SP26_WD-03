@@ -77,7 +77,8 @@ export const Movie = () => {
         banner: bannerData,
         the_loai: values.genre_id,
         dien_vien: values.dien_vien || [],
-        phu_de: values.phu_de || [],
+        quoc_gia: values.quoc_gia || "Global",
+        phu_de: values.phu_de || "Tiếng Việt",
         do_tuoi: values.do_tuoi || "P",
       };
       // console.log("UPLOAD RESULT", posterData);
@@ -156,9 +157,22 @@ export const Movie = () => {
     {
       title: "Trạng Thái",
       dataIndex: "trang_thai",
-      render: (status: string) => (
-        <Tag color={status === "Đang chiếu" ? "green" : "red"}>{status}</Tag>
-      ),
+      render: (status: string) => {
+        const color =
+          status === "dang_chieu"
+            ? "green"
+            : status === "sap_chieu"
+              ? "gold"
+              : "red";
+        const text =
+          status === "dang_chieu"
+            ? "Đang chiếu"
+            : status === "sap_chieu"
+              ? "Sắp chiếu"
+              : "Ngừng chiếu";
+
+        return <Tag color={color}>{text}</Tag>;
+      },
     },
     {
       title: "Action",
@@ -214,14 +228,16 @@ export const Movie = () => {
         open={open}
         onCancel={closeModal}
         onOk={() => form.submit()}
-        width={800}
+        width={1280}
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <Form.Item
               name="ten_phim"
               label="Tên phim"
-              rules={[{ required: true }]}
+              rules={[
+                { required: true, message: "Tên phim không được để trống" },
+              ]}
             >
               <Input />
             </Form.Item>
@@ -229,7 +245,7 @@ export const Movie = () => {
             <Form.Item
               name="genre_id"
               label="Thể loại"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Nhập thể loại" }]}
             >
               <Select mode="multiple" allowClear placeholder="Chọn thể loại">
                 {genres?.map((g: any) => (
@@ -248,12 +264,20 @@ export const Movie = () => {
               <Select mode="tags" placeholder="Nhập tên diễn viên" />
             </Form.Item>
 
-            <Form.Item name="phu_de" label="Phụ đề">
+            <Form.Item name="phu_de" label="Phụ đề" initialValue={"Tiếng Việt"}>
               <Select mode="tags" placeholder="Tiếng Việt, Tiếng Anh..." />
             </Form.Item>
 
-            <Form.Item name="thoi_luong" label="Thời lượng">
-              <InputNumber min={1} className="w-full" />
+            <Form.Item
+              name="thoi_luong"
+              label="Thời lượng"
+              rules={[{ required: true, message: "Nhập thời gian phim" }]}
+            >
+              <InputNumber min={90} className="w-full" />
+            </Form.Item>
+
+            <Form.Item name="rateting" label="Sao">
+              <InputNumber min={0} className="w-full" />
             </Form.Item>
 
             <Form.Item name="quoc_gia" label="Quốc gia">
@@ -273,20 +297,30 @@ export const Movie = () => {
             <Form.Item name="trailer" label="Trailer">
               <Input />
             </Form.Item>
+            <div className="flex gap-3">
+              <Form.Item
+                name="ngay_cong_chieu"
+                label="Ngày chiếu"
+                rules={[{ required: true, message: "Chọn ngày chiếu" }]}
+              >
+                <DatePicker className="w-full" />
+              </Form.Item>
 
-            <Form.Item name="ngay_cong_chieu" label="Ngày chiếu">
-              <DatePicker className="w-full" />
-            </Form.Item>
-
-            <Form.Item name="ngay_ket_thuc" label="Ngày kết thúc">
-              <DatePicker className="w-full" />
-            </Form.Item>
+              <Form.Item
+                name="ngay_ket_thuc"
+                label="Ngày kết thúc"
+                rules={[{ required: true, message: "Chọn ngày kết thúc" }]}
+              >
+                <DatePicker className="w-full" />
+              </Form.Item>
+            </div>
 
             <Form.Item
               name="poster"
               label="Poster"
               valuePropName="fileList"
               getValueFromEvent={(e) => e?.fileList}
+              rules={[{ required: true, message: "Poster không được trống" }]}
             >
               <Upload
                 beforeUpload={() => false}
@@ -304,6 +338,7 @@ export const Movie = () => {
               label="Banner"
               valuePropName="fileList"
               getValueFromEvent={(e) => e?.fileList}
+              rules={[{ required: true, message: "Banner không được trống" }]}
             >
               <Upload
                 beforeUpload={() => false}
@@ -318,7 +353,7 @@ export const Movie = () => {
           </div>
 
           <Form.Item name="mo_ta" label="Mô tả">
-            <Input.TextArea rows={3} />
+            <Input.TextArea rows={4} />
           </Form.Item>
         </Form>
       </Modal>

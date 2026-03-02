@@ -202,7 +202,7 @@ export const Movie = Base.extend({
   poster: CloudinaryImage,
   banner: CloudinaryImage,
   trailer: z.string().url().optional(),
-  ratting: z.number().min(0).max(5).default(0),
+  rateting: z.number().min(0).max(5).default(0),
   danh_gia: z.number().min(0).max(10).default(0),
   trang_thai: MovieStatus,
   the_loai: z.array(

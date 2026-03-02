@@ -90,13 +90,19 @@ export const Rooms = () => {
     {
       title: "Đặc biệt",
       render: (_: any, record: IPhong) => {
+        const formatRow = (rowName: string) => {
+          const rowData = record.rows.find((r) => r.name === rowName);
+          return rowData ? `${rowName} (${rowData.seats})` : rowName;
+        };
+
         const allRowNames = record.rows.map((r) => r.name);
 
         // Lọc ra các hàng Normal
         const normalRows = allRowNames.filter(
           (name) => !record.vip.includes(name) && !record.couple.includes(name),
         );
-
+        const vipRows = record.vip.map(formatRow);
+        const coupleRows = record.couple.map(formatRow);
         return (
           <Space direction="vertical" size={4}>
             <Space wrap>
@@ -104,10 +110,10 @@ export const Rooms = () => {
                 <Tag color="default">Normal: {normalRows.join(", ")}</Tag>
               )}
               {record.vip.length > 0 && (
-                <Tag color="orange">VIP: {record.vip.join(", ")}</Tag>
+                <Tag color="orange">VIP: {vipRows.join(", ")}</Tag>
               )}
               {record.couple.length > 0 && (
-                <Tag color="pink">Couple: {record.couple.join(", ")}</Tag>
+                <Tag color="pink">Couple: {coupleRows.join(", ")}</Tag>
               )}
             </Space>
           </Space>
@@ -156,7 +162,7 @@ export const Rooms = () => {
           dataSource={rooms}
           loading={isLoading}
           rowKey="_id"
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 10 }}
         />
       </Card>
 
@@ -166,7 +172,7 @@ export const Rooms = () => {
         open={open}
         onCancel={() => setOpen(false)}
         footer={null}
-        width={800}
+        width={1200}
         destroyOnHidden
       >
         <Form
@@ -223,7 +229,7 @@ export const Rooms = () => {
                     <Form.Item
                       {...restField}
                       name={[name, "name"]}
-                      rules={[{ required: true }]}
+                      rules={[{ required: true, message: "Nhập hàng ghế" }]}
                     >
                       <Input placeholder="Hàng (A,B...)" />
                     </Form.Item>
@@ -231,7 +237,7 @@ export const Rooms = () => {
                     <Form.Item
                       {...restField}
                       name={[name, "seats"]}
-                      rules={[{ required: true }]}
+                      rules={[{ required: true, message: "Nhập số ghế" }]}
                     >
                       <InputNumber min={1} placeholder="Số ghế" />
                     </Form.Item>
@@ -249,7 +255,10 @@ export const Rooms = () => {
                   type="dashed"
                   block
                   icon={<PlusOutlined />}
-                  onClick={() => add()}
+                  onClick={() => {
+                    const nextLabel = String.fromCharCode(65 + fields.length);
+                    add({ name: nextLabel, seats: 10 });
+                  }}
                 >
                   Thêm hàng ghế
                 </Button>
@@ -259,7 +268,7 @@ export const Rooms = () => {
 
           <Divider />
 
-          <Form.Item name="vip" label="Hàng VIP (A,B,C...)">
+          <Form.Item name="vip" label="Hàng VIP (B,C,D...)">
             <Input placeholder="VD: C,D" />
           </Form.Item>
 

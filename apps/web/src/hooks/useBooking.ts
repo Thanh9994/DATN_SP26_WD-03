@@ -20,11 +20,10 @@ export const useBooking = (showTimeId?: string) => {
       return data;
     },
     enabled: !!showTimeId,
-    refetchInterval: 30000, // Tự động cập nhật mỗi 30s để tránh ghế ảo
+    refetchInterval: 30000,
   });
 
-  // 2. Mutation: Giữ ghế (Hold Seats)
-  const holdSeatsMutation = useMutation({
+  const holdSeats = useMutation({
     mutationFn: async (payload: {
       showTimeId: string;
       seats: string[];
@@ -34,19 +33,17 @@ export const useBooking = (showTimeId?: string) => {
       return data;
     },
     onSuccess: () => {
-      // Refresh lại danh sách ghế sau khi giữ thành công
       queryClient.invalidateQueries({
         queryKey: ["showtime-detail", showTimeId],
       });
     },
     onError: (error: any) => {
-      // console.error("Hold seats failed:", error.response?.data?.message);
       message.error(error.response?.data?.message || "Giữ ghế thất bại");
     },
   });
 
   // 3. Mutation: Xác nhận đặt vé (Confirm)
-  const confirmBookingMutation = useMutation({
+  const confirmBooking = useMutation({
     mutationFn: async (payload: {
       showTimeId: string;
       seatCodes: string[];
@@ -57,7 +54,6 @@ export const useBooking = (showTimeId?: string) => {
       return data;
     },
     onSuccess: () => {
-      // Xóa cache để cập nhật trạng thái 'booked' chính thức
       queryClient.invalidateQueries({
         queryKey: ["showtime-detail", showTimeId],
       });
@@ -74,11 +70,11 @@ export const useBooking = (showTimeId?: string) => {
     isLoading,
     isError,
 
-    holdSeats: holdSeatsMutation.mutateAsync,
-    isHolding: holdSeatsMutation.isPending,
+    holdSeats: holdSeats.mutateAsync,
+    isHolding: holdSeats.isPending,
 
-    confirmBooking: confirmBookingMutation.mutateAsync,
-    isConfirming: confirmBookingMutation.isPending,
+    confirmBooking: confirmBooking.mutateAsync,
+    isConfirming: confirmBooking.isPending,
 
     refreshSeats: refetch,
   };

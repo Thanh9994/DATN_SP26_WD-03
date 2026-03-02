@@ -14,7 +14,7 @@ import {
   Tag,
   message,
 } from "antd";
-import { useCinemas, useRooms } from "@web/hooks/useCinema";
+import { useCinemas } from "@web/hooks/useCinema";
 import { ICinema, IPhong } from "@shared/schemas";
 
 const { Title } = Typography;
@@ -28,7 +28,7 @@ export const Cinema = () => {
   // const [selectedCinemaId, setSelectedCinemaId] = useState<string | null>(null);
   // const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
 
-  const { rooms } = useRooms();
+  // const { rooms } = useRooms();
   const {
     cinemas,
     isLoading,
@@ -192,7 +192,7 @@ export const Cinema = () => {
             </Form.Item>
           </div>
 
-          <Form.Item
+          {/* <Form.Item
             name="danh_sach_phong"
             label="Chọn phòng chiếu cho rạp"
             extra="Bạn có thể chọn nhiều phòng cùng lúc"
@@ -218,7 +218,7 @@ export const Cinema = () => {
                 </Select.Option>
               ))}
             </Select>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </Modal>
     </Card>
