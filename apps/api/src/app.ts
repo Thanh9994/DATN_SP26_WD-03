@@ -5,11 +5,9 @@ import catalogRouter from "./modules/cinema-catalog";
 import accessRouter from "./modules/access-control";
 import contentRouter from "./modules/movie-content";
 import testRoute from "./modules/test/test.route";
-import oderRouter from "./modules/sales-operations";
-import { initBookingCron } from "./utils/bookingCron.util";
+import orderRouter from "./modules/sales-operations";
 
 const app = express();
-initBookingCron();
 
 app.use(cors());
 app.use(express.json());
@@ -18,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/test", testRoute);
 app.use("/api/uploads", uploadRouter);
-app.use("/api/oder", oderRouter);
+app.use("/api/order", orderRouter);
 app.use("/api/access", accessRouter);
 app.use("/api/catalog", catalogRouter);
 app.use("/api/content", contentRouter);

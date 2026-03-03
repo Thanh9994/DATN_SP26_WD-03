@@ -1,13 +1,15 @@
 import { Router } from "express";
 import productRouter from "./products/product.route";
 import bookingRouter from "./booking/booking.route";
+import { getDashboardStats } from "./booking/booking.controller";
 
-const oderRouter = Router();
+const orderRouter = Router();
 
-oderRouter.use("/product", productRouter);
-oderRouter.use("/booking", bookingRouter);
+orderRouter.use("/product", productRouter);
+orderRouter.use("/booking", bookingRouter);
+orderRouter.get("/analytics/dashboard", getDashboardStats);
 // oderRouter.use("");
 // oderRouter.use("");
 // oderRouter.use("");
 
-export default oderRouter;
+export default orderRouter;

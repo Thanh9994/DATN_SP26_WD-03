@@ -13,7 +13,6 @@ import Ticket from "@web/pages/Ticket";
 import Checkout from "@web/pages/CheckOut";
 import { BookingPage } from "@web/components/mockup";
 import MovieDetail from "@web/pages/clients/MovieDetail";
-import { DemoTrailer } from "@web/pages/Trailer";
 import BookingLayout from "@web/layouts/BookingLayout";
 import { BookingCinema } from "@web/pages/BookingCinema";
 
@@ -42,6 +41,5 @@ export const ClientRoutes: RouteObject = {
     { path: "ticket", element: <Ticket /> },
     { path: "checkout", element: <Checkout /> },
     { path: "*", element: <NotFound /> },
-    { path: "demo", element: <DemoTrailer /> },
   ],
 };

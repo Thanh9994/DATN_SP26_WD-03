@@ -5,65 +5,91 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { useMovie } from "@web/hooks/useMovie";
-import { Spin } from "antd";
+import { Button, message, Spin } from "antd";
 import { useState } from "react";
 import dayjs from "dayjs";
+import { useBooking } from "@web/hooks/useBooking";
+import { IShowTime, IShowTimeSeat } from "@shared/schemas";
 
 export default function BookingLayout() {
   const [searchParams] = useSearchParams();
-  const id = searchParams.get("movieId") || undefined;
+  const movieId = searchParams.get("movieId") || undefined;
+  const showtimeIdFromUrl = searchParams.get("showtimeId");
+
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Lấy dữ liệu phim từ hook
-  const { data: movie, isLoading } = useMovie(id);
+  // Quản lý trạng thái dùng chung
+  const [selectedShowtime, setSelectedShowtime] = useState<IShowTime | null>(
+    null,
+  );
+  const [selectedSeats, setSelectedSeats] = useState<IShowTimeSeat[]>([]);
 
-  // Quản lý trạng thái dùng chung thông qua Outlet Context
-  const [selectedShowtime, setSelectedShowtime] = useState<any>(null);
-  const [selectedSeats, setSelectedSeats] = useState<any[]>([]);
+  const { data: movie, isLoading: isMovieLoading } = useMovie(movieId);
+
+  const activeShowtimeId = selectedShowtime?._id || showtimeIdFromUrl;
+  const { showTime, holdSeats, isHolding, refreshSeats } = useBooking(
+    activeShowtimeId ?? undefined,
+  );
 
   const isSelectSeatStep = location.pathname.includes("/seats");
-  const total = selectedSeats.reduce((sum, s) => sum + s.price, 0);
+  const totalAmount = selectedSeats.reduce((sum, s) => sum + s.price, 0);
 
-  if (isLoading)
+  if (isMovieLoading)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#120a0a]">
-        <Spin size="large" />
+      <div className="h-full flex items-center justify-center bg-[#120a0a]">
+        <Spin size="large" tip="Đang tải dữ liệu..." fullscreen />
       </div>
     );
 
   if (!movie)
     return (
-      <div className="text-center pt-40 bg-[#120a0a] min-h-screen text-white">
-        <p className="text-[#b89d9f] mb-4">
-          Không tìm thấy thông tin phim hoặc ID không hợp lệ.
-        </p>
-        <button
-          onClick={() => navigate("/")}
-          className="px-6 py-2 bg-primary rounded-full font-bold transition-transform hover:scale-105"
-        >
+      <div className="text-center pt-40 bg-[#120a0a] h-full text-white">
+        <p className="text-[#b89d9f] mb-4">Không tìm thấy thông tin phim.</p>
+        <Button danger onClick={() => navigate("/")}>
           Quay lại trang chủ
-        </button>
+        </Button>
       </div>
     );
 
-  const handleNextStep = () => {
-    if (!isSelectSeatStep && selectedShowtime) {
-      // Điều hướng sang bước chọn ghế, giữ movieId và thêm showtimeId
+  const handleAction = async () => {
+    // Bước 1: Nếu đang ở trang chọn lịch chiếu -> Chuyển sang chọn ghế
+    if (!isSelectSeatStep) {
+      if (!selectedShowtime) {
+        message.warning("Vui lòng chọn một suất chiếu!");
+        return;
+      }
       navigate(
-        `/booking/${id}/seats?movieId=${id}&showtimeId=${selectedShowtime._id}`,
+        `/booking/seats?movieId=${movieId}&showtimeId=${selectedShowtime._id}`,
       );
-    } else if (isSelectSeatStep && selectedSeats.length > 0) {
-      // Bước này sẽ gọi mutation confirmBooking từ hook useBooking
-      console.log("Tiến hành thanh toán cho các ghế:", selectedSeats);
+      return;
+    }
+
+    // Bước 2: Nếu đang ở trang chọn ghế -> Giữ ghế và sang thanh toán
+    if (selectedSeats.length === 0) {
+      message.warning("Vui lòng chọn ít nhất một ghế!");
+      return;
+    }
+
+    try {
+      await holdSeats({
+        showTimeId: activeShowtimeId!,
+        seats: selectedSeats.map((s) => s.seatCode),
+        userId: "USER_ID_ALREADY_LOGGED_IN", // Thay bằng ID từ AuthContext của bạn
+      });
+
+      message.success("Giữ ghế thành công!");
+      navigate(`/checkout?movieId=${movieId}&showtimeId=${activeShowtimeId}`);
+    } catch (error) {
+      refreshSeats(); // Tải lại sơ đồ nếu có lỗi (ghế đã bị chiếm)
     }
   };
 
   return (
-    <div className="bg-[#120a0a] mt-5 min-h-screen text-white">
-      <div className="max-w-7xl mx-auto  px-8 pb-40 flex flex-col lg:flex-row gap-12">
+    <div className="h-full bg-[#120a0a] text-white py-8 lg:py-10 pb-20 lg:pb-0">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-10">
         {/* ASIDE: THÔNG TIN CHI TIẾT PHIM */}
-        <aside className="w-full lg:w-1/3 lg:sticky lg:top-24 h-fit space-y-8">
+        <aside className="w-full lg:w-1/4 lg:sticky lg:top-24 h-fit space-y-8">
           <div className="relative aspect-[2/3] w-full rounded-[2.5rem] overflow-hidden shadow-2xl group">
             <img
               src={movie.poster.url}
@@ -95,7 +121,7 @@ export default function BookingLayout() {
           </div>
         </aside>
 
-        <main className="w-full lg:w-2/3">
+        <main className="w-full lg:w-3/4 ">
           <Outlet
             context={{
               movie,
@@ -105,64 +131,85 @@ export default function BookingLayout() {
               setSelectedSeats,
             }}
           />
-        </main>
-      </div>
-
-      {/* FIXED FOOTER: THANH TRẠNG THÁI ĐẶT VÉ */}
-      <footer className="fixed bottom-0 left-0 right-0 z-[110] bg-[#120a0a]/90 backdrop-blur-xl border-t border-white/10 py-6 px-4 md:px-12 shadow-[0_-20px_50px_rgba(0,0,0,0.8)]">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-8 md:gap-12 w-full md:w-auto overflow-x-auto">
-            {/* Display: Suất chiếu hoặc Ghế */}
-            <div className="flex flex-col min-w-fit">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#b89d9f] mb-1">
-                {isSelectSeatStep ? "Ghế đã chọn" : "Suất chiếu đang chọn"}
-              </span>
-              <p className="text-xl font-black text-white whitespace-nowrap">
-                {isSelectSeatStep
-                  ? selectedSeats.map((s) => s.seatCode).join(", ") ||
-                    "Chưa chọn ghế"
-                  : selectedShowtime
-                    ? `${dayjs(selectedShowtime.startTime).format("HH:mm")} • ${selectedShowtime.roomId?.ten_phong || "Standard"}`
-                    : "Chọn một suất chiếu"}
-              </p>
-            </div>
-
-            {/* Display: Tổng tiền (Chỉ hiện khi ở bước chọn ghế) */}
-            {isSelectSeatStep && (
-              <>
-                <div className="h-10 w-px bg-white/10 hidden md:block"></div>
-                <div className="flex flex-col min-w-fit">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#b89d9f] mb-1">
-                    Tổng tạm tính
-                  </span>
-                  <p className="text-2xl font-black text-primary italic">
-                    {total.toLocaleString()}đ
+          {(selectedShowtime || showTime) && (
+            <div
+              className="bg-zinc-900/50 
+                p-5 lg:p-10
+                rounded-2xl lg:rounded-3xl 
+                border border-white/5 
+                backdrop-blur-sm 
+                space-y-5 lg:space-y-6"
+            >
+              <div className="flex border-b border-white/5">
+                <div className="text-left">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">
+                    Tổng cộng
+                  </p>
+                  <p className="text-2xl lg:text-3xl font-black text-primary">
+                    {totalAmount.toLocaleString()} VND
                   </p>
                 </div>
-              </>
-            )}
-          </div>
+              </div>
 
-          {/* Action Button */}
-          <div className="flex items-center gap-4 w-full md:max-w-xs">
-            <button
-              onClick={handleNextStep}
-              disabled={
-                (!isSelectSeatStep && !selectedShowtime) ||
-                (isSelectSeatStep && selectedSeats.length === 0)
-              }
-              className="flex-1 h-16 bg-primary disabled:bg-white/5 text-white disabled:text-white/20 rounded-2xl flex items-center justify-center gap-3 font-black text-xl transition-all active:scale-95 shadow-lg shadow-primary/20"
-            >
-              <span>
-                {isSelectSeatStep ? "Xác nhận đặt chỗ" : "Chọn chỗ ngồi"}
-              </span>
-              <span className="material-symbols-outlined font-black">
-                {isSelectSeatStep ? "payments" : "chair_alt"}
-              </span>
-            </button>
-          </div>
-        </div>
-      </footer>
+              <div className="grid grid-cols-2 gap-8 text-sm">
+                <div className="space-y-1">
+                  <p className="text-zinc-500 uppercase text-sm font-bold tracking-wider">
+                    Rạp / Phòng
+                  </p>
+                  <p className="font-bold text-zinc-200">
+                    {showTime?.roomId?.cinema_id?.name || "Cinema"} -{" "}
+                    {showTime?.roomId?.ten_phong || "Standard"}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-zinc-500 uppercase text-sm font-bold tracking-wider">
+                    Suất chiếu
+                  </p>
+                  <p className="font-bold text-zinc-200">
+                    {showTime?.startTime
+                      ? dayjs(showTime.startTime).format("HH:mm - DD/MM/YYYY")
+                      : "Chưa chọn"}
+                  </p>
+                </div>
+                <div className="col-span-2 space-y-1">
+                  <p className="text-zinc-500 uppercase text-sm font-bold tracking-wider">
+                    Ghế đã chọn
+                  </p>
+                  <p className="font-black text-primary text-lg">
+                    {selectedSeats.length > 0
+                      ? selectedSeats.map((s) => s.seatCode).join(", ")
+                      : "Vui lòng chọn ghế"}
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                type="primary"
+                danger
+                size="middle"
+                block
+                loading={isHolding}
+                onClick={handleAction}
+                className="h-12 lg:h-14
+                  font-bold lg:font-black
+                  uppercase
+                  tracking-wide lg:tracking-widest
+                  text-base lg:text-lg
+                  rounded-xl lg:rounded-2xl"
+              >
+                {isSelectSeatStep
+                  ? "Xác nhận & Thanh toán"
+                  : "Tiếp tục chọn ghế"}
+              </Button>
+
+              <p className="text-center text-[10px] text-zinc-600 italic">
+                * Bằng việc nhấn tiếp tục, bạn đồng ý với điều khoản đặt vé của
+                chúng tôi.
+              </p>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 }

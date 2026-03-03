@@ -6,8 +6,8 @@ import { User } from "../user/user.model";
 export const Register = async (req: Request, res: Response) => {
   try {
     const { email, password, ho_ten, phone } = req.body;
-    const exitUser = await User.findOne({ email });
-    if (exitUser) {
+    const exitingUser = await User.findOne({ email });
+    if (exitingUser) {
       return res.status(400).json({ message: "Email này đã được đăng ký!" });
     }
 
@@ -35,19 +35,24 @@ export const Login = async (req: Request, res: Response) => {
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
-      return res.status(404).json({ message: "Tài khoản không tồn tại." });
-    }
-
-    if (user.trang_thai === "inactive") {
-      return res.status(403).json({ message: "Tài khoản đang bị khóa." });
+      return res
+        .status(401)
+        .json({ message: "Email hoặc mật khẩu không chính xác." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
-      return res.status(400).json({ message: "Mật khẩu không đúng." });
+      return res
+        .status(401)
+        .json({ message: "Email hoặc mật khẩu không chính xác." });
     }
 
+    if (user.trang_thai === "inactive" || user.trang_thai === "banned") {
+      return res.status(403).json({
+        message:
+          "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.",
+      });
+    }
     const token = Jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET as string,
@@ -57,7 +62,7 @@ export const Login = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "Đăng nhập thành công",
       token,
-      user: { id: user._id, ho_ten: user.ho_ten, role: user.role },
+      user: { id: user._id, ho_ten: user.ho_ten },
     });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống khi đăng nhập", error });

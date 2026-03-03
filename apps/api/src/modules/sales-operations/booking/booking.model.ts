@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { BookingStatus } from "@shared/schemas";
+import { BookingStatus, IBooking } from "@shared/schemas";
 
 const bookingSchema = new mongoose.Schema(
   {
@@ -21,21 +21,51 @@ const bookingSchema = new mongoose.Schema(
         required: true,
       },
     ],
-    totalAmount: {
-      type: Number,
-      required: true,
-    },
+    seatCodes: [String],
+    items: [
+      {
+        snackDrinkId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "SnackDrink",
+        },
+        name: String,
+        quantity: Number,
+        price: Number,
+      },
+    ],
+
+    totalAmount: { type: Number, required: true },
+    discountAmount: { type: Number, default: 0 }, // Tiền được giảm
+    finalAmount: { type: Number, required: true },
+
     status: {
       type: String,
       enum: BookingStatus.options,
       default: "pending",
     },
-    paymentId: {
+
+    holdExpiresAt: {
+      type: Date,
+      required: true,
+    },
+    paymentMethod: {
       type: String,
+      enum: ["vnpay", "momo", "cash"],
+      default: "vnpay",
+    },
+
+    paymentId: String,
+    ticketCode: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
   },
   { timestamps: true },
 );
 
 bookingSchema.index({ userId: 1, createdAt: -1 });
-export const Booking = mongoose.model("Booking", bookingSchema);
+
+// Index phục vụ cho cron-job quét các booking hết hạn thanh toán
+bookingSchema.index({ status: 1, holdExpiresAt: 1 });
+export const Booking = mongoose.model<IBooking>("Booking", bookingSchema);

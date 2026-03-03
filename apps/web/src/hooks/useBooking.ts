@@ -16,8 +16,9 @@ export const useBooking = (showTimeId?: string) => {
     queryKey: ["showtime-detail", showTimeId],
     queryFn: async () => {
       if (!showTimeId) return null;
-      const { data } = await axios.get(`${API.SHOWTIME}/${showTimeId}`);
-      return data;
+      const res = await axios.get(`${API.SHOWTIME}/${showTimeId}`);
+      // console.log("Dữ liệu nhận được:", res.data);
+      return res.data;
     },
     enabled: !!showTimeId,
     refetchInterval: 30000,

@@ -81,7 +81,7 @@ const MovieDetail = () => {
           </div>
         </Modal>
       )}
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 -mt-48 relative z-30 pb-24">
+      <div className="max-w-7xl mx-auto px-3 lg:px-10 -mt-48 relative z-30 pb-24">
         <div className="flex flex-col md:flex-row gap-10 items-end mb-16">
           <div className="w-full md:w-72 shrink-0">
             <div className="rounded-2xl overflow-hidden shadow-2xl border border-white/10 aspect-[2/3]">
@@ -122,7 +122,7 @@ const MovieDetail = () => {
           </div>
         </div>
 
-        <div className="space-y-20">
+        <div className="space-y-16">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-20">
             <div className="lg:col-span-2 space-y-12">
               <h3 className="text-primary font-black uppercase tracking-widest text-xs mb-6 flex items-center gap-2">
@@ -131,9 +131,17 @@ const MovieDetail = () => {
               <p className="text-white/70 leading-relaxed text-xl font-light italic whitespace-pre-line border-l-2 border-white/10 pl-8">
                 {movie.mo_ta}
               </p>
-              <div className="pt-10">
+              <div className="pt-6">
                 <button
-                  onClick={() => navigate(`/booking?movieId=${id}`)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const token = localStorage.getItem("token");
+                    if (!token) {
+                      navigate("/login");
+                    } else {
+                      navigate(`/booking?movieId=${movie._id}`);
+                    }
+                  }}
                   className="bg-primary text-white font-bold text-lg uppercase tracking-widest px-8 py-3 rounded-2xl shadow-2xl shadow-primary/40 transform hover:scale-105 transition-all duration-300 ease-in-out animate-pulse hover:animate-none"
                 >
                   <span className="relative z-10 text-white font-black text-xl uppercase tracking-[0.2em]">
@@ -143,7 +151,7 @@ const MovieDetail = () => {
               </div>
             </div>
 
-            <div className="bg-white/5 rounded-3xl p-8 border border-white/10 h-fit space-y-8">
+            <div className="bg-white/5 rounded-3xl p-6 border border-white/10 h-fit space-y-8">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2">
                   Đạo diễn
@@ -181,17 +189,17 @@ const MovieDetail = () => {
               {movie.dien_vien?.map((actor: string) => (
                 <div
                   key={actor}
-                  className="min-w-[150px] text-center group cursor-pointer"
+                  className="min-w-[120px] text-center group cursor-pointer"
                 >
-                  <div className="size-32 mx-auto rounded-full overflow-hidden mb-4 border-2 border-transparent group-hover:border-primary transition-all p-1">
+                  <div className="size-20 mx-auto rounded-full overflow-hidden mb-4 border-2 border-transparent group-hover:border-primary transition-all p-1">
                     <img
                       alt={actor}
                       className="w-full h-full object-cover rounded-full"
                       src={`https://ui-avatars.com/api/?name=${actor}&background=random&size=128`}
                     />
                   </div>
-                  <p className="font-bold">{actor}</p>
-                  <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">
+                  <p className="font-bold text-sm">{actor}</p>
+                  <p className="text-[9px] text-white/40 uppercase tracking-widest mt-1">
                     Diễn viên
                   </p>
                 </div>
