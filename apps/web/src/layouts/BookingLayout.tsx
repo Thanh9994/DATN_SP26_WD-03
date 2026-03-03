@@ -37,14 +37,14 @@ export default function BookingLayout() {
 
   if (isMovieLoading)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#120a0a]">
+      <div className="h-full flex items-center justify-center bg-[#120a0a]">
         <Spin size="large" tip="Đang tải dữ liệu..." fullscreen />
       </div>
     );
 
   if (!movie)
     return (
-      <div className="text-center pt-40 bg-[#120a0a] min-h-screen text-white">
+      <div className="text-center pt-40 bg-[#120a0a] h-full text-white">
         <p className="text-[#b89d9f] mb-4">Không tìm thấy thông tin phim.</p>
         <Button danger onClick={() => navigate("/")}>
           Quay lại trang chủ
@@ -86,8 +86,8 @@ export default function BookingLayout() {
   };
 
   return (
-    <div className="bg-[#120a0a] my-7 min-h-screen text-white flex flex-col">
-      <div className="max-w-7xl mx-auto px-4 sm:px-3 flex flex-col lg:flex-row gap-10 w-full flex-grow">
+    <div className="h-full bg-[#120a0a] text-white py-8 lg:py-10 pb-20 lg:pb-0">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-10">
         {/* ASIDE: THÔNG TIN CHI TIẾT PHIM */}
         <aside className="w-full lg:w-1/4 lg:sticky lg:top-24 h-fit space-y-8">
           <div className="relative aspect-[2/3] w-full rounded-[2.5rem] overflow-hidden shadow-2xl group">
@@ -132,13 +132,20 @@ export default function BookingLayout() {
             }}
           />
           {(selectedShowtime || showTime) && (
-            <div className="bg-zinc-900/50 p-10 rounded-3xl border border-white/5 backdrop-blur-sm space-y-4">
+            <div
+              className="bg-zinc-900/50 
+                p-5 lg:p-10
+                rounded-2xl lg:rounded-3xl 
+                border border-white/5 
+                backdrop-blur-sm 
+                space-y-5 lg:space-y-6"
+            >
               <div className="flex border-b border-white/5">
                 <div className="text-left">
                   <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">
                     Tổng cộng
                   </p>
-                  <p className="text-3xl font-black text-primary ">
+                  <p className="text-2xl lg:text-3xl font-black text-primary">
                     {totalAmount.toLocaleString()} VND
                   </p>
                 </div>
@@ -183,7 +190,12 @@ export default function BookingLayout() {
                 block
                 loading={isHolding}
                 onClick={handleAction}
-                className="h-14 font-black uppercase tracking-widest text-lg rounded-2xl shadow-xl shadow-primary/20"
+                className="h-12 lg:h-14
+                  font-bold lg:font-black
+                  uppercase
+                  tracking-wide lg:tracking-widest
+                  text-base lg:text-lg
+                  rounded-xl lg:rounded-2xl"
               >
                 {isSelectSeatStep
                   ? "Xác nhận & Thanh toán"

@@ -9,7 +9,7 @@ const PhimCard = () => {
   if (isLoading) {
     return (
       <div className="h-[300px] flex items-center justify-center">
-        <Spin tip="Loading..." size="large">
+        <Spin tip="Loading..." size="large" fullscreen>
           <div className="p-10" />
         </Spin>
       </div>
@@ -35,13 +35,13 @@ const PhimCard = () => {
                 alt={movie.ten_phim}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              {/* <div className="absolute top-2 left-2 uppercase bg-black/60 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold text-white">
-                  {movie.thoi_luong} Phút
-              </div> */}
+              <div className="absolute top-2 left-2 uppercase bg-black/10 backdrop-blur-md px-1.5 py-1 rounded text-[8px] font-bold text-white/100">
+                {movie.do_tuoi}
+              </div>
               {/* Badge (Ví dụ: 2D/3D/Cấm tuổi) */}
               {badge && (
                 <div
-                  className={`absolute top-2 right-2 uppercase ${badge.color} px-2 py-1 rounded text-[10px] font-bold text-white`}
+                  className={`absolute top-2 right-2 uppercase ${badge.color} px-1.5 py-1 rounded text-[8px] font-bold text-white/80`}
                 >
                   {badge.text}
                 </div>
@@ -74,8 +74,11 @@ const PhimCard = () => {
                 {movie.ten_phim}
               </h3>
               <p className="text-white/50 text-xs">
-                {movie.the_loai?.map((g) => g.name).join(", ")} •{" "}
-                {movie.thoi_luong} phút
+                {movie.the_loai
+                  ?.slice(0, 3)
+                  .map((g) => g.name)
+                  .join(", ")}{" "}
+                • {movie.thoi_luong} phút
               </p>
             </div>
           </div>

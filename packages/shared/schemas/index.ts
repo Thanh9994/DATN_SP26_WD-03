@@ -20,6 +20,7 @@ export const ShowTimeStatus = z.enum([
   "sold_out", //Hết vé
   "cancelled", //Đã Hủy
 ]);
+export const PaymentMethod = z.enum(["vnpay", "momo", "atm", "cash"]);
 
 export const Base = z.object({
   _id: z.string().optional(),
@@ -66,7 +67,7 @@ export const ShowTime = Base.extend({
 
 export const ShowTimeSeat = Base.extend({
   showTimeId: z.union([z.string(), z.any()]),
-  bookingId: z.union([z.string(), z.any()]),
+  bookingId: z.union([z.string(), z.any()]).nullable().optional(),
   ten_phong: z.string(),
   seatCode: z.string(),
   row: z.string(),
@@ -167,10 +168,27 @@ export const Booking = Base.extend({
   userId: z.string(),
   showTimeId: z.string(),
   seats: z.array(z.string()).min(1, "Phải chọn ít nhất 1 ghế"), // ["A1","A2"]
+  seatCodes: z.array(z.string()),
+  items: z
+    .array(
+      z.object({
+        snackDrinkId: z.string(),
+        name: z.string(),
+        quantity: z.number().min(1),
+        price: z.number(),
+      }),
+    )
+    .default([]),
   totalAmount: z.number(),
+  discountAmount: z.number().default(0),
+  finalAmount: z.number(),
+
   status: BookingStatus.default("pending"),
+  paymentMethod: PaymentMethod.default("vnpay"),
   paymentId: z.string().optional(),
-  expiresAt: z.coerce.date().optional(),
+
+  holdExpiresAt: z.coerce.date(),
+  ticketCode: z.string().optional(),
 });
 
 export const CreateCinema = z.object({
@@ -294,6 +312,7 @@ export type IGenre = z.infer<typeof Genre>;
 export type IMovie = z.infer<typeof Movie>;
 export type IUpdateMovie = Partial<ICreateMovie>;
 export type ICreateMovie = Omit<IMovie, "_id" | "createdAt" | "updatedAt">;
+export type ISnackDrink = z.infer<typeof SnackDrink>;
 // export type ICinemaForm = Omit<ICinema, "danh_sach_phong" | "createdAt" | "updatedAt">;
 
 export type IUser = z.infer<typeof User>;
@@ -315,9 +334,6 @@ export type IRow = z.infer<typeof Row>;
 export type IPhong = z.infer<typeof Room>;
 export type IPhongWeb = z.infer<typeof RoomWeb>;
 export type IPhongCreate = z.infer<typeof RoomCreate>;
-// export type IPopulatedBooking = Omit<IBooking, "showTimeId"> & {
-//   showTimeId: IPopulatedShowTime;
-// };
 
 export type IShowTime = z.infer<typeof ShowTime>;
 export type IShowTimeSeat = z.infer<typeof ShowTimeSeat>;
@@ -328,7 +344,14 @@ export type ICreateShowTimePl = Omit<
   movieId: string;
   roomId: string;
 };
-export type ISnackDrink = z.infer<typeof SnackDrink>;
-
+export type IBooking = z.infer<typeof Booking>;
+export type ICreateBooking = Omit<
+  IBooking,
+  "_id" | "createdAt" | "updatedAt" | "status" | "ticketCode"
+>;
+export type IPopulatedBooking = Omit<IBooking, "showTimeId" | "userId"> & {
+  showTimeId: IPopulatedShowTime;
+  userId: IUser;
+};
 // .optional(): Trường này có thể có hoặc không (tương đương với dấu ? trong Interface).
 //

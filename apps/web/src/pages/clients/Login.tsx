@@ -15,9 +15,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     try {
       await login({ email, password });
       // console.log(token);
@@ -43,10 +41,7 @@ const Login = () => {
       <Form className="space-y-6" onFinish={handleSubmit} layout="vertical">
         <Form.Item
           name="email"
-          rules={[
-            { required: true, message: "Vui lòng nhập email" },
-            { type: "email", message: "Email không hợp lệ" },
-          ]}
+          rules={[{ required: true, message: "Vui lòng nhập email" }]}
         >
           <Input
             label="Email Address"

@@ -58,7 +58,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
             className="flex items-center justify-center gap-2 min-w-max "
           >
             {/* Nhãn hàng bên trái */}
-            <span className="w-4 text-zinc-600 font-bold text-sm">
+            <span className="w-4 mr-auto text-zinc-600 font-bold text-sm">
               {rowLabel}
             </span>
 
@@ -82,7 +82,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
             </div>
 
             {/* Nhãn hàng bên phải */}
-            <span className="w-6 text-zinc-600 font-bold text-sm">
+            <span className="w-4 ml-auto text-zinc-600 font-bold text-sm">
               {rowLabel}
             </span>
           </div>

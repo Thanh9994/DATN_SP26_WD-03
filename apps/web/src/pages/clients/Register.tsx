@@ -17,8 +17,7 @@ export const Register = () => {
   const [password, setPassword] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [open, setOpen] = useState(false);
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!acceptTerms) {
       setOpen(true);
       return;

@@ -9,5 +9,5 @@ export const API = {
   GENRES: `${API_URL}/content/genres`,
   MOVIES: `${API_URL}/content/movies`,
   SHOWTIME: `${API_URL}/catalog/showtimes`,
-  BOOKING: `${API_URL}/oder/booking`,
+  BOOKING: `${API_URL}/order/booking`,
 };

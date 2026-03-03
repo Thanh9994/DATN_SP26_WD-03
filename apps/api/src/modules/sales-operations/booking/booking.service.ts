@@ -9,7 +9,6 @@ export const bookingService = {
     try {
       const holdExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 phút
 
-      // Cập nhật trạng thái ghế: Chỉ update những ghế đang là 'empty'
       const result = await SeatTime.updateMany(
         {
           showTimeId,
@@ -29,9 +28,32 @@ export const bookingService = {
       if (result.modifiedCount !== seatCodes.length) {
         throw new Error("Một số ghế đã được chọn hoặc không còn trống.");
       }
+      const seats = await SeatTime.find({
+        showTimeId,
+        seatCode: { $in: seatCodes },
+      }).session(session);
+
+      const totalAmount = seats.reduce((sum, s) => sum + s.price, 0);
+
+      // TẠO LUÔN BOOKING PENDING
+      const [newBooking] = await Booking.create(
+        [
+          {
+            userId,
+            showTimeId,
+            seats: seats.map((s) => s._id),
+            seatCodes,
+            totalAmount,
+            finalAmount: totalAmount, // Tạm thời bằng nhau nếu chưa có voucher
+            status: "pending",
+            holdExpiresAt: holdExpires,
+          },
+        ],
+        { session },
+      );
 
       await session.commitTransaction();
-      return { success: true, expiresAt: holdExpires };
+      return { booking: newBooking, expiresAt: holdExpires };
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -42,32 +64,18 @@ export const bookingService = {
 
   //Xác nhận đặt vé và tạo hóa đơn
 
-  async confirmBooking(payload: {
-    showTimeId: string;
-    seatCodes: string[];
-    userId: string;
-    paymentId?: string;
-  }) {
-    const { showTimeId, seatCodes, userId, paymentId } = payload;
+  async confirmBooking(bookingId: string, paymentId: string) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      // Kiểm tra và lấy thông tin ghế (đảm bảo vẫn đang được giữ bởi đúng User)
-      const seatDocs = await SeatTime.find({
-        showTimeId,
-        seatCode: { $in: seatCodes },
-        heldBy: userId,
-        trang_thai: "hold",
-      }).session(session);
-
-      if (seatDocs.length !== seatCodes.length) {
-        throw new Error("Phiên giữ ghế đã hết hạn hoặc không hợp lệ.");
+      const booking = await Booking.findById(bookingId).session(session);
+      if (!booking || booking.status !== "pending") {
+        throw new Error("Giao dịch không hợp lệ.");
       }
-
       // Chuyển trạng thái ghế sang 'booked'
-      await SeatTime.updateMany(
-        { _id: { $in: seatDocs.map((s) => s._id) } },
+      const seats = await SeatTime.updateMany(
+        { _id: { $in: booking.seats }, trang_thai: "hold" },
         {
           $set: { trang_thai: "booked" },
           $unset: { heldBy: "", holdExpiresAt: "" },
@@ -75,24 +83,13 @@ export const bookingService = {
         { session },
       );
 
-      const totalAmount = seatDocs.reduce((sum, s) => sum + s.price, 0);
-
-      const [newBooking] = await Booking.create(
-        [
-          {
-            userId,
-            showTimeId,
-            seats: seatDocs.map((s) => s._id), // Lưu ObjectId thay vì seatCode
-            totalAmount,
-            status: "paid",
-            paymentId,
-          },
-        ],
-        { session },
-      );
+      booking.status = "paid";
+      booking.paymentId = paymentId;
+      booking.ticketCode = `TIC-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+      await booking.save({ session });
 
       await session.commitTransaction();
-      return newBooking;
+      return booking;
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -102,17 +99,87 @@ export const bookingService = {
   },
 
   //Tự động giải phóng ghế hết hạn (Dùng cho Cron job)
-  async releaseExpiredSeats() {
-    const result = await SeatTime.updateMany(
-      {
-        trang_thai: "hold",
-        holdExpiresAt: { $lt: new Date() },
-      },
-      {
-        $set: { trang_thai: "empty" },
-        $unset: { heldBy: "", holdExpiresAt: "" },
-      },
-    );
-    return result.modifiedCount;
+  async releaseExpiredBookings() {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const now = new Date();
+
+      const expiredBookings = await Booking.find({
+        status: "pending",
+        holdExpiresAt: { $lt: now },
+      }).session(session);
+
+      if (expiredBookings.length === 0) {
+        await session.commitTransaction();
+        return 0;
+      }
+
+      const bookingIds = expiredBookings.map((b) => b._id);
+      const allSeatIds = expiredBookings.flatMap((b) => b.seats);
+
+      await SeatTime.updateMany(
+        {
+          _id: { $in: allSeatIds },
+          trang_thai: "hold",
+        },
+        {
+          $set: { trang_thai: "empty" },
+          $unset: { heldBy: "", holdExpiresAt: "", bookingId: "" },
+        },
+        { session },
+      );
+
+      const result = await Booking.updateMany(
+        { _id: { $in: bookingIds } },
+        { $set: { status: "expired" } },
+        { session },
+      );
+
+      await session.commitTransaction();
+      console.log(`[Release] Đã hủy ${result.modifiedCount} đơn hàng hết hạn.`);
+      return result.modifiedCount;
+    } catch (error) {
+      await session.abortTransaction();
+      console.error("Lỗi khi giải phóng ghế:", error);
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  },
+
+  async cancelBooking(bookingId: string, userId: string) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const booking = await Booking.findOne({ _id: bookingId, userId }).session(
+        session,
+      );
+
+      if (!booking || booking.status !== "pending") {
+        throw new Error("Không thể hủy đơn hàng này.");
+      }
+
+      await SeatTime.updateMany(
+        { _id: { $in: booking.seats } },
+        {
+          $set: { trang_thai: "empty" },
+          $unset: { heldBy: "", holdExpiresAt: "", bookingId: "" },
+        },
+        { session },
+      );
+
+      // Đổi trạng thái đơn
+      booking.status = "cancelled";
+      await booking.save({ session });
+
+      await session.commitTransaction();
+      return { success: true };
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
   },
 };

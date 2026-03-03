@@ -22,6 +22,7 @@ const sendError = (
 export const createShowTime = async (req: Request, res: Response) => {
   try {
     const { movieId, roomId, date, timeSlot, ...prices } = req.body;
+    const cleaning_TIME = 30 * 60000;
 
     const movie = await Movie.findById(movieId);
     if (!movie) return res.status(404).json({ message: "Phim không tồn tại" });
@@ -62,24 +63,28 @@ export const createShowTime = async (req: Request, res: Response) => {
     }
 
     const durationInMs = (movie.thoi_luong || 0) * 60000;
-    const endTime = new Date(startTime.getTime() + durationInMs);
+    const movieEndTime = new Date(startTime.getTime() + durationInMs);
 
     const isOver = await ShowTimeM.findOne({
       roomId: roomId,
       $or: [
         {
-          startTime: { $lt: endTime },
-          endTime: { $gt: startTime },
+          startTime: { $lt: new Date(movieEndTime.getTime() + cleaning_TIME) },
+          endTime: { $gt: new Date(startTime.getTime() - cleaning_TIME) },
         },
       ],
     });
     if (isOver) {
+      const suggestedStart = new Date(isOver.endTime.getTime() + cleaning_TIME);
       return res.status(400).json({
-        message: "Phòng này đã có lịch chiếu khác trong khoảng thời gian này!",
-        overlappingWith: {
-          start: isOver.startTime,
-          end: isOver.endTime,
-        },
+        message: `Phòng này đang bận hoặc đang dọn dẹp.`,
+        movie: isOver.movieId, // Bạn có thể populate thêm tên phim ở đây nếu cần
+        start: isOver.startTime,
+        end: isOver.endTime,
+        suggestedNextAvailable: suggestedStart.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       });
     }
 
@@ -88,13 +93,13 @@ export const createShowTime = async (req: Request, res: Response) => {
       movieId,
       roomId,
       startTime,
-      endTime,
+      endTime: movieEndTime,
       status: "upcoming",
     });
 
     const newShowTime = await ShowTimeM.create(payload);
     try {
-      // console.log("Room structure:", room.rows);
+      // console.log("Ghế và hàng ghế:", room.rows);
       await generateShowTimeSeats(newShowTime.toObject(), room.toObject());
       return res.status(201).json({
         message: `Tạo suất chiếu lúc ${startTime.toLocaleTimeString()} ngày ${startTime.toLocaleDateString()} thành công`,
@@ -102,7 +107,9 @@ export const createShowTime = async (req: Request, res: Response) => {
       });
     } catch (error) {
       await ShowTimeM.findByIdAndDelete(newShowTime._id);
-      return res.status(400).json({ message: "Lỗi sinh ghế", error });
+      return res
+        .status(400)
+        .json({ message: "Lỗi hệ thống khi khởi tạo sơ đồ ghế", error });
     }
   } catch (error) {
     return res.status(400).json({
@@ -127,7 +134,7 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
 
     const showtimes = await ShowTimeM.find(query)
       .populate("movieId", "ten_phim thoi_luong")
-      // LIÊN KẾT PHÒNG -> RẠP -> KHU VỰC
+      // rooms -> rạp -> tên - địa chỉ - thành phố
       .populate({
         path: "roomId",
         select: "ten_phong cinema_id",
