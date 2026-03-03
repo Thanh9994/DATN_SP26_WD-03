@@ -1,35 +1,25 @@
 import * as dotenv from "dotenv";
 dotenv.config();
-
-import express from "express";
-import cors from "cors";
+import app from "./app";
 import { connectDB } from "./config/db";
-import testRoute from "./modules/test/test.route";
-import genreRouter from "./modules/genre/genre.route";
-import cinemaRouter from "./modules/cinema/cinema.route";
-import uploadRouter from "./middlewares/upload";
-import movieRouter from "./modules/movie/movie.route";
-import productRouter from "./modules/products/product.route";
-import usersRouter from "./modules/auth/user.route";
+import { initAllCrons } from "./utils/initCron";
 
+const startServer = async () => {
+  try {
+    await connectDB();
+    console.log("🔗 MongoDB: Connected");
+    const cloudStatus = process.env.CLOUD_NAME ? "Connected" : "Missing";
+    const PORT = process.env.PORT || 5000;
 
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-connectDB();
-
-app.use("/api/test", testRoute);
-app.use("/api/genres", genreRouter);
-app.use("/api/cinemas", cinemaRouter);
-app.use("/api/uploads", uploadRouter);
-app.use("/api/movies", movieRouter);
-app.use("/api/product", productRouter);
-app.use("/api/auth", usersRouter);
-
-app.listen(process.env.PORT, () => {
-  console.log(`🚀 API running at http://localhost:${process.env.PORT}`);
-});
+    app.listen(PORT, () => {
+      initAllCrons();
+      console.log(
+        `🚀 API Ready |🌐 Port: ${process.env.PORT} |🔗 MongoDB: Connected |🖼️  Cloudinary: ${cloudStatus}`,
+      );
+    });
+  } catch (error) {
+    console.error("❌ Không thể khởi động server:", error);
+    process.exit(1); // Dừng nếu lỗi nghiêm trọng
+  }
+};
+startServer();

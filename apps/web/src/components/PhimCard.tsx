@@ -1,13 +1,15 @@
-import { MOVIE_BADGE } from "@shared/utils/movieStatus";
 import { useMovies } from "@web/hooks/useMovie";
+import { MOVIE_BADGE } from "@web/styles/movieStatus";
 import { Spin } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const PhimCard = () => {
   const { movies, isLoading, isError } = useMovies();
+  const navigate = useNavigate();
   if (isLoading) {
     return (
       <div className="h-[300px] flex items-center justify-center">
-        <Spin tip="Loading..." size="large">
+        <Spin tip="Loading..." size="large" fullscreen>
           <div className="p-10" />
         </Spin>
       </div>
@@ -22,6 +24,7 @@ const PhimCard = () => {
         const badge = MOVIE_BADGE[movie.trang_thai];
         return (
           <div
+            onClick={() => navigate(`/movie/${movie._id}`)}
             key={movie._id}
             className="relative w-full min-w-[235px] snap-start group cursor-pointer transition hover:z-30"
           >
@@ -32,13 +35,13 @@ const PhimCard = () => {
                 alt={movie.ten_phim}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              {/* <div className="absolute top-2 left-2 uppercase bg-black/60 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold text-white">
-                  {movie.thoi_luong} Phút
-              </div> */}
+              <div className="absolute top-2 left-2 uppercase bg-black/10 backdrop-blur-md px-1.5 py-1 rounded text-[8px] font-bold text-white/100">
+                {movie.do_tuoi}
+              </div>
               {/* Badge (Ví dụ: 2D/3D/Cấm tuổi) */}
               {badge && (
                 <div
-                  className={`absolute top-2 right-2 uppercase ${badge.color} px-2 py-1 rounded text-[10px] font-bold text-white`}
+                  className={`absolute top-2 right-2 uppercase ${badge.color} px-1.5 py-1 rounded text-[8px] font-bold text-white/80`}
                 >
                   {badge.text}
                 </div>
@@ -48,7 +51,18 @@ const PhimCard = () => {
                 className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent 
                 opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4 z-50 pointer-events-none group-hover:pointer-events-auto"
               >
-                <button className="w-full bg-white text-black py-2 rounded-lg font-bold text-sm hover:bg-red-500 hover:text-white transition">
+                <button
+                  className="w-full bg-white text-black py-2 rounded-lg font-bold text-sm hover:bg-red-500 hover:text-white transition"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const token = localStorage.getItem("token");
+                    if (!token) {
+                      navigate("/login");
+                    } else {
+                      navigate(`/booking?movieId=${movie._id}`);
+                    }
+                  }}
+                >
                   Đặt Vé Ngay
                 </button>
               </div>
@@ -60,8 +74,11 @@ const PhimCard = () => {
                 {movie.ten_phim}
               </h3>
               <p className="text-white/50 text-xs">
-                {movie.the_loai?.map((g) => g.name).join(", ")} •{" "}
-                {movie.thoi_luong} phút
+                {movie.the_loai
+                  ?.slice(0, 3)
+                  .map((g) => g.name)
+                  .join(", ")}{" "}
+                • {movie.thoi_luong} phút
               </p>
             </div>
           </div>
