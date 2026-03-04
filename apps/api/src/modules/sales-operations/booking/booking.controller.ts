@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { bookingService } from "./booking.service";
 import { Booking } from "./booking.model";
-import { getBookingAnalytics } from "@api/utils/booking.analytics";
+import { getBookingAnalytics } from "@api/utils/booking/booking.analytics";
 
 export const holdSeats = async (req: Request, res: Response) => {
   try {

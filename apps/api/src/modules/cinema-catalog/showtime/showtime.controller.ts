@@ -8,7 +8,7 @@ import { Movie } from "../../movie-content/movie/movie.model";
 import {
   CalculateShowTimeStatus,
   ShowTimeDisplay,
-} from "@api/utils/showtime.util";
+} from "@api/utils/showtime/showtime.util";
 
 const sendError = (
   res: Response,

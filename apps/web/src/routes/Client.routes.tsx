@@ -11,7 +11,6 @@ import Showtime from "@web/pages/ShowTime";
 import { RouteObject } from "react-router-dom";
 import Ticket from "@web/pages/Ticket";
 import Checkout from "@web/pages/CheckOut";
-import { BookingPage } from "@web/components/mockup";
 import MovieDetail from "@web/pages/clients/MovieDetail";
 import BookingLayout from "@web/layouts/BookingLayout";
 import { BookingCinema } from "@web/pages/BookingCinema";
@@ -39,8 +38,6 @@ export const ClientRoutes: RouteObject = {
       ],
     },
     { path: "about", element: <About /> },
-    { path: "seatmap", element: <BookingPage /> },
-    { path: "bookingpage", element: <BookingPage /> },
     { path: "event", element: <Event /> },
     {
       path: "booking",
