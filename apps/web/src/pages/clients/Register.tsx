@@ -7,7 +7,7 @@ import { Lock, Mail, Phone, User } from "lucide-react";
 import { useAuth } from "@web/hooks/useAuth";
 import { Popconfirm, Checkbox, Form } from "antd";
 
-export const Register = () => {
+const Register = () => {
   const navigate = useNavigate();
   const { register, isRegistering } = useAuth();
 
@@ -276,3 +276,4 @@ export const Register = () => {
     </AuthLayout>
   );
 };
+export default Register;
