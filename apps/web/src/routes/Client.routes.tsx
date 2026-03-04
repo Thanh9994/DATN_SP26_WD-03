@@ -34,6 +34,8 @@ export const ClientRoutes: RouteObject = {
         { index: true, element: <ProfileInfo /> },
         { path: "info", element: <ProfileInfo /> },
         { path: "settings", element: <Setting /> },
+        { path: "tickets", element: <div>Lịch sử đặt vé</div> },
+        { path: "payment", element: <div>Phương thức thanh toán</div> },
       ],
     },
     { path: "about", element: <About /> },

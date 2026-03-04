@@ -45,8 +45,12 @@ export const ProfileLayout = () => {
     label: item.label,
     icon: item.icon,
   }));
+
+  const currentLabel =
+    menuItems.find((item) => item.key === selectedKey)?.label ||
+    "Thông tin cá nhân";
   return (
-    <div className="h-auto bg-[#120a0a] text-white py-6 lg:py-10">
+    <div className="min-h-full bg-[#120a0a] text-white py-6 lg:py-10 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-5 flex flex-col lg:flex-row gap-6 lg:gap-6">
         {/* Sidebar */}
         <aside className="hidden lg:block lg:w-1/4 lg:sticky h-fit space-y-2">
@@ -61,7 +65,7 @@ export const ProfileLayout = () => {
         </aside>
         {/* Main Content */}
         <main className="w-full lg:w-3/4">
-          <div className="lg:hidden px-4 mb-4">
+          <div className="lg:hidden px-1 mb-2">
             <Dropdown
               menu={{
                 items: dropdownItems,
@@ -71,18 +75,12 @@ export const ProfileLayout = () => {
               trigger={["click"]}
             >
               <Button className=" !bg-red-500/40 !border-none !text-white flex justify-between items-center">
-                {selectedKey === "info"
-                  ? "Thông tin cá nhân"
-                  : selectedKey === "tickets"
-                    ? "Lịch sử đặt vé"
-                    : selectedKey === "payment"
-                      ? "Phương thức thanh toán"
-                      : "Cài đặt tài khoản"}
+                {currentLabel}
                 <DownOutlined />
               </Button>
             </Dropdown>
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 lg:p-4 min-h-[60vh]">
+          <div className="lg:p-4 min-h-[60vh]">
             <Outlet />
           </div>
         </main>
