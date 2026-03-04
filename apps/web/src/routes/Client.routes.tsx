@@ -7,6 +7,15 @@ import { Home } from "@web/pages/Home";
 import Login from "@web/pages/Login";
 import { Register } from "@web/pages/Register";
 import { RouteObject } from "react-router-dom";
+import Ticket from "@web/pages/Ticket";
+import Checkout from "@web/pages/CheckOut";
+import { BookingPage } from "@web/components/mockup";
+import MovieDetail from "@web/pages/clients/MovieDetail";
+import BookingLayout from "@web/layouts/BookingLayout";
+import { BookingCinema } from "@web/pages/BookingCinema";
+import { ProfileLayout } from "@web/layouts/ProfileLayout";
+import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
+import { Setting } from "@web/components/authProfile/Setting";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -16,12 +25,22 @@ export const ClientRoutes: RouteObject = {
     { path: "login", element: <Login /> },
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
+    {
+      path: "profile",
+      element: <ProfileLayout />,
+      children: [
+        { index: true, element: <ProfileInfo /> },
+        { path: "info", element: <ProfileInfo /> },
+        { path: "settings", element: <Setting /> },
+        { path: "tickets", element: <div>Lịch sử đặt vé</div> },
+        { path: "payment", element: <div>Phương thức thanh toán</div> },
+      ],
+    },
     { path: "about", element: <About /> },
     { path: "seatmap", element: <BookingPage /> },
     { path: "bookingpage", element: <BookingPage /> },
     { path: "event", element: <Event /> },
     { path: "booking", element: <SeatBooking /> },
     { path: "*", element: <NotFound /> },
-    { path: "ticket", element: <Ticket /> },
   ],
 };

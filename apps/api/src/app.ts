@@ -6,6 +6,7 @@ import accessRouter from "./modules/access-control";
 import contentRouter from "./modules/movie-content";
 import testRoute from "./modules/test/test.route";
 import orderRouter from "./modules/sales-operations";
+import { globalErrorHandler } from "./middlewares/error.middleware";
 
 const app = express();
 
@@ -20,5 +21,5 @@ app.use("/api/order", orderRouter);
 app.use("/api/access", accessRouter);
 app.use("/api/catalog", catalogRouter);
 app.use("/api/content", contentRouter);
-
+app.use(globalErrorHandler);
 export default app;

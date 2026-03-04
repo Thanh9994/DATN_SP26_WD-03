@@ -80,39 +80,11 @@ export default function Checkout() {
       {/* subtle vignette */}
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(239,68,68,0.12),rgba(0,0,0,0)_55%),radial-gradient(ellipse_at_left,rgba(255,255,255,0.06),rgba(0,0,0,0)_45%)]" />
 
-      {/* TOP BAR */}
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-black/30 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-red-600 flex items-center justify-center">
-              <div className="h-2 w-2 rounded-full bg-white/90" />
-            </div>
-            <div className="font-semibold tracking-wide">CINESTREAM</div>
-            <nav className="ml-6 hidden gap-6 text-xs text-zinc-400 md:flex">
-              <span className="cursor-pointer hover:text-white">Movies</span>
-              <span className="cursor-pointer hover:text-white">Cinemas</span>
-              <span className="cursor-pointer hover:text-white">Offers</span>
-              <span className="cursor-pointer hover:text-white">
-                My Tickets
-              </span>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-4 text-zinc-300">
-            <button className="h-9 w-9 rounded-full border border-white/10 bg-white/5 hover:bg-white/10" />
-            <div className="h-9 w-9 rounded-full bg-emerald-200/80" />
-          </div>
-        </div>
-      </header>
-
-      <div className="mx-auto max-w-6xl px-6 pt-10 pb-28">
+      <div className="mx-auto max-w-7xl px-4 pt-10 pb-28">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
           {/* LEFT */}
           <div>
-            <div className="text-3xl font-extrabold">Checkout</div>
-            <div className="mt-2 text-sm text-zinc-400">
-              Complete your booking for Dune: Part
-            </div>
+            <div className="text-3xl uppercase font-extrabold">PayMents</div>
 
             {/* PAYMENT METHOD */}
             <div className="mt-8">

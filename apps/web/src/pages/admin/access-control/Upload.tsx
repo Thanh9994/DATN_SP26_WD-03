@@ -1,11 +1,28 @@
 import { useUpload } from "@web/hooks/useUploads";
 import { useState } from "react";
-import { Input, Upload as AntUpload, Button, Card, Row, Col, Image, message, Spin } from "antd";
-import { UploadOutlined, DeleteOutlined, CopyOutlined, ReloadOutlined } from "@ant-design/icons";
+import {
+  Input,
+  Upload as AntUpload,
+  Button,
+  Card,
+  Row,
+  Col,
+  Image,
+  message,
+  Spin,
+  Popconfirm,
+} from "antd";
+import {
+  UploadOutlined,
+  DeleteOutlined,
+  CopyOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
 import type { UploadProps } from "antd";
 
 export const Upload = () => {
-  const { upload, isUploading, images, deleteImage, isDeleting, reloadImages } = useUpload();
+  const { upload, isUploading, images, deleteImage, isDeleting, reloadImages } =
+    useUpload();
   const [fileName, setFileName] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -51,33 +68,48 @@ export const Upload = () => {
         </div>
       </Card>
 
-      {/* LIST IMAGE */}
       <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
         {images?.map((img) => (
           <Col xs={24} sm={12} md={8} lg={6} key={img.public_id}>
             <Card
               hoverable
-              cover={<Image src={img.url} height={200} style={{ objectFit: "cover" }} />}
+              cover={
+                <Image
+                  src={img.url}
+                  height={220}
+                  style={{ objectFit: "cover" }}
+                />
+              }
               actions={[
-                <Button
-                  danger
-                  icon={<DeleteOutlined />}
-                  loading={isDeleting}
-                  onClick={() => {
-                    if (confirm("Xóa ảnh này?")) deleteImage(img.public_id);
-                  }}
+                <Popconfirm
+                  title="Xóa ảnh này?"
+                  description="Hành động này không thể hoàn tác."
+                  onConfirm={() => deleteImage(img.public_id)}
+                  okText="Xóa"
+                  cancelText="Hủy"
+                  okButtonProps={{ danger: true }}
                 >
-                  Xóa
-                </Button>,
+                  <Button danger icon={<DeleteOutlined />} loading={isDeleting}>
+                    Xóa
+                  </Button>
+                </Popconfirm>,
               ]}
             >
-              <p style={{ fontSize: 12, wordBreak: "break-all", display: "flex", alignItems: "center", gap: 8 }}>
+              <p
+                style={{
+                  fontSize: 10,
+                  wordBreak: "break-all",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
                 {`https://res.cloudinary.com/dcyzkqb1r/image/upload/${img.public_id}`}
                 <CopyOutlined
                   style={{ cursor: "pointer", color: "#1677ff" }}
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      `https://res.cloudinary.com/dcyzkqb1r/image/upload/${img.public_id}`
+                      `https://res.cloudinary.com/dcyzkqb1r/image/upload/${img.public_id}`,
                     );
                     message.success("Đã copy link ảnh!");
                   }}
@@ -88,9 +120,7 @@ export const Upload = () => {
         ))}
       </Row>
 
-      {(isUploading || isDeleting) && (
-        <Spin fullscreen tip="Đang xử lý..." />
-      )}
+      {(isUploading || isDeleting) && <Spin fullscreen tip="Đang xử lý..." />}
     </div>
   );
 };

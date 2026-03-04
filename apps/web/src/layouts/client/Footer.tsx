@@ -4,7 +4,7 @@ export const Footer = () => {
   const navigate = useNavigate();
   return (
     <div>
-      <footer className="bg-background-dark py-14 px-6 lg:px-10 border-t border-white/5 md:m-auto mt-20 max-sm:hidden">
+      <footer className="hidden md:block bg-background-dark py-14 px-6 lg:px-10 border-t border-white/5 md:m-auto mt-20">
         <div className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-16">
           {/* Logo + Description */}
           <div className="col-span-1">
@@ -164,8 +164,8 @@ export const Footer = () => {
           </p>
         </div>
       </footer>
-      <footer className="sticky bottom-0 z-50 md:hidden ">
-        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/10 px-8 py-3 pb-6 flex items-center justify-between z-[60]">
+      <footer className="md:hidden ">
+        <nav className="fixed bottom-0 left-0 w-full bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/10 px-6 py-3 flex items-center justify-between z-[60">
           <button
             className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ff000d] transition-colors"
             onClick={() => navigate("/")}

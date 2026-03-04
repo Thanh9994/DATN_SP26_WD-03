@@ -10,11 +10,13 @@ import { useState } from "react";
 import dayjs from "dayjs";
 import { useBooking } from "@web/hooks/useBooking";
 import { IShowTime, IShowTimeSeat } from "@shared/schemas";
+import { useAuth } from "@web/hooks/useAuth";
 
 export default function BookingLayout() {
   const [searchParams] = useSearchParams();
   const movieId = searchParams.get("movieId") || undefined;
   const showtimeIdFromUrl = searchParams.get("showtimeId");
+  const { user } = useAuth();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -53,7 +55,7 @@ export default function BookingLayout() {
     );
 
   const handleAction = async () => {
-    // Bước 1: Nếu đang ở trang chọn lịch chiếu -> Chuyển sang chọn ghế
+    //trang chọn lịch chiếu -> Chuyển sang chọn ghế
     if (!isSelectSeatStep) {
       if (!selectedShowtime) {
         message.warning("Vui lòng chọn một suất chiếu!");
@@ -65,23 +67,29 @@ export default function BookingLayout() {
       return;
     }
 
-    // Bước 2: Nếu đang ở trang chọn ghế -> Giữ ghế và sang thanh toán
+    // trang chọn ghế -> Giữ ghế và sang thanh toán
     if (selectedSeats.length === 0) {
       message.warning("Vui lòng chọn ít nhất một ghế!");
       return;
     }
 
     try {
+      if (!user) {
+        message.warning("Vui lòng đăng nhập trước khi đặt vé!");
+        navigate("/login");
+        return;
+      }
       await holdSeats({
         showTimeId: activeShowtimeId!,
         seats: selectedSeats.map((s) => s.seatCode),
-        userId: "USER_ID_ALREADY_LOGGED_IN", // Thay bằng ID từ AuthContext của bạn
+        userId: user?._id as string,
       });
 
+      await refreshSeats();
       message.success("Giữ ghế thành công!");
       navigate(`/checkout?movieId=${movieId}&showtimeId=${activeShowtimeId}`);
     } catch (error) {
-      refreshSeats(); // Tải lại sơ đồ nếu có lỗi (ghế đã bị chiếm)
+      refreshSeats();
     }
   };
 

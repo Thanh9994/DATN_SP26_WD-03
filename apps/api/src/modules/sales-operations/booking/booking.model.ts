@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { BookingStatus, IBooking } from "@shared/schemas";
+import { BookingStatus, IBooking, PaymentMethod } from "@shared/schemas";
 
 const bookingSchema = new mongoose.Schema(
   {
@@ -13,6 +13,9 @@ const bookingSchema = new mongoose.Schema(
       ref: "ShowTime",
       required: true,
     },
+    movieName: String,
+    showTimeString: String,
+    theaterName: String,
     // Chứa danh sách các ID của ghế từ bảng ShowTimeSeat
     seats: [
       {
@@ -50,7 +53,7 @@ const bookingSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["vnpay", "momo", "cash"],
+      enum: PaymentMethod.options,
       default: "vnpay",
     },
 

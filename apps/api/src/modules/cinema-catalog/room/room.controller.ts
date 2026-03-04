@@ -54,6 +54,34 @@ export const RoomsByCinema = async (req: Request, res: Response) => {
   }
 };
 
+export const updateRoom = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const room = await Room.findById(id);
+    if (!room) return res.status(404).json({ message: "Phòng không tồn tại" });
+
+    // Nếu thay đổi rạp (cinema_id), cần cập nhật reference ở collection Cinema
+    if (updates.cinema_id && updates.cinema_id !== room.cinema_id.toString()) {
+      await Cinemas.findByIdAndUpdate(room.cinema_id, {
+        $pull: { danh_sach_phong: id },
+      });
+      await Cinemas.findByIdAndUpdate(updates.cinema_id, {
+        $addToSet: { danh_sach_phong: id },
+      });
+    }
+
+    const updatedRoom = await Room.findByIdAndUpdate(id, updates, {
+      new: true,
+    });
+
+    res.json({ message: "Cập nhật phòng thành công", data: updatedRoom });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server khi cập nhật phòng", error });
+  }
+};
+
 export const deleteRoom = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

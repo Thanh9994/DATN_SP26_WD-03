@@ -20,6 +20,7 @@ import {
   SaveOutlined,
   VideoCameraOutlined,
   PartitionOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
 import { useCinemas, useRooms } from "@web/hooks/useCinema";
@@ -30,10 +31,19 @@ const { Text } = Typography;
 
 export const Rooms = () => {
   const [form] = Form.useForm();
-  const [open, setOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRoom, setEditingRoom] = useState<IPhong | null>(null);
   const { cinemas } = useCinemas();
-  const { rooms, isLoading, isError, createRoom, isCreating, deleteRoom } =
-    useRooms();
+  const {
+    rooms,
+    isLoading,
+    isError,
+    createRoom,
+    isCreating,
+    deleteRoom,
+    updateRoom,
+    isUpdating,
+  } = useRooms();
 
   // xử lý submit
   const onFinish = (values: any) => {
@@ -51,16 +61,49 @@ export const Rooms = () => {
       couple: processArray(values.couple),
     };
 
-    createRoom(payload, {
-      onSuccess: () => {
-        message.success("Tạo phòng chiếu thành công!");
-        form.resetFields();
-        setOpen(false);
-      },
-      onError: () => message.error("Không thể tạo phòng."),
-    });
+    if (editingRoom) {
+      updateRoom(
+        { id: editingRoom._id!, room: payload },
+        {
+          onSuccess: () => {
+            message.success("Cập nhật phòng thành công!");
+            handleCloseModal();
+          },
+          onError: (err: any) =>
+            message.error(err.response?.data?.message || "Cập nhật thất bại."),
+        },
+      );
+    } else {
+      createRoom(payload, {
+        onSuccess: () => {
+          message.success("Tạo phòng chiếu thành công!");
+          handleCloseModal();
+        },
+        onError: () => message.error("Không thể tạo phòng."),
+      });
+    }
   };
 
+  const handleOpenCreate = () => {
+    setEditingRoom(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (record: IPhong) => {
+    setEditingRoom(record);
+    form.setFieldsValue({
+      ...record,
+      vip: record.vip.join(", "),
+      couple: record.couple.join(", "),
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingRoom(null);
+    form.resetFields();
+  };
   const columns = [
     {
       title: "Thuộc Rạp",
@@ -123,15 +166,18 @@ export const Rooms = () => {
     {
       title: "Thao tác",
       render: (_: any, record: IPhong) => (
-        <Popconfirm
-          title="Xóa phòng này?"
-          onConfirm={() => deleteRoom(record._id!)}
-          okText="Có"
-          cancelText="Không"
-          okButtonProps={{ danger: true }}
-        >
-          <Button type="text" danger icon={<DeleteOutlined />} />
-        </Popconfirm>
+        <Space>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+          <Popconfirm
+            title="Xóa phòng này?"
+            onConfirm={() => deleteRoom(record._id!)}
+            okText="Có"
+            cancelText="Không"
+            okButtonProps={{ danger: true }}
+          >
+            <Button type="text" danger icon={<DeleteOutlined />} />
+          </Popconfirm>
+        </Space>
       ),
     },
   ];
@@ -151,7 +197,7 @@ export const Rooms = () => {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => setOpen(true)}
+            onClick={handleOpenCreate}
           >
             Thêm phòng
           </Button>
@@ -168,10 +214,10 @@ export const Rooms = () => {
 
       {/* MODAL CREATE */}
       <Modal
-        title="Tạo phòng chiếu mới"
-        open={open}
-        onCancel={() => setOpen(false)}
-        footer={null}
+        title={editingRoom ? "Cập nhật phòng chiếu" : "Tạo phòng chiếu mới"}
+        open={isModalOpen}
+        onCancel={handleCloseModal}
+        footer={null} // We use a custom button inside the form
         width={1200}
         destroyOnHidden
       >
@@ -180,7 +226,7 @@ export const Rooms = () => {
           layout="vertical"
           onFinish={onFinish}
           initialValues={{
-            loai_phong: "2D",
+            loai_phong: "2D", // Default values for creation
             rows: [{ name: "A", seats: 10 }],
           }}
         >
@@ -281,9 +327,9 @@ export const Rooms = () => {
             htmlType="submit"
             block
             icon={<SaveOutlined />}
-            loading={isCreating}
+            loading={isCreating || isUpdating}
           >
-            Lưu phòng
+            {editingRoom ? "Cập nhật phòng" : "Lưu phòng"}
           </Button>
         </Form>
       </Modal>
