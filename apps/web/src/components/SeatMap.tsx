@@ -27,7 +27,11 @@ const SeatMap: React.FC<SeatMapProps> = ({
 
   const getSeatColor = (seat: IShowTimeSeat) => {
     if (seat.trang_thai === "booked")
-      return "bg-zinc-700 cursor-not-allowed text-zinc-500";
+      return "bg-zinc-700 cursor-not-allowed text-zinc-500 border-zinc-700";
+
+    if (seat.trang_thai === "hold")
+      return "bg-yellow-500 text-black border-yellow-400 cursor-not-allowed";
+
     if (selectedSeatCodes.includes(seat.seatCode))
       return "bg-red-600 text-white border-red-400";
 
@@ -68,7 +72,9 @@ const SeatMap: React.FC<SeatMapProps> = ({
                 .map((seat) => (
                   <button
                     key={seat._id}
-                    disabled={seat.trang_thai === "booked"}
+                    disabled={
+                      seat.trang_thai === "booked" || seat.trang_thai === "hold"
+                    }
                     onClick={() => onSeatClick(seat)}
                     className={`
                       w-6 h-6 md:w-7 md:h-7 md:no-scrollbar text-[8px] md:text-xs font-semibold rounded-md border-2 transition-all
@@ -105,6 +111,10 @@ const SeatMap: React.FC<SeatMapProps> = ({
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-red-600 rounded" /> <span>Đang chọn</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-yellow-500 rounded" />
+          <span>Đang giữ</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-zinc-700 rounded" /> <span>Đã bán</span>

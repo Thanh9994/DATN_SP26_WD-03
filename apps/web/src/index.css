@@ -119,3 +119,47 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: #ffffff !important;
   transition: background-color 5000s ease-in-out 0s;
 }
+/* Selected item */
+.profile-menu .ant-menu-item-selected {
+  background-color: #ff000010 !important;
+  border-right: 4px solid #ec3a3a !important;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  color: #ec3a3a !important;
+}
+
+/* Hover item */
+.profile-menu .ant-menu-item:hover {
+  background-color: #ff00001c !important;
+  border-right: 4px solid #ec3a3a !important;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.profile-menu .ant-menu-item-selected::before {
+}
+
+/* Bỏ background xanh mặc định của AntD */
+.profile-menu .ant-menu-item-selected::after {
+  display: none !important;
+}
+
+.profile-menu .ant-menu-item {
+  display: flex !important;
+  align-items: center;
+  margin: 15px 0px 15px 0px !important;
+  height: 45px !important;
+  padding-left: 20px !important;
+}
+.ant-dropdown-menu {
+  background-color: #120a0a !important;
+}
+
+.ant-dropdown-menu-item {
+  background-color: rgb(0, 0, 0) !important;
+  margin: 3px !important;
+  color: #ffffff !important;
+}
+
+.ant-dropdown-menu-item:hover {
+  background-color: #ff000069 !important;
+}

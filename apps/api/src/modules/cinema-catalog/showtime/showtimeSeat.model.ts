@@ -25,8 +25,13 @@ const showTimeSeatSchema = new Schema<IShowTimeSeat>(
       default: "empty",
       index: true,
     },
-    heldBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
-    holdExpiresAt: { type: Date },
+    heldBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+      index: true,
+    },
+    holdExpiresAt: { type: Date, default: null, index: true },
     bookingId: {
       type: Schema.Types.ObjectId,
       ref: "Booking",
@@ -36,9 +41,6 @@ const showTimeSeatSchema = new Schema<IShowTimeSeat>(
   { timestamps: true },
 );
 
-// showTimeSeatSchema.index({ holdExpiresAt: 1 },
-//   { expireAfterSeconds: 0 },
-// );
 showTimeSeatSchema.index({ showTimeId: 1, seatCode: 1 }, { unique: true });
 
 export const SeatTime = mongoose.model<IShowTimeSeat>(

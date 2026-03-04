@@ -24,7 +24,6 @@ export const Cinema = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // States cho Modal quản lý phòng riêng biệt (nếu vẫn muốn dùng)
   // const [selectedCinemaId, setSelectedCinemaId] = useState<string | null>(null);
   // const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
 
@@ -56,7 +55,6 @@ export const Cinema = () => {
     try {
       const payload = {
         ...values,
-        // phongIds: values.danh_sach_phong
       };
       // console.log("Dữ liệu gửi lên server:", values);
       if (editingId) {
@@ -149,7 +147,7 @@ export const Cinema = () => {
         columns={columns}
         rowKey="_id"
         loading={isLoading}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 8 }}
       />
 
       <Modal
@@ -187,7 +185,17 @@ export const Cinema = () => {
               <Select placeholder="Chọn thành phố">
                 <Select.Option value="Hà Nội">Hà Nội</Select.Option>
                 <Select.Option value="Hồ Chí Minh">Hồ Chí Minh</Select.Option>
-                <Select.Option value="Đà Nẵng">Đà Nẵng</Select.Option>
+                <Select.Option value="Quảng Ninh">Quảng Ninh</Select.Option>
+                <Select.Option value="Hải Phòng">Hải Phòng</Select.Option>
+                <Select.Option value="Đà Lạt">Đà Lạt</Select.Option>
+                <Select.Option value="Tuyên Quang">Tuyên Quang</Select.Option>
+                <Select.Option value="Ninh Bình">Ninh Bình</Select.Option>
+                <Select.Option value="Quy Nhơn">Quy Nhơn</Select.Option>
+                <Select.Option value="Thái Nguyên">Thái Nguyên</Select.Option>
+                <Select.Option value="Tây Ninh">Tây Ninh</Select.Option>
+                <Select.Option value="Hưng Yên">Hưng Yên</Select.Option>
+                <Select.Option value="Bắc Giang">Bắc Giang</Select.Option>
+                <Select.Option value="Phú Thọ">Phú Thọ</Select.Option>
               </Select>
             </Form.Item>
           </div>

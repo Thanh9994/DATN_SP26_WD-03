@@ -15,6 +15,9 @@ import { BookingPage } from "@web/components/mockup";
 import MovieDetail from "@web/pages/clients/MovieDetail";
 import BookingLayout from "@web/layouts/BookingLayout";
 import { BookingCinema } from "@web/pages/BookingCinema";
+import { ProfileLayout } from "@web/layouts/ProfileLayout";
+import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
+import { Setting } from "@web/components/authProfile/Setting";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -24,6 +27,15 @@ export const ClientRoutes: RouteObject = {
     { path: "login", element: <Login /> },
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
+    {
+      path: "profile",
+      element: <ProfileLayout />,
+      children: [
+        { index: true, element: <ProfileInfo /> },
+        { path: "info", element: <ProfileInfo /> },
+        { path: "settings", element: <Setting /> },
+      ],
+    },
     { path: "about", element: <About /> },
     { path: "seatmap", element: <BookingPage /> },
     { path: "bookingpage", element: <BookingPage /> },
