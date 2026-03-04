@@ -123,6 +123,21 @@ export const useRooms = () => {
     },
   });
 
+  const updateRoom = useMutation({
+    mutationFn: async ({ id, room }: { id: string; room: any }) => {
+      const { data } = await axios.put(`${API.ROOMS}/${id}`, room);
+      return data;
+    },
+    onSuccess: () => {
+      message.success("Cập nhật phòng thành công");
+      queryClient.invalidateQueries({ queryKey: ["rooms"] });
+      queryClient.invalidateQueries({ queryKey: ["cinemas"] });
+    },
+    onError: (error: any) => {
+      message.error(error.response?.data?.message || "Cập nhật thất bại");
+    },
+  });
+
   const deleteRoom = useMutation({
     mutationFn: (id: string) => axios.delete(`${API.ROOMS}/${id}`),
     onSuccess: () => {
@@ -137,8 +152,10 @@ export const useRooms = () => {
     isLoading,
     isError,
     createRoom: createRoom.mutateAsync,
+    updateRoom: updateRoom.mutateAsync,
     deleteRoom: deleteRoom.mutate,
     isCreating: createRoom.isPending,
+    isUpdating: updateRoom.isPending,
     isDeleting: deleteRoom.isPending,
   };
 };

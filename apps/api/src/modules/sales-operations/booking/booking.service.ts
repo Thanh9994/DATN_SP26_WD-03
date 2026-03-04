@@ -69,7 +69,13 @@ export const bookingService = {
     session.startTransaction();
 
     try {
-      const booking = await Booking.findById(bookingId).session(session);
+      const booking = await Booking.findById(bookingId)
+        .populate("userId")
+        .populate({
+          path: "showTimeId",
+          populate: { path: "movieId" },
+        })
+        .session(session);
       if (!booking || booking.status !== "pending") {
         throw new Error("Giao dịch không hợp lệ.");
       }

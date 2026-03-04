@@ -115,6 +115,20 @@ export const RoomWeb = Base.extend({
   couple: z.array(z.string()).default([]),
 });
 
+export const BookingPayment = Base.extend({
+  userId: z.string(),
+  showTimeId: z.string(),
+  movieName: z.string().optional(),
+  showTimeString: z.string().optional(),
+  theaterName: z.string().optional(),
+  seats: z.array(z.string()).min(1, "Phải chọn ít nhất 1 ghế"),
+  seatCodes: z.array(z.string()),
+  // ... các trường cũ giữ nguyên
+  finalAmount: z.number(),
+  status: BookingStatus.default("pending"),
+  ticketCode: z.string().optional(),
+});
+
 export type IPopulatedRoom = Omit<IPhong, "cinema_id"> & {
   cinema_id: {
     _id: string;
@@ -345,6 +359,7 @@ export type ICreateShowTimePl = Omit<
   roomId: string;
 };
 export type IBooking = z.infer<typeof Booking>;
+export type IBookingPayment = z.infer<typeof BookingPayment>;
 export type ICreateBooking = Omit<
   IBooking,
   "_id" | "createdAt" | "updatedAt" | "status" | "ticketCode"
