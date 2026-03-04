@@ -85,6 +85,29 @@ export const bookingService = {
         seat.bookingId = newBooking._id;
         await seat.save({ session });
       }
+      const seats = await SeatTime.find({
+        showTimeId,
+        seatCode: { $in: seatCodes },
+      }).session(session);
+
+      const totalAmount = seats.reduce((sum, s) => sum + s.price, 0);
+
+      // TẠO LUÔN BOOKING PENDING
+      const [newBooking] = await Booking.create(
+        [
+          {
+            userId,
+            showTimeId,
+            seats: seats.map((s) => s._id),
+            seatCodes,
+            totalAmount,
+            finalAmount: totalAmount, // Tạm thời bằng nhau nếu chưa có voucher
+            status: "pending",
+            holdExpiresAt: holdExpires,
+          },
+        ],
+        { session },
+      );
 
       await session.commitTransaction();
 
