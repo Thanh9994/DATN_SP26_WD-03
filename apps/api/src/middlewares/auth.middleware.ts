@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { IUser } from "@shared/schemas";
 import { User } from "@api/modules/access-control/user/user.model";
+import { catchAsync } from "@api/utils/catchAsync";
+import { AppError } from "./error.middleware";
 
 // Mở rộng interface Request của Express để có thể chứa thông tin user
 declare global {
@@ -12,54 +14,53 @@ declare global {
   }
 }
 
-type UserRole = IUser["role"];
+export const authenticate = catchAsync(async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return next(new AppError("Vui lòng đăng nhập để tiếp tục", 401));
+  }
 
-export const authenticate = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+  const token = authHeader.split(" ")[1];
+
+  let decoded;
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res
-        .status(401)
-        .json({ message: "Vui lòng đăng nhập để tiếp tục" });
-    }
-
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+    decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       id: string;
     };
-
-    const user = await User.findById(decoded.id).select("-password -__v");
-    if (!user) {
-      return res.status(404).json({ message: "Người dùng không tồn tại" });
-    }
-
-    if (user.trang_thai !== "active") {
-      return res
-        .status(403)
-        .json({ message: `Tài khoản của bạn đã bị ${user.trang_thai}` });
-    }
-
-    req.user = user;
-    next();
   } catch (error) {
-    const message =
-      error instanceof jwt.TokenExpiredError
-        ? "Token đã hết hạn"
-        : "Xác thực không hợp lệ";
-    res.status(401).json({ message });
+    return next(
+      new AppError(
+        error instanceof jwt.TokenExpiredError
+          ? "Token đã hết hạn"
+          : "Xác thực không hợp lệ",
+        401,
+      ),
+    );
   }
-};
 
-export const authorize = (roles: UserRole[]) => {
+  const user = await User.findById(decoded.id).select("-password -__v");
+  if (!user) {
+    return next(
+      new AppError("Người dùng không còn tồn tại trên hệ thống", 401),
+    );
+  }
+
+  if (user.trang_thai !== "active") {
+    return next(
+      new AppError(`Tài khoản của bạn đã bị ${user.trang_thai}`, 403),
+    );
+  }
+
+  req.user = user;
+  next();
+});
+
+export const authorize = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const userRole = req.user?.role as UserRole;
-
-    if (!req.user || !roles.includes(userRole)) {
-      return res.status(403).json({ message: "Quyền truy cập bị từ chối" });
+    if (!req.user || !roles.includes(req.user.role)) {
+      return next(
+        new AppError("Bạn không có quyền thực hiện hành động này", 403),
+      );
     }
     next();
   };

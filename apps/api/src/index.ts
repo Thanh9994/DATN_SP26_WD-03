@@ -7,14 +7,14 @@ import { initAllCrons } from "./utils/initCron";
 const startServer = async () => {
   try {
     await connectDB();
-    console.log("🔗 MongoDB: Connected");
     const cloudStatus = process.env.CLOUD_NAME ? "Connected" : "Missing";
-    const PORT = process.env.PORT || 5000;
+    const PORT = process.env.PORT;
+    const ENV = process.env.NODE_ENV;
 
     app.listen(PORT, () => {
       initAllCrons();
       console.log(
-        `🚀 API Ready |🌐 Port: ${process.env.PORT} |🔗 MongoDB: Connected |🖼️  Cloudinary: ${cloudStatus}`,
+        `🚀 API Ready |🌐 Port: ${process.env.PORT} |🔗 MongoDB: Connected |🖼️  Cloudinary: ${cloudStatus} |🚀 Mode: ${ENV?.toUpperCase()}`,
       );
       console.log(`🚀 Mode: ${process.env.NODE_ENV}`);
     });

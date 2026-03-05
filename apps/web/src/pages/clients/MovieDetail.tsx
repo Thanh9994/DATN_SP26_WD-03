@@ -29,7 +29,7 @@ const MovieDetail = () => {
   }
 
   return (
-    <div>
+    <div className="text-white bg-background-dark">
       <section className="relative h-[85vh] w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
@@ -38,7 +38,7 @@ const MovieDetail = () => {
             src={movie.banner?.url}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/20 to-transparent z-10"></div>
-          <div className="absolute inset-0 bg-black/40 z-0"></div>
+          <div className="absolute inset-0 bg-b0lack/4 z-0"></div>
         </div>
         {movie.trailer && (
           <div className="relative z-20 flex flex-col items-center gap-6">

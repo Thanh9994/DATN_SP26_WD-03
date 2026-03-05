@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { API } from "@web/api/api.service";
-import axios from "axios";
+import { axiosAuth } from "./useAuth";
 import { message } from "antd";
 
 export const useBooking = (showTimeId?: string) => {
@@ -16,8 +16,7 @@ export const useBooking = (showTimeId?: string) => {
     queryKey: ["showtime-detail", showTimeId],
     queryFn: async () => {
       if (!showTimeId) return null;
-      const res = await axios.get(`${API.SHOWTIME}/${showTimeId}`);
-      // console.log("Dữ liệu nhận được:", res.data);
+      const res = await axiosAuth.get(`${API.SHOWTIME}/${showTimeId}`);
       return res.data;
     },
     enabled: !!showTimeId,
@@ -30,7 +29,7 @@ export const useBooking = (showTimeId?: string) => {
       seats: string[];
       userId: string;
     }) => {
-      const { data } = await axios.post(`${API.BOOKING}/hold`, payload);
+      const { data } = await axiosAuth.post(`${API.BOOKING}/hold`, payload);
       return data;
     },
     onSuccess: () => {
@@ -51,7 +50,7 @@ export const useBooking = (showTimeId?: string) => {
       userId: string;
       paymentId?: string;
     }) => {
-      const { data } = await axios.post(`${API.BOOKING}/confirm`, payload);
+      const { data } = await axiosAuth.post(`${API.BOOKING}/confirm`, payload);
       return data;
     },
     onSuccess: () => {

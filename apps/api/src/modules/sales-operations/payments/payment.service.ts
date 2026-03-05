@@ -1,52 +1,38 @@
 import { Booking } from "../booking/booking.model";
 import { bookingService } from "../booking/booking.service";
-import { Request } from "express";
+import { PaymentFactory } from "./gateways/payment.factory";
+import { AppError } from "@api/middlewares/error.middleware";
 
 export const paymentService = {
-  async generatePaymentUrl(bookingId: string, bankCode: string, req: Request) {
+  async initPayment(bookingId: string, method: string, ipAddr: string) {
     const booking = await Booking.findById(bookingId);
-    if (!booking || booking.status !== "pending") {
-      throw new Error("Đơn hàng không hợp lệ hoặc đã hết hạn.");
-    }
+    if (!booking) throw new AppError("Đơn hàng không tồn tại", 404);
+    if (booking.status !== "pending")
+      throw new AppError("Đơn hàng đã xử lý hoặc hết hạn", 400);
 
-    // Kiểm tra thời gian giữ ghế còn hiệu lực không
-    if (new Date() > booking.holdExpiresAt) {
-      throw new Error("Thời gian giữ ghế đã hết. Vui lòng đặt lại.");
-    }
-
-    // Logic giả lập gọi VNPay (Bạn cần cài thêm thư viện vnpay hoặc tự viết hash)
-    // Ở đây mình trả về một URL giả định để bạn hình dung flow
-    const amount = booking.finalAmount;
-    const tmnCode = process.env.VNP_TMNCODE;
-    const secretKey = process.env.VNP_HASHSECRET;
-    const vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-
-    // Bạn sẽ thực hiện logic buildQuery và tạo mã Hash tại đây...
-    const paymentUrl = `${vnpUrl}?vnp_Amount=${amount * 100}&vnp_TxnRef=${bookingId}...`;
-
-    return paymentUrl;
+    // Factory sẽ trả về class Gateway tương ứng (VNPay, Momo, v.v.)
+    const gateway = PaymentFactory.getGateway(method);
+    return await gateway.createUrl(bookingId, booking.finalAmount, ipAddr);
   },
 
-  async handleVnpayCallback(vnpayData: any) {
-    /* Giả sử vnpayData chứa:
-       vnp_ResponseCode: "00" (Thành công)
-       vnp_TxnRef: Chính là bookingId chúng ta gửi đi
-       vnp_TransactionNo: Mã giao dịch của VNPay
-    */
+  async processIpn(method: string, data: any) {
+    const gateway = PaymentFactory.getGateway(method);
 
-    const bookingId = vnpayData.vnp_TxnRef;
-    const responseCode = vnpayData.vnp_ResponseCode;
-    const transactionNo = vnpayData.vnp_TransactionNo;
+    // Gateway trả về kết quả đã được chuẩn hóa (normalized)
+    const result = await gateway.handleIpn(data);
 
-    if (responseCode === "00") {
-      // Gọi hàm confirmBooking bạn đã viết sẵn trong bookingService
-      // Hàm này đã có Transaction để đảm bảo tính toàn vẹn của Ghế và Booking
-      await bookingService.confirmBooking(bookingId, transactionNo);
-
-      return { RspCode: "00", Message: "Confirm Success" };
-    } else {
-      // Nếu thanh toán thất bại, bạn có thể để Cronjob tự hủy hoặc hủy luôn tại đây
-      return { RspCode: "01", Message: "Payment Failed" };
+    // Kiểm tra mã thành công chung (Ví dụ: '00' là thành công)
+    if (result.code === "00" && result.bookingId) {
+      // Dùng result.bookingId thay vì data.vnp_TxnRef để dùng chung cho mọi cổng
+      await bookingService.confirmBooking(
+        result.bookingId,
+        result.transactionNo || "N/A",
+      );
     }
+
+    return {
+      code: result.code,
+      message: result.message,
+    };
   },
 };

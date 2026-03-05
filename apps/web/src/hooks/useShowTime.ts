@@ -38,7 +38,7 @@ export const useShowTime = (movieId?: string) => {
         // 2. Nếu có thông tin trùng lịch, hiển thị chi tiết giờ trùng
         const start = dayjs(overlap.start).format("HH:mm");
         const end = dayjs(overlap.end).format("HH:mm");
-        message.error(`${serverMessage} (Trùng từ ${start} - ${end})`, 4); //4 giây
+        message.error(`${serverMessage} (Trùng từ ${start} - ${end})`, 4);
       } else {
         message.error(serverMessage || "Lỗi tạo suất chiếu");
       }
@@ -95,7 +95,6 @@ export const useShowTimesByMovie = (movieId?: string) => {
     enabled: !!movieId,
   });
 
-  // Logic bổ trợ: Nhóm suất chiếu theo Rạp (Cinema)
   const groupedByCinema = data?.reduce((acc: any, st: any) => {
     const cinema = st.roomId?.cinema_id;
     const cinemaId = cinema?._id;

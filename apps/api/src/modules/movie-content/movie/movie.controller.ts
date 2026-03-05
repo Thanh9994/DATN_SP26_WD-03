@@ -1,86 +1,74 @@
-import { Request, Response } from "express";
 import { movieService } from "./movie.service";
 import { calcMovieStatus } from "@api/utils/movie.status";
+import { catchAsync } from "@api/utils/catchAsync";
+import { AppError } from "@api/middlewares/error.middleware";
 
 export const movieController = {
-  async getAllMovie(_req: Request, res: Response) {
-    try {
-      const movies = await movieService.getAllMovie();
+  getAllMovie: catchAsync(async (_req, res) => {
+    const movies = await movieService.getAllMovie();
 
-      const moviesWithStatus = movies.map((movie) => ({
-        ...movie.toObject(),
-        trang_thai: calcMovieStatus(movie.ngay_cong_chieu, movie.ngay_ket_thuc),
-      }));
-      res.status(200).json({
-        message: "Lấy danh sách phim thành công",
-        data: moviesWithStatus,
-      });
-    } catch (error) {
-      res.status(500).json({ message: error });
+    const moviesWithStatus = movies.map((movie) => ({
+      ...movie.toObject(),
+      trang_thai: calcMovieStatus(movie.ngay_cong_chieu, movie.ngay_ket_thuc),
+    }));
+    res.status(200).json({
+      success: true,
+      message: "Lấy danh sách phim thành công",
+      data: moviesWithStatus,
+    });
+  }),
+
+  getMovieById: catchAsync(async (req, res, next) => {
+    const movie = await movieService.getMovieById(req.params.id);
+
+    if (!movie) {
+      return next(new AppError("Không tìm thấy phim này", 404));
     }
-  },
 
-  async getMovieById(req: Request, res: Response) {
-    try {
-      const movie = await movieService.getMovieById(req.params.id);
-      if (!movie) {
-        return res.status(404).json({ message: "Không tìm thấy phim" });
-      }
-      res.status(200).json({
-        message: "Lấy thông tin phim thành công",
-        data: movie,
-      });
-    } catch (error) {
-      res.status(500).json({ message: error });
+    res.status(200).json({
+      success: true,
+      data: movie,
+    });
+  }),
+
+  createMovie: catchAsync(async (req, res) => {
+    const movieData = req.body;
+    const newMovie = await movieService.createMovie(movieData);
+
+    res.status(201).json({
+      success: true,
+      message: "Tạo phim mới thành công",
+      data: newMovie,
+    });
+  }),
+
+  updateMovie: catchAsync(async (req, res, next) => {
+    const updatedMovie = await movieService.updateMovie(
+      req.params.id,
+      req.body,
+    );
+
+    if (!updatedMovie) {
+      return next(new AppError("Không tìm thấy phim để cập nhật", 404));
     }
-  },
 
-  async createMovie(req: Request, res: Response) {
-    try {
-      //   console.log("REQ BODY POSTER:", req.body.poster);
-      const movieData = req.body;
-      const newMovie = await movieService.createMovie(movieData);
-      res.status(201).json({
-        message: "Tạo phim mới thành công",
-        data: newMovie,
-      });
-    } catch (error) {
-      res.status(400).json({ message: error });
+    res.status(200).json({
+      success: true,
+      message: "Cập nhật phim thành công",
+      data: updatedMovie,
+    });
+  }),
+
+  deleteMovie: catchAsync(async (req, res, next) => {
+    const deletedMovie = await movieService.deleteMovie(req.params.id);
+
+    if (!deletedMovie) {
+      return next(new AppError("Không tìm thấy phim để xóa", 404));
     }
-  },
 
-  async updateMovie(req: Request, res: Response) {
-    try {
-      const movie = await movieService.getMovieById(req.params.id);
-      if (!movie) {
-        return res.status(404).json({ message: "Không tìm thấy phim" });
-      }
-      const data = {
-        ...req.body,
-        poster: req.body.poster || movie.poster,
-      };
-      const updatedMovie = await movieService.updateMovie(req.params.id, data);
-
-      res.status(200).json({
-        message: "Cập nhật phim thành công",
-        data: updatedMovie,
-      });
-    } catch (error) {
-      res.status(400).json({ message: error });
-    }
-  },
-
-  async deleteMovie(req: Request, res: Response) {
-    try {
-      const deletedMovie = await movieService.deleteMovie(req.params.id);
-      if (!deletedMovie) {
-        return res.status(404).json({ message: "Không tìm thấy phim để xóa" });
-      }
-      res.status(200).json({
-        message: "Xóa phim thành công",
-      });
-    } catch (error) {
-      res.status(500).json({ message: error });
-    }
-  },
+    res.status(200).json({
+      success: true,
+      message: "Xóa phim thành công",
+    });
+  }),
 };

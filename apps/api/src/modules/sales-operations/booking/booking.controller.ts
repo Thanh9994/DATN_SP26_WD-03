@@ -1,18 +1,26 @@
 import { Request, Response } from "express";
 import { bookingService } from "./booking.service";
 import { Booking } from "./booking.model";
-import { getBookingAnalytics } from "@api/utils/booking.analytics";
+import { getBookingAnalytics } from "@api/utils/booking/booking.analytics";
+import { catchAsync } from "@api/utils/catchAsync";
+import { AppError } from "@api/middlewares/error.middleware";
 
-export const holdSeats = async (req: Request, res: Response) => {
-  try {
-    const { showTimeId, seats, userId } = req.body;
+export const bookingController = {
+  holdSeats: catchAsync(async (req, res, next) => {
+    const userId = req.user?._id;
+    const { showTimeId, seats } = req.body;
+
+    if (!userId) {
+      return next(
+        new AppError("Bạn cần đăng nhập để thực hiện hành động này", 401),
+      );
+    }
     if (!showTimeId || !seats || seats.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Thiếu thông tin suất chiếu hoặc ghế" });
+      return next(new AppError("Thiếu thông tin suất chiếu hoặc ghế", 400));
     }
     const result = await bookingService.holdSeats(showTimeId, seats, userId);
-    return res.status(201).json({
+    res.status(201).json({
+      success: true,
       message: "Ghế đã được giữ trong 5 phút. Vui lòng thanh toán.",
       data: {
         bookingId: result.booking._id,
@@ -20,66 +28,60 @@ export const holdSeats = async (req: Request, res: Response) => {
         expiresAt: result.expiresAt,
       },
     });
-  } catch (err: any) {
-    console.error("Hold Seats Error:", err);
-    return res.status(400).json({ message: err.message || "Lỗi giữ ghế" });
-  }
-};
+  }),
 
-export const confirmBooking = async (req: Request, res: Response) => {
-  try {
+  confirmBooking: catchAsync(async (req, res, next) => {
     const { bookingId, paymentId } = req.body;
+
     if (!bookingId) {
-      return res.status(400).json({ message: "Không tìm thấy mã đặt vé" });
+      return next(new AppError("Không tìm thấy mã đặt vé", 400));
     }
+
     const result = await bookingService.confirmBooking(bookingId, paymentId);
-    return res.json({
+
+    res.json({
+      success: true,
       message: "Thanh toán thành công! Vé đã được gửi vào email.",
       data: result,
     });
-  } catch (err: any) {
-    console.error("Confirm Booking Error:", err);
-    return res
-      .status(400)
-      .json({ message: err.message || "Xác nhận vé thất bại" });
-  }
-};
+  }),
 
-export const getBookingDetail = async (req: Request, res: Response) => {
-  try {
+  getBookingDetail: catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    const booking = await Booking.findById(id)
-      .populate("showTimeId")
-      .populate({
-        path: "showTimeId",
-        populate: { path: "movieId" },
-      });
-    return res.json(booking);
-  } catch (err) {
-    return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
-  }
-};
+    const booking = await Booking.findById(id).populate({
+      path: "showTimeId",
+      populate: { path: "movieId" },
+    });
 
-export const cancelBooking = async (req: Request, res: Response) => {
-  try {
-    const { bookingId, userId } = req.body; // Trong thực tế lấy userId từ token
+    if (!booking) {
+      return next(new AppError("Không tìm thấy đơn hàng", 404));
+    }
+
+    res.json({
+      success: true,
+      data: booking,
+    });
+  }),
+
+  cancelBooking: catchAsync(async (req, res) => {
+    const { bookingId, userId } = req.body;
+
     await bookingService.cancelBooking(bookingId, userId);
-    return res.json({ message: "Đã hủy giữ ghế thành công" });
-  } catch (err) {
-    return res.status(400).json({ message: "Lỗi khi hủy" });
-  }
-};
 
-export const getDashboardStats = async (req: Request, res: Response) => {
-  try {
-    const { days = 7 } = req.query; // Mặc định thống kê 7 ngày gần nhất
+    res.json({
+      success: true,
+      message: "Đã hủy giữ ghế thành công",
+    });
+  }),
+
+  getDashboardStats: catchAsync(async (req, res) => {
+    const { days = 7 } = req.query;
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(endDate.getDate() - Number(days));
 
     const stats = await getBookingAnalytics(startDate, endDate);
 
-    // Tính toán tổng quan (Tổng doanh thu, tỉ lệ lấp đầy...)
     const summary = stats.reduce(
       (acc, curr) => ({
         totalRevenue: acc.totalRevenue + curr.revenue,
@@ -90,12 +92,10 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       { totalRevenue: 0, totalPaidOrders: 0, totalFailedOrders: 0 },
     );
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       summary,
       details: stats,
     });
-  } catch (error: any) {
-    return res.status(500).json({ message: error.message });
-  }
+  }),
 };

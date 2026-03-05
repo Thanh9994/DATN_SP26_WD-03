@@ -137,7 +137,7 @@ export const Footer = () => {
             </h4>
             <div className="space-y-2">
               <button className="w-full bg-white/5 hover:bg-white/10 rounded-2xl px-4 py-4 flex items-center">
-                <span className="material-symbols-outlined text-3xl px-2">
+                <span className="material-symbols-outlined text-3xl px-2 text-white">
                   shop
                 </span>
                 <p className="m-auto text-base font-bold text-white">
@@ -146,7 +146,7 @@ export const Footer = () => {
               </button>
 
               <button className="w-full bg-white/5 hover:bg-white/10 rounded-2xl px-4 py-4 flex items-center">
-                <span className="material-symbols-outlined text-3xl px-2">
+                <span className="material-symbols-outlined text-3xl px-2 text-white">
                   smartphone
                 </span>
                 <p className="m-auto text-base font-bold text-white">

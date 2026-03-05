@@ -31,7 +31,6 @@ export const BookingCinema = () => {
     selectedDate || (uniqueDates.length > 0 ? uniqueDates[0] : "");
 
   // 2. Lọc dữ liệu hiển thị theo ngày
-  // Chúng ta lặp qua groupedByCinema (đã được group ở useShowTime.ts)
   const filteredData = (groupedByCinema ?? [])
     .map((item: any) => ({
       ...item,
@@ -46,7 +45,7 @@ export const BookingCinema = () => {
   if (isLoading)
     return (
       <div className="h-64 flex items-center justify-center">
-        <Spin size="large" tip="Đang tải lịch chiếu..." />
+        <Spin size="large" tip="Đang tải lịch chiếu..." fullscreen />
       </div>
     );
 

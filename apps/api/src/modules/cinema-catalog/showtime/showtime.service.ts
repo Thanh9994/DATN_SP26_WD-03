@@ -1,7 +1,44 @@
 import { IPhong, ISeatType, IShowTime } from "@shared/schemas";
 import { SeatTime } from "./showtimeSeat.model";
 import { ShowTimeM } from "./showtime.model";
-export const showTimeService = {};
+import mongoose from "mongoose";
+
+export const showTimeService = {
+  async autoDeleteOldShowtimes(days: number = 20) {
+    const thresholdDate = new Date();
+    thresholdDate.setDate(thresholdDate.getDate() - days);
+
+    // 1. Tìm các suất chiếu đã kết thúc cách đây 'days' ngày
+    const oldShowTimes = await ShowTimeM.find({
+      endTime: { $lt: thresholdDate },
+    });
+
+    if (oldShowTimes.length === 0) return 0;
+
+    const idsToDelete = oldShowTimes.map((st) => st._id);
+
+    const session = await mongoose.startSession();
+    try {
+      await session.withTransaction(async () => {
+        // Xóa tất cả ghế của các suất chiếu này
+        await SeatTime.deleteMany(
+          { showTimeId: { $in: idsToDelete } },
+          { session },
+        );
+
+        await ShowTimeM.deleteMany({ _id: { $in: idsToDelete } }, { session });
+      });
+
+      return idsToDelete.length;
+    } catch (error) {
+      console.error("Lỗi khi xóa suất chiếu cũ tự động:", error);
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  },
+};
+
 export const generateShowTimeSeats = async (
   showTime: IShowTime,
   room: IPhong,

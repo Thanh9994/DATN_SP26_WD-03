@@ -54,7 +54,7 @@ export const Login = async (req: Request, res: Response) => {
       });
     }
     const token = Jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id.toString(), role: user.role },
       process.env.JWT_SECRET as string,
       { expiresIn: "1d" },
     );
@@ -62,7 +62,7 @@ export const Login = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "Đăng nhập thành công",
       token,
-      user: { id: user._id, ho_ten: user.ho_ten },
+      user: { id: user._id, ho_ten: user.ho_ten, email: user.email },
     });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống khi đăng nhập", error });

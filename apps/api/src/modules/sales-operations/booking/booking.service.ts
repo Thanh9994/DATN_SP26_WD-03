@@ -2,31 +2,25 @@ import mongoose from "mongoose";
 import { SeatTime } from "../../cinema-catalog/showtime/showtimeSeat.model";
 import { Booking } from "./booking.model";
 import { randomUUID } from "crypto";
+import { AppError } from "@api/middlewares/error.middleware";
 
 export const bookingService = {
   async holdSeats(showTimeId: string, seatCodes: string[], userId: string) {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const holdExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 phút
+      const holdDuration = 5 * 60 * 1000; // 5 phút
+      const holdExpires = new Date(Date.now() + holdDuration);
       const now = new Date();
 
       await Booking.updateMany(
-        {
-          userId,
-          showTimeId,
-          status: "pending",
-        },
+        { userId, showTimeId, status: "pending" },
         { $set: { status: "cancelled" } },
         { session },
       );
 
       await SeatTime.updateMany(
-        {
-          showTimeId,
-          heldBy: userId,
-          trang_thai: "hold",
-        },
+        { showTimeId, heldBy: userId, trang_thai: "hold" },
         {
           $set: { trang_thai: "empty" },
           $unset: { heldBy: "", holdExpiresAt: "", bookingId: "" },
@@ -40,31 +34,22 @@ export const bookingService = {
       }).session(session);
 
       if (seats.length !== seatCodes.length) {
-        throw new Error("Một số ghế không tồn tại.");
+        throw new AppError("Một số ghế không tồn tại trên hệ thống.", 404);
       }
       // Nếu số lượng ghế update không khớp với số lượng yêu cầu -> Có ghế đã bị tranh chấp
+
       for (const seat of seats) {
         const isAvailable =
           seat.trang_thai === "empty" ||
           (seat.trang_thai === "hold" &&
-            seat.holdExpiresAt &&
-            seat.holdExpiresAt < now);
-
+            (!seat.holdExpiresAt || seat.holdExpiresAt < now));
         if (!isAvailable) {
-          throw new Error(`Ghế ${seat.seatCode} đã được chọn.`);
+          throw new AppError(`Ghế ${seat.seatCode} đã có người chọn.`, 400);
         }
       }
 
-      for (const seat of seats) {
-        seat.trang_thai = "hold";
-        seat.heldBy = userId;
-        seat.holdExpiresAt = holdExpires;
-        await seat.save({ session });
-      }
+      const totalAmount = seats.reduce((sum, s) => sum + (s.price || 0), 0);
 
-      const totalAmount = seats.reduce((sum, s) => sum + s.price, 0);
-
-      // TẠO LUÔN BOOKING PENDING
       const [newBooking] = await Booking.create(
         [
           {
@@ -73,7 +58,7 @@ export const bookingService = {
             seats: seats.map((s) => s._id),
             seatCodes,
             totalAmount,
-            finalAmount: totalAmount, // Tạm thời bằng nhau nếu chưa có voucher
+            finalAmount: totalAmount,
             status: "pending",
             holdExpiresAt: holdExpires,
           },
@@ -81,31 +66,16 @@ export const bookingService = {
         { session },
       );
 
-      for (const seat of seats) {
-        seat.bookingId = newBooking._id;
-        await seat.save({ session });
-      }
-      const seats = await SeatTime.find({
-        showTimeId,
-        seatCode: { $in: seatCodes },
-      }).session(session);
-
-      const totalAmount = seats.reduce((sum, s) => sum + s.price, 0);
-
-      // TẠO LUÔN BOOKING PENDING
-      const [newBooking] = await Booking.create(
-        [
-          {
-            userId,
-            showTimeId,
-            seats: seats.map((s) => s._id),
-            seatCodes,
-            totalAmount,
-            finalAmount: totalAmount, // Tạm thời bằng nhau nếu chưa có voucher
-            status: "pending",
+      await SeatTime.updateMany(
+        { _id: { $in: seats.map((s) => s._id) } },
+        {
+          $set: {
+            trang_thai: "hold",
+            heldBy: userId,
             holdExpiresAt: holdExpires,
+            bookingId: newBooking._id,
           },
-        ],
+        },
         { session },
       );
 
@@ -117,7 +87,7 @@ export const bookingService = {
       };
     } catch (error) {
       await session.abortTransaction();
-      throw error;
+      throw error; // Để catchAsync bắt và đẩy về globalErrorHandler
     } finally {
       session.endSession();
     }
@@ -130,20 +100,18 @@ export const bookingService = {
     session.startTransaction();
 
     try {
-      const booking = await Booking.findById(bookingId)
-        .populate("userId")
-        .populate({
-          path: "showTimeId",
-          populate: { path: "movieId" },
-        })
-        .session(session);
+      const booking = await Booking.findById(bookingId).session(session);
+
       if (!booking || booking.status !== "pending") {
-        throw new Error("Giao dịch không hợp lệ.");
+        throw new AppError("Giao dịch không tồn tại hoặc đã hết hạn.", 400);
       }
 
       const now = new Date();
+      if (booking.holdExpiresAt && booking.holdExpiresAt < now) {
+        throw new AppError("Giao dịch đã quá thời gian thanh toán.", 400);
+      }
 
-      const seats = await SeatTime.updateMany(
+      const seatUpdate = await SeatTime.updateMany(
         {
           _id: { $in: booking.seats },
           bookingId: booking._id,
@@ -158,8 +126,11 @@ export const bookingService = {
         { session },
       );
 
-      if (seats.modifiedCount !== booking.seats.length) {
-        throw new Error("Ghế đã hết thời gian giữ.");
+      if (seatUpdate.modifiedCount !== booking.seats.length) {
+        throw new AppError(
+          "Một số ghế đã bị giải phóng hoặc có lỗi xảy ra.",
+          400,
+        );
       }
 
       booking.status = "paid";
@@ -215,11 +186,11 @@ export const bookingService = {
       );
 
       await session.commitTransaction();
-      console.log(`[Release] Đã hủy ${result.modifiedCount} đơn hàng hết hạn.`);
+      // console.log(`[Release] Đã hủy ${result.modifiedCount} đơn hàng hết hạn.`);
       return result.modifiedCount;
     } catch (error) {
       await session.abortTransaction();
-      console.error("Lỗi khi giải phóng ghế:", error);
+      // console.error("Lỗi khi giải phóng ghế:", error);
       throw error;
     } finally {
       session.endSession();
@@ -235,11 +206,14 @@ export const bookingService = {
       );
 
       if (!booking || booking.status !== "pending") {
-        throw new Error("Không thể hủy đơn hàng này.");
+        throw new AppError(
+          "Không thể hủy đơn hàng này hoặc đơn hàng không tồn tại.",
+          400,
+        );
       }
 
       await SeatTime.updateMany(
-        { _id: { $in: booking.seats } },
+        { _id: { $in: booking.seats }, bookingId: booking._id },
         {
           $set: { trang_thai: "empty" },
           $unset: { heldBy: "", holdExpiresAt: "", bookingId: "" },

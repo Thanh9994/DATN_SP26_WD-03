@@ -12,7 +12,7 @@ import { useBooking } from "@web/hooks/useBooking";
 import { IShowTime, IShowTimeSeat } from "@shared/schemas";
 import { useAuth } from "@web/hooks/useAuth";
 
-export default function BookingLayout() {
+const BookingLayout = () => {
   const [searchParams] = useSearchParams();
   const movieId = searchParams.get("movieId") || undefined;
   const showtimeIdFromUrl = searchParams.get("showtimeId");
@@ -220,4 +220,5 @@ export default function BookingLayout() {
       </div>
     </div>
   );
-}
+};
+export default BookingLayout;

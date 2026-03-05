@@ -4,10 +4,10 @@ import AuthLayout from "@web/layouts/AuthLayout";
 import { ArrowLeft, Mail, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export const ForgotPassword = () => {
+const ForgotPassword = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  }
+    e.preventDefault();
+  };
   return (
     <AuthLayout
       title="Forgot Password?"
@@ -42,7 +42,7 @@ export const ForgotPassword = () => {
 
       <div className="mt-12 pt-8 border-t border-white/5">
         <p className="text-white/30 text-sm text-center">
-          Still having trouble?{' '}
+          Still having trouble?{" "}
           <a href="#" className="text-primary font-bold hover:underline">
             Contact Support
           </a>
@@ -51,3 +51,4 @@ export const ForgotPassword = () => {
     </AuthLayout>
   );
 };
+export default ForgotPassword;

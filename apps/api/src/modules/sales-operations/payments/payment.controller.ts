@@ -1,31 +1,44 @@
+import { catchAsync } from "@api/utils/catchAsync";
 import { Request, Response } from "express";
 import { paymentService } from "./payment.service";
 
-export const createPaymentUrl = async (req: Request, res: Response) => {
-  try {
-    const { bookingId, bankCode } = req.body;
-    // bankCode có thể là 'VNPAYQR', 'VNBANK', v.v.
+// 1. Tạo URL thanh toán (Dùng chung cho VNPay, Momo, ZaloPay...)
+export const createPaymentUrl = catchAsync(
+  async (req: Request, res: Response) => {
+    // Nhận thêm 'method' (phương thức) từ body hoặc params
+    const { bookingId } = req.body;
+    const { method } = req.params;
 
-    const paymentUrl = await paymentService.generatePaymentUrl(
+    const ipAddr =
+      req.headers["x-forwarded-for"] || req.socket.remoteAddress || "127.0.0.1";
+
+    // Truyền 'method' vào service để nó tự chọn Gateway tương ứng
+    const paymentUrl = await paymentService.initPayment(
       bookingId,
-      bankCode,
-      req,
+      method,
+      ipAddr as string,
     );
 
-    return res.json({ paymentUrl });
-  } catch (error: any) {
-    return res.status(400).json({ message: error.message });
-  }
-};
+    res.status(200).json({
+      success: true,
+      data: paymentUrl,
+    });
+  },
+);
 
-export const vnpayIpn = async (req: Request, res: Response) => {
-  try {
-    // VNPay sẽ gọi vào đây để thông báo kết quả thanh toán ngầm (Server-to-Server)
-    const result = await paymentService.handleVnpayCallback(req.query);
+// 2. Xử lý IPN (Webhook chung cho mọi cổng)
+export const handlePaymentIpn = catchAsync(
+  async (req: Request, res: Response) => {
+    const { method } = req.params;
 
-    // Theo tài liệu VNPay, phải trả về format JSON cụ thể này
-    return res.status(200).json(result);
-  } catch (error) {
-    return res.status(500).json({ RspCode: "99", Message: "Unknow error" });
-  }
-};
+    // Service sẽ tự biết gọi Gateway nào để kiểm tra chữ ký (Checksum)
+    const result = await paymentService.processIpn(method, {
+      ...req.query,
+      ...req.body,
+    });
+
+    // Trả về kết quả theo yêu cầu của cổng đó
+    // Ví dụ VNPay cần { RspCode, Message }
+    res.status(200).json(result);
+  },
+);

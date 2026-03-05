@@ -1,35 +1,37 @@
 import express from "express";
+// import express, { NextFunction, Request, Response } from "express";
 import { Genre } from "./genre.model";
+import { catchAsync } from "@api/utils/catchAsync";
+import { AppError } from "@api/middlewares/error.middleware";
 
 const genreRouter = express.Router();
 
-genreRouter.get("/", async (_req, res) => {
-  try {
+genreRouter.get(
+  "/",
+  catchAsync(async (_req, res) => {
     const genres = await Genre.find();
-    res.json(genres);
-  } catch (error) {
-    res.status(500).json({ error: "Failed" });
-  }
-});
+    res.json({ success: true, data: genres });
+  }),
+);
 
-genreRouter.post("/", async (req, res) => {
-  try {
+genreRouter.post(
+  "/",
+  catchAsync(async (req, res) => {
     const genre = new Genre(req.body);
     await genre.save();
-    res.status(201).json(genre);
-  } catch (error) {
-    res.status(400).json({ error: "Failed" });
-  }
-});
+    res.status(201).json({ success: true, data: genre });
+  }),
+);
 
-genreRouter.delete("/:id", async (req, res) => {
-  try {
+genreRouter.delete(
+  "/:id",
+  catchAsync(async (req, res, next) => {
     const genre = await Genre.findByIdAndDelete(req.params.id);
-    if (!genre) return res.status(404).json({ error: "Genre Không thấy" });
-    res.json({ message: "Genre xóa thành công" });
-  } catch (error) {
-    res.status(500).json({ error: "Xóa không thành công genre" });
-  }
-});
+    if (!genre) {
+      return next(new AppError("Không tìm thấy thể loại này", 404));
+    }
+    res.json({ success: true, message: "Genre xóa thành công" });
+  }),
+);
 
 export default genreRouter;
