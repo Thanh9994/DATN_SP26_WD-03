@@ -14,11 +14,18 @@ import axios from "axios";
 // Axios instance có gắn token
 export const axiosAuth = axios.create();
 
-axiosAuth.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+axiosAuth.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token"); // Lấy token tại thời điểm gửi request
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
@@ -34,7 +41,7 @@ export const useAuth = () => {
       return data;
     },
     enabled: !!localStorage.getItem("token"),
-    staleTime: Infinity, // Dữ liệu "me" không bao giờ cũ
+    retry: false,
     gcTime: 1000 * 60 * 60 * 2, // Giữ trong cache 24h
   });
 

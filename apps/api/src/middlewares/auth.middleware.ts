@@ -14,8 +14,6 @@ declare global {
   }
 }
 
-type UserRole = IUser["role"];
-
 export const authenticate = catchAsync(async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

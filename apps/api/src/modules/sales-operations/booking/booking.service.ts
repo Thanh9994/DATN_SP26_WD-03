@@ -37,17 +37,6 @@ export const bookingService = {
         throw new AppError("Một số ghế không tồn tại trên hệ thống.", 404);
       }
       // Nếu số lượng ghế update không khớp với số lượng yêu cầu -> Có ghế đã bị tranh chấp
-      for (const seat of seats) {
-        const isAvailable =
-          seat.trang_thai === "empty" ||
-          (seat.trang_thai === "hold" &&
-            seat.holdExpiresAt &&
-            seat.holdExpiresAt < now);
-
-        if (!isAvailable) {
-          throw new Error(`Ghế ${seat.seatCode} đã được chọn.`);
-        }
-      }
 
       for (const seat of seats) {
         const isAvailable =

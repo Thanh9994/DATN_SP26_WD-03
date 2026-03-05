@@ -1,6 +1,15 @@
 import PhimCard from "@web/components/PhimCard";
+import { useMovies } from "@web/hooks/useMovie";
+import { Spin } from "antd";
+import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
+  const { movies, isLoading } = useMovies();
+  const navigate = useNavigate();
+
+  const featuredMovie = movies?.[0];
+
+  if (isLoading) return <Spin fullscreen />;
   return (
     <div>
       <div className="bg-background-dark text-white min-h-screen font-display dark:text-white">
@@ -9,9 +18,9 @@ export const Home = () => {
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent z-10"></div>
             <img
-              alt="Cinematic wide shot"
+              alt={featuredMovie.ten_phim}
               className="w-full h-full object-cover"
-              src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772216824375-bannerhome"
+              src={featuredMovie.banner?.url || featuredMovie.poster?.url}
             />
           </div>
           <div className="relative z-20 top-0 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 slide-down-fade">
@@ -28,25 +37,31 @@ export const Home = () => {
                 </div>
               </div>
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight mb-6 tracking-tight uppercase">
-                Dune: Part Two
+                {featuredMovie.ten_phim}
               </h1>
               <p className="text-base text-white/80 mb-8 leading-relaxed max-w-lg">
-                Paul Atreides unites with Chani and the Fremen while on a
-                warpath of revenge against the conspirators who destroyed his
-                family.
+                {featuredMovie.mo_ta}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
-                <button className="bg-primary text-white px-6 py-3 rounded-full font-semibold flex items-center justify-center gap-2 text-sm">
+                <button
+                  onClick={() =>
+                    navigate(`/booking?movieId=${featuredMovie._id}`)
+                  }
+                  className="bg-primary text-white px-6 py-3 rounded-full font-semibold flex items-center justify-center gap-2 text-sm hover:scale-105 transition-transform"
+                >
                   <span className="material-symbols-outlined text-lg">
                     confirmation_number
                   </span>
-                  Book Tickets
+                  Đặt vé ngay
                 </button>
-                <button className="bg-white/10 text-white px-6 py-3 rounded-full font-semibold flex items-center justify-center gap-2 border border-white/20 text-sm">
+                <button
+                  onClick={() => navigate(`/movie/${featuredMovie._id}`)}
+                  className="bg-white/10 text-white px-6 py-3 rounded-full font-semibold flex items-center justify-center gap-2 border border-white/20 text-sm hover:bg-white/20"
+                >
                   <span className="material-symbols-outlined text-lg">
-                    play_circle
+                    info
                   </span>
-                  Watch Trailer
+                  Chi tiết phim
                 </button>
               </div>
             </div>
@@ -75,7 +90,7 @@ export const Home = () => {
             </a>
           </div>
 
-          <div className="px-0 sm:px-4 lg:px-2 pb-8">
+          <div className="px-2 sm:px-2 lg:px-1 pb-8">
             <PhimCard />
           </div>
         </section>

@@ -7,7 +7,7 @@ export const ProfileInfo = () => {
 
   return (
     <div className="w-full">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
         <h1 className="text-xl md:text-3xl font-bold text-white">
           Information
         </h1>

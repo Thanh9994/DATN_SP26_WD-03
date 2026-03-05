@@ -34,7 +34,7 @@ export const Movie = () => {
   const { movies, isLoading, createMovie, updateMovie, deleteMovie } =
     useMovies();
   const { genres } = useGenres();
-  const { upload, isUploading } = useUpload();
+  const { upload } = useUpload();
 
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -123,8 +123,9 @@ export const Movie = () => {
     form.resetFields();
   };
 
-  const columns = [
+  const columns: any[] = [
     {
+      key: "poster",
       title: "Poster",
       dataIndex: "poster",
       render: (p: any) => (
@@ -133,28 +134,33 @@ export const Movie = () => {
           width={50}
           height={70}
           style={{ objectFit: "cover" }}
+          fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
         />
       ),
     },
-    { title: "Tên phim", dataIndex: "ten_phim" },
-    { title: "Đạo diễn", dataIndex: "dao_dien" },
-    { title: "Độ tuổi", dataIndex: "do_tuoi" },
+    { key: "ten_phim", title: "Tên phim", dataIndex: "ten_phim" },
+    { key: "dao_dien", title: "Đạo diễn", dataIndex: "dao_dien" },
+    { key: "do_tuoi", title: "Độ tuổi", dataIndex: "do_tuoi" },
     {
+      key: "thoi_luong",
       title: "Thời lượng",
       dataIndex: "thoi_luong",
       render: (m: number) => `${m} phút`,
     },
     {
+      key: "ngay_cong_chieu",
       title: "Ngày chiếu",
       dataIndex: "ngay_cong_chieu",
       render: (d: string) => (d ? dayjs(d).format("DD/MM/YYYY") : "-"),
     },
     {
+      key: "ngay_ket_thuc",
       title: "Ngày kết thúc",
       dataIndex: "ngay_ket_thuc",
       render: (d: string) => (d ? dayjs(d).format("DD/MM/YYYY") : "-"),
     },
     {
+      key: "trang_thai",
       title: "Trạng Thái",
       dataIndex: "trang_thai",
       render: (status: string) => {
@@ -175,6 +181,7 @@ export const Movie = () => {
       },
     },
     {
+      key: "action",
       title: "Action",
       render: (_: any, r: any) => (
         <Space onClick={(e) => e.stopPropagation()}>
@@ -276,8 +283,8 @@ export const Movie = () => {
               <InputNumber min={90} className="w-full" />
             </Form.Item>
 
-            <Form.Item name="rateting" label="Sao">
-              <InputNumber min={0} className="w-full" />
+            <Form.Item name="rating" label="Sao">
+              <InputNumber min={0} max={10} step={0.1} className="w-full" />
             </Form.Item>
 
             <Form.Item name="quoc_gia" label="Quốc gia">
@@ -320,16 +327,19 @@ export const Movie = () => {
               label="Poster"
               valuePropName="fileList"
               getValueFromEvent={(e) => e?.fileList}
-              rules={[{ required: true, message: "Poster không được trống" }]}
+              rules={[
+                {
+                  required: !editingId,
+                  message: "Poster không được trống",
+                },
+              ]}
             >
               <Upload
                 beforeUpload={() => false}
                 maxCount={1}
                 listType="picture"
               >
-                <Button icon={<UploadOutlined />} loading={isUploading}>
-                  Upload
-                </Button>
+                <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
             </Form.Item>
 
@@ -338,16 +348,19 @@ export const Movie = () => {
               label="Banner"
               valuePropName="fileList"
               getValueFromEvent={(e) => e?.fileList}
-              rules={[{ required: true, message: "Banner không được trống" }]}
+              rules={[
+                {
+                  required: !editingId,
+                  message: "Banner không được trống",
+                },
+              ]}
             >
               <Upload
                 beforeUpload={() => false}
                 maxCount={1}
                 listType="picture"
               >
-                <Button icon={<UploadOutlined />} loading={isUploading}>
-                  Upload Banner
-                </Button>
+                <Button icon={<UploadOutlined />}>Upload Banner</Button>
               </Upload>
             </Form.Item>
           </div>

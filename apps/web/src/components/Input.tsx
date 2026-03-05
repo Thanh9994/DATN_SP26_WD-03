@@ -39,7 +39,8 @@ export default function Input({
         id={id}
         prefix={icon}
         suffix={rightElement}
-        type={type}
+        // Nếu là password, Antd tự hiểu type, nếu không thì dùng type truyền vào
+        type={isPassword ? undefined : type}
         className={`!bg-white/5 !border-white/10 !rounded-xl !py-4 !text-white placeholder:text-white/40 focus:!ring-2 focus:!ring-primary/50 focus:!border-primary transition-all ${className}`}
         {...props}
       />

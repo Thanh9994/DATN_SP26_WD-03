@@ -16,7 +16,7 @@
 
 body {
   font-family: "Be Vietnam Pro", sans-serif;
-  background-color: #120a0a; /* background-dark */
+  background-color: #120a0a;
 }
 
 /* ================= SCROLLBAR HIDE ================= */
@@ -34,6 +34,18 @@ body {
   -webkit-backdrop-filter: blur(16px);
   background: rgba(18, 10, 10, 0.75); /* Tăng độ đậm một chút để dễ đọc text */
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-theme {
+  --admin-primary: #1890ff;
+  --admin-bg: #f0f2f5;
+  --admin-text: #262626;
+}
+
+.admin-button {
+  background-color: var(--admin-primary) !important;
+  color: white !important;
+  border-radius: 4px !important; /* Admin thường dùng bo góc nhẹ, không tròn xẻ như User */
 }
 
 /* ================= CUSTOM TAILWIND UTILITIES ================= */

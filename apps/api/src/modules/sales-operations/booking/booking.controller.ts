@@ -7,8 +7,14 @@ import { AppError } from "@api/middlewares/error.middleware";
 
 export const bookingController = {
   holdSeats: catchAsync(async (req, res, next) => {
-    const { showTimeId, seats, userId } = req.body;
+    const userId = req.user?._id;
+    const { showTimeId, seats } = req.body;
 
+    if (!userId) {
+      return next(
+        new AppError("Bạn cần đăng nhập để thực hiện hành động này", 401),
+      );
+    }
     if (!showTimeId || !seats || seats.length === 0) {
       return next(new AppError("Thiếu thông tin suất chiếu hoặc ghế", 400));
     }
@@ -93,22 +99,3 @@ export const bookingController = {
     });
   }),
 };
-
-// export const confirmBooking = async (req: Request, res: Response) => {
-//   try {
-//     const { bookingId, paymentId } = req.body;
-//     if (!bookingId) {
-//       return res.status(400).json({ message: "Không tìm thấy mã đặt vé" });
-//     }
-//     const result = await bookingService.confirmBooking(bookingId, paymentId);
-//     return res.json({
-//       message: "Thanh toán thành công! Vé đã được gửi vào email.",
-//       data: result,
-//     });
-//   } catch (err: any) {
-//     console.error("Confirm Booking Error:", err);
-//     return res
-//       .status(400)
-//       .json({ message: err.message || "Xác nhận vé thất bại" });
-//   }
-// };

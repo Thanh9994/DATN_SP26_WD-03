@@ -15,7 +15,7 @@ export const Header = () => {
     {
       key: "ho_ten",
       label: (
-        <span style={{ color: "black" }}>{user?.ho_ten || "Khách hàng"}</span>
+        <span style={{ color: "white" }}>{user?.ho_ten || "Khách hàng"}</span>
       ),
       disabled: true,
     },
@@ -135,10 +135,7 @@ export const Header = () => {
                   <img
                     alt={user?.ho_ten || "User profile"}
                     className="w-full h-full object-cover"
-                    src={
-                      user?.avatar?.url ||
-                      `https://ui-avatars.com/api/?name=${user.ho_ten}&background=random`
-                    }
+                    src={user?.avatar?.url || `https://i.pravatar.cc/150`}
                     referrerPolicy="no-referrer"
                   />
                 </div>

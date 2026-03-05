@@ -10,14 +10,11 @@ import { Link, useNavigate } from "react-router-dom";
 const Login = () => {
   const navigate = useNavigate();
   const { login, isLoggingIn } = useAuth();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (values: any) => {
     try {
-      await login({ email, password });
+      await login({ email: values.email, password: values.password });
       // console.log(token);
       navigate("/");
     } catch (err) {
@@ -32,27 +29,34 @@ const Login = () => {
       imageSrc="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1771951849120-lgon"
       lsTitle={
         <>
-          Your Front Row <br />
-          Seat Awaits.
+          Your Front Row <br /> Seat Awaits.
         </>
       }
       lsSubtitle="Stream the latest blockbusters and book tickets for the premium cinematic experience in one place."
     >
-      <Form className="space-y-6" onFinish={handleSubmit} layout="vertical">
+      <Form
+        className="space-y-6"
+        onFinish={handleSubmit}
+        layout="vertical"
+        requiredMark={false}
+      >
         <Form.Item
           name="email"
-          rules={[{ required: true, message: "Vui lòng nhập email" }]}
+          rules={[
+            { required: true, message: "Vui lòng nhập email" },
+            { type: "email", message: "Email không hợp lệ" },
+          ]}
         >
           <Input
             label="Email Address"
             type="email"
             id="email"
+            // autoComplete="email" // Thêm cái này
             placeholder="name@example.com"
             icon={<Mail size={20} />}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
           />
         </Form.Item>
+
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <label className="block text-xs font-bold text-white/40 uppercase tracking-widest">
@@ -66,25 +70,20 @@ const Login = () => {
             </Link>
           </div>
           <Form.Item
-            name="Phone"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng nhập số điện thoại",
-              },
-            ]}
+            name="password"
+            rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
           >
             <Input
               label=""
               type="password"
               id="password"
+              // autoComplete="current-password" // Thêm cái này để fix console warning
               placeholder="••••••••"
               icon={<Lock size={20} />}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
             />
           </Form.Item>
         </div>
+
         <div className="flex items-center gap-3 py-2">
           <input
             type="checkbox"
@@ -101,7 +100,7 @@ const Login = () => {
           </label>
         </div>
 
-        <Button type="submit" disabled={isLoggingIn}>
+        <Button disabled={isLoggingIn}>
           {isLoggingIn ? "Signing In..." : "Sign In"}
         </Button>
       </Form>

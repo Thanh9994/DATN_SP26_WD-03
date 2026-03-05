@@ -60,7 +60,7 @@ export const ProfileLayout = () => {
             mode="vertical"
             selectedKeys={[selectedKey]}
             items={menuItems}
-            className="profile-menu !bg-transparent !border-none !text-base !font-semibold"
+            className="profile-menu !bg-transparent !border-none !text-white !text-base !font-semibold"
           />
         </aside>
         {/* Main Content */}

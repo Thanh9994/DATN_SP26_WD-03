@@ -15,7 +15,7 @@ export const useGenres = () => {
     queryKey: ["genres"],
     queryFn: async () => {
       const { data } = await axios.get(API.GENRES);
-      return data;
+      return data.data;
     },
     staleTime: 1000 * 60 * 10,
     gcTime: 1000 * 60 * 60,
