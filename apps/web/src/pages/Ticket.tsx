@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 // import { Header } from "./Header";
 // import { Footer } from "./Footer";
 
@@ -53,7 +53,8 @@ const Ticket = (): JSX.Element => {
     rating: 4.8,
     genres: "Sci-Fi / Adventure",
     duration: "2h 46m",
-    image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=400&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=400&h=600&fit=crop",
   };
 
   const dates: DateOption[] = [
@@ -76,7 +77,10 @@ const Ticket = (): JSX.Element => {
         { time: "10:00 AM", format: { type: "STANDARD 2D" } },
         { time: "01:30 PM", format: { type: "Dolby Atmos 7.1" } },
         { time: "04:45 PM", format: { type: "Dolby Atmos 7.1" } },
-        { time: "12:00 PM", format: { type: "IMAX 3D EXPERIENCE", color: "red" } },
+        {
+          time: "12:00 PM",
+          format: { type: "IMAX 3D EXPERIENCE", color: "red" },
+        },
         { time: "03:30 PM", format: { type: "High Fidelity Laser" } },
         { time: "07:00 PM", format: { type: "Standard 2D" } },
       ],
@@ -91,7 +95,10 @@ const Ticket = (): JSX.Element => {
         { time: "09:30 AM", format: { type: "STANDARD 2D" } },
         { time: "12:45 PM", format: { type: "Dolby Atmos 7.1" } },
         { time: "03:20 PM", format: { type: "High Fidelity Laser" } },
-        { time: "06:00 PM", format: { type: "IMAX 3D EXPERIENCE", color: "red" } },
+        {
+          time: "06:00 PM",
+          format: { type: "IMAX 3D EXPERIENCE", color: "red" },
+        },
       ],
     },
     {
@@ -112,7 +119,7 @@ const Ticket = (): JSX.Element => {
     text: string,
     variant: "primary" | "secondary" = "primary",
     onClick?: () => void,
-    disabled: boolean = false
+    disabled: boolean = false,
   ): JSX.Element => (
     <button
       className={`btn btn-${variant}`}
@@ -195,7 +202,9 @@ const Ticket = (): JSX.Element => {
                           📍 {cinema.distance} • {cinema.address}
                         </p>
                       </div>
-                      <div className={`expand-icon ${expandedCinema === cinema.id ? "open" : ""}`}>
+                      <div
+                        className={`expand-icon ${expandedCinema === cinema.id ? "open" : ""}`}
+                      >
                         ⌄
                       </div>
                     </div>
@@ -206,12 +215,18 @@ const Ticket = (): JSX.Element => {
                         <div className="showtimes-grid">
                           {cinema.showtimes.map((showtime, index) => (
                             <div key={index} className="showtime-group">
-                              <span className="format-label">{showtime.format.type}</span>
+                              <span className="format-label">
+                                {showtime.format.type}
+                              </span>
                               <button
                                 className={`showtime-btn ${
-                                  showtime.format.color ? `highlight-${showtime.format.color}` : ""
+                                  showtime.format.color
+                                    ? `highlight-${showtime.format.color}`
+                                    : ""
                                 } ${selectedShowtime === showtime.time ? "selected" : ""}`}
-                                onClick={() => handleShowtimeSelect(showtime.time)}
+                                onClick={() =>
+                                  handleShowtimeSelect(showtime.time)
+                                }
                               >
                                 {showtime.time}
                               </button>
@@ -233,7 +248,7 @@ const Ticket = (): JSX.Element => {
           </section>
         </div>
       </main>
-{/* 
+      {/* 
       <Footer /> */}
     </>
   );

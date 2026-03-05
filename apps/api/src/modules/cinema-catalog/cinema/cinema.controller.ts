@@ -1,34 +1,28 @@
 import { Request, Response } from "express";
 import { Cinemas } from "./cinema.model";
 import { Room } from "../room/room.model";
+import { catchAsync } from "@api/utils/catchAsync";
+import { AppError } from "@api/middlewares/error.middleware";
 
-export const AllCinemas = async (_req: Request, res: Response) => {
-  try {
+const CinemaController = {
+  AllCinemas: catchAsync(async (_req, res) => {
     const cinemas = await Cinemas.find().populate("danh_sach_phong");
-    res.status(200).json({
-      message: "Lấy danh sách rạp thành công",
-      data: cinemas,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi server", error });
-  }
-};
+    res.json({ success: true, data: cinemas });
+  }),
 
-export const getCinemaById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const cinema = await Cinemas.findById(id);
+  getCinemaById: catchAsync(async (req, res, next) => {
+    const cinema = await Cinemas.findById(req.params.id);
     if (!cinema) {
-      return res.status(404).json({ message: "Rạp không tồn tại" });
+      return next(new AppError("Rạp không tồn tại", 404));
     }
     res.status(200).json({
+      success: true,
       message: "Lấy thông tin rạp thành công",
       data: cinema,
     });
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi server", error });
-  }
+  }),
 };
+export default CinemaController;
 
 export const createCinema = async (req: Request, res: Response) => {
   try {

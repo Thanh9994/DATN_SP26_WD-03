@@ -22,7 +22,6 @@ export const getBookingAnalytics = async (startDate: Date, endDate: Date) => {
           $sum: { $cond: [{ $eq: ["$status", "paid"] }, "$finalAmount", 0] },
         },
 
-        // Thống kê đơn bị hủy hoặc hết hạn
         totalCancelled: {
           $sum: { $cond: [{ $eq: ["$status", "cancelled"] }, 1, 0] },
         },

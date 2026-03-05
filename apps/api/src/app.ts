@@ -1,4 +1,5 @@
 import express from "express";
+import morgan from "morgan";
 import cors from "cors";
 import uploadRouter from "./middlewares/upload";
 import catalogRouter from "./modules/cinema-catalog";
@@ -9,6 +10,9 @@ import orderRouter from "./modules/sales-operations";
 import { globalErrorHandler } from "./middlewares/error.middleware";
 
 const app = express();
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 
 app.use(cors());
 app.use(express.json());

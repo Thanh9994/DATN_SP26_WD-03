@@ -70,7 +70,6 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
       key: "room_cinema",
       render: (_: any, record: any) => {
         // Ưu tiên lấy dữ liệu đã populate sẵn trong record.roomId
-        // Nếu record.roomId là string (chưa populate), mới tìm trong danh sách rooms
         const roomData =
           (typeof record.roomId === "object" ? record.roomId : null) ||
           rooms?.find((r) => r._id === record.roomId);
