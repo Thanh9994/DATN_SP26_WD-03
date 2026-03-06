@@ -35,7 +35,7 @@ export const Movie = () => {
     useMovies();
   const [submitting, setSubmitting] = useState(false);
   const { genres } = useGenres();
-  const { upload, isUploading } = useUpload();
+  const { upload } = useUpload();
 
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -127,7 +127,7 @@ export const Movie = () => {
     form.resetFields();
   };
 
-  const columns = [
+  const columns: any[] = [
     {
       key: "poster",
       title: "Poster",
@@ -351,9 +351,7 @@ export const Movie = () => {
                 maxCount={1}
                 listType="picture"
               >
-                <Button icon={<UploadOutlined />} loading={isUploading}>
-                  Upload
-                </Button>
+                <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
             </Form.Item>
 
@@ -374,9 +372,7 @@ export const Movie = () => {
                 maxCount={1}
                 listType="picture"
               >
-                <Button icon={<UploadOutlined />} loading={isUploading}>
-                  Upload Banner
-                </Button>
+                <Button icon={<UploadOutlined />}>Upload Banner</Button>
               </Upload>
             </Form.Item>
           </div>
