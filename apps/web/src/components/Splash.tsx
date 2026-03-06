@@ -1,4 +1,4 @@
-import { Film, Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX } from "lucide-react";
 import { useState } from "react";
 import "../styles/splash.css";
 
