@@ -2,7 +2,7 @@ import PhimCard from "@web/components/PhimCard";
 import MovieCardSkeleton from "@web/components/skeleton/MovieCardSkeleton";
 import { useMovies } from "@web/hooks/useMovie";
 
-const MovieSlider = () => {
+const MovieList = () => {
   const { movies, isLoading } = useMovies();
 
   if (isLoading) return <MovieCardSkeleton />;
@@ -16,4 +16,4 @@ const MovieSlider = () => {
   );
 };
 
-export default MovieSlider;
+export default MovieList;

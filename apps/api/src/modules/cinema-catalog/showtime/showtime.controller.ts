@@ -221,7 +221,15 @@ export const getShowTimeByMovie = async (req: Request, res: Response) => {
 export const getShowTimeDetail = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const showTime = await ShowTimeM.findById(id).populate("movieId roomId");
+    const showTime = await ShowTimeM.findById(id)
+      .populate('movieId')
+      .populate({
+        path: 'roomId',
+        populate: {
+          path: 'cinema_id',
+          select: 'name city address'
+        }
+      });
     if (!showTime) return res.status(404).json({ message: "Không tìm thấy" });
 
     const seats = await SeatTime.find({

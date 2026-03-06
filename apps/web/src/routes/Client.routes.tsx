@@ -6,18 +6,19 @@ import ForgotPassword from "@web/pages/clients/ForgotPassword";
 import { Home } from "@web/pages/clients/Home";
 import Login from "@web/pages/clients/Login";
 import Register from "@web/pages/clients/Register";
-import SeatBooking from "@web/pages/admin/booking/SeatBooking";
-import Showtime from "@web/pages/admin/booking/ShowTime";
+import SeatBooking from "@web/pages/clients/booking/SeatBooking";
+import Showtime from "@web/pages/ShowTime";
 import { RouteObject } from "react-router-dom";
 import Ticket from "@web/pages/Ticket";
 import Checkout from "@web/pages/CheckOut";
 import MovieDetail from "@web/pages/clients/MovieDetail";
 import BookingLayout from "@web/layouts/BookingLayout";
-import { BookingCinema } from "@web/pages/admin/booking/BookingCinema";
+import { BookingCinema } from "@web/pages/clients/booking/BookingCinema";
 import { ProfileLayout } from "@web/layouts/ProfileLayout";
 import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
 import { Setting } from "@web/components/authProfile/Setting";
 import { Cinemas } from "@web/pages/Cinemas";
+import MovieList from "@web/pages/clients/MovieList";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -41,6 +42,7 @@ export const ClientRoutes: RouteObject = {
     { path: "about", element: <About /> },
     { path: "event", element: <Event /> },
     { path: "cinema", element: <Cinemas /> },
+    { path: "movielist", element: <MovieList /> },
     {
       path: "booking",
       element: <BookingLayout />,

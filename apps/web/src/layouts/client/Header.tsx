@@ -77,10 +77,10 @@ export const Header = () => {
 
           <nav className="hidden lg:flex items-center gap-8">
             <Link
-              to="/"
+              to="/movielist"
               className="text-white text-base font-bold hover:text-primary transition-colors"
             >
-              Home
+              Movie
             </Link>
             <Link
               to="/cinema"

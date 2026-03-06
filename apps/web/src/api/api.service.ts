@@ -10,4 +10,5 @@ export const API = {
   MOVIES: `${API_URL}/content/movies`,
   SHOWTIME: `${API_URL}/catalog/showtimes`,
   BOOKING: `${API_URL}/order/booking`,
+  PAYMENT: `${API_URL}/order/v1/vnpay`,
 };
