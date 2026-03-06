@@ -10,6 +10,4 @@ paymentRouter.post("/:method/create", PaymentController.createPaymentUrl);
 // VNPay/Momo gọi về để báo kết quả
 paymentRouter.all("/:method/ipn", PaymentController.handlePaymentIpn);
 
-paymentRouter.post("/vnpay/create");
-
 export default paymentRouter;

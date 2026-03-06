@@ -1,4 +1,5 @@
 import { Home } from "lucide-react";
+import "../styles/404.css";
 
 export const NotFound = () => {
   return (
@@ -15,7 +16,7 @@ export const NotFound = () => {
         </div>
 
         <div className="relative z-10 w-full max-w-4xl mx-auto px-6 text-center">
-          <div className="relative mx-auto w-full max-w-2xl mb-8 md:mb-12 transform -rotate-1">
+          {/* <div className="relative mx-auto w-full max-w-2xl mb-8 md:mb-12 transform -rotate-1">
             <div className="aspect-video bg-white/5 border-2 md:border-4 border-white/10 rounded-sm shadow-[0_0_100px_rgba(255,255,255,0.05)] flex items-center justify-center overflow-hidden relative spotlight-glow">
               <div className="absolute inset-0 bg-white/5 animate-pulse"></div>
               <div className="text-center z-10 px-4">
@@ -29,11 +30,49 @@ export const NotFound = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-30 pointer-events-none"></div>
             </div>
             <div className="h-4 w-[90%] mx-auto bg-white/10 blur-xl rounded-full mt-2"></div>
+          </div> */}
+          <div className="">
+            <div className="main">
+              <div className="card">
+                <div className="ups">
+                  <div className="screw1">+</div>
+                  <div className="screw2">+</div>
+                </div>
+                <div className="card1">
+                  <div className="line1"></div>
+                  <div className="line2"></div>
+                  <div className="yl">
+                    <div className="roll">
+                      <div className="s_wheel"></div>
+                      <div className="tape"></div>
+                      <div className="e_wheel"></div>
+                    </div>
+                    <p className="num">90</p>
+                  </div>
+                  <div className="or">
+                    <p className="time">2×30min</p>
+                  </div>
+                </div>
+                <div className="card2_main">
+                  <div className="card2">
+                    <div className="c1"></div>
+                    <div className="t1"></div>
+                    <div className="screw5">+</div>
+                    <div className="t2"></div>
+                    <div className="c2"></div>
+                  </div>
+                </div>
+                <div className="downs">
+                  <div className="screw3">+</div>
+                  <div className="screw4">+</div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="max-w-xl mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">
-              This scene was cut from the final edit.
+              Oops! Nothing to see here...
             </h2>
             <p className="text-white/50 text-base md:text-lg mb-8 md:mb-12 font-medium">
               Let's get you back to the main feature before the credits roll.

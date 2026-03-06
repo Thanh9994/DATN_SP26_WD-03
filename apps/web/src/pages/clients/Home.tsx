@@ -1,13 +1,33 @@
 import PhimCard from "@web/components/PhimCard";
 import { useMovies } from "@web/hooks/useMovie";
 import { Spin } from "antd";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
   const { movies, isLoading } = useMovies();
   const navigate = useNavigate();
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const featuredMovie = movies?.[0];
+  const featuredMovie = movies?.[currentIndex];
+
+  useEffect(() => {
+    if (!movies?.length) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % movies.length);
+    }, 16000); // 16s đổi phim
+
+    return () => clearInterval(interval);
+  }, [movies]);
+
+  const nextMovie = () => {
+    setCurrentIndex((prev) => (prev + 1) % movies.length);
+  };
+
+  const prevMovie = () => {
+    setCurrentIndex((prev) => (prev - 1 + movies.length) % movies.length);
+  };
 
   if (isLoading) return <Spin fullscreen />;
   return (
@@ -15,19 +35,49 @@ export const Home = () => {
       <div className="bg-background-dark text-white min-h-screen font-display dark:text-white">
         {/* HERO */}
         <section className="relative h-screen w-full flex items-center overflow-hidden ">
-          <div className="absolute inset-0 z-0">
-            <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent z-10"></div>
-            <img
-              alt={featuredMovie.ten_phim}
-              className="w-full h-full object-cover"
-              src={featuredMovie.banner?.url || featuredMovie.poster?.url}
-            />
+          <button
+            onClick={prevMovie}
+            className="absolute left-5 top-1/2 -translate-y-1/2 z-30 
+              w-12 h-12 flex items-center justify-center 
+              rounded-full bg-black/10 text-white 
+              opacity-40 hover:opacity-100 hover:bg-black/60 
+              transition-all duration-300"
+          >
+            <span className="material-symbols-outlined text-3xl">
+              chevron_left
+            </span>
+          </button>
+          <div className="absolute inset-0 z-0 overflow-hidden">
+            <div
+              className="flex h-full transition-transform duration-600 ease-in-out"
+              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+            >
+              {movies?.map((movie) => (
+                <div key={movie._id} className="min-w-full h-full relative">
+                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent z-10"></div>
+
+                  {/* Desktop banner */}
+                  <img
+                    src={movie.banner?.url}
+                    alt={movie.ten_phim}
+                    className="hidden md:block w-full h-full object-cover"
+                  />
+
+                  {/* Mobile poster */}
+                  <img
+                    src={movie.poster?.url}
+                    alt={movie.ten_phim}
+                    className="block md:hidden w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="relative z-20 top-0 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 slide-down-fade">
+          <div className="relative z-20 top-0 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 slide-down-fade">
             <div className="max-w-xl">
               <div className="flex items-center gap-3 mb-4">
                 <span className="px-3 py-1 bg-primary rounded text-xs font-bold uppercase text-white">
-                  Trending #1
+                  Trending
                 </span>
                 <div className="flex items-center gap-1 text-yellow-400">
                   <span className="material-symbols-outlined text-base">
@@ -36,7 +86,7 @@ export const Home = () => {
                   <span className="text-base font-bold text-white">4.9</span>
                 </div>
               </div>
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight mb-6 tracking-tight uppercase">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight mb-6 tracking-tight uppercase">
                 {featuredMovie.ten_phim}
               </h1>
               <p className="text-base text-white/80 mb-8 leading-relaxed max-w-lg">
@@ -66,6 +116,18 @@ export const Home = () => {
               </div>
             </div>
           </div>
+          <button
+            onClick={nextMovie}
+            className="absolute right-5 top-1/2 -translate-y-1/2 z-30 
+              w-12 h-12 flex items-center justify-center 
+              rounded-full bg-black/10 text-white 
+              opacity-40 hover:opacity-100 hover:bg-black/60 
+              transition-all duration-300"
+          >
+            <span className="material-symbols-outlined text-3xl">
+              chevron_right
+            </span>
+          </button>
         </section>
         {/* NOW SHOWING */}
         <section className="py-6 max-w-7xl mx-auto">
@@ -89,9 +151,12 @@ export const Home = () => {
               </span>
             </a>
           </div>
-
-          <div className="px-2 sm:px-2 lg:px-1 pb-8">
-            <PhimCard />
+          <div className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-4">
+            {movies
+              ?.filter((m) => m.trang_thai === "dang_chieu")
+              .map((movie) => (
+                <PhimCard key={movie._id} movie={movie} />
+              ))}
           </div>
         </section>
         <section className="py-16 sm:py-20 bg-white/[0.02] border-y border-white/10">

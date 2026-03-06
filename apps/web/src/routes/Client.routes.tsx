@@ -17,6 +17,7 @@ import { BookingCinema } from "@web/pages/admin/booking/BookingCinema";
 import { ProfileLayout } from "@web/layouts/ProfileLayout";
 import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
 import { Setting } from "@web/components/authProfile/Setting";
+import { Cinemas } from "@web/pages/Cinemas";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -39,6 +40,7 @@ export const ClientRoutes: RouteObject = {
     },
     { path: "about", element: <About /> },
     { path: "event", element: <Event /> },
+    { path: "cinema", element: <Cinemas /> },
     {
       path: "booking",
       element: <BookingLayout />,

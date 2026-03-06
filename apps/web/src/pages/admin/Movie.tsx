@@ -33,6 +33,7 @@ import { useNavigate } from "react-router-dom";
 export const Movie = () => {
   const { movies, isLoading, createMovie, updateMovie, deleteMovie } =
     useMovies();
+  const [submitting, setSubmitting] = useState(false);
   const { genres } = useGenres();
   const { upload } = useUpload();
 
@@ -44,6 +45,7 @@ export const Movie = () => {
   const [form] = Form.useForm();
 
   const handleSubmit = async (values: any) => {
+    setSubmitting(true);
     try {
       let posterData: ICloudinaryImage | null = posterOld;
 
@@ -93,6 +95,8 @@ export const Movie = () => {
     } catch (error) {
       console.error("Lỗi khi lưu phim:", error);
       message.error("Thao tác thất bại, vui lòng thử lại.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -217,6 +221,8 @@ export const Movie = () => {
         columns={columns}
         dataSource={movies}
         loading={isLoading}
+        pagination={{ pageSize: 8 }}
+        scroll={{ x: 900 }}
         expandable={{
           expandedRowRender: (record) => (
             <div className="bg-slate-50 border-t border-slate-100 shadow-inner">
@@ -235,9 +241,15 @@ export const Movie = () => {
         open={open}
         onCancel={closeModal}
         onOk={() => form.submit()}
+        confirmLoading={submitting}
         width={1280}
       >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          disabled={submitting || isUploading}
+        >
           <div className="grid grid-cols-4 gap-4">
             <Form.Item
               name="ten_phim"

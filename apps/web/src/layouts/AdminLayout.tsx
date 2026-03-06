@@ -90,7 +90,7 @@ export const AdminLayouts = () => {
               >
                 <Avatar
                   size="large"
-                  src={user?.avatar?.url} // Dùng ảnh từ Cloudinary nếu có
+                  src={user?.avatar?.url || "https://i.pravatar.cc/150"} // Dùng ảnh từ Cloudinary nếu có
                   icon={!user?.avatar && <UserOutlined />}
                   style={{ cursor: "pointer", backgroundColor: "#1890ff" }}
                 >

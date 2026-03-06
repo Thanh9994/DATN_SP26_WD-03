@@ -17,7 +17,7 @@ export default function AuthLayout({
   lsSubtitle,
 }: AuthLayoutProps) {
   return (
-    <div className="flex h-screen-auto w-full mx-auto overflow-hidden">
+    <div className="flex h-auto w-full mx-auto overflow-hidden">
       {/* Title */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden slide-left">
         <div className="absolute inset-0 z-0">
@@ -32,7 +32,7 @@ export default function AuthLayout({
           <div className="absolute inset-0 bg-black/40 z-0"></div>
         </div>
 
-        <div className="relative z-20 flex flex-col justify-center left-1/4 p-22 w-full">
+        <div className="relative z-20 flex flex-col justify-center left-1/4 p-22 -mt-20 w-full">
           <h1 className="text-7xl font-black text-white leading-tight tracking-tighter uppercase mb-6">
             {lsTitle}
           </h1>
@@ -61,7 +61,7 @@ export default function AuthLayout({
       </div>
 
       {/*  Form  */}
-      <div className="w-full  lg:w-1/2 flex flex-col items-center justify-center p-8 lg:p-24 bg-background-dark relative slide-right">
+      <div className="w-auto lg:w-1/2 flex flex-col items-center justify-center p-4 lg:p-12 bg-background-dark relative slide-right">
         <div className="absolute top-1/4 right-0 w-64 h-64 bg-primary/10 blur-[120px] rounded-full"></div>
         <div className="absolute bottom-1/4 left-0 w-64 h-64 bg-primary/5 blur-[120px] rounded-full"></div>
 
