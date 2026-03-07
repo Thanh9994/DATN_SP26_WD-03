@@ -20,6 +20,7 @@ import { Setting } from "@web/components/authProfile/Setting";
 import { Cinemas } from "@web/pages/Cinemas";
 import MyBooking  from "@web/components/authProfile/MyBooking";
 import DrinkSnack from "@web/pages/DrinkSnack";
+import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
@@ -54,6 +55,7 @@ export const ClientRoutes: RouteObject = {
     { path: "showtime", element: <Showtime /> },
     { path: "ticket", element: <Ticket /> },
     { path: "foods", element: <DrinkSnack /> },
+    { path: "recommendfoods", element: <RecommentDrinkSnack /> },
     { path: "checkout", element: <Checkout /> },
     { path: "*", element: <NotFound /> },
   ],
