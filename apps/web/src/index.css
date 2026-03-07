@@ -175,3 +175,28 @@ input:-webkit-autofill:active {
 .ant-dropdown-menu-item:hover {
   background-color: #ff000069 !important;
 }
+
+.movie-tabs .ant-tabs-tab {
+  margin-left: 4px;
+  font-size: 20px;
+  padding: 10px 18px;
+}
+
+.movie-tabs .ant-tabs-tab-active {
+  color: #ef4444 !important;
+}
+
+.movie-tabs .ant-tabs-ink-bar {
+  background: #ef4444;
+  height: 3px;
+}
+.ant-tabs-nav::before {
+  border-bottom: none !important;
+}
+
+@media (max-width: 640px) {
+  .movie-tabs .ant-tabs-tab {
+    margin-left: 15px;
+    padding: 6px 10px;
+  }
+}

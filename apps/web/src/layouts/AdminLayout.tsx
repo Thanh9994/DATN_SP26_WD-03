@@ -1,9 +1,9 @@
-import { Layout, Input, Avatar, Dropdown, ConfigProvider, theme } from "antd";
+import { Layout, Input, ConfigProvider, theme, Badge } from "antd";
 import {
-  UserOutlined,
+  BellOutlined,
+  MailOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  LogoutOutlined,
 } from "@ant-design/icons";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -15,43 +15,52 @@ const { Content, Header } = Layout;
 export const AdminLayouts = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [search, setSearch] = useState("");
-  const navigate = useNavigate();
+  const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
 
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
+
+  const toggleTheme = (checked: boolean) => {
+    setThemeMode(checked ? "dark" : "light");
+  };
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
-  const menuItems = [
-    {
-      key: "profile",
-      label: "Thông tin cá nhân",
-      icon: <UserOutlined />,
-    },
-    {
-      key: "logout",
-      danger: true,
-      label: "Đăng xuất",
-      icon: <LogoutOutlined />,
-      onClick: handleLogout,
-    },
-  ];
 
   return (
     <ConfigProvider
       theme={{
-        algorithm: theme.defaultAlgorithm, // Giao diện sáng cho Admin
+        algorithm:
+          themeMode === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
         token: { colorPrimary: "#1890ff" },
       }}
     >
-      <Layout style={{ minHeight: "100vh" }}>
-        <Sidebar collapsed={collapsed} />
+      <Layout
+        style={{
+          marginLeft: collapsed ? 80 : 260,
+          transition: "all 0.2s",
+          minHeight: "100vh",
+        }}
+      >
+        <Sidebar
+          collapsed={collapsed}
+          themeMode={themeMode}
+          toggleTheme={toggleTheme}
+          user={user}
+          logout={handleLogout}
+        />
 
         <Layout>
+          {/* HEADER */}
           <Header
             style={{
-              background: "#fff",
+              position: "sticky",
+              top: 0,
+              zIndex: 10,
+              background: themeMode === "dark" ? "#141414" : "#fff",
+              color: themeMode === "dark" ? "#fff" : "#000",
               padding: "0 16px",
               display: "flex",
               alignItems: "center",
@@ -59,52 +68,41 @@ export const AdminLayouts = () => {
               boxShadow: "0 1px 4px rgba(0,21,41,.08)",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div className="flex items-center gap-4">
               {collapsed ? (
                 <MenuUnfoldOutlined
                   onClick={() => setCollapsed(false)}
-                  style={{ fontSize: 18, cursor: "pointer" }}
+                  className="text-lg cursor-pointer"
                 />
               ) : (
                 <MenuFoldOutlined
                   onClick={() => setCollapsed(true)}
-                  style={{ fontSize: 18, cursor: "pointer" }}
+                  className="text-lg cursor-pointer"
                 />
               )}
+
               <Input.Search
                 placeholder="Tìm kiếm nhanh..."
-                onSearch={(value) => setSearch(value)}
-                style={{ width: 300 }}
                 allowClear
+                onSearch={(value) => setSearch(value)}
+                className="hidden md:block w-[280px]"
               />
             </div>
+            <div className="flex justify-end gap-5 mr-4">
+              <Badge count={5}>
+                <BellOutlined className="text-xl cursor-pointer" />
+              </Badge>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontWeight: 500 }}>
-                {user?.ho_ten || "Đang tải..."}
-              </span>
-              <Dropdown
-                menu={{ items: menuItems }}
-                placement="bottomRight"
-                arrow
-              >
-                <Avatar
-                  size="large"
-                  src={user?.avatar?.url || "https://i.pravatar.cc/150"} // Dùng ảnh từ Cloudinary nếu có
-                  icon={!user?.avatar && <UserOutlined />}
-                  style={{ cursor: "pointer", backgroundColor: "#1890ff" }}
-                >
-                  {user?.ho_ten?.[0].toUpperCase()}
-                </Avatar>
-              </Dropdown>
+              <Badge count={2}>
+                <MailOutlined className="text-xl cursor-pointer" />
+              </Badge>
             </div>
           </Header>
 
+          {/* CONTENT */}
           <Content
             style={{
-              margin: "24px 16px",
-              padding: 24,
-              background: "#fff",
+              margin: 16,
               borderRadius: 8,
               minHeight: 280,
             }}

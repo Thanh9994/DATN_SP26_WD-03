@@ -130,9 +130,6 @@ export const Header = () => {
             <button className="size-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors">
               <span className="material-symbols-outlined">notifications</span>
             </button>
-            <button className="size-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors">
-              <span className="material-symbols-outlined">favorite</span>
-            </button>
           </div>
           {user ? (
             <div className="flex items-center gap-3">

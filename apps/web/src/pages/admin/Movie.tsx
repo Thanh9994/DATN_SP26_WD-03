@@ -248,7 +248,7 @@ export const Movie = () => {
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
-          disabled={submitting || isUploading}
+          disabled={submitting || isLoading}
         >
           <div className="grid grid-cols-4 gap-4">
             <Form.Item
