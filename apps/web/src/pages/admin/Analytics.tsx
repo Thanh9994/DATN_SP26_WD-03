@@ -80,7 +80,7 @@ const genreData: GenreItem[] = [
     { type: "Hài", tickets: 18000 },
 ];
 
-const GENRE_COLORS = ["#eb2f96", "#f5222d", "#722ed1", "#fa8c16"];
+const GENRE_COLORS = ["#ff4d4f", "#ff7875", "#ff9c6e", "#ffbb96"];
 
 const deviceData = [
     { name: "Mobile App", value: 50 },
@@ -88,7 +88,7 @@ const deviceData = [
     { name: "Counter", value: 15 },
 ];
 
-const PIE_COLORS = ["#1677ff", "#52c41a", "#faad14"];
+const PIE_COLORS = ["#ff4d4f", "#ff7875", "#ff9c6e"];
 
 const topMovies = [
     { name: "Lật Mặt 7: Một Điều Ước", percent: 92 },
@@ -133,8 +133,8 @@ const Analytics = () => {
     };
 
     return (
-        <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
-            <Header style={{ background: "#001529", padding: "0 32px" }}>
+        <Layout style={{ minHeight: "100vh", background: "#0f0f0f" }}>
+            <Header style={{ background: "#1a0000", padding: "0 32px" }}>
                 <Title level={3} style={{ color: "#fff", margin: 0 }}>
                     Movie Analytics Dashboard 🎬
                 </Title>
@@ -142,9 +142,15 @@ const Analytics = () => {
 
             <Content style={{ padding: 32 }}>
                 {/* FILTER */}
-                <Card style={{ marginBottom: 24 }}>
+                <Card style={{
+                    marginBottom: 24,
+                    background: "#1a1a1a",
+                    border: "1px solid #330000",
+                }}>
                     <Row gutter={16} align="middle">
                         <Col>
+                            <Text style={{ color: "#fff" }}>Cinema </Text>
+                            <br />
                             <Select
                                 value={cinema}
                                 onChange={(value) => setCinema(value)}
@@ -163,6 +169,8 @@ const Analytics = () => {
                         </Col>
 
                         <Col>
+                            <Text style={{ color: "#fff" }}>Date Range</Text>
+                            <br />
                             <RangePicker
                                 onChange={(dates) =>
                                     setDateRange(
@@ -173,7 +181,13 @@ const Analytics = () => {
                         </Col>
 
                         <Col>
-                            <Button type="primary" onClick={handleSearch}>
+                            <Text style={{ color: "#fff" }}>Search</Text>
+                            <br />
+                            <Button type="primary" onClick={handleSearch}
+                                style={{
+                                    background: "#ff4d4f",
+                                    borderColor: "#ff4d4f"
+                                }}>
                                 Search
                             </Button>
                         </Col>
@@ -183,7 +197,15 @@ const Analytics = () => {
                 {/* REVENUE + RANKING */}
                 <Row gutter={24}>
                     <Col span={16}>
-                        <Card title="Revenue Trend">
+                        <Card title="Revenue Trend" style={{
+                            background: "#1a1a1a",
+                            border: "1px solid #330000",
+                            color: "#fff"
+                        }}
+                            headStyle={{
+                                color: "#fff",
+                                background: "#1a0000"
+                            }}>
                             <ResponsiveContainer width="100%" height={320}>
                                 <AreaChart data={revenueTrend}>
                                     <XAxis dataKey="month" />
@@ -198,8 +220,8 @@ const Analytics = () => {
                                     <Area
                                         type="monotone"
                                         dataKey="value"
-                                        stroke="#1677ff"
-                                        fill="#e6f4ff"
+                                        stroke="#ff4d4f"
+                                        fill="#3a0000"
                                     />
                                 </AreaChart>
                             </ResponsiveContainer>
@@ -207,13 +229,22 @@ const Analytics = () => {
                     </Col>
 
                     <Col span={8}>
-                        <Card title="Top Phim Việt Rating Ranking 🇻🇳">
+                        <Card title="Top Phim Việt Rating Ranking 🇻🇳"
+                            style={{
+                                background: "#1a1a1a",
+                                border: "1px solid #330000",
+                                color: "#fff"
+                            }}
+                            headStyle={{
+                                color: "#fff",
+                                background: "#1a0000"
+                            }}>
                             {topMovies.map((movie, index) => (
                                 <div key={index} style={{ marginBottom: 16 }}>
-                                    <Text strong>
+                                    <Text strong style={{ color: "#fff" }}>
                                         {index + 1}. {movie.name}
                                     </Text>
-                                    <Progress percent={movie.percent} />
+                                    <Progress percent={movie.percent} strokeColor="#ff4d4f" />
                                 </div>
                             ))}
                         </Card>
@@ -223,7 +254,17 @@ const Analytics = () => {
                 {/* SECOND ROW */}
                 <Row gutter={24} style={{ marginTop: 24 }}>
                     <Col span={8}>
-                        <Card title="Tickets by Genre">
+                        <Card
+                            title={<span style={{ color: "#fff" }}>Tickets by Genre</span>}
+                            style={{
+                                background: "#1a1a1a",
+                                border: "1px solid #330000",
+                                color: "#fff"
+                            }}
+                            headStyle={{
+                                background: "#1a0000"
+                            }}
+                        >
                             <ResponsiveContainer width="100%" height={280}>
                                 <BarChart data={genreData}>
                                     <XAxis dataKey="type" />
@@ -258,7 +299,17 @@ const Analytics = () => {
                     </Col>
 
                     <Col span={8}>
-                        <Card title="Booking Device Distribution">
+                        <Card title="Booking Device Distribution"
+                            style={{
+                                background: "#1a1a1a",
+                                border: "1px solid #330000",
+                                color: "#fff"
+                            }}
+
+                            headStyle={{
+                                color: "#fff",
+                                background: "#1a0000"
+                            }}>
                             <ResponsiveContainer width="100%" height={250}>
                                 <PieChart>
                                     <Pie
@@ -280,9 +331,21 @@ const Analytics = () => {
                     </Col>
 
                     <Col span={8}>
-                        <Card title="Overall System Score">
-                            <Title level={2}>86.2</Title>
-                            <Progress percent={86} />
+                        <Card title="Overall System Score"
+
+                            style={{
+                                background: "#1a1a1a",
+                                border: "1px solid #330000",
+                                color: "#fff"
+                            }}
+
+                            headStyle={{
+                                color: "#fff",
+                                background: "#1a0000"
+                            }}>
+                            <Title level={1} style={{ color: "#ff4d4f" }}>86.2</Title>
+                            <Progress percent={86} strokeColor="#ff4d4f"
+                                style={{ color: "#fff" }} />
                             <Divider />
                             <p>Average Rating: 7.5</p>
                             <p>Highest Rating: 9.4</p>
