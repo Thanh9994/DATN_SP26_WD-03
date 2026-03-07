@@ -21,21 +21,15 @@ const postSchema = new mongoose.Schema(
       required: true,
     },
 
-    thumbnail: {
-      url: String,
-      public_id: String,
+    featured: {
+      type: Boolean,
+      default: false,
     },
 
     type: {
       type: String,
       enum: ["promotion", "event", "news"],
       default: "promotion",
-    },
-
-    status: {
-      type: String,
-      enum: ["draft", "published"],
-      default: "published",
     },
 
     startDate: Date,

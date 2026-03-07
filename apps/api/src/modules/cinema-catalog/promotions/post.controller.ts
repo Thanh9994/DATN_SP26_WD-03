@@ -15,7 +15,7 @@ export const createPost = catchAsync(async (req: Request, res: Response) => {
     status,
     startDate,
     endDate,
-    thumbnail,
+    featured,
   } = req.body;
 
   if (!title || !content) {
@@ -34,7 +34,7 @@ export const createPost = catchAsync(async (req: Request, res: Response) => {
     status,
     startDate,
     endDate,
-    thumbnail,
+    featured,
   });
 
   res.status(201).json({
@@ -46,11 +46,27 @@ export const createPost = catchAsync(async (req: Request, res: Response) => {
 // @desc    Get all posts
 // @route   GET /api/posts
 // @access  Public
-export const getPosts = catchAsync(async (req: Request, res: Response) => {
-  const posts = await Post.find().sort({ createdAt: -1 });
+export const getPosts = catchAsync(async (_req: Request, res: Response) => {
+  const posts = await Post.find().select("-__v").sort({ createdAt: -1 });
   res.status(200).json({
     message: "Posts fetched successfully",
     data: posts,
+  });
+});
+
+export const getPostById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const post = await Post.findById(id);
+
+  if (!post) {
+    res.status(404).json({ message: "Post not found" });
+    return;
+  }
+
+  res.status(200).json({
+    message: "Post fetched successfully",
+    data: post,
   });
 });
 
@@ -85,7 +101,7 @@ export const updatePost = catchAsync(async (req: Request, res: Response) => {
     status,
     startDate,
     endDate,
-    thumbnail,
+    featured,
   } = req.body;
 
   const post = await Post.findById(id);
@@ -103,7 +119,7 @@ export const updatePost = catchAsync(async (req: Request, res: Response) => {
     status,
     startDate,
     endDate,
-    thumbnail,
+    featured,
   };
 
   if (title) {

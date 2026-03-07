@@ -1,5 +1,5 @@
-const slugify = (text: string): string => {
-  return text
+export const toSlug = (str: string) => {
+  return str
     .toLowerCase()
     .normalize("NFD") // tách dấu khỏi chữ
     .replace(/[\u0300-\u036f]/g, "") // xoá dấu
@@ -10,5 +10,3 @@ const slugify = (text: string): string => {
     .replace(/[\s_-]+/g, "-")
     .replace(/^-+|-+$/g, "");
 };
-
-export default slugify;

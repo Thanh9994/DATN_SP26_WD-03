@@ -71,6 +71,12 @@ export const Sidebar = ({
       onClick: () => navigate("/admin/rooms"),
     },
     {
+      key: "promotions",
+      icon: <VideoCameraAddOutlined />,
+      label: "Bài Viết",
+      onClick: () => navigate("/admin/promotions"),
+    },
+    {
       key: "product",
       icon: <ProductOutlined />,
       label: "Product",

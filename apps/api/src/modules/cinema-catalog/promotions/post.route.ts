@@ -5,17 +5,17 @@ import {
   getPostBySlug,
   updatePost,
   deletePost,
+  getPostById,
 } from "./post.controller";
 
-const router = express.Router();
+const postRouter = express.Router();
 
-router.route("/").post(createPost).get(getPosts);
+postRouter.route("/").post(createPost).get(getPosts);
 
-router.route("/slug/:slug").get(getPostBySlug);
+postRouter.route("/:slug").get(getPostBySlug);
 
-router
-  .route("/:id")
-  .patch(updatePost)
-  .delete(deletePost);
+postRouter.get("/id/:id", getPostById);
 
-export default router;
+postRouter.route("/:id").patch(updatePost).delete(deletePost);
+
+export default postRouter;

@@ -200,3 +200,41 @@ input:-webkit-autofill:active {
     padding: 6px 10px;
   }
 }
+
+.ProseMirror {
+  outline: none;
+}
+
+.ProseMirror h1 {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.ProseMirror h2 {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.ProseMirror p {
+  margin: 10px 0;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+.ProseMirror mark {
+  background: #ffe58f;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.ProseMirror mark {
+  @apply bg-yellow-200 px-1 rounded;
+}
+.editor-wrapper {
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  min-height: 200px;
+  resize: vertical;
+  overflow: auto;
+}
