@@ -4,6 +4,7 @@ import { Spin, Modal } from "antd";
 import ReactPlayer from "react-player";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { Play } from "lucide-react";
 
 const MovieDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,7 +32,7 @@ const MovieDetail = () => {
   return (
     <div className="text-white bg-background-dark">
       <section className="relative h-[85vh] w-full flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 ">
           <img
             alt={movie.ten_phim}
             className="w-full h-full object-cover"
@@ -42,17 +43,23 @@ const MovieDetail = () => {
         </div>
         {movie.trailer && (
           <div className="relative z-20 flex flex-col items-center gap-6">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="size-24 rounded-full bg-primary/90 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-2xl shadow-primary/40 group"
-            >
-              <span className="material-symbols-outlined text-5xl translate-x-1">
-                play_arrow
-              </span>
-            </button>
-            <span className="text-white font-bold tracking-[0.3em] uppercase text-sm drop-shadow-lg">
-              Watch Trailer
-            </span>
+            <div className="relative flex items-center justify-center">
+              {/* Lớp sóng tỏa ra (Animation Pulse) */}
+              <div className="absolute inset-0 rounded-full bg-primary animate-ping"></div>
+
+              {/* Nút Play chính */}
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="relative size-24 rounded-full bg-primary text-white flex items-center justify-center 
+                  hover:scale-110 transition-transform duration-300 shadow-2xl shadow-primary group"
+              >
+                <Play
+                  size={48}
+                  fill="currentColor"
+                  className="translate-x-1 group-hover:scale-110 transition-transform"
+                />
+              </button>
+            </div>
           </div>
         )}
       </section>

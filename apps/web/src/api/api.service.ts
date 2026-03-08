@@ -9,5 +9,7 @@ export const API = {
   GENRES: `${API_URL}/content/genres`,
   MOVIES: `${API_URL}/content/movies`,
   SHOWTIME: `${API_URL}/catalog/showtimes`,
+  PROMOTION: `${API_URL}/catalog/promotions`,
   BOOKING: `${API_URL}/order/booking`,
+  PAYMENT: `${API_URL}/order/v1/vnpay`,
 };
