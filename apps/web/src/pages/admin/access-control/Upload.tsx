@@ -77,7 +77,7 @@ export const Upload = () => {
                 <Image
                   src={img.url}
                   height={220}
-                  style={{ objectFit: "cover" }}
+                  style={{ objectFit: "cover", borderRadius: 8 }}
                 />
               }
               actions={[

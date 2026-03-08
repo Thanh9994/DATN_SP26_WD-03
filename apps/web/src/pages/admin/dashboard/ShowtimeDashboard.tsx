@@ -79,9 +79,7 @@ export const ShowTimeDashboard: React.FC = () => {
     <div className="p-4">
       <Card
         title={
-          <span className="text-lg font-bold text-gray-700">
-            Bảng Tổng Hợp Suất Chiếu
-          </span>
+          <span className="text-lg font-bold">Bảng Tổng Hợp Suất Chiếu</span>
         }
         extra={
           <Space>

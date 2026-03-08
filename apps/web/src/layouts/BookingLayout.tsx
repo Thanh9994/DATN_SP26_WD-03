@@ -6,11 +6,12 @@ import {
 } from "react-router-dom";
 import { useMovie } from "@web/hooks/useMovie";
 import { Button, message, Spin } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { useBooking } from "@web/hooks/useBooking";
 import { IShowTime, IShowTimeSeat } from "@shared/schemas";
 import { useAuth } from "@web/hooks/useAuth";
+import { MapPin } from "lucide-react";
 
 const BookingLayout = () => {
   const [searchParams] = useSearchParams();
@@ -33,9 +34,20 @@ const BookingLayout = () => {
   const { showTime, holdSeats, isHolding, refreshSeats } = useBooking(
     activeShowtimeId ?? undefined,
   );
+  useEffect(() => {
+    if (showTime && !selectedShowtime) {
+      setSelectedShowtime(showTime);
+    }
+  }, [showTime, selectedShowtime]);
+  const currentData = showTime || selectedShowtime;
+  const cinema =
+    currentData?.roomId?.cinema_id || (currentData as any)?.cinemaInfo; // Trường hợp 1: Dữ liệu chuẩn Backend
+  const roomName = currentData?.roomId?.ten_phong;
 
   const isSelectSeatStep = location.pathname.includes("/seats");
   const totalAmount = selectedSeats.reduce((sum, s) => sum + s.price, 0);
+
+  if (!movie) return null;
 
   if (isMovieLoading)
     return (
@@ -59,8 +71,12 @@ const BookingLayout = () => {
     if (!isSelectSeatStep) {
       if (!selectedShowtime) {
         message.warning("Vui lòng chọn một suất chiếu!");
+        // console.log("Cinema Data:", cinema);
+        // console.log("Room Name:", roomName);
+        // console.log("Selected Showtime:", selectedShowtime);
         return;
       }
+      // console.log(selectedShowtime);
       navigate(
         `/booking/seats?movieId=${movieId}&showtimeId=${selectedShowtime._id}`,
       );
@@ -126,6 +142,24 @@ const BookingLayout = () => {
                 </span>
               </span>
             </div>
+            {cinema && (
+              <div className="pt-6 border-t border-white/10">
+                <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin size={14} className="text-primary" />
+                    <span className="text-[10px] font-black uppercase text-primary">
+                      Rạp đã chọn
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-zinc-100 text-sm uppercase">
+                    {cinema.name}
+                  </h4>
+                  <p className="text-[11px] text-[#b89d9f] mt-1">
+                    {cinema.address}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </aside>
 
@@ -160,15 +194,14 @@ const BookingLayout = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-8 text-sm">
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                   <p className="text-zinc-500 uppercase text-sm font-bold tracking-wider">
-                    Rạp / Phòng
+                    Phòng
                   </p>
                   <p className="font-bold text-zinc-200">
-                    {showTime?.roomId?.cinema_id?.name || "Cinema"} -{" "}
                     {showTime?.roomId?.ten_phong || "Standard"}
                   </p>
-                </div>
+                </div> */}
                 <div className="space-y-1">
                   <p className="text-zinc-500 uppercase text-sm font-bold tracking-wider">
                     Suất chiếu
@@ -179,7 +212,8 @@ const BookingLayout = () => {
                       : "Chưa chọn"}
                   </p>
                 </div>
-                <div className="col-span-2 space-y-1">
+                {/* <div className="col-span-2 space-y-1"> */}
+                <div className="space-y-1">
                   <p className="text-zinc-500 uppercase text-sm font-bold tracking-wider">
                     Ghế đã chọn
                   </p>
