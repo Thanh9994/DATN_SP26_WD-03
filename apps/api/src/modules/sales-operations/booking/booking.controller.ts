@@ -19,6 +19,11 @@ export const bookingController = {
       return next(new AppError("Thiếu thông tin suất chiếu hoặc ghế", 400));
     }
     const result = await bookingService.holdSeats(showTimeId, seats, userId);
+
+    console.log(
+      `✅ Booking created: ${result.booking._id}, amount: ${result.booking.totalAmount}`,
+    );
+
     res.status(201).json({
       success: true,
       message: "Ghế đã được giữ trong 5 phút. Vui lòng thanh toán.",
@@ -48,14 +53,20 @@ export const bookingController = {
 
   getBookingDetail: catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    const booking = await Booking.findById(id).populate({
-      path: "showTimeId",
-      populate: { path: "movieId" },
-    });
+    const booking = await Booking.findById(id)
+      .populate({
+        path: "showTimeId",
+        populate: [
+          { path: "movieId" }, // Lấy thông tin phim
+          {
+            path: "roomId", // Lấy thông tin phòng
+            populate: { path: "cinema_id" }, // Lấy thông tin rạp từ phòng
+          },
+        ],
+      })
+      .populate("userId", "ho_ten email");
 
-    if (!booking) {
-      return next(new AppError("Không tìm thấy đơn hàng", 404));
-    }
+    if (!booking) return next(new AppError("Không tìm thấy đơn hàng", 404));
 
     res.json({
       success: true,

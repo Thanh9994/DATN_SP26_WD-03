@@ -11,5 +11,5 @@ export const API = {
   SHOWTIME: `${API_URL}/catalog/showtimes`,
   PROMOTION: `${API_URL}/catalog/promotions`,
   BOOKING: `${API_URL}/order/booking`,
-  PAYMENT: `${API_URL}/order/v1/vnpay`,
+  PAYMENT_GATEWAY: `${API_URL}/order/v1/payments`,
 };

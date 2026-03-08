@@ -7,6 +7,6 @@ const orderRouter = Router();
 
 orderRouter.use("/product", productRouter);
 orderRouter.use("/booking", bookingRouter);
-orderRouter.use("/v1", paymentRouter);
+orderRouter.use("/v1/payments", paymentRouter);
 
 export default orderRouter;

@@ -9,7 +9,7 @@ export const bookingService = {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const holdDuration = 5 * 60 * 1000; // 5 phút
+      const holdDuration = 7 * 60 * 1000; // 5 phút
       const holdExpires = new Date(Date.now() + holdDuration);
       const now = new Date();
 

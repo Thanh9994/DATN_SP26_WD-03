@@ -1,6 +1,9 @@
 import crypto from "crypto";
 import qs from "qs";
-import { IPaymentGateway } from "../interfaces/payment-gateway.interface";
+import {
+  IPaymentGateway,
+  IPaymentResult,
+} from "../interfaces/payment-gateway.interface";
 
 export class VnpayGateway implements IPaymentGateway {
   async createUrl(
@@ -9,79 +12,81 @@ export class VnpayGateway implements IPaymentGateway {
     ipAddr: string,
   ): Promise<string> {
     const vnpUrl = process.env.VNP_URL!;
-    const tmnCode = process.env.VNP_TMNCODE!;
-    const secretKey = process.env.VNP_HASHSECRET!;
-    const returnUrl = process.env.VNP_RETURNURL!;
-    const ipnUrl = process.env.VNP_IPNURL!;
+    const secretKey = process.env.VNP_HASHSECRET!.trim();
+    const tmnCode = "UPNPC0BW".trim(); //
 
-    // fix IPv6 localhost
-    if (ipAddr === "::1") {
-      ipAddr = "127.0.0.1";
-    }
+    const date = new Date();
+    const createDate = this.formatDate(date);
 
-    let vnp_Params: any = {
+    let validIp = ipAddr || "127.0.0.1";
+    if (validIp.includes("::ffff:")) validIp = validIp.replace("::ffff:", "");
+    if (validIp === "::1") validIp = "127.0.0.1";
+
+    const vnp_Params: any = {
       vnp_Version: "2.1.0",
       vnp_Command: "pay",
       vnp_TmnCode: tmnCode,
-      vnp_Locale: "vn",
+      vnp_Amount: Math.floor(amount * 100),
+      vnp_CreateDate: createDate,
       vnp_CurrCode: "VND",
-
-      vnp_TxnRef: bookingId,
-
-      vnp_OrderInfo: `Thanh toan ve xem phim ${bookingId}`,
+      vnp_IpAddr: validIp,
+      vnp_Locale: "vn",
+      vnp_OrderInfo: `thanhtoandonhang${bookingId}`.trim(),
       vnp_OrderType: "other",
-
-      // VNPay yêu cầu *100
-      vnp_Amount: amount * 100,
-
-      vnp_ReturnUrl: returnUrl,
-      vnp_IpnUrl: ipnUrl,
-      vnp_IpAddr: ipAddr,
-
-      vnp_CreateDate: this.formatDate(new Date()),
+      vnp_ReturnUrl: process.env.VNP_RETURNURL?.trim(),
+      vnp_TxnRef: bookingId,
     };
 
-    vnp_Params = this.sortObject(vnp_Params);
+    // 1. Sắp xếp params
+    const sorted = this.sortObject(vnp_Params);
 
-    const signData = qs.stringify(vnp_Params, { encode: false });
+    // 2. Tạo chuỗi băm sử dụng encodeURIComponent để khớp với VNPay
+    const signData = Object.keys(sorted)
+      .map((key) => {
+        // Encode key và value theo chuẩn RFC3986
+        return `${encodeURIComponent(key)}=${encodeURIComponent(sorted[key]).replace(/%20/g, "+")}`;
+      })
+      .join("&");
 
     const hmac = crypto.createHmac("sha512", secretKey);
-
     const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
 
-    const paymentUrl = `${vnpUrl}?${signData}&vnp_SecureHash=${signed}`;
+    // 3. Tạo URL cuối cùng
+    const queryParams = Object.keys(sorted)
+      .map(
+        (key) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(sorted[key]).replace(/%20/g, "+")}`,
+      )
+      .join("&");
 
-    return paymentUrl;
+    const finalUrl = `${vnpUrl}?${queryParams}&vnp_SecureHash=${signed}`;
+
+    return finalUrl;
   }
 
-  async handleIpn(query: any) {
+  async handleIpn(query: any): Promise<IPaymentResult> {
     const secretKey = process.env.VNP_HASHSECRET!;
-
     const secureHash = query.vnp_SecureHash;
 
-    delete query.vnp_SecureHash;
-    delete query.vnp_SecureHashType;
+    const data = { ...query };
+    delete data.vnp_SecureHash;
+    delete data.vnp_SecureHashType;
 
-    const sortedParams = this.sortObject(query);
-
-    const signData = qs.stringify(sortedParams, { encode: false });
+    const sortedParams = this.sortObject(data);
+    const signData = Object.keys(sortedParams)
+      .map((key) => `${key}=${sortedParams[key]}`)
+      .join("&");
 
     const hmac = crypto.createHmac("sha512", secretKey);
-
     const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
 
-    // Verify checksum
     if (secureHash !== signed) {
-      return {
-        code: "97",
-        message: "Invalid checksum",
-      };
+      return { code: "97", message: "Invalid checksum" };
     }
 
     const isSuccess = query.vnp_ResponseCode === "00";
-
     return {
-      code: isSuccess ? "00" : "01",
+      code: isSuccess ? "00" : query.vnp_ResponseCode || "01",
       message: isSuccess ? "Success" : "Payment Failed",
       bookingId: query.vnp_TxnRef,
       transactionNo: query.vnp_TransactionNo,
@@ -89,27 +94,20 @@ export class VnpayGateway implements IPaymentGateway {
   }
 
   private sortObject(obj: any) {
-    let sorted: any = {};
-
-    let keys = Object.keys(obj)
-      .map((key) => encodeURIComponent(key))
-      .sort();
-
+    const sorted: any = {};
+    const keys = Object.keys(obj).sort();
     keys.forEach((key) => {
-      sorted[key] = encodeURIComponent(obj[decodeURIComponent(key)]).replace(
-        /%20/g,
-        "+",
-      );
+      if (obj[key] !== null && obj[key] !== undefined && obj[key] !== "") {
+        sorted[key] = obj[key].toString();
+      }
     });
-
     return sorted;
   }
 
   private formatDate(date: Date) {
     const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
-
     return (
-      date.getFullYear() +
+      date.getFullYear().toString() +
       pad(date.getMonth() + 1) +
       pad(date.getDate()) +
       pad(date.getHours()) +

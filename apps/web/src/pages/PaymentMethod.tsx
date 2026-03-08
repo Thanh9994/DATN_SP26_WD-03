@@ -1,32 +1,51 @@
-import { useState } from "react";
+import { useBooking } from "@web/hooks/useBooking";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { message } from "antd";
 
 const PaymentsMethod = () => {
   const [method, setMethod] = useState("vnpay");
   const [loading, setLoading] = useState(false);
-  // 2. Hàm xử lý thanh toán
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { createPaymentUrl } = useBooking();
+
+  const bookingId = location.state?.bookingId;
+  const totalAmount = location.state?.totalAmount || 0;
+  const seats = location.state?.seats || [];
+  const movieInfo = location.state?.movieInfo;
+
+  useEffect(() => {
+    if (!bookingId) {
+      message.error("Không tìm thấy thông tin đơn hàng!");
+      navigate("/");
+    }
+  }, [bookingId, navigate]);
+
   const handlePurchase = async () => {
+    if (!bookingId) {
+      message.error("Không tìm thấy thông tin đơn hàng!");
+      return;
+    }
+
+    setLoading(true);
     try {
-      setLoading(true);
+      const result = await createPaymentUrl({
+        bookingId,
+        method,
+      });
 
-      // Gọi đến API chúng ta đã tạo ở Backend
-      // URL: /api/v1/payments/:method/create
-
-      // if (response.data.success) {
-      //   // Chuyển hướng người dùng sang trang thanh toán của VNPay/Momo
-      //   window.location.href = response.data.data;
-      // }
-    } catch (error: any) {
-      console.error("Payment Error:", error);
-      alert(
-        error.response?.data?.message ||
-          "Lỗi khởi tạo thanh toán. Vui lòng thử lại.",
-      );
+      if (result.success && result.data) {
+        window.location.href = result.data;
+      }
+    } catch (error) {
+      message.error("Có lỗi xảy ra khi tạo link thanh toán!");
     } finally {
       setLoading(false);
     }
   };
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-auto text-white">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(239,68,68,0.12),rgba(0,0,0,0)_55%),radial-gradient(ellipse_at_left,rgba(255,255,255,0.06),rgba(0,0,0,0)_45%)]" />
 
       <div className="mx-auto max-w-7xl px-4 pt-10 pb-28">
@@ -119,27 +138,17 @@ const PaymentsMethod = () => {
                   <div className="flex items-start gap-3">
                     <div className="h-8 w-8 rounded-lg bg-red-600/15 border border-red-500/20" />
                     <div>
-                      <div className="font-semibold">Tickets (2x)</div>
-                      <div className="text-xs text-zinc-500">PREMIUM IMAX</div>
+                      <div className="font-semibold">
+                        Tickets ({seats.length}x)
+                      </div>
+                      <div className="text-xs text-zinc-500">
+                        {seats.join(", ")}
+                      </div>
                     </div>
                   </div>
-                  <div className="text-zinc-200 font-semibold"></div>
-                </div>
-
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-red-600/15 border border-red-500/20" />
-                    <div>
-                      <div className="font-semibold">Movie Combo</div>
-                      <div className="text-xs text-zinc-500">LIMITED</div>
-                    </div>
+                  <div className="text-zinc-200 font-semibold">
+                    {totalAmount.toLocaleString("vi-VN")} đ
                   </div>
-                  <div className="text-zinc-200 font-semibold"></div>
-                </div>
-
-                <div className="flex items-center justify-between text-xs text-zinc-500 pt-2">
-                  <span>Service Fee</span>
-                  <span></span>
                 </div>
 
                 <div className="h-px bg-white/10" />
@@ -149,10 +158,12 @@ const PaymentsMethod = () => {
                     <div className="text-[10px] tracking-[0.25em] text-red-400 font-semibold">
                       TOTAL AMOUNT
                     </div>
-                    <div className="mt-1 text-3xl font-extrabold"></div>
+                    <div className="mt-1 text-3xl font-extrabold">
+                      {totalAmount.toLocaleString("vi-VN")} đ
+                    </div>
                   </div>
                   <div className="text-[10px] text-zinc-500 border border-white/10 bg-white/5 px-2 py-1 rounded-full">
-                    USD
+                    VND
                   </div>
                 </div>
 
@@ -176,13 +187,19 @@ const PaymentsMethod = () => {
 
             {/* Movie Card */}
             <div className="rounded-[26px] border border-white/10 bg-white/5 p-4 flex items-center gap-3">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-cyan-700/60 to-orange-600/60 border border-white/10" />
+              {movieInfo?.poster && (
+                <img
+                  src={movieInfo.poster}
+                  alt={movieInfo.title}
+                  className="h-16 w-12 rounded-xl object-cover border border-white/10"
+                />
+              )}
               <div className="min-w-0">
                 <div className="font-semibold text-sm truncate">
-                  Dune: Part Two
+                  {movieInfo?.title || "Movie"}
                 </div>
                 <div className="text-[11px] text-zinc-500 mt-1">
-                  Tonight • 2:30 PM
+                  {movieInfo?.showtime || "Showtime"}
                 </div>
               </div>
             </div>

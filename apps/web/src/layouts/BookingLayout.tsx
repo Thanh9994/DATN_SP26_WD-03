@@ -95,7 +95,7 @@ const BookingLayout = () => {
         navigate("/login");
         return;
       }
-      await holdSeats({
+      const result = await holdSeats({
         showTimeId: activeShowtimeId!,
         seats: selectedSeats.map((s) => s.seatCode),
         userId: user?._id as string,
@@ -103,7 +103,21 @@ const BookingLayout = () => {
 
       await refreshSeats();
       message.success("Giữ ghế thành công!");
-      navigate(`/checkout?movieId=${movieId}&showtimeId=${activeShowtimeId}`);
+
+      navigate("/payments", {
+        state: {
+          bookingId: result.data.bookingId,
+          totalAmount: result.data.totalAmount,
+          seats: selectedSeats.map((s) => s.seatCode),
+          movieInfo: {
+            title: movie.ten_phim,
+            poster: movie.poster?.url,
+            showtime: currentData?.startTime
+              ? dayjs(currentData.startTime).format("HH:mm - DD/MM/YYYY")
+              : "Showtime",
+          },
+        },
+      });
     } catch (error) {
       refreshSeats();
     }

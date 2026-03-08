@@ -64,6 +64,21 @@ export const useBooking = (showTimeId?: string) => {
     },
   });
 
+  const createPaymentUrl = useMutation({
+    mutationFn: async (payload: { bookingId: string; method: string }) => {
+      const { data } = await axiosAuth.post(
+        `${API.PAYMENT_GATEWAY}/${payload.method}/create`,
+        { bookingId: payload.bookingId },
+      );
+      return data; // Trả về { success: true, data: "http://vnpay..." }
+    },
+    onError: (error: any) => {
+      message.error(
+        error.response?.data?.message || "Lỗi khởi tạo thanh toán.",
+      );
+    },
+  });
+
   return {
     showTime: bookingData?.showTime,
     seats: bookingData?.seats || [],
@@ -75,6 +90,9 @@ export const useBooking = (showTimeId?: string) => {
 
     confirmBooking: confirmBooking.mutateAsync,
     isConfirming: confirmBooking.isPending,
+
+    createPaymentUrl: createPaymentUrl.mutateAsync,
+    isCreatingPayment: createPaymentUrl.isPending,
 
     refreshSeats: refetch,
   };
