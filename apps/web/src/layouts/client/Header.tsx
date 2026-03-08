@@ -88,6 +88,12 @@ export const Header = () => {
             >
               Cinemas
             </Link>
+            <Link
+              to="/cinema"
+              className="text-white text-base font-bold hover:text-primary transition-colors"
+            >
+              Cinemas
+            </Link>
 
             <Link
               to="*"

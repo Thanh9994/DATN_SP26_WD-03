@@ -18,8 +18,9 @@ import { ProfileLayout } from "@web/layouts/ProfileLayout";
 import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
 import { Setting } from "@web/components/authProfile/Setting";
 import { Cinemas } from "@web/pages/Cinemas";
-import MovieList from "@web/pages/clients/MovieList";
-
+import MyBooking  from "@web/components/authProfile/MyBooking";
+import DrinkSnack from "@web/pages/DrinkSnack";
+import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
@@ -35,7 +36,7 @@ export const ClientRoutes: RouteObject = {
         { index: true, element: <ProfileInfo /> },
         { path: "info", element: <ProfileInfo /> },
         { path: "settings", element: <Setting /> },
-        { path: "tickets", element: <div>Lịch sử đặt vé</div> },
+        { path: "tickets", element: <MyBooking /> },
         { path: "payment", element: <div>Phương thức thanh toán</div> },
       ],
     },
@@ -54,6 +55,8 @@ export const ClientRoutes: RouteObject = {
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
     { path: "ticket", element: <Ticket /> },
+    { path: "foods", element: <DrinkSnack /> },
+    { path: "recommendfoods", element: <RecommentDrinkSnack /> },
     { path: "checkout", element: <Checkout /> },
     { path: "*", element: <NotFound /> },
   ],
