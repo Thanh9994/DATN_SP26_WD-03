@@ -12,6 +12,7 @@ export class VnpayGateway implements IPaymentGateway {
     const tmnCode = process.env.VNP_TMNCODE!;
     const secretKey = process.env.VNP_HASHSECRET!;
     const returnUrl = process.env.VNP_RETURNURL!;
+    const ipnUrl = process.env.VNP_IPNURL!;
 
     // fix IPv6 localhost
     if (ipAddr === "::1") {
@@ -34,6 +35,7 @@ export class VnpayGateway implements IPaymentGateway {
       vnp_Amount: amount * 100,
 
       vnp_ReturnUrl: returnUrl,
+      vnp_IpnUrl: ipnUrl,
       vnp_IpAddr: ipAddr,
 
       vnp_CreateDate: this.formatDate(new Date()),

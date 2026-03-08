@@ -107,7 +107,7 @@ export const BookingCinema = () => {
             />
           </div>
         ) : (
-          <div className="space-y-4 px-4 lg:px-0">
+          <div className="space-y-4 pb-3 px-4 lg:px-0 md:pb-5">
             {filteredData.map((item: any) => {
               const cinemaId = item.cinemaInfo?._id;
               const isOpen = openCinemas.includes(cinemaId);

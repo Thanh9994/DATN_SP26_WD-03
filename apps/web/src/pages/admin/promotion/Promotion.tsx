@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import { API } from "@web/api/api.service";
 import { useNavigate } from "react-router-dom";
+import { PlusIcon } from "lucide-react";
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -52,10 +53,10 @@ const PromotionList = () => {
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`${API.PROMOTION}/${id}`);
-      message.success("Deleted successfully");
+      message.success("Deleted Thành công");
       fetchPromotions();
     } catch {
-      message.error("Delete failed");
+      message.error("Delete Thất Bại");
     }
   };
 
@@ -125,7 +126,8 @@ const PromotionList = () => {
             type="primary"
             onClick={() => navigate("/admin/promotions/create")}
           >
-            Create Promotion
+            <PlusIcon />
+            Thêm Bài Viết
           </Button>
           <Button icon={<ReloadOutlined />} onClick={fetchPromotions}>
             Refresh

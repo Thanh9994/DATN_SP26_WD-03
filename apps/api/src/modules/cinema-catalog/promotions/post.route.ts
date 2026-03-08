@@ -10,12 +10,13 @@ import {
 
 const postRouter = express.Router();
 
-postRouter.route("/").post(createPost).get(getPosts);
+postRouter.post("/", createPost);
+postRouter.get("/", getPosts);
 
-postRouter.route("/:slug").get(getPostBySlug);
-
+postRouter.get("/slug/:slug", getPostBySlug);
 postRouter.get("/id/:id", getPostById);
 
-postRouter.route("/:id").patch(updatePost).delete(deletePost);
+postRouter.patch("/:id", updatePost);
+postRouter.delete("/:id", deletePost);
 
 export default postRouter;

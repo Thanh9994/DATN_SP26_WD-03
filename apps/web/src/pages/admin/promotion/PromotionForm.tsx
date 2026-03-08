@@ -84,7 +84,7 @@ const PromotionForm = () => {
   };
 
   return (
-    <div style={{ maxWidth: 900 }} className="p-5">
+    <div style={{ maxWidth: 1200 }} className="p-5">
       <Title level={3}>{isEdit ? "Edit Promotion" : "Create Promotion"}</Title>
 
       <Form
@@ -146,7 +146,7 @@ const PromotionForm = () => {
         {/* SUBMIT */}
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading}>
-            {isEdit ? "Update Promotion" : "Create Promotion"}
+            {isEdit ? "Update" : "Create"}
           </Button>
         </Form.Item>
       </Form>

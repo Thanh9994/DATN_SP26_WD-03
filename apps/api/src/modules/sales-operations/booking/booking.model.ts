@@ -1,22 +1,18 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { BookingStatus, IBooking, PaymentMethod } from "@shared/schemas";
 
-const bookingSchema = new mongoose.Schema(
+const bookingSchema = new Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
     showTimeId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "ShowTime",
       required: true,
     },
-    movieName: String,
-    showTimeString: String,
-    theaterName: String,
-    // Chứa danh sách các ID của ghế từ bảng ShowTimeSeat
     seats: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -24,49 +20,74 @@ const bookingSchema = new mongoose.Schema(
         required: true,
       },
     ],
-    seatCodes: [String],
-    items: [
-      {
-        snackDrinkId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "SnackDrink",
+    movieName: String,
+    showTimeString: String,
+    theaterName: String,
+    seatCodes: {
+      type: [String],
+      required: true,
+    },
+    items: {
+      type: [
+        {
+          snackDrinkId: {
+            type: Schema.Types.ObjectId,
+            ref: "SnackDrink",
+          },
+          name: String,
+          quantity: Number,
+          price: Number,
         },
-        name: String,
-        quantity: Number,
-        price: Number,
-      },
-    ],
-
-    totalAmount: { type: Number, required: true },
-    discountAmount: { type: Number, default: 0 }, // Tiền được giảm
-    finalAmount: { type: Number, required: true },
-
+      ],
+      default: [],
+    },
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+    discountAmount: {
+      type: Number,
+      default: 0,
+    },
+    finalAmount: {
+      type: Number,
+      required: true,
+    },
     status: {
       type: String,
       enum: BookingStatus.options,
       default: "pending",
-    },
-
-    holdExpiresAt: {
-      type: Date,
-      required: true,
     },
     paymentMethod: {
       type: String,
       enum: PaymentMethod.options,
       default: "vnpay",
     },
-
-    paymentId: String,
+    paymentId: {
+      type: String,
+    },
+    transactionCode: {
+      type: String,
+    },
+    holdExpiresAt: {
+      type: Date,
+    },
     ticketCode: {
       type: String,
       unique: true,
       sparse: true,
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: {
+      virtuals: true,
+    },
+  },
 );
-
 bookingSchema.index({ userId: 1, createdAt: -1 });
 
 // Index phục vụ cho cron-job quét các booking hết hạn thanh toán

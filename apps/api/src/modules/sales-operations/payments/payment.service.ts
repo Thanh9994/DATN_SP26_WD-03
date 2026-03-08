@@ -1,38 +1,50 @@
 import { Booking } from "../booking/booking.model";
-import { bookingService } from "../booking/booking.service";
-import { PaymentFactory } from "./gateways/payment.factory";
-import { AppError } from "@api/middlewares/error.middleware";
 
-export const paymentService = {
-  async initPayment(bookingId: string, method: string, ipAddr: string) {
-    const booking = await Booking.findById(bookingId);
-    if (!booking) throw new AppError("Đơn hàng không tồn tại", 404);
-    if (booking.status !== "pending")
-      throw new AppError("Đơn hàng đã xử lý hoặc hết hạn", 400);
+interface IVnpayIpnQuery {
+  vnp_TxnRef: string;
+  vnp_Amount: string;
+  vnp_TransactionNo: string;
+  vnp_ResponseCode: string;
+  vnp_TransactionStatus: string;
+}
 
-    // Factory sẽ trả về class Gateway tương ứng (VNPay, Momo, v.v.)
-    const gateway = PaymentFactory.getGateway(method);
-    return await gateway.createUrl(bookingId, booking.finalAmount, ipAddr);
-  },
+interface IVnpayIpnResponse {
+  RspCode: string;
+  Message: string;
+}
 
-  async processIpn(method: string, data: any) {
-    const gateway = PaymentFactory.getGateway(method);
+export const processIpn = async (
+  query: IVnpayIpnQuery,
+): Promise<IVnpayIpnResponse> => {
+  const bookingId = query.vnp_TxnRef;
+  const amount = parseInt(query.vnp_Amount, 10) / 100;
+  const transactionNo = query.vnp_TransactionNo;
+  const vnpResponseCode = query.vnp_ResponseCode;
 
-    // Gateway trả về kết quả đã được chuẩn hóa (normalized)
-    const result = await gateway.handleIpn(data);
+  const booking = await Booking.findById(bookingId);
 
-    // Kiểm tra mã thành công chung (Ví dụ: '00' là thành công)
-    if (result.code === "00" && result.bookingId) {
-      // Dùng result.bookingId thay vì data.vnp_TxnRef để dùng chung cho mọi cổng
-      await bookingService.confirmBooking(
-        result.bookingId,
-        result.transactionNo || "N/A",
-      );
-    }
+  if (!booking) {
+    return { RspCode: "01", Message: "Order not found" };
+  }
 
-    return {
-      code: result.code,
-      message: result.message,
-    };
-  },
+  if (booking.status === "paid") {
+    return { RspCode: "02", Message: "Order already confirmed" };
+  }
+
+  if (booking.totalAmount !== amount) {
+    return { RspCode: "04", Message: "Invalid amount" };
+  }
+
+  if (vnpResponseCode === "00") {
+    booking.status = "paid";
+    booking.transactionCode = transactionNo;
+    await booking.save();
+
+    return { RspCode: "00", Message: "Confirm Success" };
+  } else {
+    booking.status = "failed";
+    await booking.save();
+
+    return { RspCode: "00", Message: "Confirm Success" };
+  }
 };

@@ -23,8 +23,8 @@ const SeatBooking = () => {
     setSelectedSeats((prev) => {
       const isExist = prev.find((s) => s._id === seat._id);
       if (isExist) return prev.filter((s) => s._id !== seat._id);
-      if (prev.length >= 12) {
-        message.warning("Tối đa 8 ghế mỗi lần đặt");
+      if (prev.length >= 10) {
+        message.warning("Tối đa 10 ghế mỗi lần đặt");
         return prev;
       }
       return [...prev, seat];

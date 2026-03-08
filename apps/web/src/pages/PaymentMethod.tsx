@@ -1,17 +1,8 @@
-import axios from "axios";
 import { useState } from "react";
 
-const Checkout = () => {
+const PaymentsMethod = () => {
   const [method, setMethod] = useState("vnpay");
   const [loading, setLoading] = useState(false);
-
-  const bookingId = "ID_DON_HANG_CUA_BAN";
-
-  const ticketTotal = 44.0;
-  const comboTotal = 25.0;
-  const serviceFee = 2.5;
-  const total = 71.5;
-
   // 2. Hàm xử lý thanh toán
   const handlePurchase = async () => {
     try {
@@ -19,15 +10,11 @@ const Checkout = () => {
 
       // Gọi đến API chúng ta đã tạo ở Backend
       // URL: /api/v1/payments/:method/create
-      const response = await axios.post(
-        `http://localhost:5000/api/v1/payments/${method}/create`,
-        { bookingId },
-      );
 
-      if (response.data.success) {
-        // Chuyển hướng người dùng sang trang thanh toán của VNPay/Momo
-        window.location.href = response.data.data;
-      }
+      // if (response.data.success) {
+      //   // Chuyển hướng người dùng sang trang thanh toán của VNPay/Momo
+      //   window.location.href = response.data.data;
+      // }
     } catch (error: any) {
       console.error("Payment Error:", error);
       alert(
@@ -136,9 +123,7 @@ const Checkout = () => {
                       <div className="text-xs text-zinc-500">PREMIUM IMAX</div>
                     </div>
                   </div>
-                  <div className="text-zinc-200 font-semibold">
-                    ${ticketTotal.toFixed(2)}
-                  </div>
+                  <div className="text-zinc-200 font-semibold"></div>
                 </div>
 
                 <div className="flex items-start justify-between">
@@ -149,14 +134,12 @@ const Checkout = () => {
                       <div className="text-xs text-zinc-500">LIMITED</div>
                     </div>
                   </div>
-                  <div className="text-zinc-200 font-semibold">
-                    ${comboTotal.toFixed(2)}
-                  </div>
+                  <div className="text-zinc-200 font-semibold"></div>
                 </div>
 
                 <div className="flex items-center justify-between text-xs text-zinc-500 pt-2">
                   <span>Service Fee</span>
-                  <span>${serviceFee.toFixed(2)}</span>
+                  <span></span>
                 </div>
 
                 <div className="h-px bg-white/10" />
@@ -166,9 +149,7 @@ const Checkout = () => {
                     <div className="text-[10px] tracking-[0.25em] text-red-400 font-semibold">
                       TOTAL AMOUNT
                     </div>
-                    <div className="mt-1 text-3xl font-extrabold">
-                      ${total.toFixed(2)}
-                    </div>
+                    <div className="mt-1 text-3xl font-extrabold"></div>
                   </div>
                   <div className="text-[10px] text-zinc-500 border border-white/10 bg-white/5 px-2 py-1 rounded-full">
                     USD
@@ -211,4 +192,4 @@ const Checkout = () => {
     </div>
   );
 };
-export default Checkout;
+export default PaymentsMethod;

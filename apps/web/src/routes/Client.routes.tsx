@@ -9,8 +9,6 @@ import Register from "@web/pages/clients/Register";
 import SeatBooking from "@web/pages/clients/booking/SeatBooking";
 import Showtime from "@web/pages/ShowTime";
 import { RouteObject } from "react-router-dom";
-import Ticket from "@web/pages/Ticket";
-import Checkout from "@web/pages/CheckOut";
 import MovieDetail from "@web/pages/clients/MovieDetail";
 import BookingLayout from "@web/layouts/BookingLayout";
 import { BookingCinema } from "@web/pages/clients/booking/BookingCinema";
@@ -18,14 +16,20 @@ import { ProfileLayout } from "@web/layouts/ProfileLayout";
 import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
 import { Setting } from "@web/components/authProfile/Setting";
 import { Cinemas } from "@web/pages/Cinemas";
-import MyBooking  from "@web/components/authProfile/MyBooking";
+import MyBooking from "@web/components/authProfile/MyBooking";
 import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
+import MovieList from "@web/pages/clients/MovieList";
+import News from "@web/pages/News";
+import NewsDetail from "@web/pages/clients/NewDetail";
+import PaymentsMethod from "@web/pages/PaymentMethod";
+import VNPayReturn from "@web/pages/clients/payments/Vnpay-return";
+
 export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
   children: [
-    { path: "", element: <Home /> },
+    { index: true, element: <Home /> },
     { path: "login", element: <Login /> },
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
@@ -42,6 +46,13 @@ export const ClientRoutes: RouteObject = {
     },
     { path: "about", element: <About /> },
     { path: "event", element: <Event /> },
+    {
+      path: "news",
+      children: [
+        { index: true, element: <News /> },
+        { path: ":slug", element: <NewsDetail /> },
+      ],
+    },
     { path: "cinema", element: <Cinemas /> },
     { path: "movielist", element: <MovieList /> },
     {
@@ -54,10 +65,10 @@ export const ClientRoutes: RouteObject = {
     },
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
-    { path: "ticket", element: <Ticket /> },
     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
-    { path: "checkout", element: <Checkout /> },
+    { path: "payments", element: <PaymentsMethod /> },
+    { path: "vnpay-return", element: <VNPayReturn /> },
     { path: "*", element: <NotFound /> },
   ],
 };

@@ -1,44 +1,25 @@
-import { catchAsync } from "@api/utils/catchAsync";
 import { Request, Response } from "express";
-import { paymentService } from "./payment.service";
+import { processIpn } from "./payment.service";
+import { catchAsync } from "@api/utils/catchAsync";
 
-// 1. Tạo URL thanh toán (Dùng chung cho VNPay, Momo, ZaloPay...)
-export const createPaymentUrl = catchAsync(
-  async (req: Request, res: Response) => {
-    // Nhận thêm 'method' (phương thức) từ body hoặc params
-    const { bookingId } = req.body;
-    const { method } = req.params;
+const vnpayIpn = catchAsync(async (req: Request, res: Response) => {
+  const result = await processIpn(req.query as any);
+  res.json(result);
+});
 
-    const ipAddr =
-      req.headers["x-forwarded-for"] || req.socket.remoteAddress || "127.0.0.1";
+const createPaymentUrl = catchAsync(async (req: Request, res: Response) => {
+  const ipnUrl = process.env.VNP_IPN_URL;
 
-    // Truyền 'method' vào service để nó tự chọn Gateway tương ứng
-    const paymentUrl = await paymentService.initPayment(
-      bookingId,
-      method,
-      ipAddr as string,
-    );
+  console.log("Kiểm tra biến môi trường VNP_IPN_URL:", ipnUrl);
 
-    res.status(200).json({
-      success: true,
-      data: paymentUrl,
-    });
-  },
-);
+  res.json({
+    message: "Kiểm tra console của server để thấy giá trị VNP_IPN_URL.",
+    ipnUrl: ipnUrl,
+    paymentUrl: `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_IpnUrl=${ipnUrl}&...`,
+  });
+});
 
-// 2. Xử lý IPN (Webhook chung cho mọi cổng)
-export const handlePaymentIpn = catchAsync(
-  async (req: Request, res: Response) => {
-    const { method } = req.params;
-
-    // Service sẽ tự biết gọi Gateway nào để kiểm tra chữ ký (Checksum)
-    const result = await paymentService.processIpn(method, {
-      ...req.query,
-      ...req.body,
-    });
-
-    // Trả về kết quả theo yêu cầu của cổng đó
-    // Ví dụ VNPay cần { RspCode, Message }
-    res.status(200).json(result);
-  },
-);
+export const paymentController = {
+  vnpayIpn,
+  createPaymentUrl,
+};

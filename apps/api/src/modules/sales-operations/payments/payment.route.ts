@@ -1,13 +1,10 @@
-// payment.route.ts
-import { Router } from "express";
-import * as PaymentController from "./payment.controller";
+import express from 'express';
+import { paymentController } from './payment.controller';
 
-const paymentRouter = Router();
+const router = express.Router();
 
-// Khách gọi để lấy link thanh toán
-paymentRouter.post("/:method/create", PaymentController.createPaymentUrl);
+router.get('/vnpay-ipn', paymentController.vnpayIpn);
 
-// VNPay/Momo gọi về để báo kết quả
-paymentRouter.all("/:method/ipn", PaymentController.handlePaymentIpn);
+router.post('/create-payment', paymentController.createPaymentUrl);
 
-export default paymentRouter;
+export default router;
