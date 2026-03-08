@@ -2,6 +2,7 @@ import { NotFound } from "@web/components/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
 import About from "@web/pages/About";
 import Event from "@web/pages/Event";
+import Contact from "@web/pages/Contact";
 import ForgotPassword from "@web/pages/clients/ForgotPassword";
 import { Home } from "@web/pages/clients/Home";
 import Login from "@web/pages/clients/Login";
@@ -43,7 +44,7 @@ export const ClientRoutes: RouteObject = {
     { path: "about", element: <About /> },
     { path: "event", element: <Event /> },
     { path: "cinema", element: <Cinemas /> },
-    { path: "movielist", element: <MovieList /> },
+    // { path: "movielist", element: <MovieList /> },
     {
       path: "booking",
       element: <BookingLayout />,
@@ -58,6 +59,7 @@ export const ClientRoutes: RouteObject = {
     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
     { path: "checkout", element: <Checkout /> },
+    { path: "contact", element: <Contact /> },
     { path: "*", element: <NotFound /> },
   ],
 };
