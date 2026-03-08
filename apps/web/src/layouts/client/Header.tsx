@@ -108,7 +108,7 @@ export const Header = () => {
               Events
             </Link>
             <Link
-              to="*"
+              to="/contact"
               className="text-white text-base font-bold hover:text-primary transition-colors"
             >
               Contact

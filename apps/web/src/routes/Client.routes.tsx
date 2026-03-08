@@ -2,6 +2,7 @@ import { NotFound } from "@web/components/tools/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
 import About from "@web/pages/About";
 import Event from "@web/pages/Event";
+import Contact from "@web/pages/Contact";
 import ForgotPassword from "@web/pages/clients/ForgotPassword";
 import { Home } from "@web/pages/clients/Home";
 import Login from "@web/pages/clients/Login";
@@ -69,6 +70,7 @@ export const ClientRoutes: RouteObject = {
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
     { path: "payments", element: <PaymentsMethod /> },
     { path: "vnpay-return", element: <VNPayReturn /> },
+    { path: "contact", element: <Contact /> },
     { path: "*", element: <NotFound /> },
   ],
 };
