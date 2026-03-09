@@ -14,7 +14,9 @@ export const Header = () => {
   const items: MenuProps["items"] = [
     {
       key: "ho_ten",
-      label: <span style={{color: 'black'}}>{user?.ho_ten || "Khách hàng"}</span>,
+      label: (
+        <span style={{ color: "white" }}>{user?.ho_ten || "Khách hàng"}</span>
+      ),
       disabled: true,
     },
     {
@@ -22,7 +24,6 @@ export const Header = () => {
       label: "Trang cá nhân",
       icon: (
         <span className="material-symbols-outlined !text-[18px]">person</span>
-        
       ),
       onClick: () => navigate("/profile"),
     },
@@ -57,8 +58,8 @@ export const Header = () => {
   ];
 
   return (
-    <header className="fixed top-0 w-full z-50 border-b border-white/10 glass-nav">
-      <div className="mx-auto px-6 lg:px-10 py-4 flex items-center justify-between gap-8">
+    <header className="sticky top-0 w-full z-50 border-b border-white/10 glass-nav">
+      <div className="mx-auto px-5 lg:px-10 py-2.5 flex items-center justify-between gap-8">
         <div className="flex items-center gap-12">
           <div
             className="flex items-center group cursor-pointer gap-2"
@@ -76,33 +77,39 @@ export const Header = () => {
 
           <nav className="hidden lg:flex items-center gap-8">
             <Link
-              to="/"
-              className="text-white text-sm font-semibold hover:text-primary transition-colors"
+              to="/movielist"
+              className="text-white text-base font-bold hover:text-primary transition-colors"
             >
-              Home
+              Movie
+            </Link>
+            <Link
+              to="/cinema"
+              className="text-white text-base font-bold hover:text-primary transition-colors"
+            >
+              Cinemas
             </Link>
 
             <Link
-              to="*"
-              className="text-white text-sm font-semibold hover:text-primary transition-colors"
+              to="/news"
+              className="text-white text-base font-bold hover:text-primary transition-colors"
             >
               News
             </Link>
             <Link
               to="/about"
-              className="text-white text-sm font-semibold hover:text-primary transition-colors"
+              className="text-white text-base font-bold hover:text-primary transition-colors"
             >
               About
             </Link>
             <Link
               to="/event"
-              className="text-white text-sm font-semibold hover:text-primary transition-colors"
+              className="text-white text-base font-bold hover:text-primary transition-colors"
             >
               Events
             </Link>
             <Link
               to="*"
-              className="text-white text-sm font-semibold hover:text-primary transition-colors"
+              className="text-white text-base font-bold hover:text-primary transition-colors"
             >
               Contact
             </Link>
@@ -123,21 +130,15 @@ export const Header = () => {
             <button className="size-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors">
               <span className="material-symbols-outlined">notifications</span>
             </button>
-            <button className="size-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors">
-              <span className="material-symbols-outlined">favorite</span>
-            </button>
           </div>
           {user ? (
             <div className="flex items-center gap-3">
               <Dropdown menu={{ items }} placement="bottomRight" arrow>
-                <div className="size-10 rounded-full border-2 border-gray-300 overflow-hidden cursor-pointer">
+                <div className="size-10 rounded-full border-2 border-gray-400 overflow-hidden cursor-pointer shadow-sm hover:border-primary transition-all">
                   <img
-                    alt="User profile"
+                    alt={user?.ho_ten || "User profile"}
                     className="w-full h-full object-cover"
-                    src={
-                      user?.avatar?.url ||
-                      `https://ui-avatars.com/api/?name=${user.ho_ten}&background=random`
-                    }
+                    src={user?.avatar?.url || `https://i.pravatar.cc/150`}
                     referrerPolicy="no-referrer"
                   />
                 </div>

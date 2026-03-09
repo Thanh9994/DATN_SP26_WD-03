@@ -1,15 +1,23 @@
-import { Outlet } from "react-router-dom"
-import { Header } from "./client/Header"
-import { Footer } from "./client/Footer"
+import { Outlet } from "react-router-dom";
+import { Header } from "./client/Header";
+import { Footer } from "./client/Footer";
+import { ConfigProvider, theme } from "antd";
 
 export const ClientLayout = () => {
   return (
-    <div className="bg-[#120a0a] min-h-screen text-white flex flex-col">
-      <Header />
-      <main className="flex-grow">
-        <Outlet />
-      </main>
-      <Footer />
-    </div>
-  )
-}
+    <ConfigProvider
+      theme={{
+        algorithm: theme.darkAlgorithm, // Giao diện tối cho User
+        token: { colorPrimary: "#ea2a33" },
+      }}
+    >
+      <div className="min-h-screen font-display flex flex-col bg-background-dark">
+        <Header />
+        <main className="flex-1 pb-24 md:pb-12">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+    </ConfigProvider>
+  );
+};

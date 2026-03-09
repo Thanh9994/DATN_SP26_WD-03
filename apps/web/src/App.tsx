@@ -1,29 +1,40 @@
-import { Routes, Route } from "react-router-dom";
-import AdminLayout from "./layouts/AdminLayout";
-import Users from "./pages/admin/Users";
-import Dashboard from "./pages/admin/Dashboard";
-import Movies from "./pages/admin/Movies";
-import Cinemas from "./pages/admin/Cinemas";
-import Bookings from "./pages/admin/Bookings";
-import Analytics from "./pages/admin/Analytics";
-import Settings from "./pages/admin/Settings";
-import "./styles/admin.css";
-import Reports from "./pages/admin/Reports";
+// import { useRoutes } from 'react-router-dom';
+import { useLocation, useRoutes } from "react-router-dom";
+import { ClientRoutes } from "./routes/Client.routes";
+import { AdminRoutes } from "./routes/Admin.routes";
+import "./index.css";
+import "antd/dist/reset.css"; // Ant Design 5.x
+import { AppNotification } from "./components/AppNotification";
+import { useEffect, useState } from "react";
+import { Splash } from "./components/Splash";
 
 function App() {
+  const location = useLocation();
+
+  // Kiểm tra trực tiếp khi khởi tạo để tránh bị "chớp"
+  const [showSplash, setShowSplash] = useState(() => {
+    return location.pathname === "/" && !sessionStorage.getItem("splash");
+  });
+
+  useEffect(() => {
+    if (showSplash) {
+      sessionStorage.setItem("splash", "true");
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+      }, 2800);
+      return () => clearTimeout(timer);
+    }
+  }, [showSplash]);
+
+  const element = useRoutes([ClientRoutes, AdminRoutes]);
   return (
-    <Routes>
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="users" element={<Users />} />
-        <Route path="movies" element={<Movies />} />
-        <Route path="cinemas" element={<Cinemas />} />
-        <Route path="bookings" element={<Bookings />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="reports" element={<Reports />} />
-      </Route>
-    </Routes>
+    <>
+      {showSplash && <Splash />}
+      <div style={{ display: showSplash ? "none" : "block" }}>
+        <AppNotification />
+        {element}
+      </div>
+    </>
   );
 }
 

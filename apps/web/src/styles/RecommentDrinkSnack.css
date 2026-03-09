@@ -1,0 +1,428 @@
+/* ============================================
+   RECOMMEND MODAL OVERLAY & CONTAINER
+   ============================================ */
+
+.recommend-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.recommend-modal {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 900px;
+  padding: 32px;
+  position: relative;
+}
+
+.recommend-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recommend-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+/* ============================================
+   RECOMMEND HEADER
+   ============================================ */
+
+.recommend-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.recommend-subtitle {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #FF000D;
+  margin-bottom: 8px;
+}
+
+.recommend-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: white;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+/* ============================================
+   RECOMMEND CAROUSEL
+   ============================================ */
+
+.recommend-carousel {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   RECOMMEND CARDS
+   ============================================ */
+
+.recommend-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.recommend-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-4px);
+}
+
+.recommend-card.featured {
+  border-color: rgba(255, 215, 0, 0.4);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  width: 200px;
+}
+
+.recommend-card.featured:hover {
+  border-color: rgba(255, 215, 0, 0.6);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+}
+
+/* Card Image */
+.card-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-image {
+  font-size: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recommend-card.featured .card-image {
+  font-size: 80px;
+}
+
+/* Card Badges */
+.card-badge {
+  position: absolute;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  top: 8px;
+}
+
+.badge-gold {
+  background: rgba(255, 215, 0, 0.9);
+  color: #000;
+  left: 8px;
+}
+
+.badge-save {
+  background: #FF000D;
+  color: white;
+  left: 8px;
+  top: 28px;
+}
+
+.badge-red {
+  background: #FF000D;
+  color: white;
+}
+
+/* Card Body */
+.card-body {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.recommend-card.featured .card-title {
+  font-size: 14px;
+}
+
+.card-prices {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-price {
+  font-size: 14px;
+  font-weight: 900;
+  color: #FFD700;
+}
+
+.recommend-card.featured .card-price {
+  font-size: 16px;
+}
+
+.card-original-price {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: line-through;
+}
+
+/* ============================================
+   CARD BUTTONS
+   ============================================ */
+
+.card-btn {
+  border: none;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  margin-top: auto;
+}
+
+.btn-claim {
+  background: #FFD700;
+  color: #000;
+}
+
+.btn-claim:hover {
+  background: #FFF44F;
+  transform: scale(1.02);
+}
+
+.btn-add {
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-add:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ============================================
+   RECOMMEND FOOTER
+   ============================================ */
+
+.recommend-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.recommend-skip {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  text-decoration: underline;
+  padding: 8px 0;
+}
+
+.recommend-skip:hover {
+  color: white;
+}
+
+.recommend-continue {
+  background: #FF000D;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recommend-continue:hover {
+  background: #FF3333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 0, 13, 0.3);
+}
+
+.arrow {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.recommend-continue:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .recommend-modal {
+    padding: 20px 16px;
+  }
+
+  .recommend-title {
+    font-size: 22px;
+  }
+
+  .recommend-carousel {
+    gap: 12px;
+  }
+
+  .recommend-card {
+    width: 140px;
+  }
+
+  .recommend-card.featured {
+    width: 160px;
+  }
+
+  .card-image {
+    font-size: 48px;
+  }
+
+  .recommend-card.featured .card-image {
+    font-size: 60px;
+  }
+
+  .card-title {
+    font-size: 12px;
+  }
+
+  .card-price {
+    font-size: 12px;
+  }
+
+  .recommend-card.featured .card-price {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .recommend-overlay {
+    padding: 12px;
+  }
+
+  .recommend-modal {
+    padding: 16px 12px;
+  }
+
+  .recommend-title {
+    font-size: 18px;
+  }
+
+  .recommend-carousel {
+    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .recommend-card {
+    width: 100%;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .recommend-card.featured {
+    width: 100%;
+  }
+
+  .card-image-wrapper {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+  }
+
+  .card-body {
+    padding: 8px 0;
+  }
+
+  .card-title {
+    font-size: 11px;
+  }
+
+  .card-price {
+    font-size: 11px;
+  }
+
+  .card-btn {
+    padding: 8px 10px;
+    font-size: 9px;
+  }
+
+  .recommend-footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .recommend-continue {
+    width: 100%;
+    justify-content: center;
+  }
+}
