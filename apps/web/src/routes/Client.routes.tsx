@@ -1,13 +1,14 @@
 import { NotFound } from "@web/components/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
-import About from "@web/pages/About";
-import Event from "@web/pages/Event";
-import ForgotPassword from "@web/pages/clients/ForgotPassword";
-import { Home } from "@web/pages/clients/Home";
-import Login from "@web/pages/clients/Login";
-import Register from "@web/pages/clients/Register";
-import SeatBooking from "@web/pages/admin/booking/SeatBooking";
-import Showtime from "@web/pages/admin/booking/ShowTime";
+import About from "@web/pages/clients/public/About";
+import Event from "@web/pages/clients/public/Event";
+import Contact from "@web/pages/clients/public/Contact";
+import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
+import { Home } from "@web/pages/clients/public/Home";
+import Login from "@web/pages/clients/auth/Login";
+import Register from "@web/pages/clients/auth/Register";
+import SeatBooking from "@web/pages/clients/booking/SeatBooking";
+import Showtime from "@web/pages/clients/booking/ShowTime";
 import { RouteObject } from "react-router-dom";
 import Ticket from "@web/pages/Ticket";
 import Checkout from "@web/pages/CheckOut";
@@ -21,6 +22,12 @@ import { Cinemas } from "@web/pages/Cinemas";
 import MyBooking  from "@web/components/authProfile/MyBooking";
 import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
+import MovieList from "@web/pages/clients/MovieList";
+import NewsDetail from "@web/pages/clients/NewDetail";
+import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
+import VNPayReturn from "@web/pages/clients/payments/Vnpay-return";
+import News from "@web/pages/clients/public/News";
+
 export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
