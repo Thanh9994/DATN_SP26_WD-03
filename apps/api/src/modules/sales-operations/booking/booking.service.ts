@@ -135,6 +135,7 @@ export const bookingService = {
 
       booking.status = "paid";
       booking.paymentId = paymentId;
+      booking.transactionCode = paymentId;
       booking.ticketCode = "TIC-" + randomUUID().slice(0, 8).toUpperCase();
       await booking.save({ session });
 

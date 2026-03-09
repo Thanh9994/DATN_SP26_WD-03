@@ -1,12 +1,24 @@
+import { AppError } from "@api/middlewares/error.middleware";
+import { IUser } from "@shared/schemas";
 import { Booking } from "../booking/booking.model";
 import { bookingService } from "../booking/booking.service";
 import { PaymentFactory } from "./gateways/payment.factory";
-import { AppError } from "@api/middlewares/error.middleware";
 
 export const paymentService = {
-  async initPayment(bookingId: string, method: string, ipAddr: string) {
+  async initPayment(
+    bookingId: string,
+    method: string,
+    ipAddr: string,
+    user: IUser,
+  ) {
     const booking = await Booking.findById(bookingId);
     if (!booking) throw new AppError("Đơn hàng không tồn tại", 404);
+
+    // Check if the user owns the booking or is an admin
+    if (booking.userId?.toString() !== user._id?.toString() && user.role !== "admin") {
+      throw new AppError("Bạn không có quyền thanh toán cho đơn hàng này", 403);
+    }
+
     if (booking.status !== "pending")
       throw new AppError("Đơn hàng đã xử lý hoặc hết hạn", 400);
 
@@ -30,10 +42,10 @@ export const paymentService = {
     const result = await gateway.handleIpn(data);
 
     // Kiểm tra mã thành công chung (Ví dụ: '00' là thành công)
-    if (result.code === "00" && result.bookingId) {
-      // Dùng result.bookingId thay vì data.vnp_TxnRef để dùng chung cho mọi cổng
+    if (result.code === "00" && result.orderId) {
+      // Dùng result.orderId thay vì data.vnp_TxnRef để dùng chung cho mọi cổng
       await bookingService.confirmBooking(
-        result.bookingId,
+        result.orderId,
         result.transactionNo || "N/A",
       );
     }

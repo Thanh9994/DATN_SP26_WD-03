@@ -50,7 +50,6 @@ const VNPayReturn = () => {
           if (data.success) {
             setBookingInfo(data.data);
             setStatus("success");
-            message.success("Thanh toán thành công!");
           }
         } catch (error) {
           console.error("Lỗi lấy thông tin vé:", error);

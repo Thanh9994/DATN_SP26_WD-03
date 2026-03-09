@@ -20,7 +20,7 @@ export const useBooking = (showTimeId?: string) => {
       return res.data;
     },
     enabled: !!showTimeId,
-    refetchInterval: 30000,
+    refetchInterval: 10000,
   });
 
   const holdSeats = useMutation({
@@ -42,35 +42,13 @@ export const useBooking = (showTimeId?: string) => {
     },
   });
 
-  // 3. Mutation: Xác nhận đặt vé (Confirm)
-  const confirmBooking = useMutation({
-    mutationFn: async (payload: {
-      showTimeId: string;
-      seatCodes: string[];
-      userId: string;
-      paymentId?: string;
-    }) => {
-      const { data } = await axiosAuth.post(`${API.BOOKING}/confirm`, payload);
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["showtime-detail", showTimeId],
-      });
-      message.success("Đặt vé thành công!");
-    },
-    onError: (error: any) => {
-      message.error(error.response?.data?.message || "Lỗi khi xác nhận đặt vé");
-    },
-  });
-
   const createPaymentUrl = useMutation({
-    mutationFn: async (payload: { bookingId: string; method: string }) => {
-      const { data } = await axiosAuth.post(
-        `${API.PAYMENT_GATEWAY}/${payload.method}/create`,
-        { bookingId: payload.bookingId },
-      );
-      return data; // Trả về { success: true, data: "http://vnpay..." }
+    mutationFn: async (bookingId: string) => {
+      const res = await axiosAuth.post(`${API.PAYMENT_GATEWAY}/vnpay/create`, {
+        bookingId,
+      });
+
+      return res.data.data; // chỉ trả link
     },
     onError: (error: any) => {
       message.error(
@@ -87,9 +65,6 @@ export const useBooking = (showTimeId?: string) => {
 
     holdSeats: holdSeats.mutateAsync,
     isHolding: holdSeats.isPending,
-
-    confirmBooking: confirmBooking.mutateAsync,
-    isConfirming: confirmBooking.isPending,
 
     createPaymentUrl: createPaymentUrl.mutateAsync,
     isCreatingPayment: createPaymentUrl.isPending,

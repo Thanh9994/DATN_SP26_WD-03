@@ -42,7 +42,6 @@ const BookingLayout = () => {
   const currentData = showTime || selectedShowtime;
   const cinema =
     currentData?.roomId?.cinema_id || (currentData as any)?.cinemaInfo; // Trường hợp 1: Dữ liệu chuẩn Backend
-  const roomName = currentData?.roomId?.ten_phong;
 
   const isSelectSeatStep = location.pathname.includes("/seats");
   const totalAmount = selectedSeats.reduce((sum, s) => sum + s.price, 0);

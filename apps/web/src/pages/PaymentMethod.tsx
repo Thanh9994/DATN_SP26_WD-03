@@ -30,14 +30,9 @@ const PaymentsMethod = () => {
 
     setLoading(true);
     try {
-      const result = await createPaymentUrl({
-        bookingId,
-        method,
-      });
+      const paymentUrl = await createPaymentUrl(bookingId);
 
-      if (result.success && result.data) {
-        window.location.href = result.data;
-      }
+      window.location.href = paymentUrl;
     } catch (error) {
       message.error("Có lỗi xảy ra khi tạo link thanh toán!");
     } finally {
