@@ -1,10 +1,17 @@
 import { Router } from "express";
-import { Login, Register } from "./auth.controller";
+import {
+  forgotPassword,
+  Login,
+  Register,
+  resetPassword,
+} from "./auth.controller";
 
-const authRouter= Router();
+const authRouter = Router();
 
-authRouter.post ("/register", Register);
-authRouter.post ("/login", Login);
+authRouter.post("/register", Register);
+authRouter.post("/login", Login);
+authRouter.post("/forgot-password", forgotPassword);
 
+authRouter.post("/reset-password/:token", resetPassword);
 
 export default authRouter;

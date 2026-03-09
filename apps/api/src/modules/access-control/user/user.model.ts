@@ -1,12 +1,16 @@
 import { IUser, UserRole, UserStatus } from "@shared/schemas";
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema<IUser>(
+const userSchema = new mongoose.Schema(
   {
     ho_ten: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     phone: { type: String, required: true },
+
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+
     role: {
       type: String,
       enum: UserRole.options,
@@ -16,11 +20,6 @@ const userSchema = new mongoose.Schema<IUser>(
       type: String,
       enum: UserStatus.options,
       default: "active",
-    },
-    avatar: {
-      public_id: String,
-      url: String,
-      customName: String,
     },
   },
   { timestamps: true },

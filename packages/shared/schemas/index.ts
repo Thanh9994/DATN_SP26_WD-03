@@ -270,6 +270,8 @@ export const User = Base.extend({
   avatar: CloudinaryImage.optional(),
   role: UserRole.default("khach_hang"),
   trang_thai: UserStatus.default("active"),
+  resetPasswordToken: z.string().optional(),
+  resetPasswordExpire: z.coerce.date().optional(),
 });
 
 export const UpdateUser = z.object({

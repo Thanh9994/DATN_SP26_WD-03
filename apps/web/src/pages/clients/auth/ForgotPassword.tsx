@@ -1,12 +1,19 @@
 import Button from "@web/components/tools/Button";
 import Input from "@web/components/tools/Input";
+import { useAuth } from "@web/hooks/useAuth";
 import AuthLayout from "@web/layouts/AuthLayout";
 import { ArrowLeft, Mail, RefreshCw } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [email, setEmail] = useState("");
+  const { forgotPassword, isSendingReset } = useAuth();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!email) return;
+
+    await forgotPassword({ email });
   };
   return (
     <AuthLayout
@@ -32,10 +39,12 @@ const ForgotPassword = () => {
           id="email"
           placeholder="e.g.alex@example.com"
           icon={<Mail size={20} />}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
-        <Button type="submit">
-          Reset Password
+        <Button type="submit" disabled={isSendingReset}>
+          {isSendingReset ? "Sending..." : "Reset Password"}
           <RefreshCw size={20} />
         </Button>
       </form>
