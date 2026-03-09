@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { API } from "@web/api/api.service";
 import { Link } from "react-router-dom";
-import "../styles/News.css";
+import "../../../styles/News.css";
+
 interface NewsPost {
   _id: string;
   slug: string;
