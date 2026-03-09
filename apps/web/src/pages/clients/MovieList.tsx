@@ -3,7 +3,7 @@ import {
   FilterOutlined,
   PlayCircleOutlined,
 } from "@ant-design/icons";
-import PhimCard from "@web/components/PhimCard";
+import PhimCard from "@web/components/skeleton/PhimCard";
 import MovieCardSkeleton from "@web/components/skeleton/MovieCardSkeleton";
 import { useMovies } from "@web/hooks/useMovie";
 import { Button, Dropdown, Select, Tabs } from "antd";

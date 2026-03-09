@@ -1,4 +1,4 @@
-import PhimCard from "@web/components/PhimCard";
+import PhimCard from "@web/components/skeleton/PhimCard";
 import { useMovies } from "@web/hooks/useMovie";
 
 export const Cinemas = () => {

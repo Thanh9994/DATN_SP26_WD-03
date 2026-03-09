@@ -1,5 +1,5 @@
-import Button from "@web/components/Button";
-import Input from "@web/components/Input";
+import Button from "@web/components/tools/Button";
+import Input from "@web/components/tools/Input";
 import AuthLayout from "@web/layouts/AuthLayout";
 import { ArrowLeft, Mail, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";

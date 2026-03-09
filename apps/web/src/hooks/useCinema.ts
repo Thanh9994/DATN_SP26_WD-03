@@ -129,7 +129,6 @@ export const useRooms = () => {
       return data;
     },
     onSuccess: () => {
-      message.success("Cập nhật phòng thành công");
       queryClient.invalidateQueries({ queryKey: ["rooms"] });
       queryClient.invalidateQueries({ queryKey: ["cinemas"] });
     },
@@ -141,7 +140,6 @@ export const useRooms = () => {
   const deleteRoom = useMutation({
     mutationFn: (id: string) => axios.delete(`${API.ROOMS}/${id}`),
     onSuccess: () => {
-      message.success("Đã xóa phòng và cập nhật rạp thành công");
       queryClient.invalidateQueries({ queryKey: ["rooms"] });
       queryClient.invalidateQueries({ queryKey: ["cinemas"] });
     },

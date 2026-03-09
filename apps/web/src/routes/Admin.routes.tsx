@@ -5,7 +5,7 @@ import { Upload } from "@web/pages/admin/access-control/Upload";
 import { Genre } from "@web/pages/admin/Genre";
 import { Movie } from "@web/pages/admin/Movie";
 import { User } from "@web/pages/admin/access-control/User";
-import { AdminGuard } from "@web/components/AdminGuard";
+import { AdminGuard } from "@web/components/admin/AdminGuard";
 import Cinemas from "@web/pages/admin/Cinemas";
 import Product from "@web/pages/admin/Product";
 import { Rooms } from "@web/pages/admin/Rooms";

@@ -6,7 +6,7 @@ import "./index.css";
 import "antd/dist/reset.css"; // Ant Design 5.x
 import { AppNotification } from "./components/AppNotification";
 import { useEffect, useState } from "react";
-import { Splash } from "./components/Splash";
+import { Splash } from "./components/tools/Splash";
 
 function App() {
   const location = useLocation();
