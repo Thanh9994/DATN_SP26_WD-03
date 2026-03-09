@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 // import "./Setting.css";
 import "../../styles/Setting.css";
 interface ToggleSetting {
@@ -110,7 +110,11 @@ export const Setting = (): JSX.Element => {
     }));
   };
 
-  const renderButton = (text: string, isSelected: boolean, onClick?: () => void): JSX.Element => (
+  const renderButton = (
+    text: string,
+    isSelected: boolean,
+    onClick?: () => void,
+  ): JSX.Element => (
     <button
       className={`btn-option ${isSelected ? "selected" : ""}`}
       onClick={onClick}
@@ -142,7 +146,7 @@ export const Setting = (): JSX.Element => {
   const renderRadioGroup = (
     options: RadioOption[],
     selected: string,
-    onChange: (id: string) => void
+    onChange: (id: string) => void,
   ): JSX.Element => (
     <div className="radio-group">
       {options.map((option) => (
@@ -178,7 +182,9 @@ export const Setting = (): JSX.Element => {
             </div>
             <div className="button-row">
               {appearanceOptions.map((opt) =>
-                renderButton(opt.label, appearance === opt.id, () => setAppearance(opt.id))
+                renderButton(opt.label, appearance === opt.id, () =>
+                  setAppearance(opt.id),
+                ),
               )}
             </div>
           </section>
@@ -190,7 +196,9 @@ export const Setting = (): JSX.Element => {
             </div>
             <div className="button-row">
               {videoQualityOptions.map((opt) =>
-                renderButton(opt.label, videoQuality === opt.id, () => setVideoQuality(opt.id))
+                renderButton(opt.label, videoQuality === opt.id, () =>
+                  setVideoQuality(opt.id),
+                ),
               )}
             </div>
           </section>

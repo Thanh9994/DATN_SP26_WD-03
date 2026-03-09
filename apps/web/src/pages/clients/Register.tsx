@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Button from "@web/components/Button";
-import Input from "@web/components/Input";
+import Button from "@web/components/tools/Button";
+import Input from "@web/components/tools/Input";
 import AuthLayout from "@web/layouts/AuthLayout";
 import { Lock, Mail, Phone, User } from "lucide-react";
 import { useAuth } from "@web/hooks/useAuth";

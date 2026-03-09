@@ -1,5 +1,5 @@
 import { Home } from "lucide-react";
-import "../styles/404.css";
+import "../../styles/404.css";
 
 export const NotFound = () => {
   return (

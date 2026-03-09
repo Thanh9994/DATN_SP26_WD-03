@@ -15,7 +15,7 @@ import dayjs from "dayjs";
 
 import { API } from "@web/api/api.service";
 import { toSlug } from "@web/utils/slugify";
-import TiptapEditor from "@web/components/Editor";
+import TiptapEditor from "@web/components/tools/Editor";
 
 const { Title } = Typography;
 const { TextArea } = Input;

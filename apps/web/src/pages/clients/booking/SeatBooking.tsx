@@ -1,6 +1,6 @@
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import { Spin, message } from "antd";
-import SeatMap from "@web/components/SeatMap";
+import SeatMap from "@web/components/skeleton/SeatMap";
 import { IShowTimeSeat } from "@shared/schemas";
 import { useBooking } from "@web/hooks/useBooking";
 // Đường dẫn tới file hook của bạn
