@@ -9,7 +9,7 @@ import Analytics from "./pages/admin/Analytics";
 import Settings from "./pages/admin/Settings";
 import "./styles/admin.css";
 import Reports from "./pages/admin/Reports";
-
+import ChangePassword from "./pages/admin/ChangePassword";
 function App() {
   return (
     <Routes>
@@ -22,6 +22,7 @@ function App() {
         <Route path="analytics" element={<Analytics />} />
         <Route path="settings" element={<Settings />} />
         <Route path="reports" element={<Reports />} />
+        <Route path="change-password" element={<ChangePassword />} />
       </Route>
     </Routes>
   );

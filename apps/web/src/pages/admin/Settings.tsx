@@ -253,7 +253,7 @@ const Settings: React.FC = () => {
 
                                     <Button
                                         type="link"
-                                        onClick={() => navigate("/change-password")}
+                                        onClick={() => navigate("/admin/change-password")}
                                     >
                                         Đổi mật khẩu
                                     </Button>
