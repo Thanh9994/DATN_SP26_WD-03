@@ -96,7 +96,7 @@ export const Header = () => {
             </Link>
 
             <Link
-              to="*"
+              to="/news"
               className="text-white text-base font-bold hover:text-primary transition-colors"
             >
               News
