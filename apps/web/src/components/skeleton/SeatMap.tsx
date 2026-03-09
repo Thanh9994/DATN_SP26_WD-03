@@ -61,7 +61,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
     <div className="flex flex-col items-center gap-6 p-4 bg-[#0a0a0a] rounded-xl ">
       {/* Màn hình */}
       <div className="w-full max-w-lg mb-12">
-        <div className="h-1 bg-red-600 shadow-[0_0_12px_rgba(220,38,38,0.5)] mb-2" />
+        <div className="h-2 bg-red-800/40 rounded-t-[120px] shadow-[0_35px_90px_rgba(220,220,220)] mb-2" />
         <p className="text-center text-zinc-500 text-sm tracking-[0.5em] uppercase">
           Màn Hình
         </p>
@@ -90,7 +90,11 @@ const SeatMap: React.FC<SeatMapProps> = ({
                 .reduce((acc: IShowTimeSeat[][], seat, index, array) => {
                   if (seat.loai_ghe === "couple") {
                     const nextSeat = array[index + 1];
-                    if (nextSeat && nextSeat.loai_ghe === "couple" && nextSeat.number === seat.number + 1) {
+                    if (
+                      nextSeat &&
+                      nextSeat.loai_ghe === "couple" &&
+                      nextSeat.number === seat.number + 1
+                    ) {
                       acc.push([seat, nextSeat]);
                       array.splice(index + 1, 1);
                     } else {
@@ -105,16 +109,22 @@ const SeatMap: React.FC<SeatMapProps> = ({
                   const isCouple = seatGroup.length === 2;
                   const firstSeat = seatGroup[0];
                   const isDisabled = seatGroup.some(
-                    (s) => s.trang_thai === "booked" || s.trang_thai === "hold"
+                    (s) => s.trang_thai === "booked" || s.trang_thai === "hold",
                   );
-                  
+
                   return (
                     <button
-                      key={seatGroup.map(s => s._id).join('-')}
+                      key={seatGroup.map((s) => s._id).join("-")}
                       disabled={isDisabled}
-                      onClick={() => seatGroup.forEach(seat => onSeatClick(seat))}
+                      onClick={() =>
+                        seatGroup.forEach((seat) => onSeatClick(seat))
+                      }
                       className={`
-                        ${isCouple ? "w-12 md:w-14" : "w-6 md:w-7"}
+                        ${
+                          isCouple
+                            ? "w-14 md:w-16 mx-2 rounded-xl bg-pink-500/20 border-pink-500 shadow-[0_4px_10px_rgba(236,72,153,0.35)] relative"
+                            : "w-6 md:w-7"
+                        }
                         h-6 md:h-7
                         text-[8px] md:text-xs
                         font-semibold
@@ -125,7 +135,9 @@ const SeatMap: React.FC<SeatMapProps> = ({
                         ${getSeatColor(firstSeat)}
                       `}
                     >
-                      {isCouple ? `${seatGroup[0].number}-${seatGroup[1].number}` : firstSeat.number}
+                      {isCouple
+                        ? `${seatGroup[0].number}-${seatGroup[1].number}`
+                        : firstSeat.number}
                     </button>
                   );
                 })}

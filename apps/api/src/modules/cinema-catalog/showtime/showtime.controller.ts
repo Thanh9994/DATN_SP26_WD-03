@@ -279,3 +279,51 @@ export const deleteShowTime = async (req: Request, res: Response) => {
     return sendError(res, 400, "Lỗi xoá suất chiếu", error);
   }
 };
+
+export const getShowTimeSeats = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const seats = await SeatTime.find({ showTimeId: id }).sort({ row: 1, number: 1 });
+    
+    return res.json({
+      success: true,
+      data: seats,
+    });
+  } catch (error) {
+    return sendError(res, 500, "Lỗi lấy danh sách ghế", error);
+  }
+};
+
+export const getSeatStats = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    const stats = await SeatTime.aggregate([
+      { $match: { showTimeId: id } },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          booked: {
+            $sum: { $cond: [{ $eq: ["$trang_thai", "booked"] }, 1, 0] },
+          },
+          held: {
+            $sum: { $cond: [{ $eq: ["$trang_thai", "hold"] }, 1, 0] },
+          },
+          available: {
+            $sum: { $cond: [{ $eq: ["$trang_thai", "empty"] }, 1, 0] },
+          },
+        },
+      },
+    ]);
+
+    const result = stats[0] || { total: 0, booked: 0, held: 0, available: 0 };
+    
+    return res.json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    return sendError(res, 500, "Lỗi lấy thống kê ghế", error);
+  }
+};
