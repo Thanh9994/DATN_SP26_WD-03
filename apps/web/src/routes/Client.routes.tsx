@@ -21,10 +21,10 @@ import MyBooking from "@web/components/authProfile/MyBooking";
 import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 import MovieList from "@web/pages/clients/MovieList";
-import News from "@web/pages/News";
 import NewsDetail from "@web/pages/clients/NewDetail";
 import PaymentsMethod from "@web/pages/PaymentMethod";
 import VNPayReturn from "@web/pages/clients/payments/Vnpay-return";
+import News from "@web/pages/News";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -71,6 +71,7 @@ export const ClientRoutes: RouteObject = {
     { path: "payments", element: <PaymentsMethod /> },
     { path: "vnpay-return", element: <VNPayReturn /> },
     { path: "contact", element: <Contact /> },
+    { path: "news", element: <News /> },
     { path: "*", element: <NotFound /> },
   ],
 };
