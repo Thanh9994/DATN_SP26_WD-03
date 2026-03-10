@@ -5,18 +5,25 @@ import AuthLayout from "@web/layouts/AuthLayout";
 import { Form } from "antd";
 import { Lock, Mail } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login, isLoggingIn } = useAuth();
+  const [searchParams] = useSearchParams();
   const [remember, setRemember] = useState(false);
 
   const handleSubmit = async (values: any) => {
     try {
       await login({ email: values.email, password: values.password });
+      const redirectTo = searchParams.get("redirect");
       // console.log(token);
-      navigate("/");
+      if (redirectTo) {
+        // Nếu có trang chờ, quay lại trang đó (giải mã URI để lấy link chuẩn)
+        navigate(decodeURIComponent(redirectTo));
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       console.error(err);
     }

@@ -12,8 +12,8 @@ export const BookingStatus = z.enum([
   "paid", //Đã thanh toán
   "cancelled", //Đã hủy
   "expired", //Hết hạn thanh toán và reset trạng thái
-  "failed", //Thanh toán thất bại
 ]);
+export const PaymentStatus = z.enum(["pending", "success", "failed"]);
 export const ShowTimeStatus = z.enum([
   "upcoming", //Sắp diễn ra
   "ongoing", //Đang chiếu
@@ -74,7 +74,7 @@ export const ShowTimeSeat = Base.extend({
   seatCode: z.string(),
   row: z.string(),
   number: z.number(),
-  seatType: SeatType,
+  loai_ghe: SeatType,
   price: z.number(),
   trang_thai: SeatsStatus.default("empty"),
   heldBy: z.string().nullable().optional(),
@@ -369,6 +369,8 @@ export type ICreateBooking = Omit<
   IBooking,
   "_id" | "createdAt" | "updatedAt" | "status" | "ticketCode"
 >;
+
+export type IPaymentStatus = z.infer<typeof PaymentStatus>;
 export type IPopulatedBooking = Omit<IBooking, "showTimeId" | "userId"> & {
   showTimeId: IPopulatedShowTime;
   userId: IUser;

@@ -12,7 +12,7 @@ const showTimeSeatSchema = new Schema<IShowTimeSeat>(
     seatCode: { type: String, required: true },
     row: { type: String, required: true },
     number: { type: Number, required: true },
-    seatType: {
+    loai_ghe: {
       type: String,
       enum: SeatType.options,
       required: true,
@@ -41,7 +41,6 @@ const showTimeSeatSchema = new Schema<IShowTimeSeat>(
 );
 
 showTimeSeatSchema.index({ showTimeId: 1, seatCode: 1 }, { unique: true });
-showTimeSeatSchema.index({ showTimeId: 1 });
 showTimeSeatSchema.index({ showTimeId: 1, trang_thai: 1 });
 showTimeSeatSchema.index({ holdExpiresAt: 1 });
 

@@ -74,8 +74,13 @@ export const bookingController = {
     });
   }),
 
-  cancelBooking: catchAsync(async (req, res) => {
-    const { bookingId, userId } = req.body;
+  cancelBooking: catchAsync(async (req, res, next) => {
+    const userId = req.user?._id;
+    const { bookingId } = req.body;
+
+    if (!userId) {
+      return next(new AppError("Bạn cần đăng nhập để thực hiện hành động này", 401));
+    }
 
     await bookingService.cancelBooking(bookingId, userId);
 

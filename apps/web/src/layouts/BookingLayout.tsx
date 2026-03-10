@@ -18,8 +18,8 @@ const BookingLayout = () => {
   const movieId = searchParams.get("movieId") || undefined;
   const showtimeIdFromUrl = searchParams.get("showtimeId");
   const { user } = useAuth();
-
   const location = useLocation();
+
   const navigate = useNavigate();
 
   // Quản lý trạng thái dùng chung
@@ -27,10 +27,47 @@ const BookingLayout = () => {
     null,
   );
   const [selectedSeats, setSelectedSeats] = useState<IShowTimeSeat[]>([]);
+  const activeShowtimeId = selectedShowtime?._id || showtimeIdFromUrl;
 
   const { data: movie, isLoading: isMovieLoading } = useMovie(movieId);
 
-  const activeShowtimeId = selectedShowtime?._id || showtimeIdFromUrl;
+  useEffect(() => {
+    const savedSeats = localStorage.getItem("temp_seats");
+
+    if (!savedSeats || !user || !activeShowtimeId) return;
+
+    const seats = JSON.parse(savedSeats);
+
+    const autoHold = async () => {
+      try {
+        const result = await holdSeats({
+          showTimeId: activeShowtimeId,
+          seats: seats.map((s: any) => s.seatCode),
+          userId: user._id!,
+        });
+
+        localStorage.removeItem("temp_seats");
+
+        navigate("/payments", {
+          state: {
+            bookingId: result.data.bookingId,
+            totalAmount: result.data.totalAmount,
+            seats: seats.map((s: any) => s.seatCode),
+            movieInfo: {
+              title: movie?.ten_phim,
+              poster: movie?.poster?.url,
+              showtime: currentData?.startTime
+                ? dayjs(currentData.startTime).format("HH:mm - DD/MM/YYYY")
+                : "",
+            },
+          },
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    autoHold();
+  }, [user, activeShowtimeId]);
   const { showTime, holdSeats, isHolding, refreshSeats } = useBooking(
     activeShowtimeId ?? undefined,
   );
@@ -82,43 +119,49 @@ const BookingLayout = () => {
       return;
     }
 
-    // trang chọn ghế -> Giữ ghế và sang thanh toán
-    if (selectedSeats.length === 0) {
-      message.warning("Vui lòng chọn ít nhất một ghế!");
-      return;
-    }
-
-    try {
-      if (!user) {
-        message.warning("Vui lòng đăng nhập trước khi đặt vé!");
-        navigate("/login");
+    if (isSelectSeatStep) {
+      // trang chọn ghế -> Giữ ghế và sang thanh toán
+      if (selectedSeats.length === 0) {
+        message.warning("Vui lòng chọn ít nhất một ghế!");
         return;
       }
-      const result = await holdSeats({
-        showTimeId: activeShowtimeId!,
-        seats: selectedSeats.map((s) => s.seatCode),
-        userId: user?._id as string,
-      });
 
-      await refreshSeats();
-      message.success("Giữ ghế thành công!");
-
-      navigate("/payments", {
-        state: {
-          bookingId: result.data.bookingId,
-          totalAmount: result.data.totalAmount,
+      try {
+        if (!user) {
+          localStorage.setItem("temp_seats", JSON.stringify(selectedSeats));
+          message.warning("Vui lòng đăng nhập trước khi đặt vé!");
+          const currentPath = encodeURIComponent(
+            location.pathname + location.search,
+          );
+          navigate(`/login?redirect=${currentPath}`);
+          return;
+        }
+        const result = await holdSeats({
+          showTimeId: activeShowtimeId!,
           seats: selectedSeats.map((s) => s.seatCode),
-          movieInfo: {
-            title: movie.ten_phim,
-            poster: movie.poster?.url,
-            showtime: currentData?.startTime
-              ? dayjs(currentData.startTime).format("HH:mm - DD/MM/YYYY")
-              : "Showtime",
+          userId: user?._id as string,
+        });
+
+        await refreshSeats();
+        message.success("Giữ ghế thành công!");
+
+        navigate("/payments", {
+          state: {
+            bookingId: result.data.bookingId,
+            totalAmount: result.data.totalAmount,
+            seats: selectedSeats.map((s) => s.seatCode),
+            movieInfo: {
+              title: movie.ten_phim,
+              poster: movie.poster?.url,
+              showtime: currentData?.startTime
+                ? dayjs(currentData.startTime).format("HH:mm - DD/MM/YYYY")
+                : "Showtime",
+            },
           },
-        },
-      });
-    } catch (error) {
-      refreshSeats();
+        });
+      } catch (error) {
+        refreshSeats();
+      }
     }
   };
 

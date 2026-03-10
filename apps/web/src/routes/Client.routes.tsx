@@ -23,9 +23,10 @@ import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 import MovieList from "@web/pages/clients/MovieList";
 import NewsDetail from "@web/pages/clients/NewDetail";
 import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
-import VNPayReturn from "@web/pages/clients/payments/Vnpay-return";
 import News from "@web/pages/clients/public/News";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
+import Paymentlist from "@web/pages/clients/payments/PaymentList";
+import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -70,8 +71,16 @@ export const ClientRoutes: RouteObject = {
     { path: "showtime", element: <Showtime /> },
     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
-    { path: "payments", element: <PaymentsMethod /> },
-    { path: "vnpay-return", element: <VNPayReturn /> },
+    {
+      path: "payments",
+      element: <PaymentsMethod />,
+      children: [
+        { index: true, element: <Paymentlist /> },
+        { path: "failed", element: <PaymentsMethod /> },
+        { path: "success", element: <PaymentsMethod /> },
+      ],
+    },
+    { path: "payment-result", element: <PaymentResult /> },
     { path: "contact", element: <Contact /> },
     { path: "news", element: <News /> },
     { path: "*", element: <NotFound /> },

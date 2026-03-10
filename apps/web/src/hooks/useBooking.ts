@@ -20,7 +20,7 @@ export const useBooking = (showTimeId?: string) => {
       return res.data;
     },
     enabled: !!showTimeId,
-    refetchInterval: 10000,
+    refetchInterval: 5000,
   });
 
   const holdSeats = useMutation({

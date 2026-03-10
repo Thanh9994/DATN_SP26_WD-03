@@ -47,7 +47,7 @@ export const useAuth = () => {
 
   const loginMutation = useMutation<IAuthResponse, Error, ILogin>({
     mutationFn: async (payload) => {
-      const { data } = await axios.post<IAuthResponse>(
+      const { data } = await axiosAuth.post<IAuthResponse>(
         `${API.AUTH}/login`,
         payload,
       );
@@ -56,6 +56,7 @@ export const useAuth = () => {
     onSuccess: (data) => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      queryClient.setQueryData(["me"], data.user);
       showNotify("success", "Đăng Nhập Thành Công");
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },
