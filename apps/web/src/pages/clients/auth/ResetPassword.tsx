@@ -37,7 +37,7 @@ const ResetPassword = () => {
       });
 
       showNotify("success", "Đổi mật khẩu thành công");
-      Navigate("/");
+      Navigate("/login");
     } catch (error: any) {
       showNotify("error", error?.response?.data?.message || "Reset thất bại");
     } finally {
@@ -74,10 +74,40 @@ const ResetPassword = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
+          <ul className="mt-2 text-[11px] text-white/40 flex items-center justify-center gap-4 flex-wrap">
+            <li
+              className={`flex items-center gap-1 ${password.length >= 8 ? "text-green-400" : ""}`}
+            >
+              <span>{password.length >= 8 ? "✔" : "•"}</span>
+              Tối thiểu 8 ký tự
+            </li>
 
+            <li
+              className={`flex items-center gap-1 ${/[A-Z]/.test(password) ? "text-green-400" : ""}`}
+            >
+              <span>{/[A-Z]/.test(password) ? "✔" : "•"}</span>
+              Có 1 chữ hoa
+            </li>
+
+            <li
+              className={`flex items-center gap-1 ${/\d/.test(password) ? "text-green-400" : ""}`}
+            >
+              <span>{/\d/.test(password) ? "✔" : "•"}</span>
+              Có 1 số
+            </li>
+          </ul>
           <Button type="submit" disabled={loading}>
-            {loading ? "Updating..." : "Update Password"}
-            <RefreshCw size={20} />
+            {loading ? (
+              <>
+                Updating
+                <RefreshCw size={20} className="animate-spin" />
+              </>
+            ) : (
+              <>
+                Update Password
+                <RefreshCw size={20} />
+              </>
+            )}
           </Button>
         </form>
         <div className="mt-12 pt-8 border-t border-white/5">

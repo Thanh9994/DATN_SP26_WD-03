@@ -45,8 +45,6 @@ export const generateShowTimeSeats = async (
 ) => {
   if (!showTime._id) throw new Error("ShowTime ID không tồn tại");
 
-  await SeatTime.deleteMany({ showTimeId: showTime._id });
-
   const vipSet = new Set((room.vip || []).map((r) => r.trim().toUpperCase()));
   const coupleSet = new Set(
     (room.couple || []).map((r) => r.trim().toUpperCase()),

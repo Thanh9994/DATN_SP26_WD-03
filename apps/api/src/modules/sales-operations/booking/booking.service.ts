@@ -9,16 +9,17 @@ export const bookingService = {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const holdDuration = 7 * 60 * 1000; // 5 phút
+      const holdDuration = 7 * 60 * 1000; // 7 phút
       const holdExpires = new Date(Date.now() + holdDuration);
       const now = new Date();
-
+      //hủy booking đang giữ cũ
       await Booking.updateMany(
         { userId, showTimeId, status: "pending" },
         { $set: { status: "cancelled" } },
         { session },
       );
 
+      // giải phóng ghế user đang giữ
       await SeatTime.updateMany(
         { showTimeId, heldBy: userId, trang_thai: "hold" },
         {
@@ -27,25 +28,41 @@ export const bookingService = {
         },
         { session },
       );
-
+      //tìm ghế
       const seats = await SeatTime.find({
         showTimeId,
         seatCode: { $in: seatCodes },
       }).session(session);
 
       if (seats.length !== seatCodes.length) {
-        throw new AppError("Một số ghế không tồn tại trên hệ thống.", 404);
+        throw new AppError("Một số ghế không còn tồn tại hoặc đã đặt.", 404);
       }
-      // Nếu số lượng ghế update không khớp với số lượng yêu cầu -> Có ghế đã bị tranh chấp
 
-      for (const seat of seats) {
-        const isAvailable =
-          seat.trang_thai === "empty" ||
-          (seat.trang_thai === "hold" &&
-            (!seat.holdExpiresAt || seat.holdExpiresAt < now));
-        if (!isAvailable) {
-          throw new AppError(`Ghế ${seat.seatCode} đã có người chọn.`, 400);
-        }
+      const seatIds = seats.map((s) => s._id);
+      // khóa ghế
+      const updateResult = await SeatTime.updateMany(
+        {
+          _id: { $in: seatIds },
+          $or: [
+            { trang_thai: "empty" },
+            { trang_thai: "hold", holdExpiresAt: { $lt: now } },
+          ],
+        },
+        {
+          $set: {
+            trang_thai: "hold",
+            heldBy: userId,
+            holdExpiresAt: holdExpires,
+          },
+        },
+        { session },
+      );
+      // check điều kiện tránh race condition 2 user chọn 1 ghế 1 time
+      if (updateResult.modifiedCount !== seatIds.length) {
+        throw new AppError(
+          "Một số ghế vừa được người khác chọn. Vui lòng chọn lại.",
+          400,
+        );
       }
 
       const totalAmount = seats.reduce((sum, s) => sum + (s.price || 0), 0);
@@ -55,7 +72,7 @@ export const bookingService = {
           {
             userId,
             showTimeId,
-            seats: seats.map((s) => s._id),
+            seats: seatIds,
             seatCodes,
             totalAmount,
             finalAmount: totalAmount,
@@ -67,12 +84,9 @@ export const bookingService = {
       );
 
       await SeatTime.updateMany(
-        { _id: { $in: seats.map((s) => s._id) } },
+        { _id: { $in: seatIds } },
         {
           $set: {
-            trang_thai: "hold",
-            heldBy: userId,
-            holdExpiresAt: holdExpires,
             bookingId: newBooking._id,
           },
         },
@@ -87,7 +101,7 @@ export const bookingService = {
       };
     } catch (error) {
       await session.abortTransaction();
-      throw error; // Để catchAsync bắt và đẩy về globalErrorHandler
+      throw error; // catchAsync bắt và đẩy về globalErrorHandler
     } finally {
       session.endSession();
     }
@@ -100,17 +114,18 @@ export const bookingService = {
     session.startTransaction();
 
     try {
+      //1
       const booking = await Booking.findById(bookingId).session(session);
-
+      // check điều kiện 2
       if (!booking || booking.status !== "pending") {
         throw new AppError("Giao dịch không tồn tại hoặc đã hết hạn.", 400);
       }
-
+      //check timeout
       const now = new Date();
       if (booking.holdExpiresAt && booking.holdExpiresAt < now) {
         throw new AppError("Giao dịch đã quá thời gian thanh toán.", 400);
       }
-
+      // seat thuộc booking - seat đang hold - seat do user giữ
       const seatUpdate = await SeatTime.updateMany(
         {
           _id: { $in: booking.seats },
@@ -170,6 +185,7 @@ export const bookingService = {
 
       await SeatTime.updateMany(
         {
+          bookingId: { $in: bookingIds },
           trang_thai: "hold",
           holdExpiresAt: { $lt: now },
         },

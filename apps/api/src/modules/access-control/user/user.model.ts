@@ -10,7 +10,9 @@ const userSchema = new mongoose.Schema(
 
     resetPasswordToken: String,
     resetPasswordExpire: Date,
-
+    avatar: {
+      type: String,
+    },
     role: {
       type: String,
       enum: UserRole.options,

@@ -9,6 +9,7 @@ import {
   CalculateShowTimeStatus,
   ShowTimeDisplay,
 } from "@api/utils/showtime/showtime.util";
+import mongoose from "mongoose";
 
 const sendError = (
   res: Response,
@@ -66,13 +67,9 @@ export const createShowTime = async (req: Request, res: Response) => {
     const movieEndTime = new Date(startTime.getTime() + durationInMs);
 
     const isOver = await ShowTimeM.findOne({
-      roomId: roomId,
-      $or: [
-        {
-          startTime: { $lt: new Date(movieEndTime.getTime() + cleaning_TIME) },
-          endTime: { $gt: new Date(startTime.getTime() - cleaning_TIME) },
-        },
-      ],
+      roomId,
+      startTime: { $lt: movieEndTime },
+      endTime: { $gt: startTime },
     });
     if (isOver) {
       const suggestedStart = new Date(isOver.endTime.getTime() + cleaning_TIME);
@@ -222,13 +219,13 @@ export const getShowTimeDetail = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const showTime = await ShowTimeM.findById(id)
-      .populate('movieId')
+      .populate("movieId")
       .populate({
-        path: 'roomId',
+        path: "roomId",
         populate: {
-          path: 'cinema_id',
-          select: 'name city address'
-        }
+          path: "cinema_id",
+          select: "name city address",
+        },
       });
     if (!showTime) return res.status(404).json({ message: "Không tìm thấy" });
 
@@ -283,8 +280,11 @@ export const deleteShowTime = async (req: Request, res: Response) => {
 export const getShowTimeSeats = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const seats = await SeatTime.find({ showTimeId: id }).sort({ row: 1, number: 1 });
-    
+    const seats = await SeatTime.find({ showTimeId: id }).sort({
+      row: 1,
+      number: 1,
+    });
+
     return res.json({
       success: true,
       data: seats,
@@ -297,9 +297,9 @@ export const getShowTimeSeats = async (req: Request, res: Response) => {
 export const getSeatStats = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    
+
     const stats = await SeatTime.aggregate([
-      { $match: { showTimeId: id } },
+      { $match: { showTimeId: new mongoose.Types.ObjectId(id) } },
       {
         $group: {
           _id: null,
@@ -318,7 +318,7 @@ export const getSeatStats = async (req: Request, res: Response) => {
     ]);
 
     const result = stats[0] || { total: 0, booked: 0, held: 0, available: 0 };
-    
+
     return res.json({
       success: true,
       data: result,

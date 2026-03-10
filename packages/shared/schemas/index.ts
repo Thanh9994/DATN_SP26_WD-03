@@ -21,7 +21,7 @@ export const ShowTimeStatus = z.enum([
   "sold_out", //Hết vé
   "cancelled", //Đã Hủy
 ]);
-export const PaymentMethod = z.enum(["vnpay", "momo", "atm", "cash"]);
+export const PaymentMethod = z.enum(["vnpay", "momo", "atm"]);
 
 export const Base = z.object({
   _id: z.string().optional(),
@@ -57,6 +57,7 @@ export const ShowTime = Base.extend({
   roomId: z.union([z.string(), z.any()]),
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
+  showDate: z.coerce.date(),
   priceNormal: z.number().nonnegative(),
   priceVip: z.number().nonnegative(),
   priceCouple: z.number().nonnegative(),
@@ -73,7 +74,7 @@ export const ShowTimeSeat = Base.extend({
   seatCode: z.string(),
   row: z.string(),
   number: z.number(),
-  loai_ghe: SeatType,
+  seatType: SeatType,
   price: z.number(),
   trang_thai: SeatsStatus.default("empty"),
   heldBy: z.string().nullable().optional(),
