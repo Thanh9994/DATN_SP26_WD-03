@@ -7,6 +7,8 @@ const PhimCard = ({ movie }: { movie: IMovie }) => {
   const navigate = useNavigate();
   const badge = MOVIE_BADGE[movie.trang_thai];
 
+  
+
   return (
     <div
       onClick={() => navigate(`/movie/${movie._id}`)}

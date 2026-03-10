@@ -29,6 +29,7 @@ export const AdminLayouts = () => {
     navigate("/login");
   };
 
+const AdminLayout = () => {
   return (
     <ConfigProvider
       theme={{
@@ -114,3 +115,5 @@ export const AdminLayouts = () => {
     </ConfigProvider>
   );
 };
+
+export default AdminLayout;
