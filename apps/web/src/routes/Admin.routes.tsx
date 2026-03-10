@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import AdminLayouts from "@web/layouts/AdminLayout";
+=======
+
+>>>>>>> f0a534e950a27397f8233be19c88a4cc435babcf
 import { RouteObject } from "react-router-dom";
 import Dashboard from "@web/pages/admin/Dashboard";
 import { Upload } from "@web/pages/admin/access-control/Upload";
@@ -11,6 +15,7 @@ import Product from "@web/pages/admin/Product";
 import { Rooms } from "@web/pages/admin/Rooms";
 import Promotion from "@web/pages/admin/promotion/Promotion";
 import PromotionForm from "@web/pages/admin/promotion/PromotionForm";
+import { AdminLayouts } from "@web/layouts/AdminLayout";
 
 export const AdminRoutes: RouteObject = {
   path: "/admin",
