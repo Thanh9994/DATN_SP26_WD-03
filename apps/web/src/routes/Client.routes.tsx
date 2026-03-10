@@ -25,6 +25,7 @@ import NewsDetail from "@web/pages/clients/NewDetail";
 import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
 import VNPayReturn from "@web/pages/clients/payments/Vnpay-return";
 import News from "@web/pages/clients/public/News";
+import ResetPassword from "@web/pages/clients/auth/ResetPassword";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -34,6 +35,7 @@ export const ClientRoutes: RouteObject = {
     { path: "login", element: <Login /> },
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
+    { path: "reset-password/:token", element: <ResetPassword /> },
     {
       path: "profile",
       element: <ProfileLayout />,

@@ -64,10 +64,8 @@ const bookingSchema = new Schema(
       default: "vnpay",
     },
     paymentId: {
-      type: String,
-    },
-    transactionCode: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Payments",
     },
     holdExpiresAt: {
       type: Date,
@@ -89,8 +87,7 @@ const bookingSchema = new Schema(
   },
 );
 bookingSchema.index({ userId: 1, createdAt: -1 });
-
-// Index phục vụ cho cron-job quét các booking hết hạn thanh toán
 bookingSchema.index({ status: 1, holdExpiresAt: 1 });
-bookingSchema.index({ createdAt: 1, status: 1 });
+bookingSchema.index({ showTimeId: 1 });
+bookingSchema.index({ showTimeId: 1, status: 1 });
 export const Booking = mongoose.model<IBooking>("Booking", bookingSchema);

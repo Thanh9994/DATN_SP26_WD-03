@@ -114,6 +114,24 @@ export const useAuth = () => {
       message.error(err.message || "Cập nhật thất bại");
     },
   });
+
+  const forgotPasswordMutation = useMutation<
+    { message: string },
+    Error,
+    { email: string }
+  >({
+    mutationFn: async (payload) => {
+      const { data } = await axios.post(`${API.AUTH}/forgot-password`, payload);
+      return data;
+    },
+    onSuccess: (data) => {
+      showNotify("success", data.message || "Đã gửi email reset password");
+    },
+    onError: (err) => {
+      showNotify("error", err.message || "Gửi email thất bại");
+    },
+  });
+
   return {
     user,
     users,
@@ -125,6 +143,8 @@ export const useAuth = () => {
     isLoggingIn: loginMutation.isPending,
     register: registerMutation.mutateAsync,
     isRegistering: registerMutation.isPending,
+    forgotPassword: forgotPasswordMutation.mutateAsync,
+    isSendingReset: forgotPasswordMutation.isPending,
     logout,
   };
 };

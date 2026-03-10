@@ -5,6 +5,8 @@ import {
   IPaymentResult,
 } from "../interfaces/payment-gateway.interface";
 
+import { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat } from "vnpay";
+
 export class VnpayGateway implements IPaymentGateway {
   async createUrl(
     bookingId: string,

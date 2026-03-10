@@ -76,7 +76,7 @@ export const handlePaymentReturn = catchAsync(
     // Frontend sẽ dựa vào `code` và `bookingId` để hiển thị thông báo phù hợp
     // và gọi API để lấy trạng thái cuối cùng của đơn hàng (đã được IPN cập nhật)
     const frontendUrl = new URL(
-      process.env.VNP_RETURNURL || "http://localhost:5173/payment-return",
+      process.env.VNP_RETURNURL || "http://localhost:5000/payment-return",
     );
     frontendUrl.searchParams.set("bookingId", result.orderId || "");
     frontendUrl.searchParams.set("code", result.code);
