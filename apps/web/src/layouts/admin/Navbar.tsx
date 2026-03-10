@@ -88,6 +88,12 @@ export const Sidebar = ({
       label: "Media",
       onClick: () => navigate("/admin/media"),
     },
+    {
+      key: "foods",
+      icon: <ProductOutlined  />,
+      label: "Food & Drink",
+      onClick: () => navigate("/admin/foods"),
+    },
   ];
 
   const textColor = themeMode === "dark" ? "#fff" : "#000";

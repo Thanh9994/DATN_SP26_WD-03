@@ -11,6 +11,7 @@ import Product from "@web/pages/admin/Product";
 import { Rooms } from "@web/pages/admin/Rooms";
 import Promotion from "@web/pages/admin/promotion/Promotion";
 import PromotionForm from "@web/pages/admin/promotion/PromotionForm";
+import FoodDrink from "@web/pages/admin/FoodDrink";
 
 export const AdminRoutes: RouteObject = {
   path: "/admin",
@@ -26,6 +27,7 @@ export const AdminRoutes: RouteObject = {
         { path: "users", element: <User /> },
         { path: "cinemas", element: <Cinemas /> },
         { path: "product", element: <Product /> },
+        { path: "foods", element: <FoodDrink /> },
         { path: "rooms", element: <Rooms /> },
         {
           path: "promotions",
