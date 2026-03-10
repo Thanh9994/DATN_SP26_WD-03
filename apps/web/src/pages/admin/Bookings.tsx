@@ -138,7 +138,7 @@ const Bookings = () => {
         setSelectedRebook(null);
     };
 
-    const getStatusTag = (status: string, type: string) => {
+    const getStatusTag = (type: string) => {
         if (type === "upcoming") {
             return (
                 <Tag
@@ -202,7 +202,7 @@ const Bookings = () => {
                         </Col>
 
                         <Col>
-                            {getStatusTag(item.status, type)}
+                            {getStatusTag(type)}
                         </Col>
 
                         {type === "past" && item.rating && (

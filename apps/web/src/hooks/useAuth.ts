@@ -1,25 +1,31 @@
 import {
   IUser,
-  ILoginPayload,
-  IRegisterPayload,
+  ILogin,
+  IRegister,
   IAuthResponse,
   IUpdateUser,
 } from "@shared/schemas";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { API } from "@web/api/api.service";
 import { showNotify } from "@web/components/AppNotification";
 import { message } from "antd";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/auth";
-
 // Axios instance có gắn token
 export const axiosAuth = axios.create();
 
-axiosAuth.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+axiosAuth.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token"); // Lấy token tại thời điểm gửi request
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
@@ -31,7 +37,7 @@ export const useAuth = () => {
   } = useQuery<IUser>({
     queryKey: ["me"],
     queryFn: async () => {
-      const { data } = await axiosAuth.get<IUser>(`${API_URL}/me`);
+      const { data } = await axiosAuth.get<IUser>(`${API.USERS}/me`);
       return data;
     },
     enabled: !!localStorage.getItem("token"),
@@ -39,10 +45,10 @@ export const useAuth = () => {
     gcTime: 1000 * 60 * 60 * 2, // Giữ trong cache 24h
   });
 
-  const loginMutation = useMutation<IAuthResponse, Error, ILoginPayload>({
+  const loginMutation = useMutation<IAuthResponse, Error, ILogin>({
     mutationFn: async (payload) => {
       const { data } = await axios.post<IAuthResponse>(
-        `${API_URL}/login`,
+        `${API.AUTH}/login`,
         payload,
       );
       return data;
@@ -54,21 +60,22 @@ export const useAuth = () => {
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },
     onError: (err) => {
-      message.error("Đăng nhập thất bại")
-      console.log(err.message || "Đăng nhập thất bại");
+      showNotify("success", "Đăng nhập thất bại");
+      console.error(err.message || "Đăng nhập thất bại");
     },
   });
 
-  const registerMutation = useMutation<any, Error, IRegisterPayload>({
+  const registerMutation = useMutation<any, Error, IRegister>({
     mutationFn: async (payload) => {
-      const { data } = await axios.post(`${API_URL}/register`, payload);
+      const { data } = await axios.post(`${API.AUTH}/register`, payload);
       return data;
     },
     onSuccess: () => {
-      message.success("Đăng ký thành công");
+      showNotify("success", "Đăng Ký Thành Công");
     },
     onError: (err) => {
-      message.error(err.message || "Đăng ký thất bại");
+      showNotify("success", "Đăng Ký thất bại");
+      console.error(err.message || "Đăng ký thất bại");
     },
   });
 
@@ -82,7 +89,7 @@ export const useAuth = () => {
   const { data: users, isLoading: isLoadingUsers } = useQuery<IUser[]>({
     queryKey: ["users"],
     queryFn: async () => {
-      const { data } = await axiosAuth.get(`${API_URL}/`);
+      const { data } = await axiosAuth.get(`${API.USERS}/`);
       return data;
     },
     enabled: !!localStorage.getItem("token") && user?.role === "admin", // Chỉ gọi khi có token và là admin
@@ -96,7 +103,7 @@ export const useAuth = () => {
       id: string;
       datas: Partial<IUpdateUser>;
     }) => {
-      const { data } = await axiosAuth.patch(`${API_URL}/${id}`, datas);
+      const { data } = await axiosAuth.patch(`${API.USERS}/${id}`, datas);
       return data;
     },
     onSuccess: () => {
@@ -106,8 +113,25 @@ export const useAuth = () => {
     onError: (err) => {
       message.error(err.message || "Cập nhật thất bại");
     },
-
   });
+
+  const forgotPasswordMutation = useMutation<
+    { message: string },
+    Error,
+    { email: string }
+  >({
+    mutationFn: async (payload) => {
+      const { data } = await axios.post(`${API.AUTH}/forgot-password`, payload);
+      return data;
+    },
+    onSuccess: (data) => {
+      showNotify("success", data.message || "Đã gửi email reset password");
+    },
+    onError: (err) => {
+      showNotify("error", err.message || "Gửi email thất bại");
+    },
+  });
+
   return {
     user,
     users,
@@ -119,6 +143,8 @@ export const useAuth = () => {
     isLoggingIn: loginMutation.isPending,
     register: registerMutation.mutateAsync,
     isRegistering: registerMutation.isPending,
+    forgotPassword: forgotPasswordMutation.mutateAsync,
+    isSendingReset: forgotPasswordMutation.isPending,
     logout,
   };
 };

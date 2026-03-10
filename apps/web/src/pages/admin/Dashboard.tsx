@@ -204,7 +204,7 @@ const Dashboard = () => {
                                                 `${(percent * 100).toFixed(0)}%`
                                             }
                                         >
-                                            {ageData.map((entry, index) => (
+                                            {ageData.map((_, index) => (
                                                 <Cell key={index} fill={AGE_COLORS[index]} />
                                             ))}
                                         </Pie>

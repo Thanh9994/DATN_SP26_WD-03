@@ -1,12 +1,13 @@
-import { Table, Button, Space } from "antd";
+import { Table, Button, Space, Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-
+const { Text } = Typography;
 const Cinemas = () => {
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      render: (text: string) => <Text strong>{text}</Text>,
     },
     {
       title: "Location",

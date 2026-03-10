@@ -1,0 +1,260 @@
+.splash-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999; /* Đảm bảo cao nhất */
+  background: #000; /* Hoặc màu nền của bạn */
+}
+
+.text-glow {
+  text-shadow:
+    0 0 20px rgba(234, 42, 51, 0.5),
+    0 0 40px rgba(234, 42, 51, 0.3);
+}
+.metallic-text {
+  background: linear-gradient(180deg, #ffffff 0%, #a1a1a1 50%, #666666 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8));
+}
+.gold-gradient {
+  background: linear-gradient(
+    to right,
+    #bf953f,
+    #fcf6ba,
+    #b38728,
+    #fbf5b7,
+    #aa771c
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.vignette {
+  box-shadow: inset 0 0 150px 50px rgba(0, 0, 0, 0.9);
+}
+
+.animate-bg-zoom {
+  animation: bg-zoom 2s ease-out forwards;
+}
+.animate-fade-in-tl {
+  animation: fade-in-tl 1s ease-out 0.5s forwards;
+  opacity: 0;
+}
+.animate-fade-in-tr {
+  animation: fade-in-tr 1s ease-out 0.5s forwards;
+  opacity: 0;
+}
+.animate-fade-in-bl {
+  animation: fade-in-bl 1s ease-out 0.5s forwards;
+  opacity: 0;
+}
+.animate-fade-in-br {
+  animation: fade-in-br 1s ease-out 0.5s forwards;
+  opacity: 0;
+}
+.animate-fade-in-down {
+  animation: fade-in-down 1s ease-out 0.8s forwards;
+  opacity: 0;
+}
+.animate-fade-in-right {
+  animation: fade-in-right 1s ease-out 1s forwards;
+  opacity: 0;
+}
+.animate-hero-text {
+  animation: fade-in-up 1.2s ease-out 0.2s forwards;
+  opacity: 0;
+}
+.animate-hero-btn {
+  animation: fade-in-up 1s ease-out 1.2s forwards;
+  opacity: 0;
+}
+.animate-progress {
+  animation: progress 2s ease-out 1.5s forwards;
+  width: 0%;
+}
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes bg-zoom {
+  0% {
+    transform: scale(1.1);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.05);
+    opacity: 0.4;
+  }
+}
+
+@keyframes fade-in-tl {
+  0% {
+    opacity: 0;
+    transform: translate(-20px, -20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes fade-in-tr {
+  0% {
+    opacity: 0;
+    transform: translate(20px, -20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes fade-in-bl {
+  0% {
+    opacity: 0;
+    transform: translate(-20px, 20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes fade-in-br {
+  0% {
+    opacity: 0;
+    transform: translate(20px, 20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes fade-in-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 25%;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.loader {
+  height: 30px;
+  display: inline-block;
+}
+
+.loader > div {
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+  box-shadow: 0 0 10px orange;
+  background: #ffecba;
+  float: left;
+  margin: 5px;
+  transform: scale(2);
+}
+
+.loader > div:nth-child(1) {
+  animation: anm-BL-53-move1 1s infinite linear;
+}
+
+.loader > div:nth-child(2) {
+  animation: anm-BL-53-move2 1s infinite linear;
+  animation-delay: 0.2s;
+}
+
+.loader > div:nth-child(3) {
+  animation: anm-BL-53-move3 1s infinite linear;
+  animation-delay: 0.3s;
+}
+
+.loader > div:nth-child(4) {
+  animation: anm-BL-53-move4 1s infinite linear;
+  animation-delay: 0.4s;
+}
+
+.loader > div:nth-child(5) {
+  animation: anm-BL-53-move5 1s infinite linear;
+  animation-delay: 0.5s;
+}
+
+@keyframes anm-BL-53-move1 {
+  50% {
+    background: #ffbb00;
+    transform: scale(1);
+  }
+}
+
+@keyframes anm-BL-53-move2 {
+  50% {
+    background: #ffbb00;
+    transform: scale(1);
+  }
+}
+
+@keyframes anm-BL-53-move3 {
+  50% {
+    background: #ffbb00;
+    transform: scale(1);
+  }
+}
+
+@keyframes anm-BL-53-move4 {
+  50% {
+    background: #ffbb00;
+    transform: scale(1);
+  }
+}
+
+@keyframes anm-BL-53-move5 {
+  50% {
+    background: #ffbb00;
+    transform: scale(1);
+  }
+}
