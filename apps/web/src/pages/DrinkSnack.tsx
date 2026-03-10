@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 import "../styles/DrinkSnack.css";
+import { useFoodDrink } from "@web/hooks/useFoodDrink";
 
 interface Product {
   id: string;
@@ -12,7 +13,6 @@ interface Product {
     text: string;
     color: "gold" | "red";
   };
-  featured?: boolean;
   isFeatured?: boolean;
 }
 
@@ -25,60 +25,32 @@ export const DrinkSnack = (): JSX.Element => {
   const [isOpen, setIsOpen] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  const products: Product[] = [
-    {
-      id: "mega-combo",
-      title: "Mega Movie Combo",
-      description: "Extra-large popcorn, two sodas, and a box of signature movie candy.",
-      image: "🥤",
-      price: 25.0,
-      originalPrice: 32.0,
-      badge: {
-        text: "LIMITED TIME OFFER",
-        color: "gold",
-      },
-      isFeatured: true,
-    },
-    {
-      id: "family-pack",
-      title: "Family Fun Pack",
-      description: "2 Large Popcorns + 4 Sodas",
-      image: "🍿",
-      price: 38.5,
-    },
-    {
-      id: "sweet-salty",
-      title: "Sweet & Salty Duo",
-      description: "Medium Popcorn + Choco Pretzels",
-      image: "🧂",
-      price: 16.0,
-    },
-    {
-      id: "large-popcorn",
-      title: "Large Popcorn Combo",
-      description: "1 Large Popcorn + 2 Sodas",
-      image: "🍿",
-      price: 18.5,
-    },
-    {
-      id: "nachos-supreme",
-      title: "Nachos Supreme",
-      description: "Premium nachos with all toppings",
-      image: "🧀",
-      price: 12.5,
-    },
-    {
-      id: "candy-box",
-      title: "Movie Candy Mix",
-      description: "Assorted candy selection",
-      image: "🍬",
-      price: 8.0,
-    },
-  ];
+  const { foodDrinks, isLoading } = useFoodDrink();
+
+  const products: Product[] = useMemo(() => {
+    if (!Array.isArray(foodDrinks)) return [];
+
+    return foodDrinks.map((item: any) => ({
+      id: item._id,
+      title: item.ten_mon,
+      description: item.mo_ta,
+      image: item.hinh_anh,
+      price: item.gia_ban,
+      originalPrice: item.gia_goc,
+      isFeatured: item.la_noi_bat,
+      badge: item.badge
+        ? {
+            text: item.badge,
+            color: item.badge.includes("LIMITED") ? "gold" : "red",
+          }
+        : undefined,
+    }));
+  }, [foodDrinks]);
 
   const handleAddToCart = (productId: string, quantity: number = 1): void => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.productId === productId);
+
       if (existingItem) {
         return prevCart.map((item) =>
           item.productId === productId
@@ -86,6 +58,7 @@ export const DrinkSnack = (): JSX.Element => {
             : item
         );
       }
+
       return [...prevCart, { productId, quantity }];
     });
   };
@@ -97,8 +70,9 @@ export const DrinkSnack = (): JSX.Element => {
     }, 0);
   };
 
-  const renderBadge = (badge: Product["badge"]): JSX.Element | null => {
+  const renderBadge = (badge: Product["badge"]) => {
     if (!badge) return null;
+
     return (
       <div className={`product-badge badge-${badge.color}`}>
         {badge.text}
@@ -106,21 +80,41 @@ export const DrinkSnack = (): JSX.Element => {
     );
   };
 
-  const renderSaveBadge = (price: number, originalPrice?: number): JSX.Element | null => {
+  const renderSaveBadge = (price: number, originalPrice?: number) => {
     if (!originalPrice || originalPrice <= price) return null;
+
     const savings = (originalPrice - price).toFixed(2);
-    return <div className="product-badge badge-save">SAVE ${savings}</div>;
+
+    return (
+      <div className="product-badge badge-save">
+        SAVE ${savings}
+      </div>
+    );
   };
 
-  const renderProductCard = (product: Product): JSX.Element => (
+  const renderProductCard = (product: Product) => (
     <div
       key={product.id}
       className={`product-card ${product.isFeatured ? "featured" : ""}`}
     >
       <div className="product-image-wrapper">
-        <div className="product-image">{product.image}</div>
-        {product.badge && renderBadge(product.badge)}
-        {renderSaveBadge(product.price, product.originalPrice)}
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.title}
+            className="product-image-real"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              e.currentTarget.nextElementSibling?.classList.add("show");
+            }}
+          />
+        ) : null}
+        <div className="product-image">🍿</div>
+
+        <div className="product-badge-group">
+          {product.badge && renderBadge(product.badge)}
+          {renderSaveBadge(product.price, product.originalPrice)}
+        </div>
       </div>
 
       <div className="product-content">
@@ -130,6 +124,7 @@ export const DrinkSnack = (): JSX.Element => {
         <div className="product-footer">
           <div className="product-price-wrapper">
             <span className="product-price">${product.price.toFixed(2)}</span>
+
             {product.originalPrice && (
               <span className="product-original-price">
                 ${product.originalPrice.toFixed(2)}
@@ -140,17 +135,17 @@ export const DrinkSnack = (): JSX.Element => {
           {product.isFeatured ? (
             <button
               className="btn-exclusive"
-              onClick={() => handleAddToCart(product.id, 1)}
+              onClick={() => handleAddToCart(product.id)}
             >
-              Claim Exclusive Offer
+              CLAIM EXCLUSIVE OFFER
             </button>
           ) : (
             <button
               className="btn-add-order"
-              onClick={() => handleAddToCart(product.id, 1)}
+              onClick={() => handleAddToCart(product.id)}
             >
               <span className="cart-icon">🛒</span>
-              Add to Order
+              ADD TO ORDER
             </button>
           )}
         </div>
@@ -171,13 +166,23 @@ export const DrinkSnack = (): JSX.Element => {
             </button>
 
             <div className="modal-header">
-              <span className="modal-subtitle">ENHANCE YOUR MOVIE EXPERIENCE</span>
-              <h1 className="modal-title">Recommended Snacks & Combos</h1>
+              <span className="modal-subtitle">
+                ENHANCE YOUR MOVIE EXPERIENCE
+              </span>
+              <h1 className="modal-title">
+                Recommended Snacks & Combos
+              </h1>
             </div>
 
-            <div className="products-grid">
-              {products.map((product) => renderProductCard(product))}
-            </div>
+            {isLoading ? (
+              <div style={{ color: "white", textAlign: "center", padding: "40px" }}>
+                Loading...
+              </div>
+            ) : (
+              <div className="products-grid">
+                {products.map(renderProductCard)}
+              </div>
+            )}
 
             <div className="modal-footer">
               <button
@@ -190,7 +195,9 @@ export const DrinkSnack = (): JSX.Element => {
               <div className="footer-right">
                 <div className="total-price">
                   <span className="total-label">Total:</span>
-                  <span className="total-value">${getCartTotal().toFixed(2)}</span>
+                  <span className="total-value">
+                    ${getCartTotal().toFixed(2)}
+                  </span>
                 </div>
 
                 <button className="btn-continue">

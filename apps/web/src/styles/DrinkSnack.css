@@ -15,13 +15,14 @@
   z-index: 1000;
   padding: 20px;
   backdrop-filter: blur(4px);
+  overflow-y: auto;
 }
 
 .modal-container {
   background: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  max-width: 1000px;
+  max-width: 1200px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
@@ -44,6 +45,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
 }
 
 .modal-close:hover {
@@ -79,13 +81,13 @@
 }
 
 /* ============================================
-   PRODUCTS GRID
+   PRODUCTS GRID - FIX OVERLAP
    ============================================ */
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
   margin-bottom: 32px;
 }
 
@@ -102,6 +104,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 380px;
 }
 
 .product-card:hover {
@@ -111,8 +114,6 @@
 }
 
 .product-card.featured {
-  grid-column: 1;
-  grid-row: 1 / 3;
   border-color: rgba(255, 215, 0, 0.3);
   background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
 }
@@ -129,6 +130,7 @@
   aspect-ratio: 1;
   background: rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .product-image {
@@ -140,13 +142,29 @@
   font-size: 80px;
 }
 
+.product-image-real {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .product-card.featured .product-image {
   font-size: 120px;
 }
 
-/* Badges */
-.product-badge {
+/* Badge Group */
+.product-badge-group {
   position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.product-badge {
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 10px;
@@ -154,20 +172,16 @@
   letter-spacing: 0.5px;
   text-transform: uppercase;
   white-space: nowrap;
-  top: 12px;
 }
 
 .badge-gold {
-  background: rgba(255, 215, 0, 0.9);
+  background: rgba(255, 215, 0, 0.95);
   color: #000;
-  left: 12px;
 }
 
 .badge-save {
   background: #FF000D;
   color: white;
-  left: 12px;
-  top: 44px;
 }
 
 .badge-red {
@@ -181,31 +195,39 @@
   flex-direction: column;
   flex: 1;
   padding: 16px;
+  gap: 8px;
 }
 
 .product-title {
   font-size: 14px;
   font-weight: 800;
   color: white;
-  margin: 0 0 6px 0;
+  margin: 0;
   line-height: 1.3;
+  min-height: 32px;
 }
 
 .product-card.featured .product-title {
-  font-size: 18px;
-  margin: 0 0 8px 0;
+  font-size: 16px;
+  min-height: 40px;
 }
 
 .product-description {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.6);
-  margin: 0 0 12px 0;
+  margin: 0;
   flex: 1;
   line-height: 1.4;
+  min-height: 48px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .product-card.featured .product-description {
   font-size: 13px;
+  min-height: 52px;
 }
 
 /* Product Footer */
@@ -214,6 +236,8 @@
   flex-direction: column;
   gap: 10px;
   margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .product-price-wrapper {
@@ -229,7 +253,7 @@
 }
 
 .product-card.featured .product-price {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .product-original-price {
@@ -248,13 +272,14 @@
   border: none;
   padding: 12px 16px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: inherit;
+  width: 100%;
 }
 
 .btn-exclusive:hover {
@@ -279,6 +304,7 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
+  width: 100%;
 }
 
 .btn-add-order:hover {
@@ -300,6 +326,7 @@
   align-items: center;
   padding: 20px 0 0 0;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 16px;
 }
 
 .btn-skip {
@@ -312,6 +339,7 @@
   font-family: inherit;
   text-decoration: underline;
   padding: 8px 0;
+  white-space: nowrap;
 }
 
 .btn-skip:hover {
@@ -322,6 +350,7 @@
   display: flex;
   align-items: center;
   gap: 24px;
+  white-space: nowrap;
 }
 
 .total-price {
@@ -379,6 +408,18 @@
    RESPONSIVE DESIGN
    ============================================ */
 
+@media (max-width: 1024px) {
+  .modal-container {
+    max-width: 95vw;
+    padding: 32px;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+}
+
 @media (max-width: 768px) {
   .modal-container {
     padding: 24px 16px;
@@ -399,9 +440,8 @@
     margin-bottom: 20px;
   }
 
-  .product-card.featured {
-    grid-column: 1 / -1;
-    grid-row: auto;
+  .product-card {
+    min-height: 320px;
   }
 
   .product-image {
@@ -417,7 +457,12 @@
   }
 
   .product-card.featured .product-title {
-    font-size: 16px;
+    font-size: 14px;
+  }
+
+  .product-description {
+    font-size: 11px;
+    min-height: 40px;
   }
 
   .product-price {
@@ -425,7 +470,7 @@
   }
 
   .product-card.featured .product-price {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .modal-footer {
@@ -442,5 +487,84 @@
   .btn-continue {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-container {
+    padding: 16px 12px;
+    border-radius: 8px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .product-card {
+    min-height: 300px;
+  }
+
+  .product-image {
+    font-size: 48px;
+  }
+
+  .product-image-wrapper {
+    aspect-ratio: 1;
+  }
+
+  .product-content {
+    padding: 12px;
+  }
+
+  .product-title {
+    font-size: 11px;
+    min-height: auto;
+  }
+
+  .product-description {
+    font-size: 10px;
+    min-height: auto;
+    -webkit-line-clamp: 2;
+  }
+
+  .product-price {
+    font-size: 12px;
+  }
+
+  .btn-exclusive,
+  .btn-add-order {
+    padding: 8px 12px;
+    font-size: 10px;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .footer-right {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-skip {
+    font-size: 11px;
+  }
+
+  .total-value {
+    font-size: 16px;
+  }
+
+  .btn-continue {
+    width: 100%;
   }
 }

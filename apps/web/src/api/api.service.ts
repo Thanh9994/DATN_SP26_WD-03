@@ -12,4 +12,5 @@ export const API = {
   PROMOTION: `${API_URL}/catalog/promotions`,
   BOOKING: `${API_URL}/order/booking`,
   PAYMENT: `${API_URL}/order/v1/vnpay`,
+  FOODDRINK: `${API_URL}/catalog/foodsdrink`,
 };
