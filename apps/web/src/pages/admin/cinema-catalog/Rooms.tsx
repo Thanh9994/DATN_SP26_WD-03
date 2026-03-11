@@ -135,7 +135,7 @@ export const Rooms = () => {
           seatCode: `${row.name}${i}`,
           row: row.name,
           number: i,
-          loai_ghe: seatType,
+          seatType: seatType,
           price: 0,
           trang_thai: "empty",
         });

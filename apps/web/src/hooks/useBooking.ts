@@ -56,6 +56,36 @@ export const useBooking = (showTimeId?: string) => {
     refetchOnWindowFocus: true,
   });
 
+  const cancelBooking = useMutation({
+    mutationFn: async (bookingId: string) => {
+      const res = await axiosAuth.post(`${API.BOOKING}/cancel`, { bookingId });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["showtime-detail", showTimeId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["pending-booking", showTimeId],
+      });
+    },
+  });
+
+  const expireBooking = useMutation({
+    mutationFn: async (bookingId: string) => {
+      const res = await axiosAuth.post(`${API.BOOKING}/expire`, { bookingId });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["showtime-detail", showTimeId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["pending-booking", showTimeId],
+      });
+    },
+  });
+
   return {
     pendingBooking,
     showTime: bookingData?.showTime,
@@ -68,6 +98,12 @@ export const useBooking = (showTimeId?: string) => {
 
     createPaymentUrl: createPaymentUrl.mutateAsync,
     isCreatingPayment: createPaymentUrl.isPending,
+
+    cancelBooking: cancelBooking.mutateAsync,
+    isCancelling: cancelBooking.isPending,
+
+    expireBooking: expireBooking.mutateAsync,
+    isExpiring: expireBooking.isPending,
 
     refreshSeats: refetch,
   };

@@ -27,7 +27,7 @@ import News from "@web/pages/clients/public/News";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
 import Paymentlist from "@web/pages/clients/payments/PaymentList";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
-import RequireAuth from "@web/services/requieAuth";
+import RequireAuth from "@web/services/RequieAuth";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
