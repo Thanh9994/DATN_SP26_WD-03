@@ -27,7 +27,7 @@ import { useMovies } from "@web/hooks/useMovie";
 import { useGenres } from "@web/hooks/useGenre";
 import { useUpload } from "@web/hooks/useUploads";
 import { ICloudinaryImage } from "@shared/schemas";
-import { ShowTime } from "./Showtime";
+import { ShowTime } from "../Showtime";
 import { useNavigate } from "react-router-dom";
 
 export const Movie = () => {

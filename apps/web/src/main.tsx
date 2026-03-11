@@ -16,11 +16,11 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AntdApp>
+      <AntdApp>
+        <BrowserRouter>
           <App />
-        </AntdApp>
-      </BrowserRouter>
+        </BrowserRouter>
+      </AntdApp>
     </QueryClientProvider>
   </StrictMode>,
 );

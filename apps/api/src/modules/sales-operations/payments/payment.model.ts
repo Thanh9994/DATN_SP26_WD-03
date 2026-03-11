@@ -1,14 +1,14 @@
-import { PaymentMethod } from "@shared/schemas";
+import { IPaymentStatus, PaymentMethod, PaymentStatus } from "@shared/schemas";
 import mongoose from "mongoose";
 
 export interface IPayment extends Document {
-  booking: mongoose.Types.ObjectId;
-  user: mongoose.Types.ObjectId;
+  bookingId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   finalAmount: number;
   paymentMethod: string; // 'vnpay', 'momo', etc.
-  status: "pending" | "success" | "failed";
+  status: IPaymentStatus;
   transactionNo?: string; // ID from the payment gateway
-  gatewayData?: any; // Raw data from gateway for debugging
+  gatewayDataResponse?: any; // Raw data from gateway for debugging
 }
 
 const paymentSchema = new mongoose.Schema(
@@ -31,13 +31,15 @@ const paymentSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "success", "failed"],
+      enum: PaymentStatus.options,
       default: "pending",
     },
     transactionNo: { type: String, unique: true, sparse: true },
-    gatewayData: { type: mongoose.Schema.Types.Mixed },
+    gatewayDataResponse: { type: mongoose.Schema.Types.Mixed },
   },
   { timestamps: true },
 );
-
+paymentSchema.index({ bookingId: 1 });
+paymentSchema.index({ userId: 1, createdAt: -1 });
+paymentSchema.index({ status: 1 });
 export const Payment = mongoose.model<IPayment>("Payments", paymentSchema);
