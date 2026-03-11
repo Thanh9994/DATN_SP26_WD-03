@@ -18,8 +18,8 @@ const BookingLayout = () => {
   const movieId = searchParams.get("movieId") || undefined;
   const showtimeIdFromUrl = searchParams.get("showtimeId");
   const { user } = useAuth();
-
   const location = useLocation();
+
   const navigate = useNavigate();
 
   // Quản lý trạng thái dùng chung
@@ -28,25 +28,85 @@ const BookingLayout = () => {
   );
   const [selectedSeats, setSelectedSeats] = useState<IShowTimeSeat[]>([]);
 
+  const activeShowtimeId =
+    selectedShowtime?._id ?? showtimeIdFromUrl ?? undefined;
+
+  const { showTime, holdSeats, isHolding, refreshSeats, pendingBooking } =
+    useBooking(activeShowtimeId);
+
+  useEffect(() => {
+    if (!pendingBooking?.data) return;
+
+    const seatCodes = pendingBooking.data.seatCodes;
+
+    if (!seatCodes) return;
+
+    const seatsFromShowtime =
+      showTime?.seats?.filter((s: any) => seatCodes.includes(s.seatCode)) || [];
+
+    setSelectedSeats(seatsFromShowtime);
+  }, [pendingBooking, showTime]);
   const { data: movie, isLoading: isMovieLoading } = useMovie(movieId);
 
-  const activeShowtimeId = selectedShowtime?._id || showtimeIdFromUrl;
-  const { showTime, holdSeats, isHolding, refreshSeats } = useBooking(
-    activeShowtimeId ?? undefined,
-  );
   useEffect(() => {
-    if (showTime && !selectedShowtime) {
-      setSelectedShowtime(showTime);
+    const savedSeatsJSON = localStorage.getItem("temp_seats");
+
+    if (!user || !activeShowtimeId || !savedSeatsJSON) return;
+
+    localStorage.removeItem("temp_seats");
+
+    try {
+      const seatsToHold: IShowTimeSeat[] = JSON.parse(savedSeatsJSON);
+
+      if (!seatsToHold || seatsToHold.length === 0) return;
+
+      holdSeats({
+        showTimeId: activeShowtimeId,
+        seats: seatsToHold.map((s) => s.seatCode),
+      })
+        .then((result) => {
+          setTimeout(() => {
+            navigate("/payments", {
+              state: {
+                bookingId: result.bookingId,
+                totalAmount: result.totalAmount,
+                seats: seatsToHold.map((s) => s.seatCode),
+                movieInfo: {
+                  title: movie?.ten_phim,
+                  poster: movie?.poster?.url,
+                  showtime: showTime?.startTime
+                    ? dayjs(showTime.startTime).format("HH:mm - DD/MM/YYYY")
+                    : "Showtime",
+                },
+              },
+            });
+          }, 400);
+        })
+        .catch((err) => {
+          console.error("Auto hold failed:", err);
+          message.error(
+            err?.message || "Không thể tự động giữ ghế. Vui lòng chọn lại ghế.",
+          );
+        });
+    } catch (error) {
+      console.error("Parse seats error:", error);
     }
-  }, [showTime, selectedShowtime]);
-  const currentData = showTime || selectedShowtime;
+  }, [user?._id, activeShowtimeId, movie, showTime]);
+
+  const currentData = showTime ?? selectedShowtime ?? null;
+
   const cinema =
-    currentData?.roomId?.cinema_id || (currentData as any)?.cinemaInfo; // Trường hợp 1: Dữ liệu chuẩn Backend
+    currentData?.roomId?.cinema_id ?? (currentData as any)?.cinemaInfo ?? null;
 
   const isSelectSeatStep = location.pathname.includes("/seats");
-  const totalAmount = selectedSeats.reduce((sum, s) => sum + s.price, 0);
-
-  if (!movie) return null;
+  const totalAmount =
+    selectedSeats.length > 0
+      ? selectedSeats.reduce((sum, s) => sum + s.price, 0)
+      : pendingBooking?.totalAmount || 0;
+  // console.log("user", user);
+  // console.log("selectedShowtime", selectedShowtime);
+  // console.log("showtimeIdFromUrl", showtimeIdFromUrl);
+  // console.log("activeShowtimeId", activeShowtimeId);
 
   if (isMovieLoading)
     return (
@@ -66,47 +126,44 @@ const BookingLayout = () => {
     );
 
   const handleAction = async () => {
-    //trang chọn lịch chiếu -> Chuyển sang chọn ghế
+    // step 1: chọn lịch -> sang chọn ghế
     if (!isSelectSeatStep) {
       if (!selectedShowtime) {
         message.warning("Vui lòng chọn một suất chiếu!");
-        // console.log("Cinema Data:", cinema);
-        // console.log("Room Name:", roomName);
-        // console.log("Selected Showtime:", selectedShowtime);
         return;
       }
-      // console.log(selectedShowtime);
+
       navigate(
         `/booking/seats?movieId=${movieId}&showtimeId=${selectedShowtime._id}`,
       );
       return;
     }
 
-    // trang chọn ghế -> Giữ ghế và sang thanh toán
+    // step 2: chọn ghế -> giữ ghế
     if (selectedSeats.length === 0) {
       message.warning("Vui lòng chọn ít nhất một ghế!");
       return;
     }
 
     try {
-      if (!user) {
-        message.warning("Vui lòng đăng nhập trước khi đặt vé!");
-        navigate("/login");
+      if (!activeShowtimeId) {
+        message.error("Không tìm thấy suất chiếu");
         return;
       }
+
       const result = await holdSeats({
-        showTimeId: activeShowtimeId!,
+        showTimeId: activeShowtimeId,
         seats: selectedSeats.map((s) => s.seatCode),
-        userId: user?._id as string,
       });
 
       await refreshSeats();
+
       message.success("Giữ ghế thành công!");
 
       navigate("/payments", {
         state: {
-          bookingId: result.data.bookingId,
-          totalAmount: result.data.totalAmount,
+          bookingId: result.bookingId,
+          totalAmount: result.totalAmount,
           seats: selectedSeats.map((s) => s.seatCode),
           movieInfo: {
             title: movie.ten_phim,

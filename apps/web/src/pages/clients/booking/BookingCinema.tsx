@@ -1,42 +1,59 @@
 import { useShowTimesByMovie } from "@web/hooks/useShowTime";
-import { Spin, Empty } from "antd";
+import { Spin, Empty, message } from "antd";
 import dayjs from "dayjs";
 import { ChevronDown, Ticket, CalendarDays, MapPin } from "lucide-react";
-import { useState } from "react";
-import { useOutletContext, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import {
+  useNavigate,
+  useOutletContext,
+  useSearchParams,
+} from "react-router-dom";
+import { useAuth } from "@web/hooks/useAuth";
 
 export const BookingCinema = () => {
   const [searchParams] = useSearchParams();
   const movieId = searchParams.get("movieId");
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { groupedByCinema, isLoading } = useShowTimesByMovie(movieId!);
 
-  const nextDays = Array.from({ length: 7 }).map((_, i) =>
+  const nextDays = Array.from({ length: 8 }).map((_, i) =>
     dayjs().add(i, "day").format("YYYY-MM-DD"),
   );
 
   const [selectedDate, setSelectedDate] = useState<string>(nextDays[0]);
-  const [openCinemas, setOpenCinemas] = useState<string[]>([]);
-  const { setSelectedShowtime, selectedShowtime } = useOutletContext<any>();
+  const [openCinemas, setOpenCinemas] = useState<string | null>(null);
+
+  const { setSelectedShowtime, selectedShowtime, setSelectedSeats } =
+    useOutletContext<any>();
 
   const activeDate = selectedDate;
 
   const toggleCinema = (cinemaId: string) => {
-    setOpenCinemas((prev) =>
-      prev.includes(cinemaId)
-        ? prev.filter((id) => id !== cinemaId)
-        : [...prev, cinemaId],
-    );
+    setOpenCinemas((prev) => (prev === cinemaId ? null : cinemaId));
   };
 
-  const filteredData = (groupedByCinema ?? [])
-    .map((item: any) => ({
-      ...item,
-      showtimesInDate: item.showtimes.filter(
-        (st: any) => dayjs(st.startTime).format("YYYY-MM-DD") === activeDate,
-      ),
-    }))
-    .filter((item: any) => item.showtimesInDate.length > 0);
+  useEffect(() => {
+    if (!selectedShowtime) return;
+
+    const cinemaId = selectedShowtime?.roomId?.cinema_id;
+
+    if (cinemaId) {
+      setOpenCinemas(cinemaId);
+    }
+  }, [selectedShowtime]);
+
+  const filteredData = useMemo(() => {
+    return (groupedByCinema ?? [])
+      .map((item: any) => ({
+        ...item,
+        showtimesInDate: item.showtimes.filter(
+          (st: any) => dayjs(st.startTime).format("YYYY-MM-DD") === activeDate,
+        ),
+      }))
+      .filter((item: any) => item.showtimesInDate.length > 0);
+  }, [groupedByCinema, activeDate]);
 
   if (isLoading)
     return (
@@ -65,7 +82,11 @@ export const BookingCinema = () => {
             return (
               <button
                 key={date}
-                onClick={() => setSelectedDate(date)}
+                onClick={() => {
+                  setSelectedDate(date);
+                  setSelectedShowtime(null);
+                  setSelectedSeats([]);
+                }}
                 // w-[90px] và flex-shrink-0 giúp các nút luôn bằng nhau
                 className={`flex flex-col items-center justify-center w-20 h-20 md:w-24 md:h-28 flex-shrink-0 rounded-[1.5rem] transition-all border ${
                   isSelected
@@ -110,7 +131,7 @@ export const BookingCinema = () => {
           <div className="space-y-4 pb-3 px-4 lg:px-0 md:pb-5">
             {filteredData.map((item: any) => {
               const cinemaId = item.cinemaInfo?._id;
-              const isOpen = openCinemas.includes(cinemaId);
+              const isOpen = openCinemas === cinemaId;
 
               return (
                 <div
@@ -150,7 +171,27 @@ export const BookingCinema = () => {
                         {item.showtimesInDate.map((st: any) => (
                           <button
                             key={st._id}
-                            onClick={() => setSelectedShowtime(st)}
+                            onClick={() => {
+                              if (!user) {
+                                message.warning(
+                                  "Vui lòng đăng nhập để tiếp tục!",
+                                );
+
+                                const redirect = encodeURIComponent(
+                                  `/booking/seats?showtimeId=${st._id}&movieId=${movieId}`,
+                                );
+
+                                navigate(`/login?redirect=${redirect}`);
+                                return;
+                              }
+
+                              setSelectedShowtime(st);
+                              setSelectedSeats([]);
+
+                              navigate(
+                                `/booking/seats?showtimeId=${st._id}&movieId=${movieId}`,
+                              );
+                            }}
                             className={`py-4 rounded-2xl text-center transition-all border ${
                               selectedShowtime?._id === st._id
                                 ? "bg-primary border-primary text-white shadow-lg shadow-primary/30"

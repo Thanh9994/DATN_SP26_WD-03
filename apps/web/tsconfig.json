@@ -21,5 +21,5 @@
       "@shared/*": ["../../packages/shared/*"]
     }
   },
-  "include": ["src", "../../packages/shared/**/*"]
+  "include": ["src", "../../packages/shared/**/*", "src/pages/clients/payments/PaymentList.tsx"]
 }

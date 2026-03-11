@@ -51,6 +51,7 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
       startTime: startDayjs.toDate(),
       endTime: startDayjs.add(movie?.thoi_luong || 120, "minute").toDate(),
       status: "upcoming",
+      showDate: values.date.toDate(),
       priceNormal: values.priceNormal,
       priceVip: values.priceVip,
       priceCouple: values.priceCouple,

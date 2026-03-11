@@ -7,8 +7,6 @@ const PhimCard = ({ movie }: { movie: IMovie }) => {
   const navigate = useNavigate();
   const badge = MOVIE_BADGE[movie.trang_thai];
 
-  
-
   return (
     <div
       onClick={() => navigate(`/movie/${movie._id}`)}
@@ -45,10 +43,11 @@ const PhimCard = ({ movie }: { movie: IMovie }) => {
             className="w-full bg-white text-black py-2 rounded-lg font-bold text-sm hover:bg-red-500 hover:text-white transition"
             onClick={(e) => {
               e.stopPropagation();
-              const token = localStorage.getItem("token");
+              // const token = localStorage.getItem("token");
 
-              if (!token) navigate("/login");
-              else navigate(`/booking?movieId=${movie._id}`);
+              // if (!token) navigate("/login");
+              //else
+              navigate(`/booking?movieId=${movie._id}`);
             }}
           >
             Đặt Vé Ngay

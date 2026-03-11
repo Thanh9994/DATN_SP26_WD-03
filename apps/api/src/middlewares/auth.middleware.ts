@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { IUser } from "@shared/schemas";
+import { IUser, IUserDocument } from "@shared/schemas";
 import { User } from "@api/modules/access-control/user/user.model";
 import { catchAsync } from "@api/utils/catchAsync";
 import { AppError } from "./error.middleware";
@@ -51,7 +51,7 @@ export const authenticate = catchAsync(async (req, res, next) => {
     );
   }
 
-  req.user = user;
+  req.user = user as IUserDocument;
   next();
 });
 
