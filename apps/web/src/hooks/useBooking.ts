@@ -84,6 +84,8 @@ export const useBooking = (showTimeId?: string) => {
         queryKey: ["pending-booking", showTimeId],
       });
     },
+    enabled: !!showTimeId,
+    refetchOnWindowFocus: true,
   });
 
   return {
