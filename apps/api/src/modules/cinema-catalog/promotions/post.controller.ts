@@ -8,6 +8,7 @@ import { Post } from "./post.model";
 // @access  Private/Admin
 export const createPost = catchAsync(async (req: Request, res: Response) => {
   const {
+    avatar,
     title,
     content,
     summary,
@@ -26,6 +27,7 @@ export const createPost = catchAsync(async (req: Request, res: Response) => {
   const slug = slugify(title);
 
   const newPost = await Post.create({
+    avatar,
     title,
     slug,
     content,
@@ -94,6 +96,7 @@ export const getPostBySlug = catchAsync(async (req: Request, res: Response) => {
 export const updatePost = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const {
+    avatar,
     title,
     content,
     summary,
@@ -112,6 +115,7 @@ export const updatePost = catchAsync(async (req: Request, res: Response) => {
   }
 
   const updatedData: any = {
+    avatar,
     title,
     content,
     summary,
