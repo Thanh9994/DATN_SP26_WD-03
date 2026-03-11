@@ -58,14 +58,12 @@ export const RecommentDrinkSnack = (): JSX.Element => {
 
   const handleAddToCart = (productId: string, quantity: number = 1): void => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find(
-        (item) => item.productId === productId,
-      );
+      const existingItem = prevCart.find((item) => item.productId === productId);
       if (existingItem) {
         return prevCart.map((item) =>
           item.productId === productId
             ? { ...item, quantity: item.quantity + quantity }
-            : item,
+            : item
         );
       }
       return [...prevCart, { productId, quantity }];
@@ -114,7 +112,11 @@ export const RecommentDrinkSnack = (): JSX.Element => {
         className={`card-btn ${product.isFeatured ? "btn-claim" : "btn-add"}`}
         onClick={() => handleAddToCart(product.id, 1)}
       >
-        {product.isFeatured ? <>⊕ Claim Offer</> : <>🛒 Add to Order</>}
+        {product.isFeatured ? (
+          <>⊕ Claim Offer</>
+        ) : (
+          <>🛒 Add to Order</>
+        )}
       </button>
     </div>
   );
@@ -124,7 +126,10 @@ export const RecommentDrinkSnack = (): JSX.Element => {
   return (
     <div className="recommend-overlay">
       <div className="recommend-modal">
-        <button className="recommend-close" onClick={() => setIsOpen(false)}>
+        <button
+          className="recommend-close"
+          onClick={() => setIsOpen(false)}
+        >
           ✕
         </button>
 
@@ -138,7 +143,10 @@ export const RecommentDrinkSnack = (): JSX.Element => {
         </div>
 
         <div className="recommend-footer">
-          <button className="recommend-skip" onClick={() => setIsOpen(false)}>
+          <button
+            className="recommend-skip"
+            onClick={() => setIsOpen(false)}
+          >
             No thanks, go to Checkout
           </button>
 

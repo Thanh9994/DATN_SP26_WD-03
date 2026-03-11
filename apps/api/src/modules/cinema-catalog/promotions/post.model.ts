@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
+    avatar: {
+      type: String,
+    },
     title: {
       type: String,
       required: true,
