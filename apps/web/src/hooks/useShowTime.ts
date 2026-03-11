@@ -84,6 +84,36 @@ export const useDashboardShowTimes = (date: string) => {
   });
 };
 
+export const useShowTimeCountByMonth = (month?: number, year?: number) => {
+  return useQuery({
+    queryKey: ["dashboard-showtimes-count", "month", month, year],
+    queryFn: async () => {
+      if (!month || !year) return 0;
+      const { data } = await axios.get(`${API.SHOWTIME}`, {
+        params: { month, year },
+      });
+      return data.data?.length ?? 0;
+    },
+    enabled: !!month && !!year,
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
+export const useShowTimeCountByYear = (year?: number) => {
+  return useQuery({
+    queryKey: ["dashboard-showtimes-count", "year", year],
+    queryFn: async () => {
+      if (!year) return 0;
+      const { data } = await axios.get(`${API.SHOWTIME}`, {
+        params: { year },
+      });
+      return data.data?.length ?? 0;
+    },
+    enabled: !!year,
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
 export const useShowTimesByMovie = (movieId?: string) => {
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["movie-showtimes", movieId],
