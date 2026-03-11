@@ -8,11 +8,14 @@ import {
   Modal,
   Form,
   Select,
+  Typography,
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useAuth } from "@web/hooks/useAuth";
 import { useState } from "react";
 import { IUser } from "@shared/schemas";
+
+const { Title } = Typography;
 
 export const User = () => {
   const { users, isLoadingUsers, updateMutation } = useAuth();
@@ -105,7 +108,9 @@ export const User = () => {
 
   return (
     <div style={{ padding: 24 }}>
-      <h2 className="mb-4 text-xl font-bold">Quản lý người dùng</h2>
+      <Title level={4} style={{ marginBottom: 16 }}>
+        Quản lý người dùng
+      </Title>
       <Table
         dataSource={users}
         columns={columns}

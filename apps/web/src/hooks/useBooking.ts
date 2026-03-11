@@ -1,11 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { API } from "@web/api/api.service";
 import { axiosAuth } from "./useAuth";
-import { message } from "antd";
 
 export const useBooking = (showTimeId?: string) => {
   const queryClient = useQueryClient();
-
+  // const token = localStorage.getItem("accessToken");
   // 1. Lấy thông tin suất chiếu và sơ đồ ghế
   const {
     data: bookingData,
@@ -20,51 +19,77 @@ export const useBooking = (showTimeId?: string) => {
       return res.data;
     },
     enabled: !!showTimeId,
-    refetchInterval: 30000,
+    staleTime: 5000,
+    refetchInterval: false,
   });
 
   const holdSeats = useMutation({
-    mutationFn: async (payload: {
-      showTimeId: string;
-      seats: string[];
-      userId: string;
-    }) => {
+    mutationFn: async (payload: { showTimeId: string; seats: string[] }) => {
       const { data } = await axiosAuth.post(`${API.BOOKING}/hold`, payload);
-      return data;
+      return data.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["showtime-detail", showTimeId],
       });
-    },
-    onError: (error: any) => {
-      message.error(error.response?.data?.message || "Giữ ghế thất bại");
     },
   });
 
-  // 3. Mutation: Xác nhận đặt vé (Confirm)
-  const confirmBooking = useMutation({
-    mutationFn: async (payload: {
-      showTimeId: string;
-      seatCodes: string[];
-      userId: string;
-      paymentId?: string;
-    }) => {
-      const { data } = await axiosAuth.post(`${API.BOOKING}/confirm`, payload);
-      return data;
+  const createPaymentUrl = useMutation({
+    mutationFn: async (bookingId: string) => {
+      const res = await axiosAuth.post(`${API.PAYMENT_GATEWAY}/vnpay/create`, {
+        bookingId,
+      });
+
+      return res.data.data; // chỉ trả link
+    },
+  });
+
+  const { data: pendingBooking } = useQuery({
+    queryKey: ["pending-booking", showTimeId],
+    queryFn: async () => {
+      if (!showTimeId) return null;
+      const res = await axiosAuth.get(`${API.BOOKING}/pending/${showTimeId}`);
+      return res.data.data;
+    },
+    enabled: !!showTimeId,
+    refetchOnWindowFocus: true,
+  });
+
+  const cancelBooking = useMutation({
+    mutationFn: async (bookingId: string) => {
+      const res = await axiosAuth.post(`${API.BOOKING}/cancel`, { bookingId });
+      return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["showtime-detail", showTimeId],
       });
-      message.success("Đặt vé thành công!");
+      queryClient.invalidateQueries({
+        queryKey: ["pending-booking", showTimeId],
+      });
     },
-    onError: (error: any) => {
-      message.error(error.response?.data?.message || "Lỗi khi xác nhận đặt vé");
+  });
+
+  const expireBooking = useMutation({
+    mutationFn: async (bookingId: string) => {
+      const res = await axiosAuth.post(`${API.BOOKING}/expire`, { bookingId });
+      return res.data;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["showtime-detail", showTimeId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["pending-booking", showTimeId],
+      });
+    },
+    enabled: !!showTimeId,
+    refetchOnWindowFocus: true,
   });
 
   return {
+    pendingBooking,
     showTime: bookingData?.showTime,
     seats: bookingData?.seats || [],
     isLoading,
@@ -73,8 +98,14 @@ export const useBooking = (showTimeId?: string) => {
     holdSeats: holdSeats.mutateAsync,
     isHolding: holdSeats.isPending,
 
-    confirmBooking: confirmBooking.mutateAsync,
-    isConfirming: confirmBooking.isPending,
+    createPaymentUrl: createPaymentUrl.mutateAsync,
+    isCreatingPayment: createPaymentUrl.isPending,
+
+    cancelBooking: cancelBooking.mutateAsync,
+    isCancelling: cancelBooking.isPending,
+
+    expireBooking: expireBooking.mutateAsync,
+    isExpiring: expireBooking.isPending,
 
     refreshSeats: refetch,
   };

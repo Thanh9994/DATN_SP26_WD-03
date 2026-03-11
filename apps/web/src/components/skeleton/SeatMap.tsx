@@ -21,9 +21,21 @@ const SeatMap: React.FC<SeatMapProps> = ({
     },
     {} as Record<string, IShowTimeSeat[]>,
   );
+  const seatTypeOrder = {
+    normal: 0,
+    vip: 1,
+    couple: 2,
+  };
+  const sortedRows = Object.keys(rows).sort((a, b) => {
+    const typeA = rows[a][0]?.loai_ghe || "normal";
+    const typeB = rows[b][0]?.loai_ghe || "normal";
 
-  // Sắp xếp các hàng theo thứ tự A, B, C... và số ghế 1, 2, 3...
-  const sortedRows = Object.keys(rows).sort();
+    if (seatTypeOrder[typeA] !== seatTypeOrder[typeB]) {
+      return seatTypeOrder[typeA] - seatTypeOrder[typeB];
+    }
+
+    return a.localeCompare(b);
+  });
 
   const getSeatColor = (seat: IShowTimeSeat) => {
     if (seat.trang_thai === "booked")
@@ -49,7 +61,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
     <div className="flex flex-col items-center gap-6 p-4 bg-[#0a0a0a] rounded-xl ">
       {/* Màn hình */}
       <div className="w-full max-w-lg mb-12">
-        <div className="h-1 bg-red-600 shadow-[0_0_12px_rgba(220,38,38,0.5)] mb-2" />
+        <div className="h-2 bg-red-800/40 rounded-t-[120px] shadow-[0_35px_90px_rgba(220,220,220,0.9)] mb-2" />
         <p className="text-center text-zinc-500 text-sm tracking-[0.5em] uppercase">
           Màn Hình
         </p>
@@ -68,23 +80,67 @@ const SeatMap: React.FC<SeatMapProps> = ({
 
             <div className="flex gap-2 ">
               {rows[rowLabel]
-                .sort((a, b) => a.number - b.number)
-                .map((seat) => (
-                  <button
-                    key={seat._id}
-                    disabled={
-                      seat.trang_thai === "booked" || seat.trang_thai === "hold"
+                .sort((a, b) => {
+                  if (a.loai_ghe === "couple" && b.loai_ghe !== "couple")
+                    return 1;
+                  if (a.loai_ghe !== "couple" && b.loai_ghe === "couple")
+                    return -1;
+                  return a.number - b.number;
+                })
+                .reduce((acc: IShowTimeSeat[][], seat, index, array) => {
+                  if (seat.loai_ghe === "couple") {
+                    const nextSeat = array[index + 1];
+                    if (
+                      nextSeat &&
+                      nextSeat.loai_ghe === "couple" &&
+                      nextSeat.number === seat.number + 1
+                    ) {
+                      acc.push([seat, nextSeat]);
+                      array.splice(index + 1, 1);
+                    } else {
+                      acc.push([seat]);
                     }
-                    onClick={() => onSeatClick(seat)}
-                    className={`
-                      w-6 h-6 md:w-7 md:h-7 md:no-scrollbar text-[8px] md:text-xs font-semibold rounded-md border-2 transition-all
-                      flex items-center justify-center
-                      ${getSeatColor(seat)}
-                    `}
-                  >
-                    {seat.number}
-                  </button>
-                ))}
+                  } else {
+                    acc.push([seat]);
+                  }
+                  return acc;
+                }, [])
+                .map((seatGroup) => {
+                  const isCouple = seatGroup.length === 2;
+                  const firstSeat = seatGroup[0];
+                  const isDisabled = seatGroup.some(
+                    (s) => s.trang_thai === "booked" || s.trang_thai === "hold",
+                  );
+
+                  return (
+                    <button
+                      key={seatGroup.map((s) => s._id).join("-")}
+                      disabled={isDisabled}
+                      onClick={() =>
+                        seatGroup.forEach((seat) => onSeatClick(seat))
+                      }
+                      className={`
+                        ${
+                          isCouple
+                            ? "w-14 md:w-16 rounded-xl bg-pink-500/20 border-pink-500 relative"
+                            : "w-6 md:w-7"
+                        }
+                        h-6 md:h-7
+                        text-[8px] md:text-xs
+                        font-semibold
+                        rounded-md
+                        border-2
+                        transition-all
+                        flex items-center justify-center
+                        ${getSeatColor(firstSeat)}
+                      `}
+                    >
+                      {isCouple
+                        ? `${seatGroup[0].number}-${seatGroup[1].number}`
+                        : firstSeat.number}
+                    </button>
+                  );
+                })}
             </div>
 
             {/* Nhãn hàng bên phải */}

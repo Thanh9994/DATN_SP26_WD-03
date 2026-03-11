@@ -13,7 +13,7 @@ export const useShowTime = (movieId?: string) => {
     queryFn: async () => {
       if (!movieId) return [];
       const { data } = await axios.get(`${API.SHOWTIME}/movie/${movieId}`);
-      console.log("Dữ liệu lịch chiếu trả về:", data.data);
+      // console.log("Dữ liệu lịch chiếu trả về:", data.data);
       return data.data;
     },
     enabled: !!movieId,

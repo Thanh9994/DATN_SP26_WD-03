@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../styles/RecommentDrinkSnack.css";
 
 interface Product {

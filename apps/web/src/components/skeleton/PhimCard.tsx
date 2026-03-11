@@ -21,14 +21,14 @@ const PhimCard = ({ movie }: { movie: IMovie }) => {
         />
 
         {/* Age */}
-        <div className="absolute top-2 left-2 uppercase bg-black/10 backdrop-blur-md px-1.5 py-1 rounded text-[8px] font-bold text-white">
+        <div className="absolute top-2 left-2 uppercase bg-black/10 backdrop-blur-md px-1.5 py-[2px] rounded text-[8px] md:text-[10px] font-bold text-white">
           {movie.do_tuoi}
         </div>
 
         {/* Status badge */}
         {badge && (
           <div
-            className={`absolute top-2 right-2 uppercase ${badge.color} px-1.5 py-1 rounded text-[8px] font-bold text-white/80`}
+            className={`absolute top-2 right-2 uppercase ${badge.color} px-1.5 py-[2px] rounded text-[8px] md:text-[10px] font-bold text-white/80`}
           >
             {badge.text}
           </div>
@@ -43,10 +43,11 @@ const PhimCard = ({ movie }: { movie: IMovie }) => {
             className="w-full bg-white text-black py-2 rounded-lg font-bold text-sm hover:bg-red-500 hover:text-white transition"
             onClick={(e) => {
               e.stopPropagation();
-              const token = localStorage.getItem("token");
+              // const token = localStorage.getItem("token");
 
-              if (!token) navigate("/login");
-              else navigate(`/booking?movieId=${movie._id}`);
+              // if (!token) navigate("/login");
+              //else
+              navigate(`/booking?movieId=${movie._id}`);
             }}
           >
             Đặt Vé Ngay

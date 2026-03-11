@@ -33,7 +33,7 @@ export default function AuthLayout({
         </div>
 
         <div className="relative z-20 flex flex-col justify-center left-1/4 p-22 -mt-20 w-full">
-          <h1 className="text-7xl font-black text-white leading-tight tracking-tighter uppercase mb-6">
+          <h1 className="text-6xl font-black text-white leading-tight tracking-tighter uppercase mb-6">
             {lsTitle}
           </h1>
 

@@ -1,22 +1,31 @@
-import Button from "@web/components/Button";
-import Input from "@web/components/Input";
+import Button from "@web/components/tools/Button";
+import Input from "@web/components/tools/Input";
 import { useAuth } from "@web/hooks/useAuth";
 import AuthLayout from "@web/layouts/AuthLayout";
 import { Form } from "antd";
 import { Lock, Mail } from "lucide-react";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, isLoggingIn } = useAuth();
+  const { user, login, isLoggingIn } = useAuth();
+  const [searchParams] = useSearchParams();
   const [remember, setRemember] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      const redirectTo = searchParams.get("redirect") || "/";
+      navigate(decodeURIComponent(redirectTo), { replace: true });
+    }
+  }, [user]);
 
   const handleSubmit = async (values: any) => {
     try {
       await login({ email: values.email, password: values.password });
-      // console.log(token);
-      navigate("/");
+      const redirectTo = searchParams.get("redirect") || "/";
+
+      navigate(decodeURIComponent(redirectTo), { replace: true });
     } catch (err) {
       console.error(err);
     }
@@ -84,21 +93,32 @@ const Login = () => {
           </Form.Item>
         </div>
 
-        <div className="flex items-center gap-3 py-2">
+        <label className="flex items-center gap-3 cursor-pointer">
           <input
             type="checkbox"
-            id="remember"
-            className="w-5 h-5 rounded border-white/10 bg-white/5 text-primary focus:ring-offset-background-dark focus:ring-primary transition-all cursor-pointer"
+            className="peer hidden"
             checked={remember}
             onChange={(e) => setRemember(e.target.checked)}
           />
-          <label
-            htmlFor="remember"
-            className="text-sm text-white/60 cursor-pointer select-none font-medium"
-          >
+
+          <div className="w-5 h-5 rounded-md border border-white/20 bg-white/5 flex items-center justify-center peer-checked:bg-primary peer-checked:border-primary transition">
+            <svg
+              className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.704 5.29a1 1 0 010 1.42l-7.2 7.2a1 1 0 01-1.42 0l-3.2-3.2a1 1 0 111.42-1.42l2.49 2.49 6.49-6.49a1 1 0 011.42 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+
+          <span className="text-sm text-white/60 font-medium">
             Keep me signed in
-          </label>
-        </div>
+          </span>
+        </label>
 
         <Button disabled={isLoggingIn}>
           {isLoggingIn ? "Signing In..." : "Sign In"}

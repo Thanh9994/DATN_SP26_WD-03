@@ -1,38 +1,151 @@
+import { AppError } from "@api/middlewares/error.middleware";
+import { IUser } from "@shared/schemas";
 import { Booking } from "../booking/booking.model";
 import { bookingService } from "../booking/booking.service";
 import { PaymentFactory } from "./gateways/payment.factory";
-import { AppError } from "@api/middlewares/error.middleware";
+import { Payment } from "./payment.model";
 
 export const paymentService = {
-  async initPayment(bookingId: string, method: string, ipAddr: string) {
+  async initPayment(
+    bookingId: string,
+    method: string,
+    ipAddr: string,
+    user: IUser,
+  ) {
     const booking = await Booking.findById(bookingId);
-    if (!booking) throw new AppError("Đơn hàng không tồn tại", 404);
-    if (booking.status !== "pending")
-      throw new AppError("Đơn hàng đã xử lý hoặc hết hạn", 400);
 
-    // Factory sẽ trả về class Gateway tương ứng (VNPay, Momo, v.v.)
-    const gateway = PaymentFactory.getGateway(method);
-    return await gateway.createUrl(bookingId, booking.finalAmount, ipAddr);
-  },
-
-  async processIpn(method: string, data: any) {
-    const gateway = PaymentFactory.getGateway(method);
-
-    // Gateway trả về kết quả đã được chuẩn hóa (normalized)
-    const result = await gateway.handleIpn(data);
-
-    // Kiểm tra mã thành công chung (Ví dụ: '00' là thành công)
-    if (result.code === "00" && result.bookingId) {
-      // Dùng result.bookingId thay vì data.vnp_TxnRef để dùng chung cho mọi cổng
-      await bookingService.confirmBooking(
-        result.bookingId,
-        result.transactionNo || "N/A",
-      );
+    if (!booking) {
+      throw new AppError("Đơn hàng không tồn tại", 404);
     }
 
-    return {
-      code: result.code,
-      message: result.message,
-    };
+    // check quyền
+    if (
+      booking.userId?.toString() !== user._id?.toString() &&
+      user.role !== "admin"
+    ) {
+      throw new AppError("Bạn không có quyền thanh toán đơn hàng này", 403);
+    }
+
+    // check trạng thái booking
+    if (booking.status !== "pending") {
+      throw new AppError("Đơn hàng đã xử lý hoặc hết hạn", 400);
+    }
+
+    const amount = booking.finalAmount || booking.totalAmount;
+
+    if (!amount || amount <= 0) {
+      throw new AppError("Số tiền không hợp lệ", 400);
+    }
+
+    console.log(
+      `💰 Creating payment for booking ${bookingId}, amount: ${amount}`,
+    );
+
+    // tạo record payment
+    const payment = await Payment.create({
+      bookingId: booking._id,
+      userId: booking.userId,
+      finalAmount: amount,
+      paymentMethod: method,
+      status: "pending",
+    });
+
+    // lấy gateway
+    let gateway;
+
+    try {
+      gateway = PaymentFactory.getGateway(method);
+    } catch {
+      throw new AppError("Phương thức thanh toán không được hỗ trợ", 400);
+    }
+
+    // tạo url thanh toán
+    const paymentUrl = await gateway.createUrl(
+      payment._id.toString(),
+      amount,
+      ipAddr,
+    );
+
+    return paymentUrl;
+  },
+
+  // Xử lý IPN từ gateway
+
+  async processIpn(method: string, data: any) {
+    try {
+      const gateway = PaymentFactory.getGateway(method);
+
+      const result =
+        data.vnp_SecureHashType || data.vnp_SecureHash
+          ? gateway.verifyReturn(data)
+          : await gateway.handleIpn(data);
+
+      if (!result.paymentId) {
+        return {
+          code: "97",
+          message: "Thiếu paymentId",
+        };
+      }
+
+      const payment = await Payment.findById(result.paymentId);
+
+      if (!payment) {
+        return {
+          code: "01",
+          message: "Payment không tồn tại",
+        };
+      }
+
+      const amount = Number(data.vnp_Amount) / 100;
+
+      if (amount !== payment.finalAmount) {
+        return {
+          code: "04",
+          message: "Sai số tiền thanh toán",
+        };
+      }
+
+      // chống xử lý nhiều lần
+      if (payment.status === "success") {
+        return {
+          code: "00",
+          message: "Payment already processed",
+        };
+      }
+
+      if (result.code === "00") {
+        payment.status = "success";
+        payment.transactionNo = result.transactionNo;
+        payment.gatewayDataResponse = data;
+
+        await bookingService.confirmBooking(
+          payment.bookingId.toString(),
+          result.transactionNo || "N/A",
+          payment.userId.toString(),
+        );
+      } else {
+        payment.status = "failed";
+        payment.gatewayDataResponse = data;
+
+        await bookingService.cancelBooking(
+          payment.bookingId.toString(),
+          payment.userId.toString(),
+        );
+      }
+      console.log("VNPay result:", result);
+      console.log("Found payment:", payment);
+      await payment.save();
+      return {
+        code: result.code,
+        bookingId: result.paymentId,
+        transactionNo: result.transactionNo,
+      };
+    } catch (error) {
+      console.error("IPN PROCESS ERROR:", error);
+      return {
+        code: "99",
+        message: "Lỗi Thất bại",
+      };
+    }
   },
 };

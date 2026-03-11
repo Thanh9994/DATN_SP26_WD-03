@@ -1,87 +1,52 @@
 import React, { useState } from "react";
-import { Card, DatePicker, Table, Tag, Space, Typography } from "antd";
+import { Card, DatePicker, Space, Typography, Row, Col } from "antd";
 import dayjs from "dayjs";
 import { useDashboardShowTimes } from "@web/hooks/useShowTime";
-import { useRooms } from "@web/hooks/useCinema";
+import { useSeatsByShowtime, useCalculateSeatStats } from "@web/hooks/useSeat";
 
 const { Text } = Typography;
 
+const ShowtimeCard: React.FC<{ showtime: any }> = ({ showtime }) => {
+  const { data: seats } = useSeatsByShowtime(showtime._id);
+  const totalSeats = showtime.roomId?.rows?.reduce((sum: number, row: any) => sum + row.seats, 0) || 0;
+  const stats = useCalculateSeatStats(seats, totalSeats);
+
+  return (
+    <Card
+      size="small"
+      className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow"
+    >
+      <div className="space-y-2">
+        <Text strong className="text-base block">
+          {showtime.movieId?.ten_phim || "Phim không xác định"}
+        </Text>
+        <div className="text-sm text-gray-600">
+          <div>🎬 {showtime.roomId?.ten_phong || "N/A"}</div>
+          <div>🏢 {showtime.roomId?.cinema_id?.name || "N/A"}</div>
+          <div className="font-semibold text-blue-600">
+            ⏰ {dayjs(showtime.startTime).format("HH:mm")} - {dayjs(showtime.endTime).format("HH:mm")}
+          </div>
+        </div>
+        <div className="pt-2 border-t flex justify-between text-xs">
+          <span className="text-green-600">✓ Còn: {stats.availableSeats}</span>
+          <span className="text-red-600">✗ Đã đặt: {stats.bookedSeats}</span>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
 export const ShowTimeDashboard: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState(dayjs().add(1, "day")); // Mặc định xem ngày mai
-  const { rooms } = useRooms();
+  const [selectedDate, setSelectedDate] = useState(dayjs().add(1, "day"));
   const { data: showtimes, isLoading } = useDashboardShowTimes(
     selectedDate.format("YYYY-MM-DD"),
   );
-
-  const columns = [
-    {
-      title: "Phòng chiếu",
-      dataIndex: "ten_phong",
-      key: "room",
-      width: 150,
-      fixed: "left" as const,
-      render: (text: string) => <Text strong>{text}</Text>,
-    },
-    {
-      title: "Lịch trình trong ngày",
-      key: "timeline",
-      render: (_: any, record: any) => {
-        // Lọc các suất chiếu thuộc về phòng này
-        const roomSlots =
-          showtimes?.filter((st: any) => {
-            const stRoomId = st.roomId?._id || st.roomId;
-            return stRoomId === record._id;
-          }) || [];
-
-        return (
-          <div className="flex gap-2 overflow-x-auto py-2">
-            {roomSlots.length > 0 ? (
-              roomSlots
-                .sort(
-                  (a: any, b: any) =>
-                    dayjs(a.startTime).unix() - dayjs(b.startTime).unix(),
-                )
-                .map((i: any) => (
-                  <Card
-                    key={i._id}
-                    size="small"
-                    className="min-w-[140px] border-l-4 border-l-blue-500 shadow-sm"
-                    style={{ padding: 1 }}
-                  >
-                    <div className="flex flex-col">
-                      <Text
-                        ellipsis={{ tooltip: true }}
-                        className="font-bold text-sm"
-                      >
-                        {i.movieId?.ten_phim || "Phim không xác định"}
-                      </Text>
-                      <Space className="text-[11px] text-gray-500">
-                        <Tag color="blue" className="mr-0 text-sx">
-                          {dayjs(i.startTime).format("HH:mm")} -{" "}
-                          {dayjs(i.endTime).format("HH:mm")}
-                        </Tag>
-                      </Space>
-                    </div>
-                  </Card>
-                ))
-            ) : (
-              <Text type="secondary" italic className="text-xs">
-                Trống lịch
-              </Text>
-            )}
-          </div>
-        );
-      },
-    },
-  ];
 
   return (
     <div className="p-4">
       <Card
         title={
-          <span className="text-lg font-bold text-gray-700">
-            Bảng Tổng Hợp Suất Chiếu
-          </span>
+          <span className="text-lg font-bold">Bảng Tổng Hợp Suất Chiếu</span>
         }
         extra={
           <Space>
@@ -94,16 +59,28 @@ export const ShowTimeDashboard: React.FC = () => {
             />
           </Space>
         }
+        loading={isLoading}
       >
-        <Table
-          dataSource={rooms}
-          columns={columns}
-          rowKey="_id"
-          loading={isLoading}
-          pagination={false}
-          bordered
-          scroll={{ x: 1000 }}
-        />
+        <Row gutter={[16, 16]}>
+          {showtimes && showtimes.length > 0 ? (
+            showtimes
+              .sort(
+                (a: any, b: any) =>
+                  dayjs(a.startTime).unix() - dayjs(b.startTime).unix(),
+              )
+              .map((showtime: any) => (
+                <Col xs={24} sm={12} lg={8} xl={6} key={showtime._id}>
+                  <ShowtimeCard showtime={showtime} />
+                </Col>
+              ))
+          ) : (
+            <Col span={24}>
+              <Text type="secondary" className="block text-center py-8">
+                Không có suất chiếu nào trong ngày này
+              </Text>
+            </Col>
+          )}
+        </Row>
       </Card>
 
       <div className="mt-4 grid grid-cols-3 gap-4">
@@ -111,7 +88,6 @@ export const ShowTimeDashboard: React.FC = () => {
           <Text type="secondary">Tổng suất chiếu</Text>
           <div className="text-2xl font-bold">{showtimes?.length || 0}</div>
         </Card>
-        {/* Có thể thêm các thống kê khác như: Phòng bận nhất, Phim nhiều suất nhất... */}
       </div>
     </div>
   );

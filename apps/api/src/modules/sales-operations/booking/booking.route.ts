@@ -4,12 +4,17 @@ import { Router } from "express";
 
 const bookingRouter = Router();
 
-bookingRouter.use(authenticate);
-
-bookingRouter.post("/hold", bookingController.holdSeats);
-bookingRouter.post("/confirm", bookingController.confirmBooking);
-bookingRouter.post("/cancel", bookingController.cancelBooking);
 bookingRouter.get("/detail/:id", bookingController.getBookingDetail);
+
+bookingRouter.post("/hold", authenticate, bookingController.holdSeats);
+bookingRouter.post("/confirm", authenticate, bookingController.confirmBooking);
+bookingRouter.post("/cancel", authenticate, bookingController.cancelBooking);
+bookingRouter.post("/expire", authenticate, bookingController.expireBooking);
+bookingRouter.get(
+  "/pending/:showtimeId",
+  authenticate,
+  bookingController.getPendingBooking,
+);
 
 bookingRouter.get(
   "/analytics/dashboard",
