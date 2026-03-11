@@ -7,8 +7,6 @@ export const Cinemas = () => {
   return (
     <div className="min-h-full max-w-7xl mx-auto my-10 flex items-center justify-center gap-4">
       <div className="bg-white w-1/5 top-0 items-center justify-center">
-        asiâssssssssssssssssssssssssssssssssssssssâfasfasfasfasfas
-        fasfasfáadgasdgasdgasdgasdgasdgasdgade
         <button className="px-5 py-5 bg-primary-dark text-white border rounded-2xl text-center">
           Áp dụng bộ lọc
         </button>
