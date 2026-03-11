@@ -77,12 +77,21 @@ export const ClientRoutes: RouteObject = {
     },
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
-    { path: "ticket", element: <Ticket /> },
-    { path: "foods", element: <DrinkSnack /> },
+     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
-    { path: "checkout", element: <Checkout /> },
-    { path: "*", element: <NotFound /> },
+    {
+      path: "payments",
+      element: <PaymentsMethod />,
+      children: [
+        { index: true, element: <Paymentlist /> },
+        { path: "failed", element: <PaymentsMethod /> },
+        { path: "success", element: <PaymentsMethod /> },
+      ],
+    },
+    { path: "payment-result", element: <PaymentResult /> },
+    { path: "ticket", element: <Ticket /> },   
     { path: "contact", element: <Contact /> },
+        { path: "*", element: <NotFound /> },
   ],
 
 };
