@@ -12,7 +12,7 @@ const showTimeSeatSchema = new Schema<IShowTimeSeat>(
     seatCode: { type: String, required: true },
     row: { type: String, required: true },
     number: { type: Number, required: true },
-    loai_ghe: {
+    seatType: {
       type: String,
       enum: SeatType.options,
       required: true,

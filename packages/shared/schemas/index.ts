@@ -74,7 +74,7 @@ export const ShowTimeSeat = Base.extend({
   seatCode: z.string(),
   row: z.string(),
   number: z.number(),
-  loai_ghe: SeatType,
+  seatType: SeatType,
   price: z.number(),
   trang_thai: SeatsStatus.default("empty"),
   heldBy: z.string().nullable().optional(),
