@@ -71,18 +71,38 @@ export const handlePaymentReturn = catchAsync(
 
     console.log("🔁 PAYMENT RETURN:", result);
 
-    // nếu thanh toán thành công
-    if (result.code === "00" && result.bookingId) {
-      await paymentService.processIpn(method, req.query);
-    }
+    const payment = await Payment.findById(result.paymentId);
+    if (payment) {
+      payment.gatewayDataResponse = req.query;
 
-    // Redirect về frontend
+      if (result.code === "00") {
+        payment.status = "success";
+        payment.transactionNo = result.transactionNo;
+
+        await bookingService.confirmBooking(
+          payment.bookingId.toString(),
+          payment._id.toString(),
+          payment.userId.toString(),
+        );
+      } else {
+        payment.status = "failed";
+
+        // hủy giữ ghế
+        await bookingService.cancelBooking(
+          payment.bookingId.toString(),
+          payment.userId.toString(),
+        );
+      }
+      await payment.save();
+    }
+    // nếu thanh toán thành công
+
     const frontendUrl = new URL(
       process.env.FRONTEND_URL || "http://localhost:5173",
     );
+
     frontendUrl.pathname = "/payment-result";
     frontendUrl.searchParams.set("code", result.code || "97");
-    frontendUrl.searchParams.set("bookingId", result.bookingId || "");
     frontendUrl.searchParams.set("transactionNo", result.transactionNo || "");
 
     return res.redirect(frontendUrl.toString());

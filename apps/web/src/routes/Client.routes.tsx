@@ -27,6 +27,7 @@ import News from "@web/pages/clients/public/News";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
 import Paymentlist from "@web/pages/clients/payments/PaymentList";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
+import RequireAuth from "@web/services/requieAuth";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -64,7 +65,14 @@ export const ClientRoutes: RouteObject = {
       element: <BookingLayout />,
       children: [
         { index: true, element: <BookingCinema /> },
-        { path: "seats", element: <SeatBooking /> },
+        {
+          path: "seats",
+          element: (
+            <RequireAuth>
+              <SeatBooking />
+            </RequireAuth>
+          ),
+        },
       ],
     },
     { path: "movie/:id", element: <MovieDetail /> },

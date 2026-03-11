@@ -44,7 +44,7 @@ export const paymentService = {
     // tạo record payment
     const payment = await Payment.create({
       bookingId: booking._id,
-      userId: user._id,
+      userId: booking.userId,
       finalAmount: amount,
       paymentMethod: method,
       status: "pending",
@@ -75,16 +75,19 @@ export const paymentService = {
     try {
       const gateway = PaymentFactory.getGateway(method);
 
-      const result = await gateway.handleIpn(data);
+      const result =
+        data.vnp_SecureHashType || data.vnp_SecureHash
+          ? gateway.verifyReturn(data)
+          : await gateway.handleIpn(data);
 
-      if (!result.bookingId) {
+      if (!result.paymentId) {
         return {
           code: "97",
-          message: "Thiếu bookingId",
+          message: "Thiếu paymentId",
         };
       }
 
-      const payment = await Payment.findOne({ bookingId: result.bookingId });
+      const payment = await Payment.findById(result.paymentId);
 
       if (!payment) {
         return {
@@ -115,25 +118,27 @@ export const paymentService = {
         payment.transactionNo = result.transactionNo;
         payment.gatewayDataResponse = data;
 
-        await payment.save();
-
         await bookingService.confirmBooking(
           payment.bookingId.toString(),
           result.transactionNo || "N/A",
+          payment.userId.toString(),
         );
       } else {
         payment.status = "failed";
         payment.gatewayDataResponse = data;
 
-        await payment.save();
         await bookingService.cancelBooking(
           payment.bookingId.toString(),
           payment.userId.toString(),
         );
       }
+      console.log("VNPay result:", result);
+      console.log("Found payment:", payment);
+      await payment.save();
       return {
         code: result.code,
-        message: result.message,
+        bookingId: result.paymentId,
+        transactionNo: result.transactionNo,
       };
     } catch (error) {
       console.error("IPN PROCESS ERROR:", error);

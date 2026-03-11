@@ -36,13 +36,18 @@ export const bookingController = {
   }),
 
   confirmBooking: catchAsync(async (req, res, next) => {
+    const userId = req.user!._id!.toString();
     const { bookingId, paymentId } = req.body;
 
     if (!bookingId) {
       return next(new AppError("Không tìm thấy mã đặt vé", 400));
     }
 
-    const result = await bookingService.confirmBooking(bookingId, paymentId);
+    const result = await bookingService.confirmBooking(
+      bookingId,
+      paymentId,
+      userId,
+    );
 
     res.json({
       success: true,
@@ -79,7 +84,9 @@ export const bookingController = {
     const { bookingId } = req.body;
 
     if (!userId) {
-      return next(new AppError("Bạn cần đăng nhập để thực hiện hành động này", 401));
+      return next(
+        new AppError("Bạn cần đăng nhập để thực hiện hành động này", 401),
+      );
     }
 
     await bookingService.cancelBooking(bookingId, userId);
@@ -87,6 +94,30 @@ export const bookingController = {
     res.json({
       success: true,
       message: "Đã hủy giữ ghế thành công",
+    });
+  }),
+
+  getPendingBooking: catchAsync(async (req, res) => {
+    const { showtimeId } = req.params;
+    const userId = req.user?._id;
+
+    const booking = await Booking.findOne({
+      userId,
+      showTimeId: showtimeId,
+      status: "pending",
+      holdExpiresAt: { $gt: new Date() },
+    });
+
+    if (!booking) {
+      return res.json({
+        success: true,
+        data: null,
+      });
+    }
+
+    res.json({
+      success: true,
+      data: booking,
     });
   }),
 

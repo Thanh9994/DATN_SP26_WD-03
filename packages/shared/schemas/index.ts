@@ -335,6 +335,9 @@ export type ISnackDrink = z.infer<typeof SnackDrink>;
 // export type ICinemaForm = Omit<ICinema, "danh_sach_phong" | "createdAt" | "updatedAt">;
 
 export type IUser = z.infer<typeof User>;
+export type IUserDocument = IUser & {
+  _id: string;
+};
 export type IUserLog = z.infer<typeof UserLog>;
 export type IUpdateUser = z.infer<typeof UpdateUser>;
 export type ILogin = z.infer<typeof Login>;

@@ -4,13 +4,13 @@ export interface PaymentGateway {
   handleIpn(data: any): Promise<{
     code: string;
     message: string;
-    bookingId?: string;
+    paymentId?: string;
     transactionNo?: string;
   }>;
 
   verifyReturn(data: any): {
     code: string;
-    bookingId?: string;
+    paymentId?: string;
     transactionNo?: string;
   };
 }

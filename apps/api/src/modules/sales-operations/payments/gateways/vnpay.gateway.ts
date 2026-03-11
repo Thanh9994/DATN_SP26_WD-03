@@ -28,18 +28,18 @@ const vnpay = new VNPay({
 
 export class VnpayGateway implements PaymentGateway {
   async createUrl(
-    bookingId: string,
+    paymentId: string,
     amount: number,
     ipAddr: string,
   ): Promise<string> {
     const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setMinutes(tomorrow.getMinutes() + 15);
 
     const paymentUrl = vnpay.buildPaymentUrl({
       vnp_Amount: amount,
       vnp_IpAddr: ipAddr,
-      vnp_TxnRef: bookingId,
-      vnp_OrderInfo: `Payments ${bookingId} - ${generatePayID()}`,
+      vnp_TxnRef: paymentId,
+      vnp_OrderInfo: `Payments for booking ${paymentId} - ${generatePayID()}`,
       vnp_OrderType: ProductCode.Other,
       // vnp_ReturnUrl: process.env.VNP_RETURNURL as string,
       vnp_ReturnUrl: "http://localhost:5000/payments/vnpay/return",
@@ -57,7 +57,7 @@ export class VnpayGateway implements PaymentGateway {
     return {
       code: result.isSuccess && result.vnp_ResponseCode === "00" ? "00" : "97",
       message: result.message,
-      bookingId: query.vnp_TxnRef,
+      paymentId: query.vnp_TxnRef,
       transactionNo: query.vnp_TransactionNo,
     };
   }
@@ -67,7 +67,8 @@ export class VnpayGateway implements PaymentGateway {
 
     return {
       code: result.isVerified && result.vnp_ResponseCode === "00" ? "00" : "97",
-      bookingId: query.vnp_TxnRef,
+      message: result.message,
+      paymentId: query.vnp_TxnRef,
       transactionNo: query.vnp_TransactionNo,
     };
   }

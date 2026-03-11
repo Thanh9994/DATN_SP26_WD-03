@@ -85,6 +85,7 @@ export const useAuth = () => {
     localStorage.removeItem("user");
     queryClient.removeQueries({ queryKey: ["me"] });
     showNotify("success", "Đăng Xuất Thành Công", "");
+    queryClient.clear();
   };
 
   const { data: users, isLoading: isLoadingUsers } = useQuery<IUser[]>({
