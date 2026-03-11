@@ -9,11 +9,10 @@ const showTimeSeatSchema = new Schema<IShowTimeSeat>(
       required: true,
       index: true,
     },
-    ten_phong: { type: String, required: true },
     seatCode: { type: String, required: true },
     row: { type: String, required: true },
     number: { type: Number, required: true },
-    loai_ghe: {
+    seatType: {
       type: String,
       enum: SeatType.options,
       required: true,
@@ -31,7 +30,7 @@ const showTimeSeatSchema = new Schema<IShowTimeSeat>(
       default: null,
       index: true,
     },
-    holdExpiresAt: { type: Date, default: null, index: true },
+    holdExpiresAt: Date,
     bookingId: {
       type: Schema.Types.ObjectId,
       ref: "Booking",
@@ -42,6 +41,8 @@ const showTimeSeatSchema = new Schema<IShowTimeSeat>(
 );
 
 showTimeSeatSchema.index({ showTimeId: 1, seatCode: 1 }, { unique: true });
+showTimeSeatSchema.index({ showTimeId: 1, trang_thai: 1 });
+showTimeSeatSchema.index({ holdExpiresAt: 1 });
 
 export const SeatTime = mongoose.model<IShowTimeSeat>(
   "ShowTimeSeat",

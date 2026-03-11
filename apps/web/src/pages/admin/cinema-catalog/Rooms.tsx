@@ -21,10 +21,17 @@ import {
   VideoCameraOutlined,
   PartitionOutlined,
   EditOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
 import { useCinemas, useRooms } from "@web/hooks/useCinema";
-import { IPhongCreate, IPhong, ICinemaWeb } from "@shared/schemas";
+import {
+  IPhongCreate,
+  IPhong,
+  ICinemaWeb,
+  IShowTimeSeat,
+} from "@shared/schemas";
+import SeatMap from "@web/components/skeleton/SeatMap";
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -33,6 +40,8 @@ export const Rooms = () => {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<IPhong | null>(null);
+  const [isSeatMapOpen, setIsSeatMapOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<IPhong | null>(null);
   const { cinemas } = useCinemas();
   const {
     rooms,
@@ -104,6 +113,36 @@ export const Rooms = () => {
     setEditingRoom(null);
     form.resetFields();
   };
+
+  const handleViewSeatMap = (record: IPhong) => {
+    setSelectedRoom(record);
+    setIsSeatMapOpen(true);
+  };
+
+  const generateMockSeats = (room: IPhong): IShowTimeSeat[] => {
+    const seats: IShowTimeSeat[] = [];
+    room.rows.forEach((row) => {
+      const seatType = room.vip.includes(row.name)
+        ? "vip"
+        : room.couple.includes(row.name)
+          ? "couple"
+          : "normal";
+      for (let i = 1; i <= row.seats; i++) {
+        seats.push({
+          _id: `${room._id}-${row.name}-${i}`,
+          showTimeId: "",
+          ten_phong: room.ten_phong,
+          seatCode: `${row.name}${i}`,
+          row: row.name,
+          number: i,
+          seatType: seatType,
+          price: 0,
+          trang_thai: "empty",
+        });
+      }
+    });
+    return seats;
+  };
   const columns = [
     {
       title: "Thuộc Rạp",
@@ -167,6 +206,10 @@ export const Rooms = () => {
       title: "Thao tác",
       render: (_: any, record: IPhong) => (
         <Space>
+          <Button
+            icon={<EyeOutlined />}
+            onClick={() => handleViewSeatMap(record)}
+          />
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
           <Popconfirm
             title="Xóa phòng này?"
@@ -332,6 +375,23 @@ export const Rooms = () => {
             {editingRoom ? "Cập nhật phòng" : "Lưu phòng"}
           </Button>
         </Form>
+      </Modal>
+
+      {/* MODAL SEAT MAP */}
+      <Modal
+        title={`Sơ đồ ghế - ${selectedRoom?.ten_phong}`}
+        open={isSeatMapOpen}
+        onCancel={() => setIsSeatMapOpen(false)}
+        footer={null}
+        width={1000}
+      >
+        {selectedRoom && (
+          <SeatMap
+            seats={generateMockSeats(selectedRoom)}
+            selectedSeatCodes={[]}
+            onSeatClick={() => {}}
+          />
+        )}
       </Modal>
     </div>
   );

@@ -1,4 +1,4 @@
-import PhimCard from "@web/components/PhimCard";
+import PhimCard from "@web/components/skeleton/PhimCard";
 import { useMovies } from "@web/hooks/useMovie";
 import { Spin } from "antd";
 import { useEffect, useState } from "react";

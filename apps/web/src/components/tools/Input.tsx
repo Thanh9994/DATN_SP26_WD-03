@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Input as AntInput } from "antd";
+import { Eye } from "lucide-react";
 
 interface InputProps {
   label: string;
@@ -24,8 +25,11 @@ export default function Input({
   type = "text",
   ...props
 }: InputProps) {
+  const [showPassword, setShowPassword] = useState(false);
+
   const isPassword = type === "password";
-  const InputComponent = isPassword ? AntInput.Password : AntInput;
+
+  const currentType = isPassword && showPassword ? "text" : type;
 
   return (
     <div className="space-y-2">
@@ -35,12 +39,24 @@ export default function Input({
       >
         {label}
       </label>
-      <InputComponent
+
+      <AntInput
         id={id}
         prefix={icon}
-        suffix={rightElement}
-        // Nếu là password, Antd tự hiểu type, nếu không thì dùng type truyền vào
-        type={isPassword ? undefined : type}
+        suffix={
+          isPassword ? (
+            <Eye
+              size={18}
+              className="cursor-pointer text-white/40 hover:text-primary"
+              onMouseDown={() => setShowPassword(true)}
+              onMouseUp={() => setShowPassword(false)}
+              onMouseLeave={() => setShowPassword(false)}
+            />
+          ) : (
+            rightElement
+          )
+        }
+        type={currentType}
         className={`!bg-white/5 !border-white/10 !rounded-xl !py-4 !text-white placeholder:text-white/40 focus:!ring-2 focus:!ring-primary/50 focus:!border-primary transition-all ${className}`}
         {...props}
       />

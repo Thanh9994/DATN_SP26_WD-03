@@ -77,10 +77,10 @@ export const Header = () => {
 
           <nav className="hidden lg:flex items-center gap-8">
             <Link
-              to="/"
+              to="/movielist"
               className="text-white text-base font-bold hover:text-primary transition-colors"
             >
-              Home
+              Movie
             </Link>
             <Link
               to="/cinema"
@@ -90,7 +90,7 @@ export const Header = () => {
             </Link>
 
             <Link
-              to="*"
+              to="/news"
               className="text-white text-base font-bold hover:text-primary transition-colors"
             >
               News
@@ -108,7 +108,7 @@ export const Header = () => {
               Events
             </Link>
             <Link
-              to="*"
+              to="/contact"
               className="text-white text-base font-bold hover:text-primary transition-colors"
             >
               Contact
@@ -129,9 +129,6 @@ export const Header = () => {
           <div className="flex items-center gap-3">
             <button className="size-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors">
               <span className="material-symbols-outlined">notifications</span>
-            </button>
-            <button className="size-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors">
-              <span className="material-symbols-outlined">favorite</span>
             </button>
           </div>
           {user ? (

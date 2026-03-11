@@ -6,7 +6,7 @@ import "./index.css";
 import "antd/dist/reset.css"; // Ant Design 5.x
 import { AppNotification } from "./components/AppNotification";
 import { useEffect, useState } from "react";
-import { Splash } from "./components/Splash";
+import { Splash } from "./components/tools/Splash";
 
 function App() {
   const location = useLocation();
@@ -21,7 +21,7 @@ function App() {
       sessionStorage.setItem("splash", "true");
       const timer = setTimeout(() => {
         setShowSplash(false);
-      }, 3500);
+      }, 2800);
       return () => clearTimeout(timer);
     }
   }, [showSplash]);

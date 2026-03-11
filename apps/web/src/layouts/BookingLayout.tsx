@@ -6,20 +6,22 @@ import {
 } from "react-router-dom";
 import { useMovie } from "@web/hooks/useMovie";
 import { Button, message, Spin } from "antd";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { useBooking } from "@web/hooks/useBooking";
 import { IShowTime, IShowTimeSeat } from "@shared/schemas";
 import { useAuth } from "@web/hooks/useAuth";
+import { MapPin } from "lucide-react";
 
 const BookingLayout = () => {
   const [searchParams] = useSearchParams();
   const movieId = searchParams.get("movieId") || undefined;
   const showtimeIdFromUrl = searchParams.get("showtimeId");
   const { user } = useAuth();
-
   const location = useLocation();
+
   const navigate = useNavigate();
+  const prevPathRef = useRef(location.pathname);
 
   // Quản lý trạng thái dùng chung
   const [selectedShowtime, setSelectedShowtime] = useState<IShowTime | null>(
@@ -27,15 +29,124 @@ const BookingLayout = () => {
   );
   const [selectedSeats, setSelectedSeats] = useState<IShowTimeSeat[]>([]);
 
+  const activeShowtimeId =
+    selectedShowtime?._id ?? showtimeIdFromUrl ?? undefined;
+
+  const {
+    showTime,
+    holdSeats,
+    isHolding,
+    refreshSeats,
+    pendingBooking,
+    cancelBooking,
+    expireBooking,
+  } = useBooking(activeShowtimeId);
+
+  useEffect(() => {
+    if (!pendingBooking) return;
+
+    const seatCodes = pendingBooking.seatCodes;
+
+    if (!seatCodes) return;
+
+    const seatsFromShowtime =
+      showTime?.seats?.filter((s: any) => seatCodes.includes(s.seatCode)) || [];
+
+    setSelectedSeats(seatsFromShowtime);
+  }, [pendingBooking, showTime]);
   const { data: movie, isLoading: isMovieLoading } = useMovie(movieId);
 
-  const activeShowtimeId = selectedShowtime?._id || showtimeIdFromUrl;
-  const { showTime, holdSeats, isHolding, refreshSeats } = useBooking(
-    activeShowtimeId ?? undefined,
-  );
+  useEffect(() => {
+    const savedSeatsJSON = localStorage.getItem("temp_seats");
+
+    if (!user || !activeShowtimeId || !savedSeatsJSON) return;
+
+    localStorage.removeItem("temp_seats");
+
+    try {
+      const seatsToHold: IShowTimeSeat[] = JSON.parse(savedSeatsJSON);
+
+      if (!seatsToHold || seatsToHold.length === 0) return;
+
+      holdSeats({
+        showTimeId: activeShowtimeId,
+        seats: seatsToHold.map((s) => s.seatCode),
+      })
+        .then((result) => {
+          setTimeout(() => {
+            navigate("/payments", {
+              state: {
+                bookingId: result.bookingId,
+                totalAmount: result.totalAmount,
+                seats: seatsToHold.map((s) => s.seatCode),
+                movieInfo: {
+                  title: movie?.ten_phim,
+                  poster: movie?.poster?.url,
+                  showtime: showTime?.startTime
+                    ? dayjs(showTime.startTime).format("HH:mm - DD/MM/YYYY")
+                    : "Showtime",
+                },
+              },
+            });
+          }, 400);
+        })
+        .catch((err) => {
+          console.error("Auto hold failed:", err);
+          message.error(
+            err?.message || "Không thể tự động giữ ghế. Vui lòng chọn lại ghế.",
+          );
+        });
+    } catch (error) {
+      console.error("Parse seats error:", error);
+    }
+  }, [user?._id, activeShowtimeId, movie, showTime]);
+
+  const currentData = showTime ?? selectedShowtime ?? null;
+
+  const cinema =
+    currentData?.roomId?.cinema_id ?? (currentData as any)?.cinemaInfo ?? null;
 
   const isSelectSeatStep = location.pathname.includes("/seats");
-  const totalAmount = selectedSeats.reduce((sum, s) => sum + s.price, 0);
+  const totalAmount =
+    selectedSeats.length > 0
+      ? selectedSeats.reduce((sum, s) => sum + s.price, 0)
+      : pendingBooking?.totalAmount || 0;
+
+  useEffect(() => {
+    const prevPath = prevPathRef.current;
+    const isLeavingSeats =
+      prevPath.includes("/booking/seats") &&
+      !location.pathname.includes("/booking/seats");
+    const isBackToBooking = location.pathname.startsWith("/booking");
+
+    if (isLeavingSeats && isBackToBooking && pendingBooking?._id) {
+      expireBooking(pendingBooking._id).catch((error) => {
+        console.error("Expire booking quay lại thất bại:", error);
+      });
+      setSelectedSeats([]);
+      setSelectedShowtime(null);
+    }
+
+    prevPathRef.current = location.pathname;
+  }, [location.pathname, pendingBooking?._id, expireBooking]);
+
+  const handleBackToCinema = async () => {
+    if (pendingBooking?._id) {
+      try {
+        await expireBooking(pendingBooking._id);
+      } catch (error) {
+        console.error("Expire booking failed:", error);
+      }
+    }
+
+    setSelectedSeats([]);
+    setSelectedShowtime(null);
+    navigate(`/booking?movieId=${movieId}`);
+  };
+  // console.log("user", user);
+  // console.log("selectedShowtime", selectedShowtime);
+  // console.log("showtimeIdFromUrl", showtimeIdFromUrl);
+  // console.log("activeShowtimeId", activeShowtimeId);
 
   if (isMovieLoading)
     return (
@@ -55,39 +166,54 @@ const BookingLayout = () => {
     );
 
   const handleAction = async () => {
-    //trang chọn lịch chiếu -> Chuyển sang chọn ghế
+    // step 1: chọn lịch -> sang chọn ghế
     if (!isSelectSeatStep) {
       if (!selectedShowtime) {
         message.warning("Vui lòng chọn một suất chiếu!");
         return;
       }
+
       navigate(
         `/booking/seats?movieId=${movieId}&showtimeId=${selectedShowtime._id}`,
       );
       return;
     }
 
-    // trang chọn ghế -> Giữ ghế và sang thanh toán
+    // step 2: chọn ghế -> giữ ghế
     if (selectedSeats.length === 0) {
       message.warning("Vui lòng chọn ít nhất một ghế!");
       return;
     }
 
     try {
-      if (!user) {
-        message.warning("Vui lòng đăng nhập trước khi đặt vé!");
-        navigate("/login");
+      if (!activeShowtimeId) {
+        message.error("Không tìm thấy suất chiếu");
         return;
       }
-      await holdSeats({
-        showTimeId: activeShowtimeId!,
+
+      const result = await holdSeats({
+        showTimeId: activeShowtimeId,
         seats: selectedSeats.map((s) => s.seatCode),
-        userId: user?._id as string,
       });
 
       await refreshSeats();
+
       message.success("Giữ ghế thành công!");
-      navigate(`/checkout?movieId=${movieId}&showtimeId=${activeShowtimeId}`);
+
+      navigate("/payments", {
+        state: {
+          bookingId: result.bookingId,
+          totalAmount: result.totalAmount,
+          seats: selectedSeats.map((s) => s.seatCode),
+          movieInfo: {
+            title: movie.ten_phim,
+            poster: movie.poster?.url,
+            showtime: currentData?.startTime
+              ? dayjs(currentData.startTime).format("HH:mm - DD/MM/YYYY")
+              : "Showtime",
+          },
+        },
+      });
     } catch (error) {
       refreshSeats();
     }
@@ -126,10 +252,39 @@ const BookingLayout = () => {
                 </span>
               </span>
             </div>
+            {cinema && (
+              <div className="pt-6 border-t border-white/10">
+                <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin size={14} className="text-primary" />
+                    <span className="text-[10px] font-black uppercase text-primary">
+                      Rạp đã chọn
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-zinc-100 text-sm uppercase">
+                    {cinema.name}
+                  </h4>
+                  <p className="text-[11px] text-[#b89d9f] mt-1">
+                    {cinema.address}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </aside>
 
         <main className="w-full lg:w-3/4 ">
+          {isSelectSeatStep && (
+            <div className="mb-6">
+              <Button
+                type="default"
+                onClick={handleBackToCinema}
+                className="border-white/20 text-white bg-white/5 hover:bg-white/10"
+              >
+                Quay lại chọn rạp
+              </Button>
+            </div>
+          )}
           <Outlet
             context={{
               movie,
@@ -137,6 +292,9 @@ const BookingLayout = () => {
               setSelectedShowtime,
               selectedSeats,
               setSelectedSeats,
+              pendingBooking,
+              cancelBooking,
+              expireBooking,
             }}
           />
           {(selectedShowtime || showTime) && (
@@ -160,15 +318,14 @@ const BookingLayout = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-8 text-sm">
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                   <p className="text-zinc-500 uppercase text-sm font-bold tracking-wider">
-                    Rạp / Phòng
+                    Phòng
                   </p>
                   <p className="font-bold text-zinc-200">
-                    {showTime?.roomId?.cinema_id?.name || "Cinema"} -{" "}
                     {showTime?.roomId?.ten_phong || "Standard"}
                   </p>
-                </div>
+                </div> */}
                 <div className="space-y-1">
                   <p className="text-zinc-500 uppercase text-sm font-bold tracking-wider">
                     Suất chiếu
@@ -179,7 +336,8 @@ const BookingLayout = () => {
                       : "Chưa chọn"}
                   </p>
                 </div>
-                <div className="col-span-2 space-y-1">
+                {/* <div className="col-span-2 space-y-1"> */}
+                <div className="space-y-1">
                   <p className="text-zinc-500 uppercase text-sm font-bold tracking-wider">
                     Ghế đã chọn
                   </p>

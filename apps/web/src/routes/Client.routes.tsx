@@ -1,19 +1,18 @@
-import { NotFound } from "@web/components/NotFound";
+import { NotFound } from "@web/components/tools/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
-import About from "@web/pages/About";
-import Event from "@web/pages/Event";
-import ForgotPassword from "@web/pages/clients/ForgotPassword";
-import { Home } from "@web/pages/clients/Home";
-import Login from "@web/pages/clients/Login";
-import Register from "@web/pages/clients/Register";
-import SeatBooking from "@web/pages/admin/booking/SeatBooking";
-import Showtime from "@web/pages/admin/booking/ShowTime";
+import About from "@web/pages/clients/public/About";
+import Event from "@web/pages/clients/public/Event";
+import Contact from "@web/pages/clients/public/Contact";
+import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
+import { Home } from "@web/pages/clients/public/Home";
+import Login from "@web/pages/clients/auth/Login";
+import Register from "@web/pages/clients/auth/Register";
+import SeatBooking from "@web/pages/clients/booking/SeatBooking";
+import Showtime from "@web/pages/clients/booking/ShowTime";
 import { RouteObject } from "react-router-dom";
-import Ticket from "@web/pages/Ticket";
-import Checkout from "@web/pages/CheckOut";
 import MovieDetail from "@web/pages/clients/MovieDetail";
 import BookingLayout from "@web/layouts/BookingLayout";
-import { BookingCinema } from "@web/pages/admin/booking/BookingCinema";
+import { BookingCinema } from "@web/pages/clients/booking/BookingCinema";
 import { ProfileLayout } from "@web/layouts/ProfileLayout";
 import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
 import { Setting } from "@web/components/authProfile/Setting";
@@ -25,10 +24,11 @@ export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
   children: [
-    { path: "", element: <Home /> },
+    { index: true, element: <Home /> },
     { path: "login", element: <Login /> },
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
+    { path: "reset-password/:token", element: <ResetPassword /> },
     {
       path: "profile",
       element: <ProfileLayout />,
@@ -42,13 +42,28 @@ export const ClientRoutes: RouteObject = {
     },
     { path: "about", element: <About /> },
     { path: "event", element: <Event /> },
+    {
+      path: "news",
+      children: [
+        { index: true, element: <News /> },
+        { path: ":slug", element: <NewsDetail /> },
+      ],
+    },
     { path: "cinema", element: <Cinemas /> },
+    { path: "movielist", element: <MovieList /> },
     {
       path: "booking",
       element: <BookingLayout />,
       children: [
         { index: true, element: <BookingCinema /> },
-        { path: "seats", element: <SeatBooking /> },
+        {
+          path: "seats",
+          element: (
+            <RequireAuth>
+              <SeatBooking />
+            </RequireAuth>
+          ),
+        },
       ],
     },
     { path: "movie/:id", element: <MovieDetail /> },

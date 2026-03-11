@@ -175,3 +175,66 @@ input:-webkit-autofill:active {
 .ant-dropdown-menu-item:hover {
   background-color: #ff000069 !important;
 }
+
+.movie-tabs .ant-tabs-tab {
+  margin-left: 4px;
+  font-size: 20px;
+  padding: 10px 18px;
+}
+
+.movie-tabs .ant-tabs-tab-active {
+  color: #ef4444 !important;
+}
+
+.movie-tabs .ant-tabs-ink-bar {
+  background: #ef4444;
+  height: 3px;
+}
+.ant-tabs-nav::before {
+  border-bottom: none !important;
+}
+
+@media (max-width: 640px) {
+  .movie-tabs .ant-tabs-tab {
+    margin-left: 15px;
+    padding: 6px 10px;
+  }
+}
+
+.ProseMirror {
+  outline: none;
+}
+
+.ProseMirror h1 {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.ProseMirror h2 {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.ProseMirror p {
+  margin: 10px 0;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+.ProseMirror mark {
+  background: #ffe58f;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.ProseMirror mark {
+  @apply bg-yellow-200 px-1 rounded;
+}
+.editor-wrapper {
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  min-height: 200px;
+  resize: vertical;
+  overflow: auto;
+}

@@ -1,6 +1,6 @@
 import { Volume2, VolumeX } from "lucide-react";
 import { useState } from "react";
-import "../styles/splash.css";
+import "../../styles/Splash.css";
 
 export const Splash = () => {
   const [isMuted, setIsMuted] = useState(false);

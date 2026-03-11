@@ -1,6 +1,6 @@
 import { IShowTimeSeat } from "@shared/schemas";
 import { useState } from "react";
-import SeatMap from "./SeatMap";
+import SeatMap from "./skeleton/SeatMap";
 
 export const BookingPage = () => {
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);

@@ -13,6 +13,7 @@ export const BookingStatus = z.enum([
   "cancelled", //Đã hủy
   "expired", //Hết hạn thanh toán và reset trạng thái
 ]);
+export const PaymentStatus = z.enum(["pending", "success", "failed"]);
 export const ShowTimeStatus = z.enum([
   "upcoming", //Sắp diễn ra
   "ongoing", //Đang chiếu
@@ -20,7 +21,7 @@ export const ShowTimeStatus = z.enum([
   "sold_out", //Hết vé
   "cancelled", //Đã Hủy
 ]);
-export const PaymentMethod = z.enum(["vnpay", "momo", "atm", "cash"]);
+export const PaymentMethod = z.enum(["vnpay", "momo", "atm"]);
 
 export const Base = z.object({
   _id: z.string().optional(),
@@ -56,6 +57,7 @@ export const ShowTime = Base.extend({
   roomId: z.union([z.string(), z.any()]),
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
+  showDate: z.coerce.date(),
   priceNormal: z.number().nonnegative(),
   priceVip: z.number().nonnegative(),
   priceCouple: z.number().nonnegative(),
@@ -72,7 +74,7 @@ export const ShowTimeSeat = Base.extend({
   seatCode: z.string(),
   row: z.string(),
   number: z.number(),
-  loai_ghe: SeatType,
+  seatType: SeatType,
   price: z.number(),
   trang_thai: SeatsStatus.default("empty"),
   heldBy: z.string().nullable().optional(),
@@ -200,6 +202,7 @@ export const Booking = Base.extend({
   status: BookingStatus.default("pending"),
   paymentMethod: PaymentMethod.default("vnpay"),
   paymentId: z.string().optional(),
+  transactionCode: z.string().optional(),
 
   holdExpiresAt: z.coerce.date(),
   ticketCode: z.string().optional(),
@@ -268,6 +271,8 @@ export const User = Base.extend({
   avatar: CloudinaryImage.optional(),
   role: UserRole.default("khach_hang"),
   trang_thai: UserStatus.default("active"),
+  resetPasswordToken: z.string().optional(),
+  resetPasswordExpire: z.coerce.date().optional(),
 });
 
 export const UpdateUser = z.object({
@@ -330,6 +335,9 @@ export type ISnackDrink = z.infer<typeof SnackDrink>;
 // export type ICinemaForm = Omit<ICinema, "danh_sach_phong" | "createdAt" | "updatedAt">;
 
 export type IUser = z.infer<typeof User>;
+export type IUserDocument = IUser & {
+  _id: string;
+};
 export type IUserLog = z.infer<typeof UserLog>;
 export type IUpdateUser = z.infer<typeof UpdateUser>;
 export type ILogin = z.infer<typeof Login>;
@@ -364,6 +372,8 @@ export type ICreateBooking = Omit<
   IBooking,
   "_id" | "createdAt" | "updatedAt" | "status" | "ticketCode"
 >;
+
+export type IPaymentStatus = z.infer<typeof PaymentStatus>;
 export type IPopulatedBooking = Omit<IBooking, "showTimeId" | "userId"> & {
   showTimeId: IPopulatedShowTime;
   userId: IUser;
