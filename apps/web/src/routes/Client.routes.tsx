@@ -2,7 +2,7 @@ import { NotFound } from "@web/components/tools/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
 import About from "@web/pages/clients/public/About";
 import Event from "@web/pages/clients/public/Event";
-import Contact from "@web/pages/clients/public/Contact";
+
 import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
 import { Home } from "@web/pages/clients/public/Home";
 import Login from "@web/pages/clients/auth/Login";
@@ -16,15 +16,18 @@ import { BookingCinema } from "@web/pages/clients/booking/BookingCinema";
 import { ProfileLayout } from "@web/layouts/ProfileLayout";
 import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
 import { Setting } from "@web/components/authProfile/Setting";
-import { Cinemas } from "@web/pages/Cinemas";
 import MyBooking  from "@web/components/authProfile/MyBooking";
 import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 import MovieList from "@web/pages/clients/MovieList";
 import NewsDetail from "@web/pages/clients/NewDetail";
-import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
-import VNPayReturn from "@web/pages/clients/payments/Vnpay-return";
 import News from "@web/pages/clients/public/News";
+import RequireAuth from "@web/services/RequieAuth";
+import Checkout from "@web/pages/CheckOut";
+import { Ticket } from "lucide-react";
+import ResetPassword from "@web/pages/clients/auth/ResetPassword";
+import Cinemas from "@web/pages/Cinemas";
+import Contact from "@web/pages/clients/public/Contact";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -79,5 +82,7 @@ export const ClientRoutes: RouteObject = {
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
     { path: "checkout", element: <Checkout /> },
     { path: "*", element: <NotFound /> },
+    { path: "contact", element: <Contact /> },
   ],
+
 };
