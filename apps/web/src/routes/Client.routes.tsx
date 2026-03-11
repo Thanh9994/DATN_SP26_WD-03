@@ -16,7 +16,7 @@ import { BookingCinema } from "@web/pages/clients/booking/BookingCinema";
 import { ProfileLayout } from "@web/layouts/ProfileLayout";
 import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
 import { Setting } from "@web/components/authProfile/Setting";
-import { Cinemas } from "@web/pages/Cinemas";
+import  Cinemas  from "@web/pages/Cinemas";
 import MyBooking from "@web/components/authProfile/MyBooking";
 import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
@@ -27,7 +27,7 @@ import News from "@web/pages/clients/public/News";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
 import Paymentlist from "@web/pages/clients/payments/PaymentList";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
-import RequireAuth from "@web/services/requieAuth";
+import RequireAuth from "@web/services/RequieAuth";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
