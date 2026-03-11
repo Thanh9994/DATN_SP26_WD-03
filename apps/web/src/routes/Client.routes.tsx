@@ -16,19 +16,10 @@ import { BookingCinema } from "@web/pages/clients/booking/BookingCinema";
 import { ProfileLayout } from "@web/layouts/ProfileLayout";
 import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
 import { Setting } from "@web/components/authProfile/Setting";
-import  Cinemas  from "@web/pages/Cinemas";
-import MyBooking from "@web/components/authProfile/MyBooking";
+import { Cinemas } from "@web/pages/Cinemas";
+import MyBooking  from "@web/components/authProfile/MyBooking";
 import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
-import MovieList from "@web/pages/clients/MovieList";
-import NewsDetail from "@web/pages/clients/NewDetail";
-import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
-import News from "@web/pages/clients/public/News";
-import ResetPassword from "@web/pages/clients/auth/ResetPassword";
-import Paymentlist from "@web/pages/clients/payments/PaymentList";
-import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
-import RequireAuth from "@web/services/RequieAuth";
-
 export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
@@ -77,20 +68,10 @@ export const ClientRoutes: RouteObject = {
     },
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
+    { path: "ticket", element: <Ticket /> },
     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
-    {
-      path: "payments",
-      element: <PaymentsMethod />,
-      children: [
-        { index: true, element: <Paymentlist /> },
-        { path: "failed", element: <PaymentsMethod /> },
-        { path: "success", element: <PaymentsMethod /> },
-      ],
-    },
-    { path: "payment-result", element: <PaymentResult /> },
-    { path: "contact", element: <Contact /> },
-    { path: "news", element: <News /> },
+    { path: "checkout", element: <Checkout /> },
     { path: "*", element: <NotFound /> },
   ],
 };
