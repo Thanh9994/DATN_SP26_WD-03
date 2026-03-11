@@ -52,8 +52,8 @@ export const DetailTicket = (): JSX.Element => {
   return (
     <div className="detail-ticket-page">
       <div className="ticket-header">
-        <h1 className="ticket-page-title">Desktop Digital Ticket Confirmation</h1>
-      </div>
+        <h1 className="ticket-page-title">Digital Ticket Confirmation</h1>
+        </div>
 
       <div className="ticket-container">
         <div className="ticket-card">

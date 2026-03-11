@@ -1,17 +1,15 @@
-
-
 .detail-ticket-page {
   background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 100%);
   color: #ffffff;
   min-height: 100vh;
   padding: 40px 20px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
 }
-
 
 .ticket-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
 .ticket-page-title {
@@ -22,9 +20,9 @@
   letter-spacing: 0.5px;
 }
 
-
 .ticket-container {
   max-width: 920px;
+  width: 100%;
   margin: 0 auto 32px;
 }
 
@@ -34,22 +32,25 @@
   border-radius: 16px;
   padding: 32px;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: 40px;
   backdrop-filter: blur(10px);
+  box-sizing: border-box;
 }
 
 .ticket-poster-section {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .poster-wrapper {
   position: relative;
-  aspect-ratio: 2/3;
+  aspect-ratio: 2 / 3;
   border-radius: 12px;
   overflow: hidden;
+  width: 100%;
 }
 
 .poster-image {
@@ -63,7 +64,7 @@
   position: absolute;
   top: 12px;
   left: 12px;
-  background: #FF000D;
+  background: #ff000d;
   color: white;
   padding: 6px 14px;
   border-radius: 4px;
@@ -71,6 +72,8 @@
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
+  max-width: calc(100% - 24px);
+  box-sizing: border-box;
 }
 
 .movie-title {
@@ -79,16 +82,16 @@
   margin: 0;
   line-height: 1.2;
   letter-spacing: -0.5px;
+  word-break: break-word;
 }
-
 
 .ticket-details-section {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-width: 0;
 }
 
-/* Cinema Info */
 .cinema-info {
   display: flex;
   flex-direction: column;
@@ -108,21 +111,26 @@
   font-weight: 900;
   margin: 0;
   letter-spacing: -0.3px;
+  word-break: break-word;
 }
 
 .cinema-screen {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.6);
   margin: 0;
+  word-break: break-word;
 }
+
 .booking-id-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   padding: 14px 16px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
+  flex-wrap: wrap;
 }
 
 .booking-label {
@@ -136,13 +144,13 @@
 .booking-id {
   font-size: 14px;
   font-weight: 900;
-  color: #FF000D;
+  color: #ff000d;
+  word-break: break-word;
 }
 
-/* Info Grid */
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -155,6 +163,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   text-align: center;
+  min-width: 0;
 }
 
 .info-label {
@@ -167,6 +176,7 @@
   letter-spacing: 1px;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.5);
+  flex-wrap: wrap;
 }
 
 .info-icon {
@@ -177,9 +187,9 @@
   font-size: 13px;
   font-weight: 700;
   color: white;
+  word-break: break-word;
 }
 
-/* Divider */
 .ticket-divider {
   height: 1px;
   background: linear-gradient(
@@ -192,7 +202,7 @@
 
 .qr-section {
   display: grid;
-  grid-template-columns: 140px 1fr;
+  grid-template-columns: 140px minmax(0, 1fr);
   gap: 24px;
   align-items: center;
   padding: 20px;
@@ -209,6 +219,8 @@
   border-radius: 8px;
   padding: 8px;
   aspect-ratio: 1;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .qr-code-image {
@@ -221,6 +233,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .qr-title {
@@ -234,20 +247,22 @@
   color: rgba(255, 255, 255, 0.7);
   margin: 0;
   line-height: 1.5;
+  word-break: break-word;
 }
 
 .qr-verification {
   font-size: 11px;
   font-weight: 700;
-  color: #FF000D;
+  color: #ff000d;
   text-decoration: none;
   letter-spacing: 0.5px;
   display: inline-block;
   transition: all 0.3s ease;
+  word-break: break-word;
 }
 
 .qr-verification:hover {
-  color: #FF3333;
+  color: #ff3333;
 }
 
 .pass-badge {
@@ -259,15 +274,17 @@
   text-transform: uppercase;
   padding: 12px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  word-break: break-word;
 }
-
 
 .ticket-actions {
   max-width: 920px;
+  width: 100%;
   margin: 0 auto 24px;
   display: flex;
   justify-content: center;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .ticket-button {
@@ -285,6 +302,8 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: inherit;
+  min-width: 220px;
+  max-width: 100%;
 }
 
 .btn-primary {
@@ -326,8 +345,198 @@
   border-radius: 8px;
   font-size: 13px;
   color: rgba(255, 0, 13, 0.8);
+  text-align: center;
+  flex-wrap: wrap;
 }
 
 .warning-icon {
   font-size: 16px;
+}
+
+/* Tablet */
+@media (max-width: 991px) {
+  .detail-ticket-page {
+    padding: 32px 16px;
+  }
+
+  .ticket-card {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 24px;
+  }
+
+  .ticket-poster-section {
+    max-width: 340px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .movie-title {
+    text-align: center;
+  }
+
+  .info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .qr-section {
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .ticket-actions {
+    gap: 12px;
+  }
+
+  .ticket-button {
+    flex: 1 1 240px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .detail-ticket-page {
+    padding: 24px 12px;
+  }
+
+  .ticket-header {
+    margin-bottom: 24px;
+  }
+
+  .ticket-page-title {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .ticket-container {
+    margin-bottom: 20px;
+  }
+
+  .ticket-card {
+    padding: 16px;
+    gap: 20px;
+    border-radius: 12px;
+  }
+
+  .ticket-poster-section {
+    max-width: 100%;
+    gap: 12px;
+  }
+
+  .poster-badge {
+    top: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    font-size: 9px;
+  }
+
+  .movie-title {
+    font-size: 18px;
+    text-align: left;
+  }
+
+  .cinema-name {
+    font-size: 16px;
+  }
+
+  .cinema-screen {
+    font-size: 12px;
+  }
+
+  .booking-id-section {
+    padding: 12px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .ticket-info-item {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .info-label {
+    justify-content: flex-start;
+  }
+
+  .qr-section {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .qr-code-wrapper {
+    max-width: 180px;
+    margin: 0 auto;
+  }
+
+  .qr-content {
+    text-align: center;
+  }
+
+  .pass-badge {
+    font-size: 10px;
+    letter-spacing: 0.8px;
+  }
+
+  .ticket-actions {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 20px;
+  }
+
+  .ticket-button {
+    width: 100%;
+    min-width: unset;
+    padding: 13px 18px;
+    font-size: 12px;
+  }
+
+  .ticket-warning {
+    font-size: 12px;
+    padding: 12px 14px;
+  }
+}
+
+/* Very small mobile */
+@media (max-width: 480px) {
+  .detail-ticket-page {
+    padding: 20px 10px;
+  }
+
+  .ticket-card {
+    padding: 14px;
+  }
+
+  .ticket-page-title {
+    font-size: 15px;
+  }
+
+  .movie-title {
+    font-size: 17px;
+  }
+
+  .cinema-name {
+    font-size: 15px;
+  }
+
+  .booking-id {
+    font-size: 13px;
+  }
+
+  .qr-title {
+    font-size: 13px;
+  }
+
+  .qr-description {
+    font-size: 11px;
+  }
+
+  .btn-icon {
+    font-size: 14px;
+  }
 }
