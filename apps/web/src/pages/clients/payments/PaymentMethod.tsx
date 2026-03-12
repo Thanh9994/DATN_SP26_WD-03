@@ -38,7 +38,9 @@ const PaymentsMethod = () => {
   const outlet = useOutlet();
   const [searchParams] = useSearchParams();
   const { createPaymentUrl } = useBooking();
-  const [bookingDetail, setBookingDetail] = useState<BookingDetail | null>(null);
+  const [bookingDetail, setBookingDetail] = useState<BookingDetail | null>(
+    null,
+  );
   const [bookingLoading, setBookingLoading] = useState(false);
 
   const bookingIdState = location.state?.bookingId;
@@ -86,7 +88,7 @@ const PaymentsMethod = () => {
     }
 
     if (method !== "vnpay") {
-      message.info("PhÆ°Æ¡ng thá»©c nÃ y chÆ°a Ä‘Æ°á»£c há»— trá»£.");
+      message.info("Phương thức này chưa được hỗ trợ.");
       return;
     }
 
@@ -113,83 +115,85 @@ const PaymentsMethod = () => {
               <>{outlet}</>
             ) : (
               <>
-                <div className="text-3xl uppercase font-extrabold">Payments</div>
-
-            {/* PAYMENT METHOD */}
-            <div className="mt-8">
-              <div className="flex items-center gap-3">
-                <span className="h-6 w-6 rounded-full bg-red-600/15 border border-red-500/30 text-red-300 text-xs flex items-center justify-center">
-                  1
-                </span>
-                <div className="text-xs tracking-[0.25em] text-zinc-300 font-semibold">
-                  PAYMENT METHOD
+                <div className="text-3xl uppercase font-extrabold">
+                  Payments
                 </div>
-              </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                {/* VNPay Button */}
-                <button
-                  type="button"
-                  onClick={() => setMethod("vnpay")}
-                  className={`p-4 rounded-2xl border transition-all ${method === "vnpay" ? "border-red-500 bg-red-500/10" : "border-white/10 bg-white/5"}`}
-                >
-                  <div className="text-[11px] font-semibold uppercase tracking-widest">
-                    VNPay
+                {/* PAYMENT METHOD */}
+                <div className="mt-8">
+                  <div className="flex items-center gap-3">
+                    <span className="h-6 w-6 rounded-full bg-red-600/15 border border-red-500/30 text-red-300 text-xs flex items-center justify-center">
+                      1
+                    </span>
+                    <div className="text-xs tracking-[0.25em] text-zinc-300 font-semibold">
+                      PAYMENT METHOD
+                    </div>
                   </div>
-                  <div className="text-[9px] text-zinc-500 mt-1">
-                    Nội địa & Quốc tế
-                  </div>
-                </button>
 
-                {/* Giả định thêm Momo */}
-                <button
-                  type="button"
-                  onClick={() => setMethod("momo")}
-                  className={`p-4 rounded-2xl border transition-all ${method === "momo" ? "border-pink-500 bg-pink-500/10" : "border-white/10 bg-white/5"}`}
-                >
-                  <div className="text-[11px] font-semibold uppercase tracking-widest">
-                    MoMo
-                  </div>
-                  <div className="text-[9px] text-zinc-500 mt-1">
-                    Ví điện tử MoMo
-                  </div>
-                </button>
+                  <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    {/* VNPay Button */}
+                    <button
+                      type="button"
+                      onClick={() => setMethod("vnpay")}
+                      className={`p-4 rounded-2xl border transition-all ${method === "vnpay" ? "border-red-500 bg-red-500/10" : "border-white/10 bg-white/5"}`}
+                    >
+                      <div className="text-[11px] font-semibold uppercase tracking-widest">
+                        VNPay
+                      </div>
+                      <div className="text-[9px] text-zinc-500 mt-1">
+                        Nội địa & Quốc tế
+                      </div>
+                    </button>
 
-                <button
-                  type="button"
-                  onClick={() => setMethod("atm")}
-                  className={`p-4 rounded-2xl border transition-all ${method === "atm" ? "border-amber-500 bg-amber-500/10" : "border-white/10 bg-white/5"}`}
-                >
-                  <div className="text-[11px] font-semibold uppercase tracking-widest">
-                    ATM
-                  </div>
-                  <div className="text-[9px] text-zinc-500 mt-1">
-                    Tháº» ATM ná»™i Ä‘á»‹a
-                  </div>
-                </button>
-              </div>
-            </div>
+                    {/* Giả định thêm Momo */}
+                    <button
+                      type="button"
+                      onClick={() => setMethod("momo")}
+                      className={`p-4 rounded-2xl border transition-all ${method === "momo" ? "border-pink-500 bg-pink-500/10" : "border-white/10 bg-white/5"}`}
+                    >
+                      <div className="text-[11px] font-semibold uppercase tracking-widest">
+                        MoMo
+                      </div>
+                      <div className="text-[9px] text-zinc-500 mt-1">
+                        Ví điện tử MoMo
+                      </div>
+                    </button>
 
-            {/* CARD DETAILS - Chỉ hiện nếu không dùng VNPay/Momo (tùy bạn thiết kế) */}
-            <div className="mt-8">
-              <div className="flex items-center gap-3">
-                <span className="h-6 w-6 rounded-full bg-red-600/15 border border-red-500/30 text-red-300 text-xs flex items-center justify-center">
-                  2
-                </span>
-                <div className="text-xs tracking-[0.25em] text-zinc-300 font-semibold">
-                  ORDER CONFIRMATION
+                    <button
+                      type="button"
+                      onClick={() => setMethod("atm")}
+                      className={`p-4 rounded-2xl border transition-all ${method === "atm" ? "border-amber-500 bg-amber-500/10" : "border-white/10 bg-white/5"}`}
+                    >
+                      <div className="text-[11px] font-semibold uppercase tracking-widest">
+                        ATM
+                      </div>
+                      <div className="text-[9px] text-zinc-500 mt-1">
+                        Thẻ ATM nội địa
+                      </div>
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <div className="mt-4 rounded-[26px] border border-white/10 bg-white/5 p-6">
-                <p className="text-sm text-zinc-400">
-                  Bạn đang thực hiện thanh toán qua cổng{" "}
-                  <strong>{method.toUpperCase()}</strong>. Sau khi nhấn nút
-                  "Complete Purchase", bạn sẽ được chuyển hướng an toàn đến
-                  trang thanh toán chính thức.
-                </p>
-              </div>
-            </div>
+                {/* CARD DETAILS - Chỉ hiện nếu không dùng VNPay/Momo (tùy bạn thiết kế) */}
+                <div className="mt-8">
+                  <div className="flex items-center gap-3">
+                    <span className="h-6 w-6 rounded-full bg-red-600/15 border border-red-500/30 text-red-300 text-xs flex items-center justify-center">
+                      2
+                    </span>
+                    <div className="text-xs tracking-[0.25em] text-zinc-300 font-semibold">
+                      ORDER CONFIRMATION
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-[26px] border border-white/10 bg-white/5 p-6">
+                    <p className="text-sm text-zinc-400">
+                      Bạn đang thực hiện thanh toán qua cổng{" "}
+                      <strong>{method.toUpperCase()}</strong>. Sau khi nhấn nút
+                      "Complete Purchase", bạn sẽ được chuyển hướng an toàn đến
+                      trang thanh toán chính thức.
+                    </p>
+                  </div>
+                </div>
               </>
             )}
           </div>
@@ -281,7 +285,7 @@ const PaymentsMethod = () => {
             </div>
             {bookingLoading && (
               <div className="text-xs text-zinc-500 text-center">
-                Äang táº£i thÃ´ng tin booking...
+                Đang tải thông tin...
               </div>
             )}
           </div>
