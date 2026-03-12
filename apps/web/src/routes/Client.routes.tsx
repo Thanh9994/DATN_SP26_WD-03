@@ -45,6 +45,7 @@ export const ClientRoutes: RouteObject = {
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "reset-password/:token", element: <ResetPassword /> },
+
     {
       path: "profile",
       element: <ProfileLayout />,
@@ -56,8 +57,10 @@ export const ClientRoutes: RouteObject = {
         { path: "payment", element: <div>Phương thức thanh toán</div> },
       ],
     },
+
     { path: "about", element: <About /> },
     { path: "event", element: <Event /> },
+
     {
       path: "news",
       children: [
@@ -65,6 +68,7 @@ export const ClientRoutes: RouteObject = {
         { path: ":slug", element: <NewsDetail /> },
       ],
     },
+
     { path: "cinema", element: <Cinemas /> },
     { path: "movielist", element: <MovieList /> },
     { path: "cinemadetail/:id", element: <CinemaDetail /> },
@@ -83,10 +87,12 @@ export const ClientRoutes: RouteObject = {
         },
       ],
     },
+
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
+
     {
       path: "payments",
       element: <PaymentsMethod />,
@@ -97,6 +103,7 @@ export const ClientRoutes: RouteObject = {
         { path: "result", element: <PaymentResult /> },
       ],
     },
+
     { path: "payment-result", element: <PaymentResult /> },
     { path: "ticket", element: <Ticket /> },
     { path: "contact", element: <Contact /> },
