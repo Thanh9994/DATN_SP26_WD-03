@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
@@ -17,9 +21,17 @@
     "noUnusedParameters": true,
     "baseUrl": ".",
     "paths": {
-      "@web/*": ["src/*"],
-      "@shared/*": ["../../packages/shared/*"]
+      "@web/*": [
+        "src/*"
+      ],
+      "@shared/*": [
+        "../../packages/shared/*"
+      ]
     }
   },
-  "include": ["src", "../../packages/shared/**/*"]
+  "include": [
+    "src",
+    "../../packages/shared/**/*",
+    "src/pages/clients/payments/PaymentList.tsx"
+  ]
 }

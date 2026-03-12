@@ -1,81 +1,117 @@
-import { NavLink, Outlet } from "react-router-dom";
-import { Avatar, Typography } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Layout, Input, ConfigProvider, theme, Badge } from "antd";
+import {
+  BellOutlined,
+  MailOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+} from "@ant-design/icons";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Sidebar } from "./admin/Navbar";
+import { useAuth } from "@web/hooks/useAuth";
 
-const { Text } = Typography;
+const { Content, Header } = Layout;
 
-const AdminLayout = () => {
+export const AdminLayouts = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [search, setSearch] = useState("");
+  const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
+
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const toggleTheme = (checked: boolean) => {
+    setThemeMode(checked ? "dark" : "light");
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
-    <div className="admin-container">
-      <aside className="sidebar">
-        {/* ===== SIDEBAR HEADER (ĐÃ SỬA) ===== */}
-        <div
-          style={{
-            padding: "20px 16px",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            borderBottom: "1px solid rgba(255,255,255,0.1)",
-          }}
-        >
-          <Avatar
-            size={44}
-            icon={<UserOutlined />}
-            style={{ backgroundColor: "#1677ff" }}
-          />
-          <div>
-            <Text style={{ color: "#fff", fontWeight: 600 }}>
-              Admin Panel
-            </Text>
-            <br />
-            <Text style={{ color: "#aaa", fontSize: 12 }}>
-              Super Admin
-            </Text>
-          </div>
-        </div>
+    <ConfigProvider
+      theme={{
+        algorithm:
+          themeMode === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
+        token: { colorPrimary: "#1890ff" },
+      }}
+    >
+      <Layout
+        style={{
+          marginLeft: collapsed ? 80 : 260,
+          transition: "all 0.2s",
+          minHeight: "100vh",
+        }}
+      >
+        <Sidebar
+          collapsed={collapsed}
+          themeMode={themeMode}
+          toggleTheme={toggleTheme}
+          user={user}
+          logout={handleLogout}
+        />
 
-        {/* ===== MENU ===== */}
-        <nav>
-          <NavLink to="/admin" end className={({ isActive }) => isActive ? "active" : undefined}>
-            Dashboard
-          </NavLink>
-          <NavLink to="/admin/users" className={({ isActive }) => isActive ? "active" : undefined}>
-            Users
-          </NavLink>
-          <NavLink to="/admin/movies" className={({ isActive }) => isActive ? "active" : undefined}>
-            Movies
-          </NavLink>
-          <NavLink to="/admin/settings" className={({ isActive }) => isActive ? "active" : undefined}>
-            Settings
-          </NavLink>
-          <NavLink to="/admin/analytics" className={({ isActive }) => isActive ? "active" : undefined}>
-            Analytics
-          </NavLink>
-          <NavLink to="/admin/reports" className={({ isActive }) => isActive ? "active" : undefined}>
-            Reports
-          </NavLink>
-          <NavLink to="/admin/bookings" className={({ isActive }) => isActive ? "active" : undefined}>
-            Bookings
-          </NavLink>
-          <NavLink to="/admin/cinemas" className={({ isActive }) => isActive ? "active" : undefined}>
-            Cinemas
-          </NavLink>
-        </nav>
-      </aside>
+        <Layout>
+          {/* HEADER */}
+          <Header
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 10,
+              background: themeMode === "dark" ? "#141414" : "#fff",
+              color: themeMode === "dark" ? "#fff" : "#000",
+              padding: "0 16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              boxShadow: "0 1px 4px rgba(0,21,41,.08)",
+            }}
+          >
+            <div className="flex items-center gap-4">
+              {collapsed ? (
+                <MenuUnfoldOutlined
+                  onClick={() => setCollapsed(false)}
+                  className="text-lg cursor-pointer"
+                />
+              ) : (
+                <MenuFoldOutlined
+                  onClick={() => setCollapsed(true)}
+                  className="text-lg cursor-pointer"
+                />
+              )}
 
-      {/* ===== CONTENT ===== */}
-      <div className="content">
-        <header className="header">
-          <span>Xin chào Admin</span>
-          <button>Logout</button>
-        </header>
+              <Input.Search
+                placeholder="Tìm kiếm nhanh..."
+                allowClear
+                onSearch={(value) => setSearch(value)}
+                className="hidden md:block w-[280px]"
+              />
+            </div>
+            <div className="flex justify-end gap-5 mr-4">
+              <Badge count={5}>
+                <BellOutlined className="text-xl cursor-pointer" />
+              </Badge>
 
-        <main className="main">
-          <Outlet />
-        </main>
-      </div>
-    </div>
+              <Badge count={2}>
+                <MailOutlined className="text-xl cursor-pointer" />
+              </Badge>
+            </div>
+          </Header>
+
+          {/* CONTENT */}
+          <Content
+            style={{
+              margin: 16,
+              borderRadius: 8,
+              minHeight: 280,
+            }}
+          >
+            <Outlet context={{ search }} />
+          </Content>
+        </Layout>
+      </Layout>
+    </ConfigProvider>
   );
 };
-
-export default AdminLayout;
+export default AdminLayouts;

@@ -5,8 +5,8 @@ import cron from "node-cron";
 
 let isProcessing = false;
 export const initBookingCron = () => {
-  // Chạy mỗi phút 1 lần
-  cron.schedule("*/1 * * * *", async () => {
+  // Chạy mỗi phút 30 sec lần
+  cron.schedule("*/30 * * * *", async () => {
     const session = await mongoose.startSession();
     if (isProcessing) return;
     isProcessing = true;
@@ -40,7 +40,7 @@ export const initBookingCron = () => {
           },
           {
             $set: { trang_thai: "empty" },
-            $unset: { heldBy: "", holdExpiresAt: "", bookingId: "" }, // Xóa luôn link tới booking
+            $unset: { heldBy: "", holdExpiresAt: "", bookingId: "" },
           },
           { session },
         );

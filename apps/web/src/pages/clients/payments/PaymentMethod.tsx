@@ -1,5 +1,5 @@
 import { useBooking } from "@web/hooks/useBooking";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { message } from "antd";
 import { CheckCircle2 } from "lucide-react";
@@ -14,6 +14,7 @@ const PaymentsMethod = () => {
   const totalAmount = location.state?.totalAmount || 0;
   const seats = location.state?.seats || [];
   const movieInfo = location.state?.movieInfo;
+  const isProcessing = useRef(false);
 
   useEffect(() => {
     if (!bookingId) {
@@ -28,14 +29,19 @@ const PaymentsMethod = () => {
       return;
     }
 
+    // 🔒 lock request
+    if (isProcessing.current) return;
+    isProcessing.current = true;
+
     setLoading(true);
+
     try {
       const paymentUrl = await createPaymentUrl(bookingId);
 
       window.location.href = paymentUrl;
     } catch (error) {
       message.error("Có lỗi xảy ra khi tạo link thanh toán!");
-    } finally {
+      isProcessing.current = false; // mở lock nếu lỗi
       setLoading(false);
     }
   };

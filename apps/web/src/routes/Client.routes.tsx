@@ -16,16 +16,19 @@ import { BookingCinema } from "@web/pages/clients/booking/BookingCinema";
 import { ProfileLayout } from "@web/layouts/ProfileLayout";
 import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
 import { Setting } from "@web/components/authProfile/Setting";
-import { Cinemas } from "@web/pages/Cinemas";
+import Cinemas from "@web/pages/Cinemas";
 import MyBooking from "@web/components/authProfile/MyBooking";
 import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 import MovieList from "@web/pages/clients/MovieList";
 import NewsDetail from "@web/pages/clients/NewDetail";
 import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
-import VNPayReturn from "@web/pages/clients/payments/Vnpay-return";
 import News from "@web/pages/clients/public/News";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
+import Paymentlist from "@web/pages/clients/payments/PaymentList";
+import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
+import RequireAuth from "@web/services/RequieAuth";
+import Checkout from "@web/pages/clients/payments/Checkout";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -36,6 +39,7 @@ export const ClientRoutes: RouteObject = {
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "reset-password/:token", element: <ResetPassword /> },
+
     {
       path: "profile",
       element: <ProfileLayout />,
@@ -47,8 +51,10 @@ export const ClientRoutes: RouteObject = {
         { path: "payment", element: <div>Phương thức thanh toán</div> },
       ],
     },
+
     { path: "about", element: <About /> },
     { path: "event", element: <Event /> },
+
     {
       path: "news",
       children: [
@@ -56,24 +62,47 @@ export const ClientRoutes: RouteObject = {
         { path: ":slug", element: <NewsDetail /> },
       ],
     },
+
     { path: "cinema", element: <Cinemas /> },
     { path: "movielist", element: <MovieList /> },
+
     {
       path: "booking",
       element: <BookingLayout />,
       children: [
         { index: true, element: <BookingCinema /> },
-        { path: "seats", element: <SeatBooking /> },
+        {
+          path: "seats",
+          element: (
+            <RequireAuth>
+              <SeatBooking />
+            </RequireAuth>
+          ),
+        },
       ],
     },
+
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
+
     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
-    { path: "payments", element: <PaymentsMethod /> },
-    { path: "vnpay-return", element: <VNPayReturn /> },
+
+    {
+      path: "payments",
+      element: <PaymentsMethod />,
+      children: [
+        { index: true, element: <Paymentlist /> },
+        { path: "checkout", element: <Checkout /> },
+        { path: "failed", element: <PaymentsMethod /> },
+        { path: "success", element: <PaymentsMethod /> },
+      ],
+    },
+
+    { path: "payment-result", element: <PaymentResult /> },
+
     { path: "contact", element: <Contact /> },
-    { path: "news", element: <News /> },
+
     { path: "*", element: <NotFound /> },
   ],
 };

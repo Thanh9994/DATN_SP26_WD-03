@@ -5,7 +5,7 @@ import { API } from "@web/api/api.service";
 import dayjs from "dayjs";
 import { axiosAuth } from "@web/hooks/useAuth";
 
-// Định nghĩa kiểu dữ liệu để hiển thị
+//Định nghĩa kiểu dữ liệu để hiển thị
 interface BookingDetail {
   seatCodes: string[];
   movieName: string;
@@ -26,13 +26,10 @@ interface BookingDetail {
   };
 }
 
-const VNPayReturn = () => {
+const Paymentlist = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState<"success" | "error" | "processing">(
-    "processing",
-  );
   const [bookingInfo, setBookingInfo] = useState<BookingDetail | null>(null);
 
   useEffect(() => {
@@ -49,14 +46,11 @@ const VNPayReturn = () => {
 
           if (data.success) {
             setBookingInfo(data.data);
-            setStatus("success");
           }
         } catch (error) {
           console.error("Lỗi lấy thông tin vé:", error);
-          setStatus("error");
         }
       } else {
-        setStatus("error");
         message.error("Giao dịch thất bại.");
       }
       setLoading(false);
@@ -207,4 +201,4 @@ const VNPayReturn = () => {
   );
 };
 
-export default VNPayReturn;
+export default Paymentlist;

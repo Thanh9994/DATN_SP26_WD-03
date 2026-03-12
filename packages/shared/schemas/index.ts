@@ -12,8 +12,8 @@ export const BookingStatus = z.enum([
   "paid", //Đã thanh toán
   "cancelled", //Đã hủy
   "expired", //Hết hạn thanh toán và reset trạng thái
-  "failed", //Thanh toán thất bại
 ]);
+export const PaymentStatus = z.enum(["pending", "success", "failed"]);
 export const ShowTimeStatus = z.enum([
   "upcoming", //Sắp diễn ra
   "ongoing", //Đang chiếu
@@ -335,6 +335,9 @@ export type ISnackDrink = z.infer<typeof SnackDrink>;
 // export type ICinemaForm = Omit<ICinema, "danh_sach_phong" | "createdAt" | "updatedAt">;
 
 export type IUser = z.infer<typeof User>;
+export type IUserDocument = IUser & {
+  _id: string;
+};
 export type IUserLog = z.infer<typeof UserLog>;
 export type IUpdateUser = z.infer<typeof UpdateUser>;
 export type ILogin = z.infer<typeof Login>;
@@ -369,6 +372,8 @@ export type ICreateBooking = Omit<
   IBooking,
   "_id" | "createdAt" | "updatedAt" | "status" | "ticketCode"
 >;
+
+export type IPaymentStatus = z.infer<typeof PaymentStatus>;
 export type IPopulatedBooking = Omit<IBooking, "showTimeId" | "userId"> & {
   showTimeId: IPopulatedShowTime;
   userId: IUser;

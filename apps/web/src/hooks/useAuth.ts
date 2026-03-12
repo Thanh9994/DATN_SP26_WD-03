@@ -41,13 +41,13 @@ export const useAuth = () => {
       return data;
     },
     enabled: !!localStorage.getItem("token"),
-    staleTime: Infinity, // Dữ liệu "me" không bao giờ cũ
+    retry: false,
     gcTime: 1000 * 60 * 60 * 2, // Giữ trong cache 24h
   });
 
   const loginMutation = useMutation<IAuthResponse, Error, ILogin>({
     mutationFn: async (payload) => {
-      const { data } = await axios.post<IAuthResponse>(
+      const { data } = await axiosAuth.post<IAuthResponse>(
         `${API.AUTH}/login`,
         payload,
       );
@@ -56,7 +56,8 @@ export const useAuth = () => {
     onSuccess: (data) => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      showNotify("success", "Đăng Nhập Thành Công", "");
+      queryClient.setQueryData(["me"], data.user);
+      showNotify("success", "Đăng Nhập Thành Công");
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },
     onError: (err) => {
@@ -84,6 +85,7 @@ export const useAuth = () => {
     localStorage.removeItem("user");
     queryClient.removeQueries({ queryKey: ["me"] });
     showNotify("success", "Đăng Xuất Thành Công", "");
+    queryClient.clear();
   };
 
   const { data: users, isLoading: isLoadingUsers } = useQuery<IUser[]>({

@@ -4,19 +4,28 @@ import { useAuth } from "@web/hooks/useAuth";
 import AuthLayout from "@web/layouts/AuthLayout";
 import { Form } from "antd";
 import { Lock, Mail } from "lucide-react";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, isLoggingIn } = useAuth();
+  const { user, login, isLoggingIn } = useAuth();
+  const [searchParams] = useSearchParams();
   const [remember, setRemember] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      const redirectTo = searchParams.get("redirect") || "/";
+      navigate(decodeURIComponent(redirectTo), { replace: true });
+    }
+  }, [user]);
 
   const handleSubmit = async (values: any) => {
     try {
       await login({ email: values.email, password: values.password });
-      // console.log(token);
-      navigate("/");
+      const redirectTo = searchParams.get("redirect") || "/";
+
+      navigate(decodeURIComponent(redirectTo), { replace: true });
     } catch (err) {
       console.error(err);
     }
