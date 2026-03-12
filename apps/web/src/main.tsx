@@ -9,7 +9,6 @@ import "antd/dist/reset.css";
 import "./styles/auth.css";
 import "./styles/About.css";
 import "./styles/Event.css";
-import "./styles/Register.css";
 
 const queryClient = new QueryClient();
 

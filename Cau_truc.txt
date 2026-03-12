@@ -55,6 +55,9 @@ packages/
 
 giữ nguyên terminal base và npm i hoặc npm install
 
+\DATN_SP26_WD-03\apps\api cài thư viện backend vào đây 
+\DATN_SP26_WD-03\apps\web cài thư viện frontend vào đây
+
 test db bằng cách kết nối compass - check  request = postman 
 
 demo nếu ổn thì tôi chuyển hết sang Cloudinary và atlas nhé mọi người chỉ 1 dùng env và url tối ưu web nhẹ và mượt mà 
@@ -85,7 +88,7 @@ components/           Component dùng chung (Button, Modal…)
 │   └── user.service.ts
 ├── hooks/ call api 1 lần và dùng cho các component khác nhé mọi người cho gọn code
 ├── App.tsx
-├── .env #Dán đoạn code vào file này VITE_API_URL=http://localhost:5000
+├── .env #Dán đoạn code vào file này VITE=http://localhost:5000
 └── main.tsx
 
 lấy base nhớ add or clone link git sẽ hiện ra graph timeline của tôi là được nhé 
