@@ -1,5 +1,5 @@
 import { RouteObject } from "react-router-dom";
-import { Dashboard } from "@web/pages/admin/Dashboard";
+import Dashboard from "@web/pages/admin/Dashboard";
 import { Upload } from "@web/pages/admin/access-control/Upload";
 import { Genre } from "@web/pages/admin/cinema-catalog/Genre";
 import { Movie } from "@web/pages/admin/cinema-catalog/Movie";

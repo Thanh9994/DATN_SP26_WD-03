@@ -59,9 +59,9 @@ export const Rooms = () => {
     const processArray = (val: string) =>
       val
         ? val
-            .split(",")
-            .map((s) => s.trim().toUpperCase())
-            .filter(Boolean)
+          .split(",")
+          .map((s) => s.trim().toUpperCase())
+          .filter(Boolean)
         : [];
 
     const payload: IPhongCreate = {
@@ -389,7 +389,7 @@ export const Rooms = () => {
           <SeatMap
             seats={generateMockSeats(selectedRoom)}
             selectedSeatCodes={[]}
-            onSeatClick={() => {}}
+            onSeatClick={() => { }}
           />
         )}
       </Modal>
