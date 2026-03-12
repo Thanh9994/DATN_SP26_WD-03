@@ -118,7 +118,6 @@ const MyBooking = () => {
 
       {/* Main Content Container */}
       <div className="w-full bg-white/5 border border-white/10 rounded-3xl p-4 lg:p-8 backdrop-blur-xl space-y-12">
-        {/* Upcoming Section */}
         <section>
           <div className="flex items-center gap-2 mb-6">
             <Clock
@@ -158,7 +157,6 @@ const MyBooking = () => {
           </div>
         </section>
 
-        {/* Past Section */}
         <section>
           <div className="flex items-center gap-2 mb-6 border-t border-white/5 pt-10">
             <History

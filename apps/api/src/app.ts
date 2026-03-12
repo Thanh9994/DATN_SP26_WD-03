@@ -9,7 +9,7 @@ import testRoute from "./modules/test/test.route";
 import orderRouter from "./modules/sales-operations";
 import { globalErrorHandler } from "./middlewares/error.middleware";
 import paymentRouter from "./modules/sales-operations/payments/payment.route";
-
+import chatbotRoute from "./modules/chatbot/chatbot.route";
 const app = express();
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -27,5 +27,6 @@ app.use("/api/access", accessRouter);
 app.use("/api/catalog", catalogRouter);
 app.use("/api/content", contentRouter);
 app.use("/payments", paymentRouter);
+app.use("/api/chatbot", chatbotRoute);
 app.use(globalErrorHandler);
 export default app;

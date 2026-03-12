@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { Header } from "./client/Header";
 import { Footer } from "./client/Footer";
 import { ConfigProvider, theme } from "antd";
+import ChatBot from "@web/components/chatbot/ChatBot";
 
 export const ClientLayout = () => {
   return (
@@ -17,6 +18,7 @@ export const ClientLayout = () => {
           <Outlet />
         </main>
         <Footer />
+        <ChatBot />
       </div>
     </ConfigProvider>
   );
