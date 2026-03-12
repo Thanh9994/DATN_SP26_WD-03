@@ -2,7 +2,6 @@ import { NotFound } from "@web/components/tools/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
 import About from "@web/pages/clients/public/About";
 import Event from "@web/pages/clients/public/Event";
-
 import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
 import { Home } from "@web/pages/clients/public/Home";
 import Login from "@web/pages/clients/auth/Login";
@@ -26,7 +25,10 @@ import RequireAuth from "@web/services/RequieAuth";
 import Checkout from "@web/pages/CheckOut";
 import { Ticket } from "lucide-react";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
-import Cinemas from "@web/pages/Cinemas";
+import Paymentlist from "@web/pages/clients/payments/PaymentList";
+import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
+import RequireAuth from "@web/services/RequieAuth";
+import CinemaDetail from "@web/pages/CinemaDetail";
 import Contact from "@web/pages/clients/public/Contact";
 
 export const ClientRoutes: RouteObject = {
@@ -60,6 +62,7 @@ export const ClientRoutes: RouteObject = {
     },
     { path: "cinema", element: <Cinemas /> },
     { path: "movielist", element: <MovieList /> },
+    { path: "cinemadetail/:id", element: <CinemaDetail /> },
     {
       path: "booking",
       element: <BookingLayout />,
@@ -77,10 +80,20 @@ export const ClientRoutes: RouteObject = {
     },
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
-    { path: "ticket", element: <Ticket /> },
-    { path: "foods", element: <DrinkSnack /> },
+     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
-    { path: "checkout", element: <Checkout /> },
+    {
+      path: "payments",
+      element: <PaymentsMethod />,
+      children: [
+        { index: true, element: <Paymentlist /> },
+        { path: "failed", element: <PaymentsMethod /> },
+        { path: "success", element: <PaymentsMethod /> },
+      ],
+    },
+    { path: "payment-result", element: <PaymentResult /> },
+    { path: "ticket", element: <Ticket /> },   
+    { path: "contact", element: <Contact /> },
     { path: "*", element: <NotFound /> },
     { path: "contact", element: <Contact /> },
   ],
