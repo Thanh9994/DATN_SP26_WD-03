@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../styles/DrinkSnack.css";
 
 interface Product {
@@ -29,7 +29,8 @@ export const DrinkSnack = (): JSX.Element => {
     {
       id: "mega-combo",
       title: "Mega Movie Combo",
-      description: "Extra-large popcorn, two sodas, and a box of signature movie candy.",
+      description:
+        "Extra-large popcorn, two sodas, and a box of signature movie candy.",
       image: "🥤",
       price: 25.0,
       originalPrice: 32.0,
@@ -78,12 +79,14 @@ export const DrinkSnack = (): JSX.Element => {
 
   const handleAddToCart = (productId: string, quantity: number = 1): void => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.productId === productId);
+      const existingItem = prevCart.find(
+        (item) => item.productId === productId,
+      );
       if (existingItem) {
         return prevCart.map((item) =>
           item.productId === productId
             ? { ...item, quantity: item.quantity + quantity }
-            : item
+            : item,
         );
       }
       return [...prevCart, { productId, quantity }];
@@ -100,13 +103,14 @@ export const DrinkSnack = (): JSX.Element => {
   const renderBadge = (badge: Product["badge"]): JSX.Element | null => {
     if (!badge) return null;
     return (
-      <div className={`product-badge badge-${badge.color}`}>
-        {badge.text}
-      </div>
+      <div className={`product-badge badge-${badge.color}`}>{badge.text}</div>
     );
   };
 
-  const renderSaveBadge = (price: number, originalPrice?: number): JSX.Element | null => {
+  const renderSaveBadge = (
+    price: number,
+    originalPrice?: number,
+  ): JSX.Element | null => {
     if (!originalPrice || originalPrice <= price) return null;
     const savings = (originalPrice - price).toFixed(2);
     return <div className="product-badge badge-save">SAVE ${savings}</div>;
@@ -163,15 +167,14 @@ export const DrinkSnack = (): JSX.Element => {
       {isOpen && (
         <div className="modal-overlay">
           <div className="modal-container">
-            <button
-              className="modal-close"
-              onClick={() => setIsOpen(false)}
-            >
+            <button className="modal-close" onClick={() => setIsOpen(false)}>
               ✕
             </button>
 
             <div className="modal-header">
-              <span className="modal-subtitle">ENHANCE YOUR MOVIE EXPERIENCE</span>
+              <span className="modal-subtitle">
+                ENHANCE YOUR MOVIE EXPERIENCE
+              </span>
               <h1 className="modal-title">Recommended Snacks & Combos</h1>
             </div>
 
@@ -180,17 +183,16 @@ export const DrinkSnack = (): JSX.Element => {
             </div>
 
             <div className="modal-footer">
-              <button
-                className="btn-skip"
-                onClick={() => setIsOpen(false)}
-              >
+              <button className="btn-skip" onClick={() => setIsOpen(false)}>
                 No thanks, go to Checkout
               </button>
 
               <div className="footer-right">
                 <div className="total-price">
                   <span className="total-label">Total:</span>
-                  <span className="total-value">${getCartTotal().toFixed(2)}</span>
+                  <span className="total-value">
+                    ${getCartTotal().toFixed(2)}
+                  </span>
                 </div>
 
                 <button className="btn-continue">
