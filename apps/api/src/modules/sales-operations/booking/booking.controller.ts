@@ -97,6 +97,24 @@ export const bookingController = {
     });
   }),
 
+  expireBooking: catchAsync(async (req, res, next) => {
+    const userId = req.user?._id;
+    const { bookingId } = req.body;
+
+    if (!userId) {
+      return next(
+        new AppError("Bạn cần đăng nhập để thực hiện hành động này", 401),
+      );
+    }
+
+    await bookingService.expireBooking(bookingId, userId);
+
+    res.json({
+      success: true,
+      message: "Đã hủy giữ ghế thành công",
+    });
+  }),
+
   getPendingBooking: catchAsync(async (req, res) => {
     const { showtimeId } = req.params;
     const userId = req.user?._id;
