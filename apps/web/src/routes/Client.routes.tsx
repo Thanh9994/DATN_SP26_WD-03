@@ -85,6 +85,7 @@ export const ClientRoutes: RouteObject = {
     },
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
+    { path: "ticket", element: <Ticket /> },
     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
     {
@@ -101,5 +102,7 @@ export const ClientRoutes: RouteObject = {
     { path: "ticket", element: <Ticket /> },
     { path: "contact", element: <Contact /> },
     { path: "*", element: <NotFound /> },
+    { path: "contact", element: <Contact /> },
   ],
+
 };
