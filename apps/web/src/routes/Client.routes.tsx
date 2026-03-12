@@ -1,9 +1,13 @@
 import { NotFound } from "@web/components/tools/NotFound";
-import { ClientLayout } from "@web/layouts/ClientLayout";
+
+// Public
+import { Home } from "@web/pages/clients/public/Home";
 import About from "@web/pages/clients/public/About";
 import Event from "@web/pages/clients/public/Event";
+import News from "@web/pages/clients/public/News";
+
+import { ClientLayout } from "@web/layouts/ClientLayout";
 import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
-import { Home } from "@web/pages/clients/public/Home";
 import Login from "@web/pages/clients/auth/Login";
 import Register from "@web/pages/clients/auth/Register";
 import SeatBooking from "@web/pages/clients/booking/SeatBooking";
@@ -21,18 +25,14 @@ import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 import MovieList from "@web/pages/clients/MovieList";
 import NewsDetail from "@web/pages/clients/NewDetail";
-import News from "@web/pages/clients/public/News";
 import RequireAuth from "@web/services/RequieAuth";
 import { Ticket } from "lucide-react";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
 import Paymentlist from "@web/pages/clients/payments/PaymentList";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
-import RequireAuth from "@web/services/RequieAuth";
 import CinemaDetail from "@web/pages/CinemaDetail";
 import Contact from "@web/pages/clients/public/Contact";
-import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
 import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
-import Paymentlist from "@web/pages/clients/payments/PaymentList";
 import { PaymentFailed } from "@web/pages/clients/payments/PaymentFailed";
 import { PaymentSuccess } from "@web/pages/clients/payments/PaymentSuccess";
 
