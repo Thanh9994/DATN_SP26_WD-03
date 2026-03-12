@@ -25,6 +25,10 @@ import News from "@web/pages/clients/public/News";
 import RequireAuth from "@web/services/RequieAuth";
 import { Ticket } from "lucide-react";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
+import Paymentlist from "@web/pages/clients/payments/PaymentList";
+import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
+import RequireAuth from "@web/services/RequieAuth";
+import CinemaDetail from "@web/pages/CinemaDetail";
 import Contact from "@web/pages/clients/public/Contact";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
 import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
@@ -63,6 +67,7 @@ export const ClientRoutes: RouteObject = {
     },
     { path: "cinema", element: <Cinemas /> },
     { path: "movielist", element: <MovieList /> },
+    { path: "cinemadetail/:id", element: <CinemaDetail /> },
     {
       path: "booking",
       element: <BookingLayout />,
