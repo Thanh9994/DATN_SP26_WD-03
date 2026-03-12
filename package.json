@@ -8,10 +8,6 @@
     "dev": "concurrently -n API,WEB -c green,blue \"npm run dev --workspace=@apps/api\" \"npm run dev --workspace=@apps/web\""
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "cross-env": "^10.1.0"
-  },
-  "dependencies": {
-    "recharts": "^3.7.0"
+    "concurrently": "^8.2.2"
   }
 }
