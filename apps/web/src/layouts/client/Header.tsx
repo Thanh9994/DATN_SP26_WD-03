@@ -68,12 +68,21 @@ export const Header = () => {
             <img
               src="https://res.cloudinary.com/dcyzkqb1r/image/upload/t_PVM3/f_webp/q_40/H%E1%BB%8Fa_T%E1%BB%91c_fh4emr"
               alt="Logo"
-              className="w-[55px] h-[55px] object-cover"
+              className="w-[40px] h-[40px] lg:w-[55px] lg:h-[55px] object-cover" // Giảm size trên mobile
             />
+            <h2 className="hidden sm:block m-auto text-white text-xl font-black uppercase">
+              Cinema{" "}
+            </h2>
+          </div>
+          {/* <div
+            className="flex items-center group cursor-pointer gap-2"
+            onClick={() => navigate("/")}
+          >
+            <img src="" alt="Logo" className="w-[55px] h-[55px] object-cover" />
             <h2 className="m-auto text-white text-xl font-black tracking-normal uppercase">
               Cinema
             </h2>
-          </div>
+          </div> */}
 
           <nav className="hidden lg:flex items-center gap-8">
             <Link
@@ -127,7 +136,7 @@ export const Header = () => {
             />
           </div>
           <div className="flex items-center gap-3">
-            <button className="size-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors">
+            <button className="size-8 sm:size-12 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors">
               <span className="material-symbols-outlined">notifications</span>
             </button>
           </div>
@@ -145,16 +154,16 @@ export const Header = () => {
               </Dropdown>
             </div>
           ) : (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <button
                 onClick={() => navigate("/login")}
-                className="font-bold text-sm uppercase tracking-widest text-white/80 hover:text-white transition-colors"
+                className=" text-[10px] sm:text-sm uppercase sm:font-bold tracking-widest text-white/80 hover:text-white transition-colors"
               >
                 Login
               </button>
               <button
                 onClick={() => navigate("/register")}
-                className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-full font-bold text-sm uppercase tracking-widest transition-all"
+                className="text-white bg-primary px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-[10px] sm:text-sm sm:font-bold uppercase tracking-widest transition-all"
               >
                 Sign Up
               </button>

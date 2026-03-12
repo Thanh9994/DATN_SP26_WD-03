@@ -14,6 +14,7 @@ interface InputProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
   name?: string;
+  autoComplete?: string;
 }
 
 export default function Input({
@@ -23,6 +24,7 @@ export default function Input({
   className = "",
   id,
   type = "text",
+  autoComplete,
   ...props
 }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
@@ -42,6 +44,7 @@ export default function Input({
 
       <AntInput
         id={id}
+        autoComplete={autoComplete}
         prefix={icon}
         suffix={
           isPassword ? (

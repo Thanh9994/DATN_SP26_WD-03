@@ -2,7 +2,6 @@ import { NotFound } from "@web/components/tools/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
 import About from "@web/pages/clients/public/About";
 import Event from "@web/pages/clients/public/Event";
-
 import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
 import { Home } from "@web/pages/clients/public/Home";
 import Login from "@web/pages/clients/auth/Login";

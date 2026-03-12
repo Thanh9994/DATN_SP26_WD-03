@@ -61,16 +61,16 @@ export default function AuthLayout({
       </div>
 
       {/*  Form  */}
-      <div className="w-auto lg:w-1/2 flex flex-col items-center justify-center p-4 lg:p-12 bg-background-dark relative slide-right">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-5 lg:p-12 bg-background-dark relative slide-right">
         <div className="absolute top-1/4 right-0 w-64 h-64 bg-primary/10 blur-[120px] rounded-full"></div>
         <div className="absolute bottom-1/4 left-0 w-64 h-64 bg-primary/5 blur-[120px] rounded-full"></div>
 
         <div className="w-full max-w-md relative z-10 auth-card-anim">
-          <div className="mb-10">
-            <h2 className="text-4xl font-black text-white tracking-tight mb-2">
+          <div className="mb-4 sm:mb-10">
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-1">
               {title}
             </h2>
-            <p className="text-white/50">{subtitle}</p>
+            <p className="text-[12px] sm:text-base text-white/50">{subtitle}</p>
           </div>
           {children}
         </div>
