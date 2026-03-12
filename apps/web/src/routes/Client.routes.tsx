@@ -16,7 +16,8 @@ import { BookingCinema } from "@web/pages/clients/booking/BookingCinema";
 import { ProfileLayout } from "@web/layouts/ProfileLayout";
 import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
 import { Setting } from "@web/components/authProfile/Setting";
-import MyBooking  from "@web/components/authProfile/MyBooking";
+import  Cinemas  from "@web/pages/Cinemas";
+import MyBooking from "@web/components/authProfile/MyBooking";
 import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 import MovieList from "@web/pages/clients/MovieList";
@@ -26,7 +27,10 @@ import RequireAuth from "@web/services/RequieAuth";
 import Checkout from "@web/pages/CheckOut";
 import { Ticket } from "lucide-react";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
-import Cinemas from "@web/pages/Cinemas";
+import Paymentlist from "@web/pages/clients/payments/PaymentList";
+import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
+import RequireAuth from "@web/services/RequieAuth";
+import CinemaDetail from "@web/pages/CinemaDetail";
 import Contact from "@web/pages/clients/public/Contact";
 
 export const ClientRoutes: RouteObject = {
@@ -60,6 +64,7 @@ export const ClientRoutes: RouteObject = {
     },
     { path: "cinema", element: <Cinemas /> },
     { path: "movielist", element: <MovieList /> },
+    { path: "cinemadetail/:id", element: <CinemaDetail /> },
     {
       path: "booking",
       element: <BookingLayout />,
@@ -91,7 +96,7 @@ export const ClientRoutes: RouteObject = {
     { path: "payment-result", element: <PaymentResult /> },
     { path: "ticket", element: <Ticket /> },   
     { path: "contact", element: <Contact /> },
-        { path: "*", element: <NotFound /> },
+    { path: "*", element: <NotFound /> },
   ],
 
 };
