@@ -37,11 +37,7 @@ export const Home = () => {
         <section className="relative h-screen w-full flex items-center overflow-hidden ">
           <button
             onClick={prevMovie}
-            className="absolute left-5 top-1/2 -translate-y-1/2 z-30 
-              w-12 h-12 flex items-center justify-center 
-              rounded-full bg-black/10 text-white 
-              opacity-40 hover:opacity-100 hover:bg-black/60 
-              transition-all duration-300"
+            className="hidden md:flex absolute left-5 top-1/2 -translate-y-1/2 z-30 w-12 h-12 items-center justify-center rounded-full bg-black/20 text-white opacity-40 hover:opacity-100 transition-all"
           >
             <span className="material-symbols-outlined text-3xl">
               chevron_left
@@ -73,23 +69,23 @@ export const Home = () => {
               ))}
             </div>
           </div>
-          <div className="relative z-20 top-0 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 slide-down-fade">
+          <div className="relative z-20 top-0 w-full max-w-7xl mx-auto px-5 slide-down-fade">
             <div className="max-w-xl">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="px-3 py-1 bg-primary rounded text-xs font-bold uppercase text-white">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="px-2 py-0.5 bg-primary rounded text-[10px] font-bold uppercase text-white">
                   Trending
                 </span>
                 <div className="flex items-center gap-1 text-yellow-400">
-                  <span className="material-symbols-outlined text-base">
+                  <span className="material-symbols-outlined text-sm">
                     star
                   </span>
-                  <span className="text-base font-bold text-white">4.9</span>
+                  <span className="text-sm font-bold text-white">4.9</span>
                 </div>
               </div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight mb-6 tracking-tight uppercase">
+              <h1 className="text-2xl sm:text-4xl font-black text-white leading-tight mb-4 tracking-tight uppercase line-clamp-2">
                 {featuredMovie.ten_phim}
               </h1>
-              <p className="text-base text-white/80 mb-8 leading-relaxed max-w-lg">
+              <p className="text-sm sm:text-base text-white/80 mb-6 leading-relaxed max-w-lg line-clamp-3">
                 {featuredMovie.mo_ta}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
@@ -97,7 +93,7 @@ export const Home = () => {
                   onClick={() =>
                     navigate(`/booking?movieId=${featuredMovie._id}`)
                   }
-                  className="bg-primary text-white px-6 py-3 rounded-full font-semibold flex items-center justify-center gap-2 text-sm hover:scale-105 transition-transform"
+                  className="bg-primary text-white px-6 py-3 rounded-full font-bold flex items-center justify-center gap-2 text-xs uppercase tracking-wider hover:scale-105 transition-all"
                 >
                   <span className="material-symbols-outlined text-lg">
                     confirmation_number
@@ -106,7 +102,7 @@ export const Home = () => {
                 </button>
                 <button
                   onClick={() => navigate(`/movie/${featuredMovie._id}`)}
-                  className="bg-white/10 text-white px-6 py-3 rounded-full font-semibold flex items-center justify-center gap-2 border border-white/20 text-sm hover:bg-white/20"
+                  className="bg-white/10 backdrop-blur-md text-white px-6 py-3 rounded-full font-bold flex items-center justify-center gap-2 border border-white/20 text-xs uppercase tracking-wider"
                 >
                   <span className="material-symbols-outlined text-lg">
                     info
@@ -118,11 +114,7 @@ export const Home = () => {
           </div>
           <button
             onClick={nextMovie}
-            className="absolute right-5 top-1/2 -translate-y-1/2 z-30 
-              w-12 h-12 flex items-center justify-center 
-              rounded-full bg-black/10 text-white 
-              opacity-40 hover:opacity-100 hover:bg-black/60 
-              transition-all duration-300"
+            className="hidden md:flex absolute right-5 top-1/2 -translate-y-1/2 z-30 w-12 h-12 items-center justify-center rounded-full bg-black/20 text-white opacity-40 hover:opacity-100 transition-all"
           >
             <span className="material-symbols-outlined text-3xl">
               chevron_right
@@ -130,28 +122,28 @@ export const Home = () => {
           </button>
         </section>
         {/* NOW SHOWING */}
-        <section className="py-6 max-w-7xl mx-auto">
-          <div className="px-4 flex items-center justify-between mb-6">
-            <div className="flex flex-row justify-center items-center sm:flex-row sm:items-center gap-2 sm:gap-4">
-              <h2 className="text-lg md:text-4xl font-bold text-white whitespace-nowrap">
+        <section className="py-8 max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl md:text-3xl font-black text-white uppercase tracking-tighter">
                 Now Showing
               </h2>
-              <span className="w-full text-[8px] md:text-xs font-bold px-2 md:px-1 py-1 bg-red-500/20 text-red-500 rounded-full uppercase">
-                New Releases
+              <span className="hidden xs:block text-[10px] font-bold px-2 py-0.5 bg-red-500/20 text-red-500 rounded-full uppercase">
+                New
               </span>
             </div>
 
             <a
-              className="text-red-500 text-xs md:text-sm font-bold flex items-center gap-1 hover:underline whitespace-nowrap"
+              className="text-primary text-xs font-bold flex items-center gap-1 uppercase tracking-widest"
               href="#"
             >
-              View All
+              Tất cả
               <span className="material-symbols-outlined text-sm">
                 arrow_forward
               </span>
             </a>
           </div>
-          <div className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-4">
+          <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-4 px-4">
             {movies
               ?.filter((m) => m.trang_thai === "dang_chieu")
               .map((movie) => (

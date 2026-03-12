@@ -309,6 +309,7 @@ export const Register = z.object({
 export const AuthResponse = z.object({
   user: User,
   token: z.string(),
+  remember: z.boolean().optional(),
 });
 
 export type IPopulatedShowTime = Omit<IShowTime, "roomId" | "movieId"> & {

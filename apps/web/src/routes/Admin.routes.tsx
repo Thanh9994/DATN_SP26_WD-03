@@ -1,4 +1,3 @@
-
 import { RouteObject } from "react-router-dom";
 import { Dashboard } from "@web/pages/admin/Dashboard";
 import { Upload } from "@web/pages/admin/access-control/Upload";
