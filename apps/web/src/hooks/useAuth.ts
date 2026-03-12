@@ -11,12 +11,15 @@ import { showNotify } from "@web/components/AppNotification";
 import { message } from "antd";
 import axios from "axios";
 
+const getStoredToken = () =>
+  localStorage.getItem("token") || sessionStorage.getItem("token");
+
 // Axios instance có gắn token
 export const axiosAuth = axios.create();
 
 axiosAuth.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = getStoredToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -31,6 +34,7 @@ axiosAuth.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // Xóa local cache cũ khi token logout hết hạn hoặc lỗi
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       localStorage.removeItem("user");
       // Tùy chọn: Chuyển hướng về login
     }
@@ -51,7 +55,7 @@ export const useAuth = () => {
       const { data } = await axiosAuth.get<IUser>(`${API.USERS}/me`);
       return data;
     },
-    enabled: !!localStorage.getItem("token"),
+    enabled: !!getStoredToken(),
     retry: false,
     gcTime: 1000 * 60 * 60 * 2, // Giữ trong cache 24h
   });
@@ -103,6 +107,7 @@ export const useAuth = () => {
 
   const logout = () => {
     localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     localStorage.removeItem("user");
     queryClient.clear();
     queryClient.removeQueries({ queryKey: ["me"] });

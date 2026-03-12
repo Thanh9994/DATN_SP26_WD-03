@@ -108,3 +108,16 @@ export const useBooking = (showTimeId?: string) => {
     refreshSeats: refetch,
   };
 };
+
+export const useMyBookings = (status: string = "paid") => {
+  return useQuery({
+    queryKey: ["my-bookings", status],
+    queryFn: async () => {
+      const res = await axiosAuth.get(`${API.BOOKING}/my`, {
+        params: { status },
+      });
+      return res.data.data || [];
+    },
+    staleTime: 1000 * 60,
+  });
+};

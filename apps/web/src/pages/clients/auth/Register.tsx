@@ -219,7 +219,7 @@ const Register = () => {
         </Button>
       </Form>
 
-      <div className="relative my-8">
+      <div className="relative my-4 sm:my-8">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-white/10"></div>
         </div>
@@ -230,7 +230,7 @@ const Register = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <Button variant="secondary" className="!py-3">
           <img
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
@@ -247,7 +247,7 @@ const Register = () => {
         </Button>
       </div>
 
-      <p className="mt-8 text-center text-sm text-white/40 font-medium">
+      <p className="mt-4 sm:mt-8 text-center text-sm text-white/40 font-medium">
         Already have an account?{" "}
         <Link to="/login" className="text-primary font-bold hover:underline">
           Sign In

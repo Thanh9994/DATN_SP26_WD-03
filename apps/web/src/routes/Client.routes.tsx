@@ -29,6 +29,8 @@ import Contact from "@web/pages/clients/public/Contact";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
 import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
 import Paymentlist from "@web/pages/clients/payments/PaymentList";
+import { PaymentFailed } from "@web/pages/clients/payments/PaymentFailed";
+import { PaymentSuccess } from "@web/pages/clients/payments/PaymentSuccess";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -84,9 +86,10 @@ export const ClientRoutes: RouteObject = {
       path: "payments",
       element: <PaymentsMethod />,
       children: [
-        { index: true, element: <Paymentlist /> },
-        { path: "failed", element: <PaymentsMethod /> },
-        { path: "success", element: <PaymentsMethod /> },
+        { path: "vnpay", element: <Paymentlist /> },
+        { path: "failed", element: <PaymentFailed /> },
+        { path: "success", element: <PaymentSuccess /> },
+        { path: "result", element: <PaymentResult /> },
       ],
     },
     { path: "payment-result", element: <PaymentResult /> },
