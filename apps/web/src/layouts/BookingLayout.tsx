@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import { useMovie } from "@web/hooks/useMovie";
 import { Button, message, Spin } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { useBooking } from "@web/hooks/useBooking";
 import { IShowTime, IShowTimeSeat } from "@shared/schemas";
@@ -21,6 +21,7 @@ const BookingLayout = () => {
   const location = useLocation();
 
   const navigate = useNavigate();
+  const prevPathRef = useRef(location.pathname);
 
   // Quản lý trạng thái dùng chung
   const [selectedShowtime, setSelectedShowtime] = useState<IShowTime | null>(
@@ -31,13 +32,20 @@ const BookingLayout = () => {
   const activeShowtimeId =
     selectedShowtime?._id ?? showtimeIdFromUrl ?? undefined;
 
-  const { showTime, holdSeats, isHolding, refreshSeats, pendingBooking } =
-    useBooking(activeShowtimeId);
+  const {
+    showTime,
+    holdSeats,
+    isHolding,
+    refreshSeats,
+    pendingBooking,
+    cancelBooking,
+    expireBooking,
+  } = useBooking(activeShowtimeId);
 
   useEffect(() => {
-    if (!pendingBooking?.data) return;
+    if (!pendingBooking) return;
 
-    const seatCodes = pendingBooking.data.seatCodes;
+    const seatCodes = pendingBooking.seatCodes;
 
     if (!seatCodes) return;
 
@@ -103,6 +111,38 @@ const BookingLayout = () => {
     selectedSeats.length > 0
       ? selectedSeats.reduce((sum, s) => sum + s.price, 0)
       : pendingBooking?.totalAmount || 0;
+
+  useEffect(() => {
+    const prevPath = prevPathRef.current;
+    const isLeavingSeats =
+      prevPath.includes("/booking/seats") &&
+      !location.pathname.includes("/booking/seats");
+    const isBackToBooking = location.pathname.startsWith("/booking");
+
+    if (isLeavingSeats && isBackToBooking && pendingBooking?._id) {
+      expireBooking(pendingBooking._id).catch((error) => {
+        console.error("Expire booking quay lại thất bại:", error);
+      });
+      setSelectedSeats([]);
+      setSelectedShowtime(null);
+    }
+
+    prevPathRef.current = location.pathname;
+  }, [location.pathname, pendingBooking?._id, expireBooking]);
+
+  const handleBackToCinema = async () => {
+    if (pendingBooking?._id) {
+      try {
+        await expireBooking(pendingBooking._id);
+      } catch (error) {
+        console.error("Expire booking failed:", error);
+      }
+    }
+
+    setSelectedSeats([]);
+    setSelectedShowtime(null);
+    navigate(`/booking?movieId=${movieId}`);
+  };
   // console.log("user", user);
   // console.log("selectedShowtime", selectedShowtime);
   // console.log("showtimeIdFromUrl", showtimeIdFromUrl);
@@ -234,6 +274,17 @@ const BookingLayout = () => {
         </aside>
 
         <main className="w-full lg:w-3/4 ">
+          {isSelectSeatStep && (
+            <div className="mb-6">
+              <Button
+                type="default"
+                onClick={handleBackToCinema}
+                className="border-white/20 text-white bg-white/5 hover:bg-white/10"
+              >
+                Quay lại chọn rạp
+              </Button>
+            </div>
+          )}
           <Outlet
             context={{
               movie,
@@ -241,6 +292,9 @@ const BookingLayout = () => {
               setSelectedShowtime,
               selectedSeats,
               setSelectedSeats,
+              pendingBooking,
+              cancelBooking,
+              expireBooking,
             }}
           />
           {(selectedShowtime || showTime) && (

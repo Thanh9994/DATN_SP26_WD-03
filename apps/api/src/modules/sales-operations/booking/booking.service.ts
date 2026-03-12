@@ -294,4 +294,41 @@ export const bookingService = {
       session.endSession();
     }
   },
+
+  async expireBooking(bookingId: string, userId: string) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const booking = await Booking.findOne({ _id: bookingId, userId }).session(
+        session,
+      );
+
+      if (!booking || booking.status !== "pending") {
+        throw new AppError(
+          "Không thể hủy đơn hàng này hoặc đơn hàng không tồn tại.",
+          400,
+        );
+      }
+
+      await SeatTime.updateMany(
+        { _id: { $in: booking.seats }, bookingId: booking._id },
+        {
+          $set: { trang_thai: "empty" },
+          $unset: { heldBy: "", holdExpiresAt: "", bookingId: "" },
+        },
+        { session },
+      );
+
+      booking.status = "expired";
+      await booking.save({ session });
+
+      await session.commitTransaction();
+      return { success: true };
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  },
 };
