@@ -31,12 +31,12 @@ const Paymentlist = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [bookingInfo, setBookingInfo] = useState<BookingDetail | null>(null);
+  const responseCode = searchParams.get("vnp_ResponseCode");
+  const bookingId = searchParams.get("vnp_TxnRef");
+  const isSuccess = responseCode === "00";
 
   useEffect(() => {
     const processPayment = async () => {
-      const responseCode = searchParams.get("vnp_ResponseCode");
-      const bookingId = searchParams.get("vnp_TxnRef");
-
       if (responseCode === "00" && bookingId) {
         try {
           // ĐỔI Ở ĐÂY: Dùng axiosAuth để tự động đính kèm Token
@@ -60,8 +60,7 @@ const Paymentlist = () => {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 backdrop-blur-sm">
+    <div className="w-full bg-white/5 border border-white/10 rounded-[28px] p-8">
         {loading ? (
           <div className="text-center py-10">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
@@ -69,7 +68,7 @@ const Paymentlist = () => {
           </div>
         ) : (
           <div className="text-center">
-            {status === "success" ? (
+            {isSuccess ? (
               <>
                 <div className="h-16 w-16 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center mx-auto mb-6">
                   <svg
@@ -196,7 +195,6 @@ const Paymentlist = () => {
             )}
           </div>
         )}
-      </div>
     </div>
   );
 };

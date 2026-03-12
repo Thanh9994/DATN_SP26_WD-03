@@ -2,35 +2,99 @@ import { useBooking } from "@web/hooks/useBooking";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { message } from "antd";
+import {
+  useLocation,
+  useNavigate,
+  useOutlet,
+  useSearchParams,
+} from "react-router-dom";
+import { message } from "antd";
+import { API } from "@web/api/api.service";
+import { axiosAuth } from "@web/hooks/useAuth";
+import dayjs from "dayjs";
+
+interface BookingDetail {
+  seatCodes: string[];
+  totalAmount: number;
+  finalAmount: number;
+  ticketCode: string;
+  showTimeId: {
+    movieId: {
+      ten_phim: string;
+    };
+    roomId: {
+      ten_phong: string;
+      cinema_id: {
+        name: string;
+      };
+    };
+    startTime: string;
+  };
+}
 
 const PaymentsMethod = () => {
   const [method, setMethod] = useState("vnpay");
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const outlet = useOutlet();
+  const [searchParams] = useSearchParams();
   const { createPaymentUrl } = useBooking();
+  const [bookingDetail, setBookingDetail] = useState<BookingDetail | null>(null);
+  const [bookingLoading, setBookingLoading] = useState(false);
 
-  const bookingId = location.state?.bookingId;
-  const totalAmount = location.state?.totalAmount || 0;
-  const seats = location.state?.seats || [];
+  const bookingIdState = location.state?.bookingId;
+  const bookingIdParam =
+    searchParams.get("bookingId") || searchParams.get("vnp_TxnRef");
+  const activeBookingId = bookingIdState || bookingIdParam;
+
+  const totalAmount =
+    location.state?.totalAmount ??
+    bookingDetail?.finalAmount ??
+    bookingDetail?.totalAmount ??
+    0;
+  const seats = location.state?.seats || bookingDetail?.seatCodes || [];
   const movieInfo = location.state?.movieInfo;
+  const showtimeText =
+    movieInfo?.showtime ||
+    (bookingDetail?.showTimeId?.startTime
+      ? dayjs(bookingDetail.showTimeId.startTime).format("HH:mm - DD/MM/YYYY")
+      : "Showtime");
 
   useEffect(() => {
-    if (!bookingId) {
+    if (outlet) return;
+    if (!activeBookingId) {
       message.error("Không tìm thấy thông tin đơn hàng!");
       navigate("/");
     }
-  }, [bookingId, navigate]);
+  }, [activeBookingId, navigate, outlet]);
+
+  useEffect(() => {
+    if (!activeBookingId) return;
+    setBookingLoading(true);
+    axiosAuth
+      .get(`${API.BOOKING}/detail/${activeBookingId}`)
+      .then((res) => {
+        if (res.data?.success) setBookingDetail(res.data.data);
+      })
+      .catch((error) => console.error("Load booking detail failed:", error))
+      .finally(() => setBookingLoading(false));
+  }, [activeBookingId]);
 
   const handlePurchase = async () => {
-    if (!bookingId) {
+    if (!activeBookingId) {
       message.error("Không tìm thấy thông tin đơn hàng!");
+      return;
+    }
+
+    if (method !== "vnpay") {
+      message.info("PhÆ°Æ¡ng thá»©c nÃ y chÆ°a Ä‘Æ°á»£c há»— trá»£.");
       return;
     }
 
     setLoading(true);
     try {
-      const paymentUrl = await createPaymentUrl(bookingId);
+      const paymentUrl = await createPaymentUrl(activeBookingId);
 
       window.location.href = paymentUrl;
     } catch (error) {
@@ -47,7 +111,11 @@ const PaymentsMethod = () => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
           {/* LEFT */}
           <div>
-            <div className="text-3xl uppercase font-extrabold">Payments</div>
+            {outlet ? (
+              <>{outlet}</>
+            ) : (
+              <>
+                <div className="text-3xl uppercase font-extrabold">Payments</div>
 
             {/* PAYMENT METHOD */}
             <div className="mt-8">
@@ -91,11 +159,14 @@ const PaymentsMethod = () => {
 
                 <button
                   type="button"
-                  disabled
-                  className="p-4 rounded-2xl border border-white/5 bg-white/5 opacity-40 cursor-not-allowed"
+                  onClick={() => setMethod("atm")}
+                  className={`p-4 rounded-2xl border transition-all ${method === "atm" ? "border-amber-500 bg-amber-500/10" : "border-white/10 bg-white/5"}`}
                 >
                   <div className="text-[11px] font-semibold uppercase tracking-widest">
-                    ZaloPay
+                    ATM
+                  </div>
+                  <div className="text-[9px] text-zinc-500 mt-1">
+                    Tháº» ATM ná»™i Ä‘á»‹a
                   </div>
                 </button>
               </div>
@@ -121,6 +192,8 @@ const PaymentsMethod = () => {
                 </p>
               </div>
             </div>
+              </>
+            )}
           </div>
 
           {/* RIGHT - ORDER SUMMARY */}
@@ -162,14 +235,16 @@ const PaymentsMethod = () => {
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={handlePurchase}
-                  className={`mt-3 w-full rounded-2xl bg-red-600 hover:bg-red-500 transition py-3 font-semibold shadow-[0_0_40px_rgba(239,68,68,0.22)] ${loading ? "opacity-50 cursor-wait" : ""}`}
-                >
-                  {loading ? "Processing..." : "Complete Purchase"}
-                </button>
+                {!outlet && (
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={handlePurchase}
+                    className={`mt-3 w-full rounded-2xl bg-red-600 hover:bg-red-500 transition py-3 font-semibold shadow-[0_0_40px_rgba(239,68,68,0.22)] ${loading ? "opacity-50 cursor-wait" : ""}`}
+                  >
+                    {loading ? "Processing..." : "Complete Purchase"}
+                  </button>
+                )}
 
                 <div className="text-[10px] text-zinc-500 text-center leading-relaxed">
                   Bằng cách nhấn hoàn tất, bạn đồng ý với{" "}
@@ -191,13 +266,26 @@ const PaymentsMethod = () => {
               )}
               <div className="min-w-0">
                 <div className="font-semibold text-sm truncate">
-                  {movieInfo?.title || "Movie"}
+                  {movieInfo?.title ||
+                    bookingDetail?.showTimeId?.movieId?.ten_phim ||
+                    "Movie"}
                 </div>
                 <div className="text-[11px] text-zinc-500 mt-1">
-                  {movieInfo?.showtime || "Showtime"}
+                  {showtimeText}
                 </div>
+                {bookingDetail?.showTimeId?.roomId?.cinema_id?.name && (
+                  <div className="text-[11px] text-zinc-500 mt-1">
+                    {bookingDetail.showTimeId.roomId.cinema_id.name} -{" "}
+                    {bookingDetail.showTimeId.roomId.ten_phong}
+                  </div>
+                )}
               </div>
             </div>
+            {bookingLoading && (
+              <div className="text-xs text-zinc-500 text-center">
+                Äang táº£i thÃ´ng tin booking...
+              </div>
+            )}
           </div>
         </div>
       </div>
