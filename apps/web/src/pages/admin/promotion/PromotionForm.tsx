@@ -96,6 +96,10 @@ const PromotionForm = () => {
           status: "published",
         }}
       >
+        <Form.Item label="Avatar" name="avatar" rules={[{ required: true }]}>
+          <Input
+          />
+        </Form.Item>
         <Form.Item label="Title" name="title" rules={[{ required: true }]}>
           <Input
             onChange={(e) => {

@@ -1,157 +1,294 @@
 import { useBooking } from "@web/hooks/useBooking";
-import { useState, useEffect, useRef } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { message } from "antd";
-import { CheckCircle2 } from "lucide-react";
+import {
+  useLocation,
+  useNavigate,
+  useOutlet,
+  useSearchParams,
+} from "react-router-dom";
+import { message } from "antd";
+import { API } from "@web/api/api.service";
+import { axiosAuth } from "@web/hooks/useAuth";
+import dayjs from "dayjs";
+
+interface BookingDetail {
+  seatCodes: string[];
+  totalAmount: number;
+  finalAmount: number;
+  ticketCode: string;
+  showTimeId: {
+    movieId: {
+      ten_phim: string;
+    };
+    roomId: {
+      ten_phong: string;
+      cinema_id: {
+        name: string;
+      };
+    };
+    startTime: string;
+  };
+}
 
 const PaymentsMethod = () => {
+  const [method, setMethod] = useState("vnpay");
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const outlet = useOutlet();
+  const [searchParams] = useSearchParams();
   const { createPaymentUrl } = useBooking();
+  const [bookingDetail, setBookingDetail] = useState<BookingDetail | null>(null);
+  const [bookingLoading, setBookingLoading] = useState(false);
 
-  const bookingId = location.state?.bookingId;
-  const totalAmount = location.state?.totalAmount || 0;
-  const seats = location.state?.seats || [];
+  const bookingIdState = location.state?.bookingId;
+  const bookingIdParam =
+    searchParams.get("bookingId") || searchParams.get("vnp_TxnRef");
+  const activeBookingId = bookingIdState || bookingIdParam;
+
+  const totalAmount =
+    location.state?.totalAmount ??
+    bookingDetail?.finalAmount ??
+    bookingDetail?.totalAmount ??
+    0;
+  const seats = location.state?.seats || bookingDetail?.seatCodes || [];
   const movieInfo = location.state?.movieInfo;
-  const isProcessing = useRef(false);
+  const showtimeText =
+    movieInfo?.showtime ||
+    (bookingDetail?.showTimeId?.startTime
+      ? dayjs(bookingDetail.showTimeId.startTime).format("HH:mm - DD/MM/YYYY")
+      : "Showtime");
 
   useEffect(() => {
-    if (!bookingId) {
+    if (outlet) return;
+    if (!activeBookingId) {
       message.error("Không tìm thấy thông tin đơn hàng!");
       navigate("/");
     }
-  }, [bookingId, navigate]);
+  }, [activeBookingId, navigate, outlet]);
+
+  useEffect(() => {
+    if (!activeBookingId) return;
+    setBookingLoading(true);
+    axiosAuth
+      .get(`${API.BOOKING}/detail/${activeBookingId}`)
+      .then((res) => {
+        if (res.data?.success) setBookingDetail(res.data.data);
+      })
+      .catch((error) => console.error("Load booking detail failed:", error))
+      .finally(() => setBookingLoading(false));
+  }, [activeBookingId]);
 
   const handlePurchase = async () => {
-    if (!bookingId) {
+    if (!activeBookingId) {
       message.error("Không tìm thấy thông tin đơn hàng!");
       return;
     }
 
-    // 🔒 lock request
-    if (isProcessing.current) return;
-    isProcessing.current = true;
+    if (method !== "vnpay") {
+      message.info("PhÆ°Æ¡ng thá»©c nÃ y chÆ°a Ä‘Æ°á»£c há»— trá»£.");
+      return;
+    }
 
     setLoading(true);
-
     try {
-      const paymentUrl = await createPaymentUrl(bookingId);
+      const paymentUrl = await createPaymentUrl(activeBookingId);
 
       window.location.href = paymentUrl;
     } catch (error) {
       message.error("Có lỗi xảy ra khi tạo link thanh toán!");
-      isProcessing.current = false; // mở lock nếu lỗi
+    } finally {
       setLoading(false);
     }
   };
   return (
-    <div className="min-h-auto bg-[#120d0d] text-white ">
-      <main className="max-w-7xl mx-auto py-8 px-5">
-        <div className="flex flex-col lg:flex-row gap-12">
-          <Outlet />
+    <div className="min-h-auto text-white">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(239,68,68,0.12),rgba(0,0,0,0)_55%),radial-gradient(ellipse_at_left,rgba(255,255,255,0.06),rgba(0,0,0,0)_45%)]" />
 
-          <aside className="w-full lg:w-1/3">
-            <div className="sticky top-12 space-y-6">
-              <div className="summary-card p-8 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                <h3 className="text-2xl font-black mb-8">Order Summary</h3>
+      <div className="mx-auto max-w-7xl px-4 pt-10 pb-28">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
+          {/* LEFT */}
+          <div>
+            {outlet ? (
+              <>{outlet}</>
+            ) : (
+              <>
+                <div className="text-3xl uppercase font-extrabold">Payments</div>
 
-                <div className="space-y-6 mb-8">
-                  {/* {MOCK_ORDER_DATA.items.map((item) => ( */}
-                  <div
-                    // key={item.id}
-                    className="flex justify-between items-center group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary">
-                        {/* <item.icon className="w-5 h-5" /> */}
-                      </div>
-                      <div>
-                        <p className="font-bold">
-                          {seats.join(", ") || "Seats"}
-                        </p>
-                        <p
-                          className={`text-[10px] text-white/40 uppercase tracking-widest `}
-                        >
-                          {movieInfo?.ten_phim || "Movie"}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="font-black text-white/80">
-                      {totalAmount.toFixed(2)}
-                    </span>
-                  </div>
-                  {/* ))} */}
-
-                  <div className="flex justify-between items-center border-t border-white/5 pt-6">
-                    <p className="text-white/40 font-medium">Service Fee</p>
-                    <span className="font-bold text-white/40">00 VNĐ</span>
-                  </div>
+            {/* PAYMENT METHOD */}
+            <div className="mt-8">
+              <div className="flex items-center gap-3">
+                <span className="h-6 w-6 rounded-full bg-red-600/15 border border-red-500/30 text-red-300 text-xs flex items-center justify-center">
+                  1
+                </span>
+                <div className="text-xs tracking-[0.25em] text-zinc-300 font-semibold">
+                  PAYMENT METHOD
                 </div>
-
-                <div className="border-t-2 border-dashed border-white/10 pt-6 mb-8">
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">
-                        Total Amount
-                      </p>
-                      <p className="text-4xl font-black">
-                        {totalAmount.toFixed(2)}
-                      </p>
-                    </div>
-                    <span className="text-[10px] text-white/40 bg-white/5 px-2 py-1 rounded uppercase tracking-tighter">
-                      {bookingId?.slice(-8) || "N/A"}
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handlePurchase}
-                  disabled={loading}
-                  className={`w-full py-5 text-white rounded-[1.25rem] flex items-center justify-center gap-3 font-black text-xl shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all ${
-                    loading
-                      ? "bg-gray-600 cursor-not-allowed"
-                      : "bg-gradient-to-r from-[#ff3e47] to-[#ea2a33] hover:from-[#ff555d] hover:to-[#ff3e47] shadow-primary/40"
-                  }`}
-                >
-                  <span>{loading ? "Processing..." : "Complete Purchase"}</span>
-                  <CheckCircle2 className="w-6 h-6" />
-                </button>
-
-                <p className="text-center mt-6 text-xs text-white/30">
-                  By clicking complete purchase, you agree to our{" "}
-                  <a className="underline hover:text-white" href="#">
-                    Terms of Service
-                  </a>
-                </p>
               </div>
 
-              <div className="flex items-center gap-4 px-4 py-3 bg-white/5 rounded-2xl border border-white/5">
-                <img
-                  alt="Movie Thumbnail"
-                  className="w-16 h-20 object-cover rounded-xl"
-                  src={
-                    movieInfo?.poster.url ||
-                    "https://via.placeholder.com/80x100"
-                  }
-                />
-                <div>
-                  <p className="font-bold text-sm">
-                    {movieInfo?.ten_phim || "Movie Title"}
-                  </p>
-                  <p className="text-xs text-white/50">
-                    {seats.join(", ") || "No seats selected"}
-                  </p>
-                  <p className="text-xs text-primary font-bold mt-1 uppercase tracking-tighter">
-                    {movieInfo?.cinema || "Cinema"}
-                  </p>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                {/* VNPay Button */}
+                <button
+                  type="button"
+                  onClick={() => setMethod("vnpay")}
+                  className={`p-4 rounded-2xl border transition-all ${method === "vnpay" ? "border-red-500 bg-red-500/10" : "border-white/10 bg-white/5"}`}
+                >
+                  <div className="text-[11px] font-semibold uppercase tracking-widest">
+                    VNPay
+                  </div>
+                  <div className="text-[9px] text-zinc-500 mt-1">
+                    Nội địa & Quốc tế
+                  </div>
+                </button>
+
+                {/* Giả định thêm Momo */}
+                <button
+                  type="button"
+                  onClick={() => setMethod("momo")}
+                  className={`p-4 rounded-2xl border transition-all ${method === "momo" ? "border-pink-500 bg-pink-500/10" : "border-white/10 bg-white/5"}`}
+                >
+                  <div className="text-[11px] font-semibold uppercase tracking-widest">
+                    MoMo
+                  </div>
+                  <div className="text-[9px] text-zinc-500 mt-1">
+                    Ví điện tử MoMo
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMethod("atm")}
+                  className={`p-4 rounded-2xl border transition-all ${method === "atm" ? "border-amber-500 bg-amber-500/10" : "border-white/10 bg-white/5"}`}
+                >
+                  <div className="text-[11px] font-semibold uppercase tracking-widest">
+                    ATM
+                  </div>
+                  <div className="text-[9px] text-zinc-500 mt-1">
+                    Tháº» ATM ná»™i Ä‘á»‹a
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* CARD DETAILS - Chỉ hiện nếu không dùng VNPay/Momo (tùy bạn thiết kế) */}
+            <div className="mt-8">
+              <div className="flex items-center gap-3">
+                <span className="h-6 w-6 rounded-full bg-red-600/15 border border-red-500/30 text-red-300 text-xs flex items-center justify-center">
+                  2
+                </span>
+                <div className="text-xs tracking-[0.25em] text-zinc-300 font-semibold">
+                  ORDER CONFIRMATION
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-[26px] border border-white/10 bg-white/5 p-6">
+                <p className="text-sm text-zinc-400">
+                  Bạn đang thực hiện thanh toán qua cổng{" "}
+                  <strong>{method.toUpperCase()}</strong>. Sau khi nhấn nút
+                  "Complete Purchase", bạn sẽ được chuyển hướng an toàn đến
+                  trang thanh toán chính thức.
+                </p>
+              </div>
+            </div>
+              </>
+            )}
+          </div>
+
+          {/* RIGHT - ORDER SUMMARY */}
+          <div className="space-y-4">
+            <div className="rounded-[26px] border border-white/10 bg-white/5 p-6">
+              <div className="text-lg font-semibold">Order Summary</div>
+
+              <div className="mt-5 space-y-4 text-sm">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    <div className="h-8 w-8 rounded-lg bg-red-600/15 border border-red-500/20" />
+                    <div>
+                      <div className="font-semibold">
+                        Tickets ({seats.length}x)
+                      </div>
+                      <div className="text-xs text-zinc-500">
+                        {seats.join(", ")}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-zinc-200 font-semibold">
+                    {totalAmount.toLocaleString("vi-VN")} đ
+                  </div>
+                </div>
+
+                <div className="h-px bg-white/10" />
+
+                <div className="flex items-end justify-between">
+                  <div>
+                    <div className="text-[10px] tracking-[0.25em] text-red-400 font-semibold">
+                      TOTAL AMOUNT
+                    </div>
+                    <div className="mt-1 text-3xl font-extrabold">
+                      {totalAmount.toLocaleString("vi-VN")} đ
+                    </div>
+                  </div>
+                  <div className="text-[10px] text-zinc-500 border border-white/10 bg-white/5 px-2 py-1 rounded-full">
+                    VND
+                  </div>
+                </div>
+
+                {!outlet && (
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={handlePurchase}
+                    className={`mt-3 w-full rounded-2xl bg-red-600 hover:bg-red-500 transition py-3 font-semibold shadow-[0_0_40px_rgba(239,68,68,0.22)] ${loading ? "opacity-50 cursor-wait" : ""}`}
+                  >
+                    {loading ? "Processing..." : "Complete Purchase"}
+                  </button>
+                )}
+
+                <div className="text-[10px] text-zinc-500 text-center leading-relaxed">
+                  Bằng cách nhấn hoàn tất, bạn đồng ý với{" "}
+                  <span className="text-zinc-400 underline">
+                    Điều khoản dịch vụ
+                  </span>
                 </div>
               </div>
             </div>
-          </aside>
+
+            {/* Movie Card */}
+            <div className="rounded-[26px] border border-white/10 bg-white/5 p-4 flex items-center gap-3">
+              {movieInfo?.poster && (
+                <img
+                  src={movieInfo.poster}
+                  alt={movieInfo.title}
+                  className="h-16 w-12 rounded-xl object-cover border border-white/10"
+                />
+              )}
+              <div className="min-w-0">
+                <div className="font-semibold text-sm truncate">
+                  {movieInfo?.title ||
+                    bookingDetail?.showTimeId?.movieId?.ten_phim ||
+                    "Movie"}
+                </div>
+                <div className="text-[11px] text-zinc-500 mt-1">
+                  {showtimeText}
+                </div>
+                {bookingDetail?.showTimeId?.roomId?.cinema_id?.name && (
+                  <div className="text-[11px] text-zinc-500 mt-1">
+                    {bookingDetail.showTimeId.roomId.cinema_id.name} -{" "}
+                    {bookingDetail.showTimeId.roomId.ten_phong}
+                  </div>
+                )}
+              </div>
+            </div>
+            {bookingLoading && (
+              <div className="text-xs text-zinc-500 text-center">
+                Äang táº£i thÃ´ng tin booking...
+              </div>
+            )}
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

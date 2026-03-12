@@ -63,4 +63,54 @@ export const initBookingCron = () => {
   });
 
   console.log("--- Booking Cron Job đã được khởi tạo thành công ---");
+  //"Xóa booking đã hủy/hết hạn sau 2 ngày"
+  // Cleanup expired/cancelled bookings older than 2 days
+  cron.schedule("0 * * * *", async () => {
+    const session = await mongoose.startSession();
+    if (isProcessing) return;
+    isProcessing = true;
+    try {
+      session.startTransaction();
+      const cutoff = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+
+      const oldBookings = await Booking.find({
+        status: { $in: ["expired", "cancelled"] },
+        updatedAt: { $lt: cutoff },
+      }).session(session);
+
+      if (oldBookings.length > 0) {
+        const bookingIds = oldBookings.map((b) => b._id);
+        const allSeatIds = oldBookings.flatMap((b) => b.seats);
+
+        await SeatTime.updateMany(
+          {
+            _id: { $in: allSeatIds },
+            bookingId: { $in: bookingIds },
+            trang_thai: "hold",
+          },
+          {
+            $set: { trang_thai: "empty" },
+            $unset: { heldBy: "", holdExpiresAt: "", bookingId: "" },
+          },
+          { session },
+        );
+
+        await Booking.deleteMany({ _id: { $in: bookingIds } }, { session });
+
+        console.log(
+          `[Cron]: Đã xóa ${bookingIds.length} đơn hàng hết hạn/đã hủy quá 2 ngày.`,
+        );
+      }
+
+      await session.commitTransaction();
+    } catch (error) {
+      if (session.inTransaction()) {
+        await session.abortTransaction();
+      }
+      console.error("[Cron Error]:", error);
+    } finally {
+      isProcessing = false;
+      session.endSession();
+    }
+  });
 };

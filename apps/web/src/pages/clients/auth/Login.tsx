@@ -12,22 +12,27 @@ const Login = () => {
   const { user, login, isLoggingIn } = useAuth();
   const [searchParams] = useSearchParams();
   const [remember, setRemember] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
       const redirectTo = searchParams.get("redirect") || "/";
       navigate(decodeURIComponent(redirectTo), { replace: true });
     }
-  }, [user]);
+  }, [user, navigate, searchParams]);
 
   const handleSubmit = async (values: any) => {
+    setErrorMsg(null);
     try {
-      await login({ email: values.email, password: values.password });
-      const redirectTo = searchParams.get("redirect") || "/";
-
-      navigate(decodeURIComponent(redirectTo), { replace: true });
-    } catch (err) {
-      console.error(err);
+      await login({
+        email: values.email,
+        password: values.password,
+        remember: remember,
+      });
+    } catch (err: any) {
+      const message =
+        err.response?.data?.message || "Đăng nhập thất bại. Vui lòng thử lại.";
+      setErrorMsg(message);
     }
   };
 
@@ -44,7 +49,8 @@ const Login = () => {
       lsSubtitle="Stream the latest blockbusters and book tickets for the premium cinematic experience in one place."
     >
       <Form
-        className="space-y-6"
+        disabled={isLoggingIn}
+        className={`space-y-6 transition-opacity ${isLoggingIn ? "opacity-50 pointer-events-none" : "opacity-100"}`}
         onFinish={handleSubmit}
         layout="vertical"
         requiredMark={false}
@@ -60,7 +66,8 @@ const Login = () => {
             label="Email Address"
             type="email"
             id="email"
-            // autoComplete="email" // Thêm cái này
+            // autoComplete="username"
+            autoComplete="email"
             placeholder="name@example.com"
             icon={<Mail size={20} />}
           />
@@ -86,7 +93,7 @@ const Login = () => {
               label=""
               type="password"
               id="password"
-              // autoComplete="current-password" // Thêm cái này để fix console warning
+              autoComplete="current-password" // Thêm cái này để fix console warning
               placeholder="••••••••"
               icon={<Lock size={20} />}
             />
@@ -119,9 +126,20 @@ const Login = () => {
             Keep me signed in
           </span>
         </label>
-
+        {errorMsg && (
+          <div className="text-red-500 text-sm font-medium bg-red-500/10 border border-red-500/20 rounded-lg p-3 animate-shake">
+            {errorMsg}
+          </div>
+        )}
         <Button disabled={isLoggingIn}>
-          {isLoggingIn ? "Signing In..." : "Sign In"}
+          {isLoggingIn ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Signing In...
+            </div>
+          ) : (
+            "Sign In"
+          )}
         </Button>
       </Form>
 

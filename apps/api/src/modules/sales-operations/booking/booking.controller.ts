@@ -97,6 +97,24 @@ export const bookingController = {
     });
   }),
 
+  expireBooking: catchAsync(async (req, res, next) => {
+    const userId = req.user?._id;
+    const { bookingId } = req.body;
+
+    if (!userId) {
+      return next(
+        new AppError("Bạn cần đăng nhập để thực hiện hành động này", 401),
+      );
+    }
+
+    await bookingService.expireBooking(bookingId, userId);
+
+    res.json({
+      success: true,
+      message: "Đã hủy giữ ghế thành công",
+    });
+  }),
+
   getPendingBooking: catchAsync(async (req, res) => {
     const { showtimeId } = req.params;
     const userId = req.user?._id;
@@ -118,6 +136,34 @@ export const bookingController = {
     res.json({
       success: true,
       data: booking,
+    });
+  }),
+
+  getMyBookings: catchAsync(async (req, res) => {
+    const userId = req.user?._id;
+    const status = (req.query.status as string) || "paid";
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const bookings = await Booking.find({ userId, status })
+      .populate({
+        path: "showTimeId",
+        populate: [
+          { path: "movieId", select: "ten_phim poster" },
+          {
+            path: "roomId",
+            select: "ten_phong cinema_id",
+            populate: { path: "cinema_id", select: "name address" },
+          },
+        ],
+      })
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: bookings,
     });
   }),
 

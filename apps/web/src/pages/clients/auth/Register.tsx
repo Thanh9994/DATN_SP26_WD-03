@@ -5,29 +5,37 @@ import Input from "@web/components/tools/Input";
 import AuthLayout from "@web/layouts/AuthLayout";
 import { Lock, Mail, Phone, User } from "lucide-react";
 import { useAuth } from "@web/hooks/useAuth";
-import { Popconfirm, Checkbox, Form } from "antd";
+import { Checkbox, Form } from "antd";
 
 const Register = () => {
   const navigate = useNavigate();
   const { register, isRegistering } = useAuth();
+  const [form] = Form.useForm();
+  const passwordValue = Form.useWatch("password", form) || "";
 
-  const [ho_ten, setHoten] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const [open, setOpen] = useState(false);
-  const handleSubmit = async () => {
+  const [termsError, setTermsError] = useState(false);
+
+  const handleSubmit = async (values: any) => {
     if (!acceptTerms) {
-      setOpen(true);
+      setTermsError(true);
       return;
     }
+    setErrorMsg(null);
     try {
-      await register({ ho_ten, email, password, phone });
+      await register({
+        ho_ten: values.ho_ten,
+        email: values.email,
+        password: values.password,
+        phone: values.phone,
+      });
       navigate("/login");
-    } catch (err) {
-      console.error(err);
-      // alert(err.message || "Register failed");
+    } catch (err: any) {
+      const message =
+        err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.";
+      setErrorMsg(message);
     }
   };
 
@@ -41,19 +49,20 @@ const Register = () => {
 
     return score;
   };
+  const score = calculateStrength(passwordValue);
 
-  const strengthScore = calculateStrength(password);
+  const getStrengthColor = () => {
+    if (score <= 1) return "bg-red-500";
+    if (score <= 3) return "bg-yellow-500";
+    return "bg-green-500";
+  };
 
-  const strengthLabel =
-    strengthScore <= 1 ? "Weak" : strengthScore <= 3 ? "Medium" : "Strong";
-
-  const strengthColor =
-    strengthScore <= 1
-      ? "bg-red-500"
-      : strengthScore <= 3
-        ? "bg-yellow-500"
-        : "bg-green-500";
-
+  const requirements = [
+    { label: "8+ ký tự", met: passwordValue.length >= 8 },
+    { label: "Chữ hoa", met: /[A-Z]/.test(passwordValue) },
+    { label: "Số", met: /\d/.test(passwordValue) },
+    { label: "Ký tự đặc biệt", met: /[@$!%*?&]/.test(passwordValue) },
+  ];
   return (
     <AuthLayout
       title="Create Account"
@@ -66,7 +75,12 @@ const Register = () => {
       }
       lsSubtitle="Stream the latest blockbusters and book tickets for exclusive premieres at your favorite local cinemas."
     >
-      <Form className="space-y-4" onFinish={handleSubmit} layout="vertical">
+      <Form
+        className="space-y-3 sm:space-y-4"
+        form={form}
+        onFinish={handleSubmit}
+        layout="vertical"
+      >
         <Form.Item
           name="ho_ten"
           rules={[{ required: true, message: "Vui lòng nhập họ tên" }]}
@@ -75,10 +89,9 @@ const Register = () => {
             label="Full Name"
             type="text"
             id="name"
-            placeholder="John Doe"
+            autoComplete="name"
+            placeholder="Nguyễn Văn Hoàng"
             icon={<User size={20} />}
-            value={ho_ten}
-            onChange={(e) => setHoten(e.target.value)}
           />
         </Form.Item>
         <Form.Item
@@ -94,12 +107,10 @@ const Register = () => {
             id="email"
             placeholder="name@company.com"
             icon={<Mail size={20} />}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
           />
         </Form.Item>
         <Form.Item
-          name="Phone"
+          name="phone"
           rules={[
             {
               required: true,
@@ -113,133 +124,102 @@ const Register = () => {
             id="phone"
             placeholder="+84 or 09********"
             icon={<Phone size={20} />}
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
           />
         </Form.Item>
         <Form.Item
           name="password"
           rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
         >
-          <div className="space-y-3">
+          <div className="space-y-1.5 sm:space-y-2">
             <Input
               label="Password"
               type="password"
               id="password"
-              placeholder="••••••••"
+              placeholder="Password"
               icon={<Lock size={20} />}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
             />
 
-            <div className="px-1">
-              {/* Strength Bar */}
-              <div className="flex gap-1.5 mb-2">
-                {[1, 2, 3, 4].map((level) => (
-                  <div
-                    key={level}
-                    className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                      strengthScore >= level ? strengthColor : "bg-white/10"
-                    }`}
-                  />
-                ))}
-              </div>
-
-              {/* Strength Text */}
-              <p className="text-[10px] font-bold uppercase tracking-wider">
-                <span className="text-white/40">Password Strength: </span>
-                <span
-                  className={
-                    strengthScore <= 1
-                      ? "text-red-400"
-                      : strengthScore <= 3
-                        ? "text-yellow-400"
-                        : "text-green-400"
-                  }
-                >
-                  {strengthLabel}
-                </span>
-              </p>
-
-              {/* Requirements */}
-              <ul className="mt-2 text-[11px] text-white/40 flex items-center justify-center gap-4 flex-wrap">
-                <li
-                  className={`flex items-center gap-1 ${password.length >= 8 ? "text-green-400" : ""}`}
-                >
-                  <span>{password.length >= 8 ? "✔" : "•"}</span>
-                  Tối thiểu 8 ký tự
-                </li>
-
-                <li
-                  className={`flex items-center gap-1 ${/[A-Z]/.test(password) ? "text-green-400" : ""}`}
-                >
-                  <span>{/[A-Z]/.test(password) ? "✔" : "•"}</span>
-                  Có 1 chữ hoa
-                </li>
-
-                <li
-                  className={`flex items-center gap-1 ${/\d/.test(password) ? "text-green-400" : ""}`}
-                >
-                  <span>{/\d/.test(password) ? "✔" : "•"}</span>
-                  Có 1 số
-                </li>
-
-                <li
-                  className={`flex items-center gap-1 ${/[@$!%*?&]/.test(password) ? "text-green-400" : ""}`}
-                >
-                  <span>{/[@$!%*?&]/.test(password) ? "✔" : "•"}</span>
-                  Ký tự đặc biệt
-                </li>
-              </ul>
+            <div className="grid grid-cols-4 gap-1.5 px-1">
+              {requirements.map((req, index) => {
+                const isMet = req.met;
+                const step = index + 1;
+                return (
+                  <div key={index} className="flex flex-col gap-1.5">
+                    {/* Thanh màu */}
+                    <div
+                      className={`h-1 w-full rounded-full transition-all duration-500 ${
+                        score >= step ? getStrengthColor() : "bg-white/10"
+                      }`}
+                    />
+                    {/* Chữ nhỏ dưới mỗi thanh */}
+                    <span
+                      className={`text-[9px] text-center leading-tight transition-colors duration-300 ${
+                        isMet ? "text-green-400 font-bold" : "text-white/20"
+                      }`}
+                    >
+                      {isMet ? "✔ " : ""}
+                      {req.label}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </Form.Item>
-        <div className="flex items-start gap-3 px-1">
-          <Popconfirm
-            title="Xác nhận điều khoản"
-            description="Bạn có đồng ý với Terms of Service và Privacy Policy không?"
-            open={open}
-            onConfirm={() => {
-              setAcceptTerms(true);
-              setOpen(false);
-            }}
-            onCancel={() => {
-              setOpen(false);
-            }}
-            okText="Đồng ý"
-            cancelText="Hủy"
-          >
+        <div
+          className={`space-y-2 p-1 rounded-lg transition-all ${termsError ? "bg-red-500/5 ring-1 ring-red-500/20" : ""}`}
+        >
+          <div className="flex items-start gap-3">
             <Checkbox
               checked={acceptTerms}
               onChange={(e) => {
-                if (!acceptTerms && e.target.checked) {
-                  setOpen(true);
-                } else {
-                  setAcceptTerms(false);
-                }
+                setAcceptTerms(e.target.checked);
+                if (e.target.checked) setTermsError(false);
               }}
-            >
-              <span className="text-xs text-white/60">
-                By creating an account, I agree to the{" "}
-                <a href="#" className="underline hover:text-primary">
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a href="#" className="underline hover:text-primary">
-                  Privacy Policy
-                </a>
-                .
-              </span>
-            </Checkbox>
-          </Popconfirm>
+            />
+            <span className="text-xs text-white/60 leading-relaxed">
+              I have read and agree to the{" "}
+              <a href="#" className="text-primary hover:underline font-medium">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="#" className="text-primary hover:underline font-medium">
+                Privacy Policy
+              </a>
+              .
+            </span>
+          </div>
+
+          {/* Thông báo nhắc nhở nhỏ xíu nếu họ quên tích */}
+          {termsError && (
+            <p className="text-[10px] text-red-400 font-bold uppercase tracking-tighter animate-pulse ml-8">
+              * Please accept the terms to continue
+            </p>
+          )}
         </div>
 
+        {errorMsg && (
+          <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl p-4 animate-shake">
+            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+            <span className="text-red-500 text-sm font-medium italic">
+              {errorMsg}
+            </span>
+          </div>
+        )}
+
         <Button type="submit" disabled={isRegistering}>
-          {isRegistering ? "Creating..." : "Create Account"}
+          {isRegistering ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Processing...
+            </div>
+          ) : (
+            "Create Account"
+          )}
         </Button>
       </Form>
 
-      <div className="relative my-8">
+      <div className="relative my-4 sm:my-8">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-white/10"></div>
         </div>
@@ -250,7 +230,7 @@ const Register = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <Button variant="secondary" className="!py-3">
           <img
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
@@ -267,7 +247,7 @@ const Register = () => {
         </Button>
       </div>
 
-      <p className="mt-8 text-center text-sm text-white/40 font-medium">
+      <p className="mt-4 sm:mt-8 text-center text-sm text-white/40 font-medium">
         Already have an account?{" "}
         <Link to="/login" className="text-primary font-bold hover:underline">
           Sign In

@@ -2,7 +2,6 @@ import { NotFound } from "@web/components/tools/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
 import About from "@web/pages/clients/public/About";
 import Event from "@web/pages/clients/public/Event";
-import Contact from "@web/pages/clients/public/Contact";
 import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
 import { Home } from "@web/pages/clients/public/Home";
 import Login from "@web/pages/clients/auth/Login";
@@ -22,13 +21,20 @@ import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 import MovieList from "@web/pages/clients/MovieList";
 import NewsDetail from "@web/pages/clients/NewDetail";
-import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
 import News from "@web/pages/clients/public/News";
+import RequireAuth from "@web/services/RequieAuth";
+import { Ticket } from "lucide-react";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
 import Paymentlist from "@web/pages/clients/payments/PaymentList";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
 import RequireAuth from "@web/services/RequieAuth";
-import Checkout from "@web/pages/clients/payments/Checkout";
+import CinemaDetail from "@web/pages/CinemaDetail";
+import Contact from "@web/pages/clients/public/Contact";
+import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
+import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
+import Paymentlist from "@web/pages/clients/payments/PaymentList";
+import { PaymentFailed } from "@web/pages/clients/payments/PaymentFailed";
+import { PaymentSuccess } from "@web/pages/clients/payments/PaymentSuccess";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -65,7 +71,7 @@ export const ClientRoutes: RouteObject = {
 
     { path: "cinema", element: <Cinemas /> },
     { path: "movielist", element: <MovieList /> },
-
+    { path: "cinemadetail/:id", element: <CinemaDetail /> },
     {
       path: "booking",
       element: <BookingLayout />,
@@ -84,7 +90,7 @@ export const ClientRoutes: RouteObject = {
 
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
-
+    { path: "ticket", element: <Ticket /> },
     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
 
@@ -92,17 +98,17 @@ export const ClientRoutes: RouteObject = {
       path: "payments",
       element: <PaymentsMethod />,
       children: [
-        { index: true, element: <Paymentlist /> },
-        { path: "checkout", element: <Checkout /> },
-        { path: "failed", element: <PaymentsMethod /> },
-        { path: "success", element: <PaymentsMethod /> },
+        { path: "vnpay", element: <Paymentlist /> },
+        { path: "failed", element: <PaymentFailed /> },
+        { path: "success", element: <PaymentSuccess /> },
+        { path: "result", element: <PaymentResult /> },
       ],
     },
 
     { path: "payment-result", element: <PaymentResult /> },
-
+    { path: "ticket", element: <Ticket /> },
     { path: "contact", element: <Contact /> },
-
     { path: "*", element: <NotFound /> },
+    { path: "contact", element: <Contact /> },
   ],
 };
