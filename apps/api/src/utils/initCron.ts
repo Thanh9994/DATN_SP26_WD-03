@@ -1,4 +1,4 @@
-import { startMovieStatusCron } from "./movie.status";
+import { startMovieStatusCron } from "./assets/movie.status";
 import { initBookingCron } from "./booking/bookingCron.util";
 import { initShowtimeCleanupCron } from "./showtime/showTimeCleanUp.utils";
 import { initSeatHoldCron } from "./showtime/seathold.utils";

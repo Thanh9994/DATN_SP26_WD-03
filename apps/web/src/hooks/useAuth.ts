@@ -55,9 +55,13 @@ export const useAuth = () => {
       const { data } = await axiosAuth.get<IUser>(`${API.USERS}/me`);
       return data;
     },
+    initialData: () => {
+      const stored = localStorage.getItem("user");
+      return stored ? JSON.parse(stored) : undefined;
+    },
     enabled: !!getStoredToken(),
-    retry: false,
-    gcTime: 1000 * 60 * 60 * 2, // Giữ trong cache 24h
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
   });
 
   const loginMutation = useMutation<
@@ -83,7 +87,6 @@ export const useAuth = () => {
         "Đăng Nhập Thành Công",
         `Chào mừng ${data.user.ho_ten}!`,
       );
-      queryClient.invalidateQueries({ queryKey: ["me"] });
     },
     onError: (err) => {
       // showNotify("success", "Đăng nhập thất bại");
@@ -117,10 +120,11 @@ export const useAuth = () => {
   const { data: users, isLoading: isLoadingUsers } = useQuery<IUser[]>({
     queryKey: ["users"],
     queryFn: async () => {
+      if (user?.role !== "admin") return [];
       const { data } = await axiosAuth.get(`${API.USERS}/`);
       return data;
     },
-    enabled: !!localStorage.getItem("token") && user?.role === "admin", // Chỉ gọi khi có token và là admin
+    enabled: !!getStoredToken() && !!user,
     staleTime: 1000 * 60 * 5,
   });
   const updateMutation = useMutation({
