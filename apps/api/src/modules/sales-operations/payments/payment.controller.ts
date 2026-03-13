@@ -30,7 +30,7 @@ export const createPaymentUrl = catchAsync(
       ipAddr,
       user,
     );
-
+    console.log("PAYMENT URL:", paymentUrl);
     res.status(200).json({
       success: true,
       data: paymentUrl,

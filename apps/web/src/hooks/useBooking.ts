@@ -39,15 +39,20 @@ export const useBooking = (showTimeId?: string) => {
     mutationFn: async ({
       bookingId,
       holdToken,
+      method,
     }: {
       bookingId: string;
       holdToken: string;
+      method: string;
     }) => {
-      const res = await axiosAuth.post(`${API.PAYMENT_GATEWAY}/vnpay/create`, {
-        bookingId,
-        holdToken,
-      });
-
+      const res = await axiosAuth.post(
+        `${API.PAYMENT_GATEWAY}/${method}/create`,
+        {
+          bookingId,
+          holdToken,
+        },
+      );
+      console.log("PAYMENT RESPONSE", res.data.data);
       return res.data.data; // chỉ trả link
     },
   });

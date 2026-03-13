@@ -47,7 +47,9 @@ const PaymentsMethod = () => {
 
   const bookingIdState = location.state?.bookingId;
   const bookingIdParam =
-    searchParams.get("bookingId") || searchParams.get("vnp_TxnRef");
+    searchParams.get("bookingId") ||
+    searchParams.get("vnp_TxnRef") ||
+    searchParams.get("orderId");
   const activeBookingId = bookingIdState || bookingIdParam;
   const holdToken = holdTokenState || bookingDetail?.holdToken;
 
@@ -100,7 +102,7 @@ const PaymentsMethod = () => {
       return;
     }
 
-    if (method !== "vnpay") {
+    if (method !== "vnpay" && method !== "momo") {
       message.info("Phương thức này chưa được hỗ trợ.");
       return;
     }
@@ -110,7 +112,12 @@ const PaymentsMethod = () => {
       const paymentUrl = await createPaymentUrl({
         bookingId: activeBookingId,
         holdToken: holdToken,
+        method,
       });
+      if (!paymentUrl) {
+        message.error("Không nhận được link thanh toán");
+        return;
+      }
 
       window.location.href = paymentUrl;
     } catch (error) {
