@@ -36,9 +36,16 @@ export const useBooking = (showTimeId?: string) => {
   });
 
   const createPaymentUrl = useMutation({
-    mutationFn: async (bookingId: string) => {
+    mutationFn: async ({
+      bookingId,
+      holdToken,
+    }: {
+      bookingId: string;
+      holdToken: string;
+    }) => {
       const res = await axiosAuth.post(`${API.PAYMENT_GATEWAY}/vnpay/create`, {
         bookingId,
+        holdToken,
       });
 
       return res.data.data; // chỉ trả link
@@ -57,8 +64,17 @@ export const useBooking = (showTimeId?: string) => {
   });
 
   const cancelBooking = useMutation({
-    mutationFn: async (bookingId: string) => {
-      const res = await axiosAuth.post(`${API.BOOKING}/cancel`, { bookingId });
+    mutationFn: async ({
+      bookingId,
+      holdToken,
+    }: {
+      bookingId: string;
+      holdToken: string;
+    }) => {
+      const res = await axiosAuth.post(`${API.BOOKING}/cancel`, {
+        bookingId,
+        holdToken,
+      });
       return res.data;
     },
     onSuccess: () => {
@@ -72,8 +88,17 @@ export const useBooking = (showTimeId?: string) => {
   });
 
   const expireBooking = useMutation({
-    mutationFn: async (bookingId: string) => {
-      const res = await axiosAuth.post(`${API.BOOKING}/expire`, { bookingId });
+    mutationFn: async ({
+      bookingId,
+      holdToken,
+    }: {
+      bookingId: string;
+      holdToken: string;
+    }) => {
+      const res = await axiosAuth.post(`${API.BOOKING}/expire`, {
+        bookingId,
+        holdToken,
+      });
       return res.data;
     },
     onSuccess: () => {

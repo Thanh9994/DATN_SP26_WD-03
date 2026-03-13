@@ -16,6 +16,7 @@ interface BookingDetail {
   totalAmount: number;
   finalAmount: number;
   ticketCode: string;
+  holdToken?: string;
   showTimeId: {
     movieId: {
       ten_phim: string;
@@ -42,11 +43,13 @@ const PaymentsMethod = () => {
     null,
   );
   const [bookingLoading, setBookingLoading] = useState(false);
+  const holdTokenState = location.state?.holdToken;
 
   const bookingIdState = location.state?.bookingId;
   const bookingIdParam =
     searchParams.get("bookingId") || searchParams.get("vnp_TxnRef");
   const activeBookingId = bookingIdState || bookingIdParam;
+  const holdToken = holdTokenState || bookingDetail?.holdToken;
 
   const totalAmount =
     location.state?.totalAmount ??
@@ -75,15 +78,25 @@ const PaymentsMethod = () => {
     axiosAuth
       .get(`${API.BOOKING}/detail/${activeBookingId}`)
       .then((res) => {
-        if (res.data?.success) setBookingDetail(res.data.data);
+        if (res.data?.success)
+          setBookingDetail({
+            ...res.data.data,
+            holdToken: res.data.data.holdToken,
+          });
       })
       .catch((error) => console.error("Load booking detail failed:", error))
       .finally(() => setBookingLoading(false));
   }, [activeBookingId]);
 
   const handlePurchase = async () => {
+    if (loading) return;
     if (!activeBookingId) {
       message.error("Không tìm thấy thông tin đơn hàng!");
+      return;
+    }
+
+    if (!holdToken) {
+      message.error("Phiên giữ ghế không hợp lệ. Vui lòng đặt lại.");
       return;
     }
 
@@ -94,7 +107,10 @@ const PaymentsMethod = () => {
 
     setLoading(true);
     try {
-      const paymentUrl = await createPaymentUrl(activeBookingId);
+      const paymentUrl = await createPaymentUrl({
+        bookingId: activeBookingId,
+        holdToken: holdToken,
+      });
 
       window.location.href = paymentUrl;
     } catch (error) {

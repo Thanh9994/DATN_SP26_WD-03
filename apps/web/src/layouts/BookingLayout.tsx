@@ -77,6 +77,7 @@ const BookingLayout = () => {
             navigate("/payments", {
               state: {
                 bookingId: result.bookingId,
+                holdToken: result.holdToken,
                 totalAmount: result.totalAmount,
                 seats: seatsToHold.map((s) => s.seatCode),
                 movieInfo: {
@@ -203,6 +204,7 @@ const BookingLayout = () => {
       navigate("/payments", {
         state: {
           bookingId: result.bookingId,
+          holdToken: result.holdToken,
           totalAmount: result.totalAmount,
           seats: selectedSeats.map((s) => s.seatCode),
           movieInfo: {

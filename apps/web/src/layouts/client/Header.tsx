@@ -17,7 +17,7 @@ export const Header = () => {
       label: (
         <span style={{ color: "white" }}>{user?.ho_ten || "Khách hàng"}</span>
       ),
-      disabled: true,
+      onClick: () => navigate("/profile/info"),
     },
     {
       key: "profile",
@@ -33,6 +33,7 @@ export const Header = () => {
       icon: (
         <span className="material-symbols-outlined !text-[18px]">history</span>
       ),
+      onClick: () => navigate("/profile/tickets"),
     },
     {
       key: "admin",
