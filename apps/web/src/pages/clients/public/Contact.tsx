@@ -86,7 +86,7 @@ export const Contact = (): JSX.Element => {
         details: ["+1 (800) CINE-FILM", "Mon-Sun, 24/7 Service"],
       },
     ],
-    [],
+    []
   );
 
   const renderMissionCard = (card: MissionCard): JSX.Element => (
@@ -171,7 +171,7 @@ export const Contact = (): JSX.Element => {
     type: string,
     placeholder: string,
     value: string,
-    isTextarea: boolean = false,
+    isTextarea: boolean = false
   ) => (
     <div className="contact-form-group">
       <label className="contact-form-label">{label}</label>
@@ -257,7 +257,7 @@ export const Contact = (): JSX.Element => {
           <div className="contact-layout">
             <div className="contact-info-panel">
               <div className="contact-cards-group">
-                {contactInfo.map((info) => (
+                {contactInfo.map((info, index) => (
                   <div key={info.title} className="contact-card">
                     <div className="contact-icon">{info.icon}</div>
                     <div className="contact-content">
@@ -291,14 +291,14 @@ export const Contact = (): JSX.Element => {
                       "FULL NAME",
                       "text",
                       "John Wick",
-                      formData.fullName,
+                      formData.fullName
                     )}
                     {renderFormInput(
                       "email",
                       "EMAIL ADDRESS",
                       "email",
                       "john@continental.com",
-                      formData.email,
+                      formData.email
                     )}
                   </div>
 
@@ -307,7 +307,7 @@ export const Contact = (): JSX.Element => {
                     "SUBJECT",
                     "text",
                     "Inquiry about private screening",
-                    formData.subject,
+                    formData.subject
                   )}
 
                   {renderFormInput(
@@ -316,7 +316,7 @@ export const Contact = (): JSX.Element => {
                     "text",
                     "Tell us how we can help you...",
                     formData.message,
-                    true,
+                    true
                   )}
 
                   <button
@@ -324,10 +324,10 @@ export const Contact = (): JSX.Element => {
                     className={`send-button ${isSubmitting ? "is-loading" : ""}`}
                     disabled={isSubmitting}
                   >
-                    <span className="btn-icon">{isSubmitting ? "◌" : "▷"}</span>
-                    {isSubmitting
-                      ? "Sending Message..."
-                      : "Send Cinematic Message"}
+                    <span className="btn-icon">
+                      {isSubmitting ? "◌" : "▷"}
+                    </span>
+                    {isSubmitting ? "Sending Message..." : "Send Cinematic Message"}
                   </button>
 
                   <p className="form-policy-text">
