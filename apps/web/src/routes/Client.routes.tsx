@@ -107,4 +107,5 @@ export const ClientRoutes: RouteObject = {
     { path: "contact", element: <Contact /> },
     { path: "*", element: <NotFound /> },
   ],
+
 };
