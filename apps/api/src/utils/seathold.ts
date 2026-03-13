@@ -1,4 +1,4 @@
-import { SeatTime } from "@api/modules/showtime/showtimeSeat.model";
+import { SeatTime } from "@api/modules/cinema-catalog/showtime/showtimeSeat.model";
 import cron from "node-cron";
 
 cron.schedule("* * * * *", async () => {

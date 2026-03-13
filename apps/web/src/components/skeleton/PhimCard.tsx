@@ -1,5 +1,5 @@
 import { IMovie } from "@shared/schemas";
-import { MOVIE_BADGE } from "@web/styles/movieStatus";
+import { MOVIE_BADGE } from "@web/utils/movieStatus";
 
 import { useNavigate } from "react-router-dom";
 

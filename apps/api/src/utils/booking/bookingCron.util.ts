@@ -25,7 +25,6 @@ export const initBookingCron = () => {
         // Thu thập tất cả Seat IDs từ các booking hết hạn
         const allSeatIds = expiredBookings.flatMap((b) => b.seats);
 
-        // 2. Cập nhật Booking sang trạng thái 'expired'
         await Booking.updateMany(
           { _id: { $in: bookingIds } },
           { $set: { status: "expired" } },
@@ -62,7 +61,6 @@ export const initBookingCron = () => {
     }
   });
 
-  console.log("--- Booking Cron Job đã được khởi tạo thành công ---");
   //"Xóa booking đã hủy/hết hạn sau 2 ngày"
   // Cleanup expired/cancelled bookings older than 2 days
   cron.schedule("0 * * * *", async () => {

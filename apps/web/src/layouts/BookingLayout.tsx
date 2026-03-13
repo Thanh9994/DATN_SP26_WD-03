@@ -77,6 +77,7 @@ const BookingLayout = () => {
             navigate("/payments", {
               state: {
                 bookingId: result.bookingId,
+                holdToken: result.holdToken,
                 totalAmount: result.totalAmount,
                 seats: seatsToHold.map((s) => s.seatCode),
                 movieInfo: {
@@ -203,6 +204,7 @@ const BookingLayout = () => {
       navigate("/payments", {
         state: {
           bookingId: result.bookingId,
+          holdToken: result.holdToken,
           totalAmount: result.totalAmount,
           seats: selectedSeats.map((s) => s.seatCode),
           movieInfo: {
@@ -232,23 +234,26 @@ const BookingLayout = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#120a0a] via-transparent to-transparent opacity-60"></div>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black leading-tight tracking-tight uppercase">
+          <h1 className="text-2xl md:text-3xl font-bold leading-tight tracking-tight uppercase">
             {movie.ten_phim}
           </h1>
           <div className="space-y-4">
-            <div className="flex items-center gap-5">
-              <span className="px-2 py-1 bg-primary/20 text-primary text-[12px] font-black uppercase tracking-widest rounded-md border border-primary/30">
+            <div className="flex items-center gap-4">
+              <span className="px-2 py-1 bg-primary/20 text-primary text-[10px] font-black uppercase tracking-widest rounded-md border border-primary/30">
                 {movie.ngay_cong_chieu
                   ? dayjs(movie.ngay_cong_chieu).format("YYYY")
                   : "2024"}
               </span>
-              <span className="text-[#b89d9f] text-sm font-bold flex items-center gap-1">
+              <span className="text-[#b89d9f] text-xs font-bold flex items-center gap-1">
                 <span className="material-symbols-outlined text-sm">
                   schedule
                 </span>
-                {movie.thoi_luong} phút
-                <span className="mx-2 px-2 py-1 bg-primary/20 text-primary text-[12px] font-black uppercase tracking-widest rounded-md border border-primary/30">
+                {movie.thoi_luong} Min
+                <span className="mx-1 px-2 py-1 bg-primary/20 text-primary text-[10px] font-extrabold uppercase tracking-widest rounded-md border border-primary/30">
                   {movie.do_tuoi}
+                </span>
+                <span className="mx-1 px-2 py-1 bg-primary/20 text-white/70  tracking-widest rounded-md border border-primary/30">
+                  {movie.phu_de}
                 </span>
               </span>
             </div>

@@ -1,6 +1,5 @@
 import { catchAsync } from "@api/utils/catchAsync";
 import { Request, Response } from "express";
-// import { paymentService } from "./payment.service";
 import { PaymentFactory } from "./gateways/payment.factory";
 import { bookingService } from "../booking/booking.service";
 import { Payment } from "./payment.model";
@@ -8,9 +7,15 @@ import { paymentService } from "./payment.service";
 
 export const createPaymentUrl = catchAsync(
   async (req: Request, res: Response) => {
-    const { bookingId } = req.body;
+    const { bookingId, holdToken } = req.body;
     const { method } = req.params;
 
+    if (!bookingId || !holdToken) {
+      return res.status(400).json({
+        success: false,
+        message: "Thiếu bookingId hoặc holdToken",
+      });
+    }
     const user = req.user!;
 
     const ipAddr =
@@ -20,6 +25,7 @@ export const createPaymentUrl = catchAsync(
 
     const paymentUrl = await paymentService.initPayment(
       bookingId,
+      holdToken,
       method,
       ipAddr,
       user,
@@ -66,13 +72,18 @@ export const handlePaymentReturn = catchAsync(
 
     const gateway = PaymentFactory.getGateway(method);
 
-    // verify chữ ký
     const result = gateway.verifyReturn(req.query);
 
+    if (!result.paymentId) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment không hợp lệ",
+      });
+    }
     console.log("🔁 PAYMENT RETURN:", result);
 
     const payment = await Payment.findById(result.paymentId);
-    if (payment) {
+    if (payment && payment.status !== "success") {
       payment.gatewayDataResponse = req.query;
 
       if (result.code === "00") {
@@ -87,16 +98,14 @@ export const handlePaymentReturn = catchAsync(
       } else {
         payment.status = "failed";
 
-        // hủy giữ ghế
         await bookingService.cancelBooking(
           payment.bookingId.toString(),
           payment.userId.toString(),
         );
       }
+
       await payment.save();
     }
-    // nếu thanh toán thành công
-
     const frontendUrl = new URL(
       process.env.FRONTEND_URL || "http://localhost:5173",
     );

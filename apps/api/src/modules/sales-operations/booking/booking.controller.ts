@@ -1,4 +1,3 @@
-import { Request, Response } from "express";
 import { bookingService } from "./booking.service";
 import { Booking } from "./booking.model";
 import { getBookingAnalytics } from "@api/utils/booking/booking.analytics";
@@ -29,6 +28,7 @@ export const bookingController = {
       message: "Ghế đã được giữ trong 5 phút. Vui lòng thanh toán.",
       data: {
         bookingId: result.booking._id,
+        holdToken: result.booking.holdToken,
         totalAmount: result.booking.totalAmount,
         expiresAt: result.expiresAt,
       },

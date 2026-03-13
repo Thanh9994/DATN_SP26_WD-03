@@ -1,9 +1,13 @@
 import { NotFound } from "@web/components/tools/NotFound";
-import { ClientLayout } from "@web/layouts/ClientLayout";
+
+// Public
+import { Home } from "@web/pages/clients/public/Home";
 import About from "@web/pages/clients/public/About";
 import Event from "@web/pages/clients/public/Event";
+import News from "@web/pages/clients/public/News";
+
+import { ClientLayout } from "@web/layouts/ClientLayout";
 import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
-import { Home } from "@web/pages/clients/public/Home";
 import Login from "@web/pages/clients/auth/Login";
 import Register from "@web/pages/clients/auth/Register";
 import SeatBooking from "@web/pages/clients/booking/SeatBooking";
@@ -21,18 +25,13 @@ import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 import MovieList from "@web/pages/clients/MovieList";
 import NewsDetail from "@web/pages/clients/NewDetail";
-import News from "@web/pages/clients/public/News";
 import RequireAuth from "@web/services/RequieAuth";
 import { Ticket } from "lucide-react";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
-import Paymentlist from "@web/pages/clients/payments/PaymentList";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
-import RequireAuth from "@web/services/RequieAuth";
 import CinemaDetail from "@web/pages/CinemaDetail";
 import Contact from "@web/pages/clients/public/Contact";
-import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
 import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
-import Paymentlist from "@web/pages/clients/payments/PaymentList";
 import { PaymentFailed } from "@web/pages/clients/payments/PaymentFailed";
 import { PaymentSuccess } from "@web/pages/clients/payments/PaymentSuccess";
 
@@ -45,6 +44,7 @@ export const ClientRoutes: RouteObject = {
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "reset-password/:token", element: <ResetPassword /> },
+
     {
       path: "profile",
       element: <ProfileLayout />,
@@ -56,8 +56,10 @@ export const ClientRoutes: RouteObject = {
         { path: "payment", element: <div>Phương thức thanh toán</div> },
       ],
     },
+
     { path: "about", element: <About /> },
     { path: "event", element: <Event /> },
+
     {
       path: "news",
       children: [
@@ -65,6 +67,7 @@ export const ClientRoutes: RouteObject = {
         { path: ":slug", element: <NewsDetail /> },
       ],
     },
+
     { path: "cinema", element: <Cinemas /> },
     { path: "movielist", element: <MovieList /> },
     { path: "cinemadetail/:id", element: <CinemaDetail /> },
@@ -83,21 +86,23 @@ export const ClientRoutes: RouteObject = {
         },
       ],
     },
+
     { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
     { path: "ticket", element: <Ticket /> },
     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
+
     {
       path: "payments",
       element: <PaymentsMethod />,
       children: [
-        { path: "vnpay", element: <Paymentlist /> },
         { path: "failed", element: <PaymentFailed /> },
         { path: "success", element: <PaymentSuccess /> },
         { path: "result", element: <PaymentResult /> },
       ],
     },
+
     { path: "payment-result", element: <PaymentResult /> },
     { path: "ticket", element: <Ticket /> },
     { path: "contact", element: <Contact /> },
