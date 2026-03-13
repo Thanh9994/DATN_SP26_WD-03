@@ -71,7 +71,7 @@ export const generateShowTimeSeats = async (
         seatCode: `${rowNameUp}${i}`,
         row: rowNameUp,
         number: i,
-        loai_ghe: defaultType,
+        seatType: defaultType,
         price: defaultPrice,
         trang_thai: "empty",
       });

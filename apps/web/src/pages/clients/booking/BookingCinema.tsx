@@ -55,11 +55,12 @@ export const BookingCinema = () => {
       .map((item: any) => ({
         ...item,
         showtimesInDate: item.showtimes.filter(
-          (st: any) => dayjs(st.startTime).format("YYYY-MM-DD") === activeDate,
+          (st: any) =>
+            dayjs(st.startTime).format("YYYY-MM-DD") === selectedDate,
         ),
       }))
-      .filter((item: any) => item.showtimesInDate.length > 0);
-  }, [groupedByCinema, activeDate]);
+      .filter((item: any) => item.showtimesInDate.length);
+  }, [groupedByCinema, selectedDate]);
 
   if (isLoading)
     return (

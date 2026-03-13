@@ -61,11 +61,14 @@ const bookingSchema = new Schema(
     paymentMethod: {
       type: String,
       enum: PaymentMethod.options,
-      default: "vnpay",
     },
     paymentId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Payments",
+    },
+    holdToken: {
+      type: String,
+      required: true,
     },
     holdExpiresAt: {
       type: Date,

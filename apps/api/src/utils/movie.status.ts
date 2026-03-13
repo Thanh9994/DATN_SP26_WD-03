@@ -21,8 +21,6 @@ export const startMovieStatusCron = () => {
         },
         { $set: { trang_thai: "dang_chieu" } },
       );
-
-      console.log("✅ Cập nhật trạng thái phim hàng loạt thành công");
     } catch (error) {
       console.error("❌ Lỗi cập nhật trạng thái phim:", error);
     }

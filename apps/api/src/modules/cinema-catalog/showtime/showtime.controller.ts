@@ -65,10 +65,11 @@ export const createShowTime = async (req: Request, res: Response) => {
 
     const durationInMs = (movie.thoi_luong || 0) * 60000;
     const movieEndTime = new Date(startTime.getTime() + durationInMs);
+    const cleaningEnd = new Date(movieEndTime.getTime() + cleaning_TIME);
 
     const isOver = await ShowTimeM.findOne({
       roomId,
-      startTime: { $lt: movieEndTime },
+      startTime: { $lt: cleaningEnd },
       endTime: { $gt: startTime },
     });
     if (isOver) {
@@ -131,7 +132,9 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
       const monthNum = Number(month);
       const yearNum = Number(year);
       if (!Number.isFinite(monthNum) || !Number.isFinite(yearNum)) {
-        return res.status(400).json({ message: "ThÃ¡ng hoáº·c nÄƒm khÃ´ng há»£p lá»‡" });
+        return res
+          .status(400)
+          .json({ message: "ThÃ¡ng hoáº·c nÄƒm khÃ´ng há»£p lá»‡" });
       }
       const startOfMonth = new Date(yearNum, monthNum - 1, 1, 0, 0, 0, 0);
       const endOfMonth = new Date(yearNum, monthNum, 0, 23, 59, 59, 999);
@@ -181,7 +184,9 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
 export const getShowTimeByMovie = async (req: Request, res: Response) => {
   try {
     const { movieId } = req.params;
-    const showtimes = await ShowTimeM.find({ movieId })
+    const now = new Date(Date.now() - 15 * 60 * 1000);
+
+    const showtimes = await ShowTimeM.find({ movieId, startTime: { $gt: now } })
       .populate({
         path: "roomId",
         select: "ten_phong cinema_id",
