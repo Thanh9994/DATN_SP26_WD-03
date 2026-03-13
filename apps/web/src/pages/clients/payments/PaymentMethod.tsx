@@ -1,7 +1,5 @@
 import { useBooking } from "@web/hooks/useBooking";
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { message } from "antd";
 import {
   useLocation,
   useNavigate,

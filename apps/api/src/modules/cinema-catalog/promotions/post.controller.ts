@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import slugify from "../../../utils/slugify";
+import slugify from "../../../utils/assets/slugify";
 import { catchAsync } from "@api/utils/catchAsync";
 import { Post } from "./post.model";
 

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { IUser, IUserDocument } from "@shared/schemas";
+import { IUser, IUserDocument, IUserRole } from "@shared/schemas";
 import { User } from "@api/modules/access-control/user/user.model";
 import { catchAsync } from "@api/utils/catchAsync";
 import { AppError } from "./error.middleware";
@@ -25,7 +25,6 @@ export const authenticate = catchAsync(async (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
 
-  let decoded;
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       id: string;
@@ -50,7 +49,7 @@ export const authenticate = catchAsync(async (req, res, next) => {
   }
 });
 
-export const authorize = (roles: string[]) => {
+export const authorize = (roles: IUserRole[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
       return next(
