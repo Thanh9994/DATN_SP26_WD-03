@@ -11,7 +11,11 @@ export const Header = () => {
     navigate("/");
   };
 
-  const items: MenuProps["items"] = [
+  type MenuItem = NonNullable<MenuProps["items"]>[number] & {
+    roles?: string[];
+  };
+
+  const items: MenuItem[] = [
     {
       key: "ho_ten",
       label: (
@@ -38,13 +42,13 @@ export const Header = () => {
     {
       key: "admin",
       label: "Quản trị viên",
+      roles: ["admin", "manager"],
       icon: (
         <span className="material-symbols-outlined !text-[18px]">
           shield_person
         </span>
       ),
       onClick: () => navigate("/admin"),
-      style: user?.role !== "admin" ? { display: "none" } : {},
     },
     { type: "divider" },
     {
@@ -57,7 +61,9 @@ export const Header = () => {
       onClick: handleLogout,
     },
   ];
-
+  const menuItems = items.filter(
+    (item) => !("roles" in item) || (user && item.roles?.includes(user.role)),
+  );
   return (
     <header className="sticky top-0 w-full z-50 border-b border-white/10 glass-nav">
       <div className="mx-auto px-5 lg:px-10 py-2.5 flex items-center justify-between gap-8">
@@ -145,7 +151,11 @@ export const Header = () => {
           </div>
           {user ? (
             <div className="flex items-center gap-3">
-              <Dropdown menu={{ items }} placement="bottomRight" arrow>
+              <Dropdown
+                menu={{ items: menuItems }}
+                placement="bottomRight"
+                arrow
+              >
                 <div className="size-10 rounded-full border-2 border-gray-400 overflow-hidden cursor-pointer shadow-sm hover:border-primary transition-all">
                   <img
                     alt={user?.ho_ten || "User profile"}

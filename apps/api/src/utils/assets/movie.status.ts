@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import { Movie } from "../modules/movie-content/movie/movie.model";
+import { Movie } from "../../modules/movie-content/movie/movie.model";
 import { IMovieStatus } from "@shared/schemas";
 
 export const startMovieStatusCron = () => {

@@ -6,10 +6,10 @@ const usersRouter = Router();
 
 usersRouter.get("/me", authenticate, me);
 
-usersRouter.use(authenticate, authorize(["admin"]));
+usersRouter.use(authenticate, authorize(["admin", "manager"]));
 
 usersRouter.get("/", getAllUsers);
-usersRouter.patch("/:id", updateUser);
-usersRouter.delete("/:id", deleteUser);
+usersRouter.patch("/:id", authorize(["admin"]), updateUser);
+usersRouter.delete("/:id", authorize(["admin"]), deleteUser);
 
 export default usersRouter;
