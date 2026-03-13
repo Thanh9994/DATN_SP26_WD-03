@@ -19,7 +19,9 @@ app.use(cors());
 
 if (process.env.NODE_ENV === "development") {
   app.use(
-    morgan(":method :url :status :res[content-length] - :response-time ms"),
+    morgan(
+      ":method :url :status :response-time ms :res[content-length] :remote-addr",
+    ),
   );
 }
 
