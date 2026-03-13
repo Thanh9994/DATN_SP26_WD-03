@@ -4,12 +4,14 @@ import SeatMap from "@web/components/skeleton/SeatMap";
 import { IShowTimeSeat } from "@shared/schemas";
 import { useBooking } from "@web/hooks/useBooking";
 import { useEffect } from "react";
+import { useAuth } from "@web/hooks/useAuth";
 // Đường dẫn tới file hook của bạn
 interface BookingContextType {
   selectedSeats: IShowTimeSeat[];
   setSelectedSeats: React.Dispatch<React.SetStateAction<IShowTimeSeat[]>>;
 }
 const SeatBooking = () => {
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
 
   const showtimeId = searchParams.get("showtimeId") || "";
@@ -45,6 +47,13 @@ const SeatBooking = () => {
   // console.log("seats", seats);
 
   const handleSeatClick = (seat: IShowTimeSeat) => {
+    if (seat.trang_thai === "booked") return;
+
+    if (seat.trang_thai === "hold" && seat.heldBy !== user?._id) {
+      message.warning("Ghế này đang được người khác giữ");
+      return;
+    }
+
     setSelectedSeats((prev) => {
       const exist = prev.find((s) => s._id === seat._id);
 
@@ -77,6 +86,7 @@ const SeatBooking = () => {
             seats={seats ?? []}
             selectedSeatCodes={selectedSeats.map((s) => s.seatCode)}
             onSeatClick={handleSeatClick}
+            currentUserId={user?._id || ""}
           />
         </div>
       </div>

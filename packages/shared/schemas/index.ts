@@ -13,7 +13,7 @@ export const BookingStatus = z.enum([
   "cancelled", //Đã hủy
   "expired", //Hết hạn thanh toán và reset trạng thái
 ]);
-export const PaymentStatus = z.enum(["pending", "success", "failed"]);
+export const PaymentStatus = z.enum(["pending", "paying", "success", "failed"]);
 export const ShowTimeStatus = z.enum([
   "upcoming", //Sắp diễn ra
   "ongoing", //Đang chiếu
@@ -203,7 +203,7 @@ export const Booking = Base.extend({
   paymentMethod: PaymentMethod.default("vnpay"),
   paymentId: z.string().optional(),
   transactionCode: z.string().optional(),
-
+  holdToken: z.string(),
   holdExpiresAt: z.coerce.date(),
   ticketCode: z.string().optional(),
 });

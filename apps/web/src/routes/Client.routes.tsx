@@ -28,7 +28,6 @@ import NewsDetail from "@web/pages/clients/NewDetail";
 import RequireAuth from "@web/services/RequieAuth";
 import { Ticket } from "lucide-react";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
-import Paymentlist from "@web/pages/clients/payments/PaymentList";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
 import CinemaDetail from "@web/pages/CinemaDetail";
 import Contact from "@web/pages/clients/public/Contact";
@@ -97,7 +96,6 @@ export const ClientRoutes: RouteObject = {
       path: "payments",
       element: <PaymentsMethod />,
       children: [
-        { path: "vnpay", element: <Paymentlist /> },
         { path: "failed", element: <PaymentFailed /> },
         { path: "success", element: <PaymentSuccess /> },
         { path: "result", element: <PaymentResult /> },
