@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 // Enum status lấy từ schema của bạn
 
 export const TicketCl = z.object({
-  id: z.string(),
+  _id: z.string(),
   title: z.string(),
   image: z.string(),
   cinemaName: z.string(),
@@ -41,7 +41,7 @@ export const mapToTicketCl = (raw: IPopulatedBooking): ITicketCl => {
   const startTime = showTime?.startTime ? dayjs(showTime.startTime) : dayjs();
 
   return {
-    id: raw._id?.toString() || (raw._id as string),
+    _id: raw._id?.toString() || (raw._id as string),
     title: movie?.ten_phim || "N/A",
     image: movie?.poster?.url || "",
     cinemaName: cinema?.name || "N/A",

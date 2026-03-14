@@ -26,11 +26,11 @@ import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 import MovieList from "@web/pages/clients/MovieList";
 import NewsDetail from "@web/pages/clients/NewDetail";
 import RequireAuth from "@web/services/RequieAuth";
-import { Ticket } from "lucide-react";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
 import CinemaDetail from "@web/pages/CinemaDetail";
 import Contact from "@web/pages/clients/public/Contact";
+
 import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
 import { PaymentFailed } from "@web/pages/clients/payments/PaymentFailed";
 import { PaymentSuccess } from "@web/pages/clients/payments/PaymentSuccess";

@@ -25,9 +25,9 @@ export const Register = catchAsync(async (req, res) => {
   });
 
   res.status(201).json({
-    message: "Đăng ký thành công",
+    message: 'Đăng ký thành công',
     user: {
-      id: user._id,
+      _id: user._id,
       email: user.email,
       ho_ten: user.ho_ten,
     },
@@ -37,32 +37,32 @@ export const Register = catchAsync(async (req, res) => {
 export const Login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select('+password');
 
   if (!user) {
-    throw new AppError("Email hoặc mật khẩu không chính xác", 401);
+    throw new AppError('Email hoặc mật khẩu không chính xác', 401);
   }
 
-  if (user.trang_thai === "inactive" || user.trang_thai === "banned") {
-    throw new AppError("Tài khoản đã bị khóa", 403);
+  if (user.trang_thai === 'inactive' || user.trang_thai === 'banned') {
+    throw new AppError('Tài khoản đã bị khóa', 403);
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    throw new AppError("Email hoặc mật khẩu không chính xác", 401);
+    throw new AppError('Email hoặc mật khẩu không chính xác', 401);
   }
 
   const token = Jwt.sign(
-    { id: user._id.toString(), role: user.role },
+    { _id: user._id.toString(), role: user.role },
     process.env.JWT_SECRET as string,
-    { expiresIn: process.env.JWT_EXPIRES_IN as Jwt.SignOptions["expiresIn"] },
+    { expiresIn: process.env.JWT_EXPIRES_IN as Jwt.SignOptions['expiresIn'] },
   );
 
   res.status(200).json({
-    message: "Đăng nhập thành công",
+    message: 'Đăng nhập thành công',
     token,
     user: {
-      id: user._id,
+      _id: user._id,
       ho_ten: user.ho_ten,
       email: user.email,
       role: user.role,
@@ -76,26 +76,23 @@ export const forgotPassword = catchAsync(async (req, res) => {
 
   if (!user) {
     return res.json({
-      message: "If the email exists, a reset link has been sent.",
+      message: 'If the email exists, a reset link has been sent.',
     });
   }
 
-  const resetToken = crypto.randomBytes(32).toString("hex");
+  const resetToken = crypto.randomBytes(32).toString('hex');
 
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(resetToken)
-    .digest("hex");
+  const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
   user.resetPasswordToken = hashedToken;
   user.resetPasswordExpire = new Date(Date.now() + 10 * 60 * 1000);
 
   await user.save();
 
-  const resetUrl = `http://localhost:5174/reset-password/${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL}/${resetToken}`;
 
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
@@ -104,7 +101,7 @@ export const forgotPassword = catchAsync(async (req, res) => {
 
   await transporter.sendMail({
     to: user.email,
-    subject: "Reset Password",
+    subject: 'Reset Password',
     html: `
         <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:40px 0;">
           <div style="max-width:520px;margin:auto;background:#ffffff;border-radius:12px;padding:40px 30px;box-shadow:0 10px 25px rgba(0,0,0,0.05);">
@@ -149,7 +146,7 @@ export const forgotPassword = catchAsync(async (req, res) => {
       `,
   });
 
-  res.json({ message: "Đã gửi email reset password" });
+  res.json({ message: 'Đã gửi email reset password' });
 });
 
 export const resetPassword = catchAsync(async (req, res) => {
@@ -158,11 +155,11 @@ export const resetPassword = catchAsync(async (req, res) => {
 
   if (!password) {
     return res.status(400).json({
-      message: "Mật khẩu không được để trống",
+      message: 'Mật khẩu không được để trống',
     });
   }
 
-  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
   // tìm user
   const user = await User.findOne({
     resetPasswordToken: hashedToken,
@@ -171,13 +168,13 @@ export const resetPassword = catchAsync(async (req, res) => {
 
   if (!user) {
     return res.status(400).json({
-      message: "Token không hợp lệ hoặc đã hết hạn",
+      message: 'Token không hợp lệ hoặc đã hết hạn',
     });
   }
 
   const isSamePassword = await bcrypt.compare(password, user.password);
   if (isSamePassword) {
-    throw new AppError("Mật khẩu mới không được trùng mật khẩu cũ", 400);
+    throw new AppError('Mật khẩu mới không được trùng mật khẩu cũ', 400);
   }
 
   user.password = await bcrypt.hash(password, 10); // Đổi về salt 10 cho đồng bộ tốc độ
@@ -186,5 +183,5 @@ export const resetPassword = catchAsync(async (req, res) => {
 
   await user.save();
 
-  res.status(200).json({ message: "Đổi mật khẩu thành công" });
+  res.status(200).json({ message: 'Đổi mật khẩu thành công' });
 });
