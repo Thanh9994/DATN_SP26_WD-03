@@ -5,7 +5,6 @@ import { Home } from "@web/pages/clients/public/Home";
 import About from "@web/pages/clients/public/About";
 import Event from "@web/pages/clients/public/Event";
 import News from "@web/pages/clients/public/News";
-
 import { ClientLayout } from "@web/layouts/ClientLayout";
 import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
 import Login from "@web/pages/clients/auth/Login";
@@ -26,14 +25,16 @@ import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
 import MovieList from "@web/pages/clients/MovieList";
 import NewsDetail from "@web/pages/clients/NewDetail";
 import RequireAuth from "@web/services/RequieAuth";
-import { Ticket } from "lucide-react";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
 import CinemaDetail from "@web/pages/CinemaDetail";
 import Contact from "@web/pages/clients/public/Contact";
+
 import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
 import { PaymentFailed } from "@web/pages/clients/payments/PaymentFailed";
 import { PaymentSuccess } from "@web/pages/clients/payments/PaymentSuccess";
+import Ticket from "@web/pages/Ticket";
+import VerifyEmail from "@web/pages/clients/auth/VerifyEmail";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -44,6 +45,8 @@ export const ClientRoutes: RouteObject = {
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "reset-password/:token", element: <ResetPassword /> },
+    { path: "verify-email", element: <VerifyEmail /> },
+
 
     {
       path: "profile",
