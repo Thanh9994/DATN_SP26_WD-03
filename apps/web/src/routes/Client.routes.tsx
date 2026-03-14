@@ -2,7 +2,6 @@ import { NotFound } from "@web/components/tools/NotFound";
 import { ClientLayout } from "@web/layouts/ClientLayout";
 import About from "@web/pages/clients/public/About";
 import Event from "@web/pages/clients/public/Event";
-
 import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
 import { Home } from "@web/pages/clients/public/Home";
 import Login from "@web/pages/clients/auth/Login";
@@ -24,16 +23,13 @@ import MovieList from "@web/pages/clients/MovieList";
 import NewsDetail from "@web/pages/clients/NewDetail";
 import News from "@web/pages/clients/public/News";
 import RequireAuth from "@web/services/RequieAuth";
-import { Contact, Ticket } from "lucide-react";
 import ResetPassword from "@web/pages/clients/auth/ResetPassword";
 import Paymentlist from "@web/pages/clients/payments/PaymentList";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
 import CinemaDetail from "@web/pages/CinemaDetail";
-<<<<<<< HEAD
-import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
-=======
 import Contact from "@web/pages/clients/public/Contact";
->>>>>>> bb5300ae1a8dad0baf4acd9cc6e0228be757c859
+import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
+import { Ticket } from "lucide-react";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
