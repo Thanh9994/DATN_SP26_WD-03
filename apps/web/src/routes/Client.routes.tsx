@@ -29,7 +29,11 @@ import ResetPassword from "@web/pages/clients/auth/ResetPassword";
 import Paymentlist from "@web/pages/clients/payments/PaymentList";
 import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
 import CinemaDetail from "@web/pages/CinemaDetail";
+<<<<<<< HEAD
 import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
+=======
+import Contact from "@web/pages/clients/public/Contact";
+>>>>>>> bb5300ae1a8dad0baf4acd9cc6e0228be757c859
 
 export const ClientRoutes: RouteObject = {
   path: "/",

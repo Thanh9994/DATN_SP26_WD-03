@@ -341,3 +341,14 @@ export default function CinemaDetail() {
     </div>
   );
 }
+=========
+const CinemaDetail = () => {
+  return (
+    <div>
+      
+    </div>
+  )
+}
+
+export default CinemaDetail
+>>>>>>>>> Temporary merge branch 2
