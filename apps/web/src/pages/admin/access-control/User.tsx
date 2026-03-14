@@ -130,6 +130,7 @@ export const User = () => {
             <Select
               options={[
                 { value: "admin", label: "Admin" },
+                { value: "manager", label: "Manager" },
                 { value: "khach_hang", label: "Khách hàng" },
               ]}
             />

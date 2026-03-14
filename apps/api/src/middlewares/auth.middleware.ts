@@ -27,9 +27,12 @@ export const authenticate = catchAsync(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      id: string;
+      id?: string;
+      _id?: string;
     };
-    const user = await User.findById(decoded.id).select("-password -__v");
+    const userId = decoded._id || decoded.id;
+    if (!userId) return next(new AppError("Token không hợp lệ", 401));
+    const user = await User.findById(userId).select("-password -__v");
 
     if (!user) return next(new AppError("User không tồn tại", 401));
     if (user.trang_thai !== "active")
