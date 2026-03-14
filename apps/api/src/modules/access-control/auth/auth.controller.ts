@@ -16,24 +16,64 @@ export const Register = catchAsync(async (req, res) => {
   }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
+  const verifyToken = crypto.randomBytes(32).toString("hex");
 
   const user = await User.create({
     ho_ten,
     email,
     phone,
     password: hashedPassword,
+    emailVerifyToken: verifyToken,
+    emailVerifyExpire: Date.now() + 1000 * 60 * 60, // 1h
+  });
+
+  const verifyUrl = `http://localhost:5000/api/access/auth/verify-email?token=${verifyToken}`;
+
+  // transporter gmail
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    to: email,
+    subject: "Xác nhận email",
+    html: `
+      <h3>Xin chào ${ho_ten}</h3>
+      <p>Nhấn vào link để xác nhận email:</p>
+      <a href="${verifyUrl}">${verifyUrl}</a>
+    `,
   });
 
   res.status(201).json({
-    message: 'Đăng ký thành công',
-    user: {
-      _id: user._id,
-      email: user.email,
-      ho_ten: user.ho_ten,
-    },
+    message: "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận.",
   });
 });
+export const verifyEmail = catchAsync(async (req, res) => {
+  const { token } = req.query;
 
+  const user = await User.findOne({
+    emailVerifyToken: token,
+    emailVerifyExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new AppError("Token không hợp lệ hoặc đã hết hạn", 400);
+  }
+
+  user.isVerified = true;
+  user.emailVerifyToken = undefined;
+  user.emailVerifyExpire = undefined;
+
+  await user.save();
+
+  res.json({
+    message: "Xác nhận email thành công",
+  });
+});
 export const Login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 

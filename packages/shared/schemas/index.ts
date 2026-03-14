@@ -273,6 +273,9 @@ export const User = Base.extend({
   trang_thai: UserStatus.default("active"),
   resetPasswordToken: z.string().optional(),
   resetPasswordExpire: z.coerce.date().optional(),
+  isVerified: z.boolean().default(false),
+  emailVerifyToken: z.string().optional(),
+  emailVerifyExpire: z.coerce.date().optional(),
 });
 
 export const UpdateUser = z.object({

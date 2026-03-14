@@ -33,6 +33,7 @@ import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
 import { PaymentFailed } from "@web/pages/clients/payments/PaymentFailed";
 import { PaymentSuccess } from "@web/pages/clients/payments/PaymentSuccess";
 import Ticket from "@web/pages/Ticket";
+import VerifyEmail from "@web/pages/clients/auth/VerifyEmail";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
@@ -43,6 +44,8 @@ export const ClientRoutes: RouteObject = {
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "reset-password/:token", element: <ResetPassword /> },
+    { path: "verify-email", element: <VerifyEmail /> },
+
 
     {
       path: "profile",
