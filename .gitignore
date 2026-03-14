@@ -2,6 +2,7 @@
 node_modules/
 .pnpm-store/
 .yarn/
+package-lock.json
 
 # Build outputs
 dist/

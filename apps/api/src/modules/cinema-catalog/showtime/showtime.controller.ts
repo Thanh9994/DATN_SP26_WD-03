@@ -65,10 +65,11 @@ export const createShowTime = async (req: Request, res: Response) => {
 
     const durationInMs = (movie.thoi_luong || 0) * 60000;
     const movieEndTime = new Date(startTime.getTime() + durationInMs);
+    const cleaningEnd = new Date(movieEndTime.getTime() + cleaning_TIME);
 
     const isOver = await ShowTimeM.findOne({
       roomId,
-      startTime: { $lt: movieEndTime },
+      startTime: { $lt: cleaningEnd },
       endTime: { $gt: startTime },
     });
     if (isOver) {
@@ -118,7 +119,7 @@ export const createShowTime = async (req: Request, res: Response) => {
 
 export const getAllShowTimes = async (req: Request, res: Response) => {
   try {
-    const { date } = req.query;
+    const { date, month, year } = req.query;
     let query = {};
 
     if (date) {
@@ -127,6 +128,25 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
       const endOfDay = new Date(date as string);
       endOfDay.setHours(23, 59, 59, 999);
       query = { startTime: { $gte: startOfDay, $lte: endOfDay } };
+    } else if (month && year) {
+      const monthNum = Number(month);
+      const yearNum = Number(year);
+      if (!Number.isFinite(monthNum) || !Number.isFinite(yearNum)) {
+        return res
+          .status(400)
+          .json({ message: "ThÃ¡ng hoáº·c nÄƒm khÃ´ng há»£p lá»‡" });
+      }
+      const startOfMonth = new Date(yearNum, monthNum - 1, 1, 0, 0, 0, 0);
+      const endOfMonth = new Date(yearNum, monthNum, 0, 23, 59, 59, 999);
+      query = { startTime: { $gte: startOfMonth, $lte: endOfMonth } };
+    } else if (year) {
+      const yearNum = Number(year);
+      if (!Number.isFinite(yearNum)) {
+        return res.status(400).json({ message: "NÄƒm khÃ´ng há»£p lá»‡" });
+      }
+      const startOfYear = new Date(yearNum, 0, 1, 0, 0, 0, 0);
+      const endOfYear = new Date(yearNum, 11, 31, 23, 59, 59, 999);
+      query = { startTime: { $gte: startOfYear, $lte: endOfYear } };
     }
 
     const showtimes = await ShowTimeM.find(query)
@@ -164,7 +184,9 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
 export const getShowTimeByMovie = async (req: Request, res: Response) => {
   try {
     const { movieId } = req.params;
-    const showtimes = await ShowTimeM.find({ movieId })
+    const now = new Date(Date.now() - 15 * 60 * 1000);
+
+    const showtimes = await ShowTimeM.find({ movieId, startTime: { $gt: now } })
       .populate({
         path: "roomId",
         select: "ten_phong cinema_id",

@@ -114,3 +114,4 @@ export const AdminLayouts = () => {
     </ConfigProvider>
   );
 };
+export default AdminLayouts;

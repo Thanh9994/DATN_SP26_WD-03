@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { SeatTime } from "../../cinema-catalog/showtime/showtimeSeat.model";
 import { Booking } from "./booking.model";
 import { randomUUID } from "crypto";
+
 import { AppError } from "@api/middlewares/error.middleware";
 
 export const bookingService = {
@@ -12,6 +13,7 @@ export const bookingService = {
       const holdDuration = 7 * 60 * 1000; // 7 phút
       const holdExpires = new Date(Date.now() + holdDuration);
       const now = new Date();
+      const holdToken = randomUUID();
       //hủy booking đang giữ cũ
 
       const existingBooking = await Booking.findOne(
@@ -98,6 +100,7 @@ export const bookingService = {
         existingBooking.totalAmount = totalAmount;
         existingBooking.finalAmount = totalAmount;
         existingBooking.holdExpiresAt = holdExpires;
+        existingBooking.holdToken = holdToken;
 
         booking = await existingBooking.save({ session });
       } else {
@@ -111,6 +114,7 @@ export const bookingService = {
               totalAmount,
               finalAmount: totalAmount,
               status: "pending",
+              holdToken,
               holdExpiresAt: holdExpires,
             },
           ],
@@ -132,6 +136,7 @@ export const bookingService = {
 
       return {
         booking,
+        holdToken,
         expiresAt: holdExpires,
       };
     } catch (error) {
@@ -169,7 +174,8 @@ export const bookingService = {
       }
 
       if (booking.status !== "pending") {
-        throw new AppError("Booking không hợp lệ.", 400);
+        await session.commitTransaction();
+        return booking;
       }
 
       // seat thuộc booking - seat đang hold - seat do user giữ
@@ -271,6 +277,9 @@ export const bookingService = {
           400,
         );
       }
+      if (!booking) return;
+
+      booking.status = "cancelled";
 
       await SeatTime.updateMany(
         { _id: { $in: booking.seats }, bookingId: booking._id },
@@ -282,7 +291,6 @@ export const bookingService = {
       );
 
       // Đổi trạng thái đơn
-      booking.status = "cancelled";
       await booking.save({ session });
 
       await session.commitTransaction();

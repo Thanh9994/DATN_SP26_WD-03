@@ -12,7 +12,6 @@ paymentRouter.post(
   PaymentController.createPaymentUrl,
 );
 
-// VNPay/Momo gọi về để báo kết quả
 paymentRouter.get("/:method/ipn", PaymentController.handlePaymentIpn);
 
 paymentRouter.get("/:method/return", PaymentController.handlePaymentReturn);
