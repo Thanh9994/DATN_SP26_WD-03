@@ -54,7 +54,7 @@ const MyBooking = () => {
       t.isPast && dayjs().diff(dayjs(t.date, "DD/MM/YYYY"), "day") >= 2;
 
     return (
-      <div key={t.id} className="mb-4">
+      <div key={t._id} className="mb-4">
         <BookingTicket ticket={t}>
           <div className="flex flex-col">
             <p className="text-[8px] text-zinc-600 font-black uppercase tracking-[0.2em] mb-0.5">
@@ -73,7 +73,7 @@ const MyBooking = () => {
             </div>
           ) : (
             <button
-              onClick={() => navigate(`/my-booking/${t.id}`)}
+              onClick={() => navigate(`/my-booking/${t._id}`)}
               className="flex items-center gap-2 px-8 py-3 bg-[#e52e2e] hover:bg-white hover:text-black text-white rounded-xl transition-all duration-300"
             >
               <Ticket size={18} />
