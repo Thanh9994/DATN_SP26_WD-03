@@ -10,12 +10,12 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": ".", 
+    "baseUrl": ".",
     "paths": {
       "@api/*": ["src/*"],
       "@shared/*": ["../../packages/shared/*"]
     }
   },
-  "include": ["src/**/*","../../../packages/shared/**/*", "src/test-mail.ts"],
+  "include": ["src", "../../packages/shared"],
   "exclude": ["node_modules", "dist"]
 }
