@@ -107,6 +107,22 @@ export const useAuth = () => {
       console.error(err.message || "Đăng ký thất bại");
     },
   });
+  
+const verifyEmailMutation = useMutation({
+  mutationFn: async (token: string) => {
+    const { data } = await axios.get(`${API.AUTH}/verify-email`, {
+      params: { token },
+    });
+    return data;
+  },
+  onSuccess: () => {
+    showNotify("success", "Xác nhận email thành công");
+  },
+  onError: (err: any) => {
+    showNotify("error", err?.response?.data?.message || "Xác nhận email thất bại");
+    console.error(err?.message || "Xác nhận email thất bại");
+  },
+});
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -165,6 +181,8 @@ export const useAuth = () => {
   });
 
   return {
+    verifyEmail:
+    verifyEmailMutation.mutateAsync,
     user,
     users,
     isLoading,

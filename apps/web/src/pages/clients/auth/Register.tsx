@@ -8,7 +8,7 @@ import { useAuth } from "@web/hooks/useAuth";
 import { Checkbox, Form } from "antd";
 
 const Register = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { register, isRegistering } = useAuth();
   const [form] = Form.useForm();
   const passwordValue = Form.useWatch("password", form) || "";
@@ -25,13 +25,12 @@ const Register = () => {
     }
     setErrorMsg(null);
     try {
-      await register({
+       await register({
         ho_ten: values.ho_ten,
         email: values.email,
         password: values.password,
         phone: values.phone,
       });
-      navigate("/login");
     } catch (err: any) {
       const message =
         err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.";
