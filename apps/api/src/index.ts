@@ -17,7 +17,6 @@ const startServer = async () => {
       console.log(
         `🚀 API Ready |🌐 Port: ${process.env.PORT} |🔗 MongoDB: Connected |🖼️  Cloudinary: ${cloudStatus} |🚀 Mode: ${ENV?.toUpperCase()}`,
       );
-      console.log(`🚀 Mode: ${process.env.NODE_ENV}`);
     });
   } catch (error) {
     console.error("❌ Không thể khởi động server:", error);

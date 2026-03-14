@@ -10,6 +10,7 @@ bookingRouter.post("/hold", authenticate, bookingController.holdSeats);
 bookingRouter.post("/confirm", authenticate, bookingController.confirmBooking);
 bookingRouter.post("/cancel", authenticate, bookingController.cancelBooking);
 bookingRouter.post("/expire", authenticate, bookingController.expireBooking);
+bookingRouter.get("/my", authenticate, bookingController.getMyBookings);
 bookingRouter.get(
   "/pending/:showtimeId",
   authenticate,

@@ -1,16 +1,16 @@
 {
   "private": true,
+  "packageManager": "npm@11.6.3",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n API,WEB -c green,blue \"npm run dev --workspace=@apps/api\" \"npm run dev --workspace=@apps/web\""
+    "dev": "turbo run dev --parallel --continue",
+    "build": "turbo run build",
+    "lint": "turbo run lint"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
-  },
-  "dependencies": {
-    "recharts": "^3.7.0"
+    "turbo": "^2.8.17"
   }
 }

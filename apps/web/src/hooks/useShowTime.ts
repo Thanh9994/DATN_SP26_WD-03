@@ -1,15 +1,15 @@
-import dayjs from "dayjs";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { message } from "antd";
-import { API } from "@web/api/api.service";
-import { ICreateShowTimePl, ShowTime, IShowTime } from "@shared/schemas";
+import dayjs from 'dayjs';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { message } from 'antd';
+import { API } from '@web/api/api.service';
+import { ICreateShowTimePl, ShowTime, IShowTime } from '@shared/schemas';
 
 export const useShowTime = (movieId?: string) => {
   const queryClient = useQueryClient();
 
   const { data: showtimes = [], isLoading } = useQuery<IShowTime[]>({
-    queryKey: ["showtimes", "movie", movieId],
+    queryKey: ['showtimes', 'movie', movieId],
     queryFn: async () => {
       if (!movieId) return [];
       const { data } = await axios.get(`${API.SHOWTIME}/movie/${movieId}`);
@@ -17,6 +17,8 @@ export const useShowTime = (movieId?: string) => {
       return data.data;
     },
     enabled: !!movieId,
+    staleTime: 1000 * 60 * 5, //tươi 5 phút
+    refetchOnWindowFocus: false, // tắt chuyển tab call lại api
   });
 
   const { mutate: createShowTime, isPending: isCreating } = useMutation({
@@ -26,9 +28,9 @@ export const useShowTime = (movieId?: string) => {
       return data;
     },
     onSuccess: () => {
-      message.success("Tạo suất chiếu thành công!");
-      queryClient.invalidateQueries({ queryKey: ["showtimes"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboard-showtimes"] });
+      message.success('Tạo suất chiếu thành công!');
+      queryClient.invalidateQueries({ queryKey: ['showtimes'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-showtimes'] });
     },
     onError: (error: any) => {
       const serverMessage = error.response?.data?.message;
@@ -36,11 +38,11 @@ export const useShowTime = (movieId?: string) => {
 
       if (overlap) {
         // 2. Nếu có thông tin trùng lịch, hiển thị chi tiết giờ trùng
-        const start = dayjs(overlap.start).format("HH:mm");
-        const end = dayjs(overlap.end).format("HH:mm");
+        const start = dayjs(overlap.start).format('HH:mm');
+        const end = dayjs(overlap.end).format('HH:mm');
         message.error(`${serverMessage} (Trùng từ ${start} - ${end})`, 4);
       } else {
-        message.error(serverMessage || "Lỗi tạo suất chiếu");
+        message.error(serverMessage || 'Lỗi tạo suất chiếu');
       }
     },
   });
@@ -51,12 +53,12 @@ export const useShowTime = (movieId?: string) => {
       return data;
     },
     onSuccess: () => {
-      message.success("Đã xóa suất chiếu");
-      queryClient.invalidateQueries({ queryKey: ["showtimes"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboard-showtimes"] });
+      message.success('Đã xóa suất chiếu');
+      queryClient.invalidateQueries({ queryKey: ['showtimes'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-showtimes'] });
     },
     onError: (error: any) => {
-      message.error(error.message || "Không thể xóa");
+      message.error(error.message || 'Không thể xóa');
     },
   });
 
@@ -72,7 +74,7 @@ export const useShowTime = (movieId?: string) => {
 
 export const useDashboardShowTimes = (date: string) => {
   return useQuery({
-    queryKey: ["dashboard-showtimes", date],
+    queryKey: ['dashboard-showtimes', date],
     queryFn: async () => {
       const { data } = await axios.get(`${API.SHOWTIME}`, {
         params: { date },
@@ -84,15 +86,47 @@ export const useDashboardShowTimes = (date: string) => {
   });
 };
 
+export const useShowTimeCountByMonth = (month?: number, year?: number) => {
+  return useQuery({
+    queryKey: ['dashboard-showtimes-count', 'month', month, year],
+    queryFn: async () => {
+      if (!month || !year) return 0;
+      const { data } = await axios.get(`${API.SHOWTIME}`, {
+        params: { month, year },
+      });
+      return data.data?.length ?? 0;
+    },
+    enabled: !!month && !!year,
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
+export const useShowTimeCountByYear = (year?: number) => {
+  return useQuery({
+    queryKey: ['dashboard-showtimes-count', 'year', year],
+    queryFn: async () => {
+      if (!year) return 0;
+      const { data } = await axios.get(`${API.SHOWTIME}`, {
+        params: { year },
+      });
+      return data.data?.length ?? 0;
+    },
+    enabled: !!year,
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
 export const useShowTimesByMovie = (movieId?: string) => {
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["movie-showtimes", movieId],
+    queryKey: ['movie-showtimes', movieId],
     queryFn: async () => {
       if (!movieId) return null;
       const { data } = await axios.get(`${API.SHOWTIME}/movie/${movieId}`);
-      return data.data; // Mảng showtimes từ backend
+      return data.data; // showtimes từ backend
     },
     enabled: !!movieId,
+    staleTime: 1000 * 60 * 5, // dữ liệu tươi 5 phút
+    refetchOnWindowFocus: false,
   });
 
   const groupedByCinema = data?.reduce((acc: any, st: any) => {

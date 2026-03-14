@@ -7,8 +7,12 @@ export interface IPayment extends Document {
   finalAmount: number;
   paymentMethod: string; // 'vnpay', 'momo', etc.
   status: IPaymentStatus;
+
+  paymentUrl?: string;
+  expireAt?: Date;
+
   transactionNo?: string; // ID from the payment gateway
-  gatewayDataResponse?: any; // Raw data from gateway for debugging
+  gatewayDataResponse?: any;
 }
 
 const paymentSchema = new mongoose.Schema(
@@ -29,6 +33,15 @@ const paymentSchema = new mongoose.Schema(
       enum: PaymentMethod.options,
       required: true,
     },
+
+    paymentUrl: {
+      type: String,
+    },
+
+    expireAt: {
+      type: Date,
+    },
+
     status: {
       type: String,
       enum: PaymentStatus.options,
@@ -42,4 +55,8 @@ const paymentSchema = new mongoose.Schema(
 paymentSchema.index({ bookingId: 1 });
 paymentSchema.index({ userId: 1, createdAt: -1 });
 paymentSchema.index({ status: 1 });
+paymentSchema.index(
+  { bookingId: 1, status: 1 },
+  { unique: true, partialFilterExpression: { status: "pending" } },
+);
 export const Payment = mongoose.model<IPayment>("Payments", paymentSchema);

@@ -1,114 +1,108 @@
-import { Request, Response } from "express";
-import bcrypt from "bcryptjs";
-import crypto from "crypto";
-import nodemailer from "nodemailer";
-import Jwt from "jsonwebtoken";
-import { User } from "../user/user.model";
+import { Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
+import Jwt from 'jsonwebtoken';
+import { User } from '../user/user.model';
+import { AppError } from '@api/middlewares/error.middleware';
+import { catchAsync } from '@api/utils/catchAsync';
 
-export const Register = async (req: Request, res: Response) => {
-  try {
-    const { email, password, ho_ten, phone } = req.body;
-    const exitingUser = await User.findOne({ email });
-    if (exitingUser) {
-      return res.status(400).json({ message: "Email này đã được đăng ký!" });
-    }
+export const Register = catchAsync(async (req, res) => {
+  const { email, password, ho_ten, phone } = req.body;
 
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    const user = await User.create({
-      ho_ten,
-      email,
-      phone,
-      password: hashedPassword,
-    });
-
-    res.status(201).json({
-      message: "Đăng ký thành công",
-      user: { id: user._id, email: user.email, ho_ten: user.ho_ten },
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi hệ thống khi đăng ký", error });
+  const exitingUser = await User.findOne({ email });
+  if (exitingUser) {
+    throw new AppError('Email đã tồn tại', 400);
   }
-};
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
-export const Login = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email }).select("+password");
+  const user = await User.create({
+    ho_ten,
+    email,
+    phone,
+    password: hashedPassword,
+  });
 
-    if (!user) {
-      return res
-        .status(401)
-        .json({ message: "Email hoặc mật khẩu không chính xác." });
-    }
+  res.status(201).json({
+    message: 'Đăng ký thành công',
+    user: {
+      _id: user._id,
+      email: user.email,
+      ho_ten: user.ho_ten,
+    },
+  });
+});
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res
-        .status(401)
-        .json({ message: "Email hoặc mật khẩu không chính xác." });
-    }
+export const Login = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
 
-    if (user.trang_thai === "inactive" || user.trang_thai === "banned") {
-      return res.status(403).json({
-        message:
-          "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.",
-      });
-    }
-    const token = Jwt.sign(
-      { id: user._id.toString(), role: user.role },
-      process.env.JWT_SECRET as string,
-      { expiresIn: process.env.JWT_EXPIRES_IN as Jwt.SignOptions["expiresIn"] },
-    );
+  const user = await User.findOne({ email }).select('+password');
 
-    res.status(200).json({
-      message: "Đăng nhập thành công",
-      token,
-      user: { id: user._id, ho_ten: user.ho_ten, email: user.email },
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi hệ thống khi đăng nhập", error });
+  if (!user) {
+    throw new AppError('Email hoặc mật khẩu không chính xác', 401);
   }
-};
 
-export const forgotPassword = async (req: Request, res: Response) => {
-  try {
-    const { email } = req.body;
+  if (user.trang_thai === 'inactive' || user.trang_thai === 'banned') {
+    throw new AppError('Tài khoản đã bị khóa', 403);
+  }
 
-    const user = await User.findOne({ email });
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new AppError('Email hoặc mật khẩu không chính xác', 401);
+  }
 
-    if (!user) {
-      return res.json({
-        message: "If the email exists, a reset link has been sent.",
-      });
-    }
+  const token = Jwt.sign(
+    { _id: user._id.toString(), role: user.role },
+    process.env.JWT_SECRET as string,
+    { expiresIn: process.env.JWT_EXPIRES_IN as Jwt.SignOptions['expiresIn'] },
+  );
 
-    const resetToken = crypto.randomBytes(32).toString("hex");
+  res.status(200).json({
+    message: 'Đăng nhập thành công',
+    token,
+    user: {
+      _id: user._id,
+      ho_ten: user.ho_ten,
+      email: user.email,
+      role: user.role,
+    },
+  });
+});
 
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(resetToken)
-      .digest("hex");
+export const forgotPassword = catchAsync(async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
 
-    user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpire = new Date(Date.now() + 10 * 60 * 1000);
-
-    await user.save();
-
-    const resetUrl = `http://localhost:5174/reset-password/${resetToken}`;
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
+  if (!user) {
+    return res.json({
+      message: 'If the email exists, a reset link has been sent.',
     });
+  }
 
-    await transporter.sendMail({
-      to: user.email,
-      subject: "Reset Password",
-      html: `
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+  user.resetPasswordToken = hashedToken;
+  user.resetPasswordExpire = new Date(Date.now() + 10 * 60 * 1000);
+
+  await user.save();
+
+  const resetUrl = `${process.env.FRONTEND_URL}/${resetToken}`;
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    to: user.email,
+    subject: 'Reset Password',
+    html: `
         <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:40px 0;">
           <div style="max-width:520px;margin:auto;background:#ffffff;border-radius:12px;padding:40px 30px;box-shadow:0 10px 25px rgba(0,0,0,0.05);">
 
@@ -150,68 +144,44 @@ export const forgotPassword = async (req: Request, res: Response) => {
           </div>
         </div>
       `,
-    });
+  });
 
-    res.json({ message: "Đã gửi email reset password" });
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi server", error });
-  }
-};
+  res.json({ message: 'Đã gửi email reset password' });
+});
 
-export const resetPassword = async (req: Request, res: Response) => {
-  try {
-    const { token } = req.params;
-    const { password } = req.body;
+export const resetPassword = catchAsync(async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
 
-    if (!password) {
-      return res.status(400).json({
-        message: "Mật khẩu không được để trống",
-      });
-    }
-
-    // hash token từ URL
-    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-
-    // tìm user
-    const user = await User.findOne({
-      resetPasswordToken: hashedToken,
-      resetPasswordExpire: { $gt: Date.now() },
-    });
-
-    if (!user) {
-      return res.status(400).json({
-        message: "Token không hợp lệ hoặc đã hết hạn",
-      });
-    }
-
-    // kiểm tra trùng mật khẩu cũ
-    const isSamePassword = await bcrypt.compare(password, user.password);
-
-    if (isSamePassword) {
-      return res.status(400).json({
-        message: "Mật khẩu mới không được trùng mật khẩu cũ",
-      });
-    }
-
-    // hash password mới
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    user.password = hashedPassword;
-
-    // clear reset token
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-
-    await user.save();
-
-    return res.status(200).json({
-      message: "Đổi mật khẩu thành công",
-    });
-  } catch (error) {
-    console.error("Reset password error:", error);
-
-    return res.status(500).json({
-      message: "Lỗi server",
+  if (!password) {
+    return res.status(400).json({
+      message: 'Mật khẩu không được để trống',
     });
   }
-};
+
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+  // tìm user
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res.status(400).json({
+      message: 'Token không hợp lệ hoặc đã hết hạn',
+    });
+  }
+
+  const isSamePassword = await bcrypt.compare(password, user.password);
+  if (isSamePassword) {
+    throw new AppError('Mật khẩu mới không được trùng mật khẩu cũ', 400);
+  }
+
+  user.password = await bcrypt.hash(password, 10); // Đổi về salt 10 cho đồng bộ tốc độ
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+
+  await user.save();
+
+  res.status(200).json({ message: 'Đổi mật khẩu thành công' });
+});

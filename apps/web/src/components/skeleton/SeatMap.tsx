@@ -5,12 +5,14 @@ interface SeatMapProps {
   seats: IShowTimeSeat[];
   selectedSeatCodes: string[];
   onSeatClick: (seat: IShowTimeSeat) => void;
+  currentUserId: string;
 }
 
 const SeatMap: React.FC<SeatMapProps> = ({
   seats,
   selectedSeatCodes,
   onSeatClick,
+  currentUserId,
 }) => {
   // 1. Nhóm ghế theo hàng (row)
   const rows = seats.reduce(
@@ -27,8 +29,8 @@ const SeatMap: React.FC<SeatMapProps> = ({
     couple: 2,
   };
   const sortedRows = Object.keys(rows).sort((a, b) => {
-    const typeA = rows[a][0]?.loai_ghe || "normal";
-    const typeB = rows[b][0]?.loai_ghe || "normal";
+    const typeA = rows[a][0]?.seatType || "normal";
+    const typeB = rows[b][0]?.seatType || "normal";
 
     if (seatTypeOrder[typeA] !== seatTypeOrder[typeB]) {
       return seatTypeOrder[typeA] - seatTypeOrder[typeB];
@@ -41,13 +43,16 @@ const SeatMap: React.FC<SeatMapProps> = ({
     if (seat.trang_thai === "booked")
       return "bg-zinc-700 cursor-not-allowed text-zinc-500 border-zinc-700";
 
-    if (seat.trang_thai === "hold")
+    if (seat.trang_thai === "hold" && seat.heldBy !== currentUserId)
       return "bg-yellow-500 text-black border-yellow-400 cursor-not-allowed";
 
     if (selectedSeatCodes.includes(seat.seatCode))
       return "bg-red-600 text-white border-red-400";
 
-    switch (seat.loai_ghe) {
+    if (seat.trang_thai === "hold" && seat.heldBy === currentUserId)
+      return "bg-yellow-500 text-black border-yellow-400";
+
+    switch (seat.seatType) {
       case "vip":
         return "border-orange-500 text-orange-500 hover:bg-orange-500/20";
       case "couple":
@@ -81,18 +86,18 @@ const SeatMap: React.FC<SeatMapProps> = ({
             <div className="flex gap-2 ">
               {rows[rowLabel]
                 .sort((a, b) => {
-                  if (a.loai_ghe === "couple" && b.loai_ghe !== "couple")
+                  if (a.seatType === "couple" && b.seatType !== "couple")
                     return 1;
-                  if (a.loai_ghe !== "couple" && b.loai_ghe === "couple")
+                  if (a.seatType !== "couple" && b.seatType === "couple")
                     return -1;
                   return a.number - b.number;
                 })
                 .reduce((acc: IShowTimeSeat[][], seat, index, array) => {
-                  if (seat.loai_ghe === "couple") {
+                  if (seat.seatType === "couple") {
                     const nextSeat = array[index + 1];
                     if (
                       nextSeat &&
-                      nextSeat.loai_ghe === "couple" &&
+                      nextSeat.seatType === "couple" &&
                       nextSeat.number === seat.number + 1
                     ) {
                       acc.push([seat, nextSeat]);
@@ -108,9 +113,14 @@ const SeatMap: React.FC<SeatMapProps> = ({
                 .map((seatGroup) => {
                   const isCouple = seatGroup.length === 2;
                   const firstSeat = seatGroup[0];
-                  const isDisabled = seatGroup.some(
-                    (s) => s.trang_thai === "booked" || s.trang_thai === "hold",
-                  );
+                  const isDisabled = seatGroup.some((s) => {
+                    if (s.trang_thai === "booked") return true;
+
+                    if (s.trang_thai === "hold" && s.heldBy !== currentUserId)
+                      return true;
+
+                    return false;
+                  });
 
                   return (
                     <button

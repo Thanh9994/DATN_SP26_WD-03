@@ -8,6 +8,7 @@ import { Payment } from "./payment.model";
 export const paymentService = {
   async initPayment(
     bookingId: string,
+    holdToken: string,
     method: string,
     ipAddr: string,
     user: IUser,
@@ -17,20 +18,27 @@ export const paymentService = {
     if (!booking) {
       throw new AppError("Đơn hàng không tồn tại", 404);
     }
-
+    if (booking.holdToken !== holdToken) {
+      throw new AppError("Token giữ ghế không hợp lệ", 403);
+    }
     // check quyền
     if (
       booking.userId?.toString() !== user._id?.toString() &&
       user.role !== "admin"
     ) {
-      throw new AppError("Bạn không có quyền thanh toán đơn hàng này", 403);
+      throw new AppError("Bạn không có quyền thanh toán đơn hàng này", 404);
     }
 
     // check trạng thái booking
     if (booking.status !== "pending") {
       throw new AppError("Đơn hàng đã xử lý hoặc hết hạn", 400);
     }
+    if (booking.holdExpiresAt && booking.holdExpiresAt < new Date()) {
+      booking.status = "expired";
+      await booking.save();
 
+      throw new AppError("Ghế đã hết thời gian giữ", 400);
+    }
     const amount = booking.finalAmount || booking.totalAmount;
 
     if (!amount || amount <= 0) {
@@ -41,16 +49,26 @@ export const paymentService = {
       `💰 Creating payment for booking ${bookingId}, amount: ${amount}`,
     );
 
+    const existedPayment = await Payment.findOne({
+      bookingId,
+      status: { $in: ["pending", "paying"] },
+      paymentMethod: method,
+      // createdAt: { $gte: new Date(Date.now() - 15 * 60 * 1000) },
+    });
+
+    if (existedPayment && existedPayment.paymentUrl) {
+      return existedPayment.paymentUrl;
+    }
+
     // tạo record payment
     const payment = await Payment.create({
       bookingId: booking._id,
       userId: booking.userId,
       finalAmount: amount,
       paymentMethod: method,
-      status: "pending",
+      status: "paying",
     });
 
-    // lấy gateway
     let gateway;
 
     try {
@@ -59,12 +77,14 @@ export const paymentService = {
       throw new AppError("Phương thức thanh toán không được hỗ trợ", 400);
     }
 
-    // tạo url thanh toán
     const paymentUrl = await gateway.createUrl(
       payment._id.toString(),
       amount,
       ipAddr,
     );
+
+    payment.paymentUrl = paymentUrl;
+    await payment.save();
 
     return paymentUrl;
   },
@@ -96,7 +116,10 @@ export const paymentService = {
         };
       }
 
-      const amount = Number(data.vnp_Amount) / 100;
+      const amount =
+        method === "vnpay"
+          ? Number(data.vnp_Amount) / 100
+          : Number(data.amount || 0);
 
       if (amount !== payment.finalAmount) {
         return {
@@ -137,7 +160,7 @@ export const paymentService = {
       await payment.save();
       return {
         code: result.code,
-        bookingId: result.paymentId,
+        paymentId: result.paymentId,
         transactionNo: result.transactionNo,
       };
     } catch (error) {

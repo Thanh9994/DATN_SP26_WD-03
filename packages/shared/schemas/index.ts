@@ -4,7 +4,7 @@ export const RoomType = z.enum(["2D", "3D", "IMAX", "4DX"]);
 export const SeatType = z.enum(["normal", "vip", "couple"]);
 export const MovieStatus = z.enum(["sap_chieu", "dang_chieu", "ngung_chieu"]);
 export const AgeRating = z.enum(["P", "C13", "C16", "C18"]);
-export const UserRole = z.enum(["admin", "nhan_vien", "khach_hang"]);
+export const UserRole = z.enum(["admin", "manager", "khach_hang"]);
 export const UserStatus = z.enum(["active", "inactive", "banned"]);
 export const SeatsStatus = z.enum(["empty", "booked", "hold", "fix"]); // "trống", Đã đặt, giữ ghế, sửa ghế
 export const BookingStatus = z.enum([
@@ -13,7 +13,7 @@ export const BookingStatus = z.enum([
   "cancelled", //Đã hủy
   "expired", //Hết hạn thanh toán và reset trạng thái
 ]);
-export const PaymentStatus = z.enum(["pending", "success", "failed"]);
+export const PaymentStatus = z.enum(["pending", "paying", "success", "failed"]);
 export const ShowTimeStatus = z.enum([
   "upcoming", //Sắp diễn ra
   "ongoing", //Đang chiếu
@@ -203,7 +203,7 @@ export const Booking = Base.extend({
   paymentMethod: PaymentMethod.default("vnpay"),
   paymentId: z.string().optional(),
   transactionCode: z.string().optional(),
-
+  holdToken: z.string(),
   holdExpiresAt: z.coerce.date(),
   ticketCode: z.string().optional(),
 });
@@ -309,6 +309,7 @@ export const Register = z.object({
 export const AuthResponse = z.object({
   user: User,
   token: z.string(),
+  remember: z.boolean().optional(),
 });
 
 export type IPopulatedShowTime = Omit<IShowTime, "roomId" | "movieId"> & {

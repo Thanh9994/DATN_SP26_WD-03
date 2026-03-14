@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { API } from "@web/api/api.service";
-import { axiosAuth } from "./useAuth";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { API } from '@web/api/api.service';
+import { axiosAuth } from './useAuth';
 
 export const useBooking = (showTimeId?: string) => {
   const queryClient = useQueryClient();
@@ -12,15 +12,15 @@ export const useBooking = (showTimeId?: string) => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["showtime-detail", showTimeId],
+    queryKey: ['showtime-detail', showTimeId],
     queryFn: async () => {
       if (!showTimeId) return null;
       const res = await axiosAuth.get(`${API.SHOWTIME}/${showTimeId}`);
       return res.data;
     },
     enabled: !!showTimeId,
-    staleTime: 5000,
-    refetchInterval: false,
+    refetchInterval: 10000,
+    refetchOnWindowFocus: true,
   });
 
   const holdSeats = useMutation({
@@ -30,23 +30,32 @@ export const useBooking = (showTimeId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["showtime-detail", showTimeId],
+        queryKey: ['showtime-detail', showTimeId],
       });
     },
   });
 
   const createPaymentUrl = useMutation({
-    mutationFn: async (bookingId: string) => {
-      const res = await axiosAuth.post(`${API.PAYMENT_GATEWAY}/vnpay/create`, {
+    mutationFn: async ({
+      bookingId,
+      holdToken,
+      method,
+    }: {
+      bookingId: string;
+      holdToken: string;
+      method: string;
+    }) => {
+      const res = await axiosAuth.post(`${API.PAYMENT_GATEWAY}/${method}/create`, {
         bookingId,
+        holdToken,
       });
-
+      console.log('PAYMENT RESPONSE', res.data.data);
       return res.data.data; // chỉ trả link
     },
   });
 
   const { data: pendingBooking } = useQuery({
-    queryKey: ["pending-booking", showTimeId],
+    queryKey: ['pending-booking', showTimeId],
     queryFn: async () => {
       if (!showTimeId) return null;
       const res = await axiosAuth.get(`${API.BOOKING}/pending/${showTimeId}`);
@@ -57,31 +66,37 @@ export const useBooking = (showTimeId?: string) => {
   });
 
   const cancelBooking = useMutation({
-    mutationFn: async (bookingId: string) => {
-      const res = await axiosAuth.post(`${API.BOOKING}/cancel`, { bookingId });
+    mutationFn: async ({ bookingId, holdToken }: { bookingId: string; holdToken: string }) => {
+      const res = await axiosAuth.post(`${API.BOOKING}/cancel`, {
+        bookingId,
+        holdToken,
+      });
       return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["showtime-detail", showTimeId],
+        queryKey: ['showtime-detail', showTimeId],
       });
       queryClient.invalidateQueries({
-        queryKey: ["pending-booking", showTimeId],
+        queryKey: ['pending-booking', showTimeId],
       });
     },
   });
 
   const expireBooking = useMutation({
-    mutationFn: async (bookingId: string) => {
-      const res = await axiosAuth.post(`${API.BOOKING}/expire`, { bookingId });
+    mutationFn: async ({ bookingId, holdToken }: { bookingId: string; holdToken: string }) => {
+      const res = await axiosAuth.post(`${API.BOOKING}/expire`, {
+        bookingId,
+        holdToken,
+      });
       return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["showtime-detail", showTimeId],
+        queryKey: ['showtime-detail', showTimeId],
       });
       queryClient.invalidateQueries({
-        queryKey: ["pending-booking", showTimeId],
+        queryKey: ['pending-booking', showTimeId],
       });
     },
   });
@@ -107,4 +122,17 @@ export const useBooking = (showTimeId?: string) => {
 
     refreshSeats: refetch,
   };
+};
+
+export const useMyBookings = (status: string = 'paid') => {
+  return useQuery({
+    queryKey: ['my-bookings', status],
+    queryFn: async () => {
+      const res = await axiosAuth.get(`${API.BOOKING}/my`, {
+        params: { status },
+      });
+      return res.data.data || [];
+    },
+    staleTime: 1000 * 60,
+  });
 };

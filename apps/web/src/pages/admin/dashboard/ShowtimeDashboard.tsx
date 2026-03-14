@@ -1,35 +1,79 @@
 import React, { useState } from "react";
-import { Card, DatePicker, Space, Typography, Row, Col } from "antd";
+import { Card, DatePicker, Space, Typography, Row, Col, Progress } from "antd";
 import dayjs from "dayjs";
-import { useDashboardShowTimes } from "@web/hooks/useShowTime";
-import { useSeatsByShowtime, useCalculateSeatStats } from "@web/hooks/useSeat";
+import {
+  useDashboardShowTimes,
+  useShowTimeCountByMonth,
+  useShowTimeCountByYear,
+} from "@web/hooks/useShowTime";
+import { useSeatStats } from "@web/hooks/useSeat";
+import { Armchair, Clock, MapPin, Monitor, Users } from "lucide-react";
 
 const { Text } = Typography;
 
 const ShowtimeCard: React.FC<{ showtime: any }> = ({ showtime }) => {
-  const { data: seats } = useSeatsByShowtime(showtime._id);
-  const totalSeats = showtime.roomId?.rows?.reduce((sum: number, row: any) => sum + row.seats, 0) || 0;
-  const stats = useCalculateSeatStats(seats, totalSeats);
+  const { data: seatStats } = useSeatStats(showtime._id);
+  const stats = {
+    availableSeats: seatStats?.available ?? 0,
+    bookedSeats: seatStats?.booked ?? 0,
+    total: (seatStats?.available ?? 0) + (seatStats?.booked ?? 0),
+  };
 
+  const percentBooked =
+    stats.total > 0 ? Math.round((stats.bookedSeats / stats.total) * 100) : 0;
   return (
     <Card
       size="small"
       className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow"
     >
       <div className="space-y-2">
-        <Text strong className="text-base block">
+        <Text strong className="text-lg block truncate ">
           {showtime.movieId?.ten_phim || "Phim không xác định"}
         </Text>
-        <div className="text-sm text-gray-600">
-          <div>🎬 {showtime.roomId?.ten_phong || "N/A"}</div>
-          <div>🏢 {showtime.roomId?.cinema_id?.name || "N/A"}</div>
-          <div className="font-semibold text-blue-600">
-            ⏰ {dayjs(showtime.startTime).format("HH:mm")} - {dayjs(showtime.endTime).format("HH:mm")}
+
+        <div className="space-y-1.5 text-sm ">
+          <div className="flex items-center gap-2">
+            <Monitor size={14} />
+            <span>{showtime.roomId?.ten_phong || "N/A"}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <MapPin size={14} />
+            <span className="truncate">
+              {showtime.roomId?.cinema_id?.name || "N/A"}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 font-medium text-blue-600 bg-blue-50 w-fit px-2 py-0.5 rounded">
+            <Clock size={14} />
+            <span>
+              {dayjs(showtime.startTime).format("HH:mm")} -{" "}
+              {dayjs(showtime.endTime).format("HH:mm")}
+            </span>
           </div>
         </div>
-        <div className="pt-2 border-t flex justify-between text-xs">
-          <span className="text-green-600">✓ Còn: {stats.availableSeats}</span>
-          <span className="text-red-600">✗ Đã đặt: {stats.bookedSeats}</span>
+        <div className="space-y-1">
+          <div className="flex justify-between text-[10px]  uppercase font-bold">
+            <span>Tỷ lệ đặt vé</span>
+            <span>{percentBooked}%</span>
+          </div>
+          <Progress
+            percent={percentBooked}
+            size="small"
+            showInfo={false}
+            strokeColor={percentBooked > 80 ? "#f43f5e" : "#3b82f6"} // Đỏ nếu gần đầy, xanh nếu bình thường
+          />
+        </div>
+
+        <div className="pt-3 border-t grid grid-cols-2 gap-2 text-[11px] font-medium justify-center">
+          <div className="flex items-center gap-1 text-emerald-600">
+            <Armchair size={16} />
+            <span>Còn: {stats.availableSeats}</span>
+          </div>
+          <div className="flex items-center gap-1 text-rose-500 justify-end">
+            <Users size={16} />
+            <span>Đã đặt: {stats.bookedSeats}</span>
+          </div>
         </div>
       </div>
     </Card>
@@ -41,6 +85,11 @@ export const ShowTimeDashboard: React.FC = () => {
   const { data: showtimes, isLoading } = useDashboardShowTimes(
     selectedDate.format("YYYY-MM-DD"),
   );
+  const monthCount = useShowTimeCountByMonth(
+    selectedDate.month() + 1,
+    selectedDate.year(),
+  );
+  const yearCount = useShowTimeCountByYear(selectedDate.year());
 
   return (
     <div className="p-4">
@@ -83,10 +132,18 @@ export const ShowTimeDashboard: React.FC = () => {
         </Row>
       </Card>
 
-      <div className="mt-4 grid grid-cols-3 gap-4">
-        <Card className="bg-blue-50">
+      <div className="mt-4 grid grid-cols-3 gap-4 w-1/2">
+        <Card className="bg-blue-100">
           <Text type="secondary">Tổng suất chiếu</Text>
           <div className="text-2xl font-bold">{showtimes?.length || 0}</div>
+        </Card>
+        <Card className="bg-blue-100">
+          <Text type="secondary">Tổng suất chiếu tháng</Text>
+          <div className="text-2xl font-bold">{monthCount.data ?? 0}</div>
+        </Card>
+        <Card className="bg-blue-100">
+          <Text type="secondary">Tổng suất chiếu năm</Text>
+          <div className="text-2xl font-bold">{yearCount.data ?? 0}</div>
         </Card>
       </div>
     </div>
