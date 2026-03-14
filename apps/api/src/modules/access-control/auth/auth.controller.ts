@@ -1,18 +1,18 @@
-import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-import nodemailer from 'nodemailer';
-import Jwt from 'jsonwebtoken';
-import { User } from '../user/user.model';
-import { AppError } from '@api/middlewares/error.middleware';
-import { catchAsync } from '@api/utils/catchAsync';
+import { Request, Response } from "express";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import nodemailer from "nodemailer";
+import Jwt from "jsonwebtoken";
+import { User } from "../user/user.model";
+import { AppError } from "@api/middlewares/error.middleware";
+import { catchAsync } from "@api/utils/catchAsync";
 
 export const Register = catchAsync(async (req, res) => {
   const { email, password, ho_ten, phone } = req.body;
 
   const exitingUser = await User.findOne({ email });
   if (exitingUser) {
-    throw new AppError('Email đã tồn tại', 400);
+    throw new AppError("Email đã tồn tại", 400);
   }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
