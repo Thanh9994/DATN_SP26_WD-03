@@ -1,49 +1,48 @@
-
 const cities = [
-  { name: "Metropolis", cinemas: 12, active: true },
-  { name: "Gotham City", cinemas: 8, active: false },
-  { name: "Star City", cinemas: 5, active: false },
-  { name: "Central City", cinemas: 9, active: false },
-  { name: "Coast City", cinemas: 4, active: false },
+  { name: 'Metropolis', cinemas: 12, active: true },
+  { name: 'Gotham City', cinemas: 8, active: false },
+  { name: 'Star City', cinemas: 5, active: false },
+  { name: 'Central City', cinemas: 9, active: false },
+  { name: 'Coast City', cinemas: 4, active: false },
 ];
 
 const cinemas = [
   {
-    name: "CineStream Grand Plaza",
-    address: "123 Luxury Avenue, Metropolis Downtown, 54001",
-    distance: "1.2 KM",
-    price: "$14.00",
+    name: 'CineStream Grand Plaza',
+    address: '123 Luxury Avenue, Metropolis Downtown, 54001',
+    distance: '1.2 KM',
+    price: '$14.00',
     featured: true,
     image:
-      "https://images.unsplash.com/photo-1560109947-543149eceb16?auto=format&fit=crop&w=800&q=80",
-    amenities: ["🏠", "🎯", "🛋️"],
+      'https://images.unsplash.com/photo-1560109947-543149eceb16?auto=format&fit=crop&w=800&q=80',
+    amenities: ['🏠', '🎯', '🛋️'],
     highlight: true,
   },
   {
-    name: "CineStream Northside Hub",
-    address: "456 Skyline Blvd, Metropolis North, 54005",
-    distance: "4.8 KM",
-    price: "$12.50",
+    name: 'CineStream Northside Hub',
+    address: '456 Skyline Blvd, Metropolis North, 54005',
+    distance: '4.8 KM',
+    price: '$12.50',
     featured: false,
     image:
-      "https://images.unsplash.com/photo-1513106580091-1d82408b8cd6?auto=format&fit=crop&w=800&q=80",
-    amenities: ["🎯", "🛋️"],
+      'https://images.unsplash.com/photo-1513106580091-1d82408b8cd6?auto=format&fit=crop&w=800&q=80',
+    amenities: ['🎯', '🛋️'],
     highlight: false,
   },
   {
-    name: "CineStream Boutique - Old Town",
-    address: "88 Heritage Square, Metropolis Old Quarter, 54002",
-    distance: "2.5 KM",
-    price: "$18.00",
+    name: 'CineStream Boutique - Old Town',
+    address: '88 Heritage Square, Metropolis Old Quarter, 54002',
+    distance: '2.5 KM',
+    price: '$18.00',
     featured: false,
     image:
-      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80",
-    amenities: ["🛋️", "🍴"],
+      'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80',
+    amenities: ['🛋️', '🍴'],
     highlight: false,
   },
 ];
 
-const filterTabs = ["ALL", "IMAX", "4DX", "VIP"];
+const filterTabs = ['ALL', 'IMAX', '4DX', 'VIP'];
 
 export default function Cinemas() {
   return (
@@ -62,32 +61,28 @@ export default function Cinemas() {
                 key={city.name}
                 className={`group flex w-full items-center justify-between rounded-full border px-5 py-4 text-left transition-all ${
                   city.active
-                    ? "border-red-500 bg-red-500 shadow-[0_0_30px_rgba(255,59,59,0.35)]"
-                    : "border-transparent bg-transparent hover:bg-white/5"
+                    ? 'border-red-500 bg-red-500 shadow-[0_0_30px_rgba(255,59,59,0.35)]'
+                    : 'border-transparent bg-transparent hover:bg-white/5'
                 }`}
               >
                 <div className="flex items-center gap-4">
                   <div
                     className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                      city.active ? "bg-white/10" : "bg-white/5"
+                      city.active ? 'bg-white/10' : 'bg-white/5'
                     }`}
                   >
                     <span className="text-lg">📍</span>
                   </div>
                   <div>
                     <div className="text-xl font-semibold">{city.name}</div>
-                    <div
-                      className={`text-sm ${
-                        city.active ? "text-white/80" : "text-white/40"
-                      }`}
-                    >
+                    <div className={`text-sm ${city.active ? 'text-white/80' : 'text-white/40'}`}>
                       {city.cinemas} Premium Cinemas
                     </div>
                   </div>
                 </div>
                 <span
                   className={`text-xl transition ${
-                    city.active ? "text-white" : "text-white/30 group-hover:text-white/60"
+                    city.active ? 'text-white' : 'text-white/30 group-hover:text-white/60'
                   }`}
                 >
                   ›
@@ -123,8 +118,8 @@ export default function Cinemas() {
                   key={tab}
                   className={`rounded-full border px-6 py-3 text-sm font-bold tracking-wide transition ${
                     index === 0
-                      ? "border-red-500 bg-red-500 text-white shadow-[0_0_25px_rgba(255,59,59,0.35)]"
-                      : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+                      ? 'border-red-500 bg-red-500 text-white shadow-[0_0_25px_rgba(255,59,59,0.35)]'
+                      : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
                   }`}
                 >
                   {tab}
@@ -190,8 +185,8 @@ export default function Cinemas() {
                   <button
                     className={`rounded-full px-8 py-4 text-lg font-extrabold transition ${
                       cinema.highlight
-                        ? "bg-red-500 text-white shadow-[0_0_30px_rgba(255,59,59,0.35)] hover:bg-red-400"
-                        : "border border-white/10 bg-white/5 text-white/90 hover:bg-white/10"
+                        ? 'bg-red-500 text-white shadow-[0_0_30px_rgba(255,59,59,0.35)] hover:bg-red-400'
+                        : 'border border-white/10 bg-white/5 text-white/90 hover:bg-white/10'
                     }`}
                   >
                     VIEW DETAILS →
@@ -204,12 +199,9 @@ export default function Cinemas() {
           {/* Map CTA */}
           <div className="mt-10 grid gap-8 rounded-[36px] border border-white/10 bg-white/[0.03] p-8 md:grid-cols-[1.4fr_320px] md:items-center">
             <div>
-              <h2 className="text-4xl font-black uppercase tracking-tight">
-                Prefer a map view?
-              </h2>
+              <h2 className="text-4xl font-black uppercase tracking-tight">Prefer a map view?</h2>
               <p className="mt-4 max-w-[620px] text-xl leading-relaxed text-white/45">
-                See all locations on an interactive map for easy navigation and
-                real-time updates.
+                See all locations on an interactive map for easy navigation and real-time updates.
               </p>
 
               <button className="mt-8 rounded-full bg-white px-8 py-5 text-base font-extrabold tracking-widest text-black transition hover:scale-[1.02]">
@@ -232,8 +224,4 @@ export default function Cinemas() {
       </div>
     </div>
   );
-};
-<<<<<<< HEAD
-=======
- 
->>>>>>> bb5300ae1a8dad0baf4acd9cc6e0228be757c859
+}
