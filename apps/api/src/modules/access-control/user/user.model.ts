@@ -1,5 +1,5 @@
-import { IUser, UserRole, UserStatus } from "@shared/schemas";
-import mongoose from "mongoose";
+import { IUser, UserRole, UserStatus } from '@shared/schemas';
+import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema(
   {
@@ -22,22 +22,23 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: UserRole.options,
-      default: "khach_hang",
+      default: 'khach_hang',
     },
     trang_thai: {
       type: String,
       enum: UserStatus.options,
-      default: "active",
+      default: 'inactive',
     },
-    isVerified: {
-      type: Boolean,
-      default: false,
+    isVerified: { type: Boolean, default: false },
+    otpCode: {
+      type: String,
     },
-    emailVerifyToken: String,
-    emailVerifyExpire: Date,
+    otpExpire: {
+      type: Date,
+    },
   },
 
   { timestamps: true },
 );
 
-export const User = mongoose.model<IUser>("User", userSchema);
+export const User = mongoose.model<IUser>('User', userSchema);
