@@ -22,6 +22,7 @@ export const User = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<IUser | null>(null);
   const [form] = Form.useForm();
+  type IUserWithBookingCount = IUser & { bookingCount?: number };
 
   const handleEdit = (record: IUser) => {
     setEditingUser(record);
@@ -82,6 +83,14 @@ export const User = () => {
           {status === 'active' ? 'Hoạt động' : 'Khóa'}
         </Tag>
       ),
+    },
+    {
+      title: 'Số vé đã đặt',
+      dataIndex: 'bookingCount',
+      key: 'bookingCount',
+      sorter: (a: IUserWithBookingCount, b: IUserWithBookingCount) =>
+        (a.bookingCount ?? 0) - (b.bookingCount ?? 0),
+      render: (count?: number) => count ?? 0,
     },
   ];
   if (user?.role === 'admin') {

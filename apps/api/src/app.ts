@@ -6,6 +6,7 @@ import catalogRouter from "./modules/cinema-catalog";
 import accessRouter from "./modules/access-control";
 import contentRouter from "./modules/movie-content";
 import orderRouter from "./modules/sales-operations";
+import adminDashboardRouter from "./modules/admin-dashboard";
 import { globalErrorHandler } from "./middlewares/error.middleware";
 import paymentRouter from "./modules/sales-operations/payments/payment.route";
 import chatbotRoute from "./modules/chatbot/chatbot.route";
@@ -35,6 +36,7 @@ api.use("/access", accessRouter);
 api.use("/catalog", catalogRouter);
 api.use("/content", contentRouter);
 api.use("/order", orderRouter);
+api.use("/admin", adminDashboardRouter);
 api.use("/chatbot", chatbotRoute);
 
 app.use("/api", api);

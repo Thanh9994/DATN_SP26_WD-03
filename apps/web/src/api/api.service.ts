@@ -3,6 +3,7 @@
   export const API = {
     AUTH: `${API_URL}/access/auth`,
     USERS: `${API_URL}/access/users`,
+    ADMIN_DASHBOARD: `${API_URL}/admin`,
     CINEMAS: `${API_URL}/catalog/cinemas`,
     ROOMS: `${API_URL}/catalog/rooms`,
     UPLOADS: `${API_URL}/uploads`,

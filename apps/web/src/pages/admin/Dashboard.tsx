@@ -2,7 +2,7 @@ import { ShowTimeDashboard } from "./dashboard/ShowtimeDashboard";
 
 export const Dashboard = () => {
   return (
-    <div>
+    <div className="space-y-4">
       <ShowTimeDashboard />
     </div>
   );

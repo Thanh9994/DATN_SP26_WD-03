@@ -1,19 +1,20 @@
+import { CleanupLog } from '@api/modules/admin-dashboard/dashboard.model';
 import { SeatTime } from '@api/modules/cinema-catalog/showtime/showtimeSeat.model';
 import { Booking } from '@api/modules/sales-operations/booking/booking.model';
+import { Payment } from '@api/modules/sales-operations/payments/payment.model';
 import mongoose from 'mongoose';
 import cron from 'node-cron';
 
 let isProcessing = false;
 export const initBookingCron = () => {
-  // Chạy mỗi phút 30 sec lần
-  cron.schedule('*/30 * * * *', async () => {
+  // Chạy mỗi 30 giây
+  cron.schedule('*/30 * * * * *', async () => {
     const session = await mongoose.startSession();
     if (isProcessing) return;
     isProcessing = true;
     try {
       session.startTransaction();
       const now = new Date();
-      // Sử dụng field holdExpiresAt để đồng bộ với logic giữ ghế
       const expiredBookings = await Booking.find({
         status: 'pending',
         holdExpiresAt: { $lt: now },
@@ -31,7 +32,6 @@ export const initBookingCron = () => {
           { session },
         );
 
-        // 3. Giải phóng chính xác những ghế thuộc về các đơn hàng này
         await SeatTime.updateMany(
           {
             _id: { $in: allSeatIds },
@@ -60,7 +60,6 @@ export const initBookingCron = () => {
   });
 
   //"Xóa booking đã hủy/hết hạn sau 2 ngày"
-  // Cleanup expired/cancelled bookings older than 2 days
   cron.schedule('0 * * * *', async () => {
     const session = await mongoose.startSession();
     if (isProcessing) return;
@@ -69,14 +68,20 @@ export const initBookingCron = () => {
       session.startTransaction();
       const cutoff = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
-      const oldBookings = await Booking.find({
-        status: { $in: ['expired', 'cancelled'] },
+      const expiredBookings = await Booking.find({
+        status: 'expired',
         updatedAt: { $lt: cutoff },
       }).session(session);
 
-      if (oldBookings.length > 0) {
-        const bookingIds = oldBookings.map((b) => b._id);
-        const allSeatIds = oldBookings.flatMap((b) => b.seats);
+      const cancelledBookings = await Booking.find({
+        status: 'cancelled',
+        updatedAt: { $lt: cutoff },
+      }).session(session);
+
+      const allBookings = [...expiredBookings, ...cancelledBookings];
+      if (allBookings.length > 0) {
+        const bookingIds = allBookings.map((b) => b._id);
+        const allSeatIds = allBookings.flatMap((b) => b.seats);
 
         await SeatTime.updateMany(
           {
@@ -94,8 +99,37 @@ export const initBookingCron = () => {
         await Booking.deleteMany({ _id: { $in: bookingIds } }, { session });
 
         console.log(
-          `[Cron]: Đã xóa ${bookingIds.length} đơn hàng hết hạn (expired/cancelled) đã hủy quá 2 ngày.`,
+          `[Cron]: Đã xóa ${expiredBookings.length} expired, ${cancelledBookings.length} cancelled quá 2 ngày.`,
         );
+        await CleanupLog.create({
+          type: 'booking',
+          details: {
+            expired: expiredBookings.length,
+            cancelled: cancelledBookings.length,
+          },
+        });
+      }
+
+      // --- Payment cleanup ---
+      const failedPayments = await Payment.find({
+        status: 'failed',
+        updatedAt: { $lt: cutoff },
+      }).session(session);
+
+      if (failedPayments.length > 0) {
+        const paymentIds = failedPayments.map((p) => p._id);
+
+        await Payment.deleteMany({ _id: { $in: paymentIds } }, { session });
+
+        console.log(
+          `[Cron]: Đã xóa ${failedPayments.length} failed payments quá 2 ngày.`,
+        );
+        await CleanupLog.create({
+          type: 'payment',
+          details: {
+            failed: failedPayments.length,
+          },
+        });
       }
 
       await session.commitTransaction();
