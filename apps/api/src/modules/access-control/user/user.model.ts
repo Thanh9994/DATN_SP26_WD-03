@@ -29,7 +29,14 @@ const userSchema = new mongoose.Schema(
       enum: UserStatus.options,
       default: "active",
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerifyToken: String,
+    emailVerifyExpire: Date,
   },
+
   { timestamps: true },
 );
 
