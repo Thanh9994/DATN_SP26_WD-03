@@ -56,7 +56,7 @@ export const paymentService = {
       // createdAt: { $gte: new Date(Date.now() - 15 * 60 * 1000) },
     });
 
-    if (existedPayment) {
+    if (existedPayment && existedPayment.paymentUrl) {
       return existedPayment.paymentUrl;
     }
 
@@ -116,7 +116,10 @@ export const paymentService = {
         };
       }
 
-      const amount = Number(data.vnp_Amount) / 100;
+      const amount =
+        method === "vnpay"
+          ? Number(data.vnp_Amount) / 100
+          : Number(data.amount || 0);
 
       if (amount !== payment.finalAmount) {
         return {
@@ -157,7 +160,7 @@ export const paymentService = {
       await payment.save();
       return {
         code: result.code,
-        bookingId: result.paymentId,
+        paymentId: result.paymentId,
         transactionNo: result.transactionNo,
       };
     } catch (error) {

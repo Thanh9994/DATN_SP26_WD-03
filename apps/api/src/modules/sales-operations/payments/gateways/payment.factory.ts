@@ -1,10 +1,12 @@
 import { PaymentGateway } from "../interfaces/payment-gateway.interface";
+import { MomoGateway } from "./momo.gateway";
 import { VnpayGateway } from "./vnpay.gateway";
 import { AppError } from "@api/middlewares/error.middleware";
 
 export class PaymentFactory {
   private static gateways: Record<string, new () => PaymentGateway> = {
     vnpay: VnpayGateway,
+    momo: MomoGateway,
   };
 
   static getGateway(method: string): PaymentGateway {

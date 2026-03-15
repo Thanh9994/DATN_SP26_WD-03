@@ -1,5 +1,6 @@
 import { NotFound } from "@web/components/tools/NotFound";
 import { RouteObject } from "react-router-dom";
+import { NotFound } from '@web/components/tools/NotFound';
 
 // Public
 import { Home } from "@web/pages/clients/public/Home";
@@ -49,9 +50,42 @@ import PaymentDeclined from "@web/pages/clients/payments/PaymentDeclined";
 
 // Services
 import RequireAuth from "@web/services/RequieAuth";
+import { Home } from '@web/pages/clients/public/Home';
+import About from '@web/pages/clients/public/About';
+import Event from '@web/pages/clients/public/Event';
+import News from '@web/pages/clients/public/News';
+import { ClientLayout } from '@web/layouts/ClientLayout';
+import ForgotPassword from '@web/pages/clients/auth/ForgotPassword';
+import Login from '@web/pages/clients/auth/Login';
+import SeatBooking from '@web/pages/clients/booking/SeatBooking';
+import Showtime from '@web/pages/clients/booking/ShowTime';
+import { RouteObject } from 'react-router-dom';
+import MovieDetail from '@web/pages/clients/MovieDetail';
+import BookingLayout from '@web/layouts/BookingLayout';
+import { BookingCinema } from '@web/pages/clients/booking/BookingCinema';
+import { ProfileLayout } from '@web/layouts/ProfileLayout';
+import { ProfileInfo } from '@web/components/authProfile/ProfileInfo';
+import { Setting } from '@web/components/authProfile/Setting';
+import Cinemas from '@web/pages/Cinemas';
+import MyBooking from '@web/components/authProfile/MyBooking';
+import DrinkSnack from '@web/pages/DrinkSnack';
+import RecommentDrinkSnack from '@web/pages/RecommentDrinkSnack';
+import MovieList from '@web/pages/clients/MovieList';
+import NewsDetail from '@web/pages/clients/NewDetail';
+import RequireAuth from '@web/services/RequieAuth';
+import ResetPassword from '@web/pages/clients/auth/ResetPassword';
+import { PaymentResult } from '@web/pages/clients/payments/PaymentResult';
+import CinemaDetail from '@web/pages/CinemaDetail';
+import Contact from '@web/pages/clients/public/Contact';
+
+import PaymentsMethod from '@web/pages/clients/payments/PaymentMethod';
+import { PaymentFailed } from '@web/pages/clients/payments/PaymentFailed';
+import { PaymentSuccess } from '@web/pages/clients/payments/PaymentSuccess';
+import Ticket from '@web/pages/Ticket';
+import Register from '@web/pages/clients/auth/Register';
 
 export const ClientRoutes: RouteObject = {
-  path: "/",
+  path: '/',
   element: <ClientLayout />,
   children: [
     // Public routes
@@ -65,26 +99,33 @@ export const ClientRoutes: RouteObject = {
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "reset-password/:token", element: <ResetPassword /> },
+    { path: 'login', element: <Login /> },
+    { path: 'register', element: <Register /> },
+    { path: 'forgot-password', element: <ForgotPassword /> },
+    { path: 'reset-password/:token', element: <ResetPassword /> },
 
     // Profile routes
     {
-      path: "profile",
+      path: 'profile',
       element: <ProfileLayout />,
       children: [
         { index: true, element: <ProfileInfo /> },
-        { path: "info", element: <ProfileInfo /> },
-        { path: "settings", element: <Setting /> },
-        { path: "tickets", element: <MyBooking /> },
-        { path: "payment", element: <div>Phương thức thanh toán</div> },
+        { path: 'info', element: <ProfileInfo /> },
+        { path: 'settings', element: <Setting /> },
+        { path: 'tickets', element: <MyBooking /> },
+        { path: 'payment', element: <div>Phương thức thanh toán</div> },
       ],
     },
 
     // News routes
+    { path: 'about', element: <About /> },
+    { path: 'event', element: <Event /> },
+
     {
-      path: "news",
+      path: 'news',
       children: [
         { index: true, element: <News /> },
-        { path: ":slug", element: <NewsDetail /> },
+        { path: ':slug', element: <NewsDetail /> },
       ],
     },
 
@@ -94,13 +135,16 @@ export const ClientRoutes: RouteObject = {
     { path: "movie/:id", element: <MovieDetail /> },
 
     // Booking routes
+    { path: 'cinema', element: <Cinemas /> },
+    { path: 'movielist', element: <MovieList /> },
+    { path: 'cinemadetail/:id', element: <CinemaDetail /> },
     {
-      path: "booking",
+      path: 'booking',
       element: <BookingLayout />,
       children: [
         { index: true, element: <BookingCinema /> },
         {
-          path: "seats",
+          path: 'seats',
           element: (
             <RequireAuth>
               <SeatBooking />
@@ -115,10 +159,16 @@ export const ClientRoutes: RouteObject = {
     // Food & Drinks
     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
+    { path: 'movie/:id', element: <MovieDetail /> },
+    { path: 'showtime', element: <Showtime /> },
+    { path: 'foods', element: <DrinkSnack /> },
+    { path: 'recommendfoods', element: <RecommentDrinkSnack /> },
 
     // Payment routes - Tổ chức lại
     {
       path: "payments",
+      path: 'payments',
+      element: <PaymentsMethod />,
       children: [
         { index: true, element: <PaymentMethod /> },
         { path: "method", element: <PaymentMethod /> },
@@ -126,6 +176,9 @@ export const ClientRoutes: RouteObject = {
         { path: "success", element: <PaymentSuccess /> },
         { path: "failed", element: <PaymentFailed /> },
         { path: "declined", element: <PaymentDeclined /> },
+        { path: 'failed', element: <PaymentFailed /> },
+        { path: 'success', element: <PaymentSuccess /> },
+        { path: 'result', element: <PaymentResult /> },
       ],
     },
 
@@ -134,5 +187,9 @@ export const ClientRoutes: RouteObject = {
 
     // 404
     { path: "*", element: <NotFound /> },
+    { path: 'payment-result', element: <PaymentResult /> },
+    { path: 'ticket', element: <Ticket /> },
+    { path: 'contact', element: <Contact /> },
+    { path: '*', element: <NotFound /> },
   ],
 };
