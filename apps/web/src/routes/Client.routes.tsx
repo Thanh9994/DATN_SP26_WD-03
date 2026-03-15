@@ -95,10 +95,7 @@ export const ClientRoutes: RouteObject = {
     { path: "contact", element: <Contact /> },
 
     // Auth routes
-    { path: "login", element: <Login /> },
-    { path: "register", element: <Register /> },
-    { path: "forgot-password", element: <ForgotPassword /> },
-    { path: "reset-password/:token", element: <ResetPassword /> },
+    
     { path: 'login', element: <Login /> },
     { path: 'register', element: <Register /> },
     { path: 'forgot-password', element: <ForgotPassword /> },
@@ -129,12 +126,6 @@ export const ClientRoutes: RouteObject = {
       ],
     },
 
-    // Cinema & Movies
-    { path: "cinema", element: <Cinemas /> },
-    { path: "movielist", element: <MovieList /> },
-    { path: "movie/:id", element: <MovieDetail /> },
-
-    // Booking routes
     { path: 'cinema', element: <Cinemas /> },
     { path: 'movielist', element: <MovieList /> },
     { path: 'cinemadetail/:id', element: <CinemaDetail /> },
@@ -157,8 +148,6 @@ export const ClientRoutes: RouteObject = {
     { path: "showtime", element: <Showtime /> },
 
     // Food & Drinks
-    { path: "foods", element: <DrinkSnack /> },
-    { path: "recommendfoods", element: <RecommentDrinkSnack /> },
     { path: 'movie/:id', element: <MovieDetail /> },
     { path: 'showtime', element: <Showtime /> },
     { path: 'foods', element: <DrinkSnack /> },
@@ -166,27 +155,18 @@ export const ClientRoutes: RouteObject = {
 
     // Payment routes - Tổ chức lại
     {
-      path: "payments",
       path: 'payments',
       element: <PaymentsMethod />,
       children: [
-        { index: true, element: <PaymentMethod /> },
-        { path: "method", element: <PaymentMethod /> },
-        { path: "checkout", element: <Checkout /> },
-        { path: "success", element: <PaymentSuccess /> },
-        { path: "failed", element: <PaymentFailed /> },
-        { path: "declined", element: <PaymentDeclined /> },
         { path: 'failed', element: <PaymentFailed /> },
         { path: 'success', element: <PaymentSuccess /> },
+        { path: "payment-result", element: <PaymentResult /> },
         { path: 'result', element: <PaymentResult /> },
       ],
     },
 
-    // Payment result route riêng (nếu cần)
-    { path: "payment-result", element: <PaymentResult /> },
 
-    // 404
-    { path: "*", element: <NotFound /> },
+
     { path: 'payment-result', element: <PaymentResult /> },
     { path: 'ticket', element: <Ticket /> },
     { path: 'contact', element: <Contact /> },

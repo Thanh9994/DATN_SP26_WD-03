@@ -1,17 +1,17 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "@web/hooks/useAuth";
-import { Spin } from "antd";
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '@web/hooks/useAuth';
+import { Spin } from 'antd';
 
 export const AdminGuard = () => {
   const { user, isLoading } = useAuth();
   if (isLoading)
     return (
-      <div className="h-screen flex items-center justify-center">
+      <div className="flex h-screen items-center justify-center">
         <Spin size="large" />
       </div>
     );
 
-  if (!user || user.role !== "admin") {
+  if (!user || !['admin', 'manager'].includes(user.role)) {
     return <Navigate to="/" replace />;
   }
 
