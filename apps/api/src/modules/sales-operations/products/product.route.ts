@@ -6,7 +6,7 @@ const productRouter = Router();
 productRouter.get("/", getAll);
 productRouter.get("/:id", getOne);
 productRouter.post("/", create);
-productRouter.put("/:id", update); // Thêm route update
+productRouter.put("/:id", update);
 productRouter.delete("/:id", remove);
 
 export default productRouter;

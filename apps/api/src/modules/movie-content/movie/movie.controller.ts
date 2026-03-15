@@ -1,5 +1,5 @@
 import { movieService } from "./movie.service";
-import { calcMovieStatus } from "@api/utils/movie.status";
+import { calcMovieStatus } from "@api/utils/assets/movie.status";
 import { catchAsync } from "@api/utils/catchAsync";
 import { AppError } from "@api/middlewares/error.middleware";
 

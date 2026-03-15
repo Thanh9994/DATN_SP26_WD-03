@@ -25,8 +25,14 @@ export const BookingCinema = () => {
   const [selectedDate, setSelectedDate] = useState<string>(nextDays[0]);
   const [openCinemas, setOpenCinemas] = useState<string | null>(null);
 
-  const { setSelectedShowtime, selectedShowtime, setSelectedSeats } =
-    useOutletContext<any>();
+  const {
+    setSelectedShowtime,
+    selectedShowtime,
+    setSelectedSeats,
+    pendingBooking,
+    cancelBooking,
+    expireBooking,
+  } = useOutletContext<any>();
 
   const activeDate = selectedDate;
 
@@ -49,11 +55,12 @@ export const BookingCinema = () => {
       .map((item: any) => ({
         ...item,
         showtimesInDate: item.showtimes.filter(
-          (st: any) => dayjs(st.startTime).format("YYYY-MM-DD") === activeDate,
+          (st: any) =>
+            dayjs(st.startTime).format("YYYY-MM-DD") === selectedDate,
         ),
       }))
-      .filter((item: any) => item.showtimesInDate.length > 0);
-  }, [groupedByCinema, activeDate]);
+      .filter((item: any) => item.showtimesInDate.length);
+  }, [groupedByCinema, selectedDate]);
 
   if (isLoading)
     return (
@@ -171,7 +178,7 @@ export const BookingCinema = () => {
                         {item.showtimesInDate.map((st: any) => (
                           <button
                             key={st._id}
-                            onClick={() => {
+                            onClick={async () => {
                               if (!user) {
                                 message.warning(
                                   "Vui lòng đăng nhập để tiếp tục!",
@@ -183,6 +190,34 @@ export const BookingCinema = () => {
 
                                 navigate(`/login?redirect=${redirect}`);
                                 return;
+                              }
+
+                              const pendingShowtimeId =
+                                selectedShowtime?._id ||
+                                (typeof pendingBooking?.showTimeId === "string"
+                                  ? pendingBooking?.showTimeId
+                                  : pendingBooking?.showTimeId?._id);
+
+                              if (
+                                pendingBooking?._id &&
+                                pendingShowtimeId &&
+                                pendingShowtimeId !== st._id
+                              ) {
+                                try {
+                                  if (expireBooking) {
+                                    await expireBooking(pendingBooking._id);
+                                  } else {
+                                    await cancelBooking({
+                                      bookingId: pendingBooking._id,
+                                      holdToken: pendingBooking.holdToken,
+                                    });
+                                  }
+                                } catch (error) {
+                                  console.error(
+                                    "Expire booking failed:",
+                                    error,
+                                  );
+                                }
                               }
 
                               setSelectedShowtime(st);

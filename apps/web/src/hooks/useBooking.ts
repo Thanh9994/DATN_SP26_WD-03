@@ -36,9 +36,16 @@ export const useBooking = (showTimeId?: string) => {
   });
 
   const createPaymentUrl = useMutation({
-    mutationFn: async (bookingId: string) => {
+    mutationFn: async ({
+      bookingId,
+      holdToken,
+    }: {
+      bookingId: string;
+      holdToken: string;
+    }) => {
       const res = await axiosAuth.post(`${API.PAYMENT_GATEWAY}/vnpay/create`, {
         bookingId,
+        holdToken,
       });
 
       return res.data.data; // chỉ trả link
@@ -56,6 +63,54 @@ export const useBooking = (showTimeId?: string) => {
     refetchOnWindowFocus: true,
   });
 
+  const cancelBooking = useMutation({
+    mutationFn: async ({
+      bookingId,
+      holdToken,
+    }: {
+      bookingId: string;
+      holdToken: string;
+    }) => {
+      const res = await axiosAuth.post(`${API.BOOKING}/cancel`, {
+        bookingId,
+        holdToken,
+      });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["showtime-detail", showTimeId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["pending-booking", showTimeId],
+      });
+    },
+  });
+
+  const expireBooking = useMutation({
+    mutationFn: async ({
+      bookingId,
+      holdToken,
+    }: {
+      bookingId: string;
+      holdToken: string;
+    }) => {
+      const res = await axiosAuth.post(`${API.BOOKING}/expire`, {
+        bookingId,
+        holdToken,
+      });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["showtime-detail", showTimeId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["pending-booking", showTimeId],
+      });
+    },
+  });
+
   return {
     pendingBooking,
     showTime: bookingData?.showTime,
@@ -69,6 +124,25 @@ export const useBooking = (showTimeId?: string) => {
     createPaymentUrl: createPaymentUrl.mutateAsync,
     isCreatingPayment: createPaymentUrl.isPending,
 
+    cancelBooking: cancelBooking.mutateAsync,
+    isCancelling: cancelBooking.isPending,
+
+    expireBooking: expireBooking.mutateAsync,
+    isExpiring: expireBooking.isPending,
+
     refreshSeats: refetch,
   };
+};
+
+export const useMyBookings = (status: string = "paid") => {
+  return useQuery({
+    queryKey: ["my-bookings", status],
+    queryFn: async () => {
+      const res = await axiosAuth.get(`${API.BOOKING}/my`, {
+        params: { status },
+      });
+      return res.data.data || [];
+    },
+    staleTime: 1000 * 60,
+  });
 };

@@ -19,7 +19,7 @@ export const PaymentResult = () => {
   useEffect(() => {
     if (bookingId) {
       axios
-        .get(`${API.BOOKING}/${bookingId}`)
+        .get(`${API.BOOKING}/detail/${bookingId}`)
         .then((res) => setBooking(res.data.data))
         .catch((err) => console.error(err))
         .finally(() => setLoading(false));
@@ -30,16 +30,15 @@ export const PaymentResult = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#120d0d] text-white flex items-center justify-center">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      <div className="w-full flex items-center justify-center py-16">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#120d0d] text-white">
-      <main className="mx-auto py-12 px-8 max-w-4xl">
-        <div className="flex flex-col items-center justify-center text-center space-y-8 py-12">
+    <div className="w-full bg-white/5 border border-white/10 rounded-[28px] p-8">
+      <div className="flex flex-col items-center justify-center text-center space-y-8 py-6">
           <div
             className={`w-24 h-24 rounded-full flex items-center justify-center mb-4 ${
               isSuccess
@@ -130,7 +129,6 @@ export const PaymentResult = () => {
             </p>
           )}
         </div>
-      </main>
     </div>
   );
 };

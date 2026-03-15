@@ -9,7 +9,6 @@ export const connectDB = async () => {
     console.log(`🚀 MongoDB connected at ${MONGO_URI}`);
   } catch (error) {
     console.error("❌ MongoDB connection failed", error);
-    // exit or rethrow depending on desired behavior:
     process.exit(1);
   }
 };

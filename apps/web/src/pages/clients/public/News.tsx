@@ -8,8 +8,7 @@ interface NewsPost {
   slug: string;
   title: string;
   summary: string;
-  image?: string;
-  thumbnail?: string;
+  avatar?: string;
   category?: string;
   date?: string;
   author?: string;
@@ -25,13 +24,14 @@ const News = () => {
     },
   });
 
-  if (isLoading)
+  if (isLoading) {
     return (
       <div className="news-loading">
         <div className="spinner"></div>
         <p>Loading news...</p>
       </div>
     );
+  }
 
   const posts: NewsPost[] = data?.data || [];
 
@@ -45,6 +45,7 @@ const News = () => {
 
   const formatDate = (dateString?: string): string => {
     if (!dateString) return "N/A";
+
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString("en-US", {
@@ -59,11 +60,10 @@ const News = () => {
 
   const renderNewsCard = (post: NewsPost) => (
     <Link key={post._id} to={`/news/${post.slug}`} className="news-card">
-      {/* Card Image */}
       <div className="news-image-wrapper">
-        {post.image || post.thumbnail ? (
+        {post.avatar ? (
           <img
-            src={post.image || post.thumbnail}
+            src={post.avatar}
             alt={post.title}
             className="news-image"
             onError={(e) => {
@@ -74,10 +74,10 @@ const News = () => {
         ) : (
           <div className="news-image-placeholder">📰</div>
         )}
+
         {post.category && <div className="news-category">{post.category}</div>}
       </div>
 
-      {/* Card Content */}
       <div className="news-content">
         <h2 className="news-title">{post.title}</h2>
 
@@ -88,16 +88,17 @@ const News = () => {
           }}
         />
 
-        {/* Card Footer */}
         <div className="news-footer">
           <div className="news-meta">
             <span className="news-date">
               📅 {formatDate(post.date || post.createdAt)}
             </span>
+
             {post.author && (
               <span className="news-author">✍️ {post.author}</span>
             )}
           </div>
+
           <div className="news-readmore">Read More →</div>
         </div>
       </div>

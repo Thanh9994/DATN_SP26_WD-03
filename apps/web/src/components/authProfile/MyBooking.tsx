@@ -1,210 +1,185 @@
-import React, { useState } from "react";
-// import "./MyBooking.css";
+import { useMemo, useState } from "react";
+import dayjs from "dayjs";
+import { SearchOutlined } from "@ant-design/icons";
+import { Clock, History, Ticket } from "lucide-react"; // Đổi sang Ticket của Lucide
+import { Input, Select } from "antd";
+import { useNavigate } from "react-router-dom";
+import { useMyBookings } from "@web/hooks/useBooking";
+import BookingTicket from "@web/components/BookingTicket"; // Component nằm ngang
+import { mapToTicketCl, ITicketCl } from "@shared/schemas/ticket";
 
-import "../../styles/MyBooking.css";
-interface BookingCard {
-  id: number;
-  title: string;
-  cinema: string;
-  date: string;
-  time: string;
-  seats: string;
-  image?: string;
-  status?: "CONFIRMED" | "REVIEWED" | "CANCELLED";
-  rating?: number;
-  category?: string;
-}
-
-interface FilterOption {
-  id: string;
-  label: string;
-}
-
-const MyBooking = (): JSX.Element => {
+const MyBooking = () => {
+  const navigate = useNavigate();
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
-  const [selectedGenre, setSelectedGenre] = useState<string>("all");
+  const [search, setSearch] = useState<string>("");
 
-  const monthFilters: FilterOption[] = [
-    { id: "all", label: "All Months" },
-    { id: "current", label: "Current Month" },
-    { id: "last3", label: "Last 3 Months" },
-  ];
+  const { data: rawBookings = [], isLoading } = useMyBookings("paid");
 
-  const genreFilters: FilterOption[] = [
-    { id: "all", label: "All Genres" },
-    { id: "scifi", label: "Sci-Fi" },
-    { id: "action", label: "Action" },
-    { id: "drama", label: "Drama" },
-  ];
+  const mappedBookings: ITicketCl[] = useMemo(() => {
+    const threeMonthsAgo = dayjs().subtract(3, "month");
+    return rawBookings
+      .map((b: any) => mapToTicketCl(b))
+      .filter((ticket: ITicketCl) =>
+        dayjs(ticket.date, "DD/MM/YYYY").isAfter(threeMonthsAgo),
+      );
+  }, [rawBookings]);
 
-  const upcomingBookings: BookingCard[] = [
-    {
-      id: 1,
-      title: "Dune: Part Two",
-      cinema: "IMAX Grand Theater • Screen 4",
-      date: "Fri, Nov 24, 2023",
-      time: "07:30 PM",
-      seats: "JI0, JI1",
-      image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=300&h=400&fit=crop",
-      status: "CONFIRMED",
-      category: "Sci-Fi",
-    },
-  ];
+  // Logic 2: Filter Search/Month
+  const filteredBookings = useMemo(() => {
+    let list = mappedBookings;
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter((b) => b.title.toLowerCase().includes(q));
+    }
+    if (selectedMonth === "current") {
+      list = list.filter((b) =>
+        dayjs(b.date, "DD/MM/YYYY").isSame(dayjs(), "month"),
+      );
+    }
+    return list;
+  }, [mappedBookings, search, selectedMonth]);
 
-  const pastBookings: BookingCard[] = [
-    {
-      id: 2,
-      title: "Oppenheimer",
-      cinema: "Grand Theater • Screen 3",
-      date: "Oct 12, 2023",
-      time: "09:15 PM",
-      seats: "A12, A13",
-      image: "https://picsum.photos/seed/user1/300/400",
-      rating: 4.8,
-      category: "Drama",
-    },
-    {
-      id: 3,
-      title: "Interstellar (Re-release)",
-      cinema: "IMAX Grand Theater • Screen 1",
-      date: "Sep 09, 2023",
-      time: "06:45 PM",
-      seats: "D04",
-      image: "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=300&h=400&fit=crop",
-      status: "REVIEWED",
-      category: "Sci-Fi",
-    },
-  ];
-
-  const renderButton = (
-    text: string,
-    variant: "primary" | "secondary" = "secondary",
-    onClick?: () => void
-  ): JSX.Element => (
-    <button className={`btn btn-${variant}`} onClick={onClick}>
-      {text}
-    </button>
+  // Logic 3: Phân loại
+  const upcomingBookings = useMemo(
+    () => filteredBookings.filter((b: ITicketCl) => !b.isPast),
+    [filteredBookings],
+  );
+  const pastBookings = useMemo(
+    () => filteredBookings.filter((b: ITicketCl) => b.isPast),
+    [filteredBookings],
   );
 
-  const renderBookingCard = (booking: BookingCard, isPast: boolean): JSX.Element => (
-    <div key={booking.id} className="booking-card">
-      <div className="booking-image">
-        <img src={booking.image} alt={booking.title} />
-        {booking.rating && <div className="booking-rating">⭐ {booking.rating}</div>}
-      </div>
+  const renderBookingTicket = (t: ITicketCl) => {
+    const isExpired =
+      t.isPast && dayjs().diff(dayjs(t.date, "DD/MM/YYYY"), "day") >= 2;
 
-      <div className="booking-content">
-        <div className="booking-header">
-          <div>
-            <h3 className="booking-title">{booking.title}</h3>
-            <p className="booking-cinema">{booking.cinema}</p>
+    return (
+      <div key={t.id} className="mb-4">
+        <BookingTicket ticket={t}>
+          <div className="flex flex-col">
+            <p className="text-[8px] text-zinc-600 font-black uppercase tracking-[0.2em] mb-0.5">
+              Ticket Code
+            </p>
+            <p className="text-sm md:text-base font-mono font-bold text-red-500 tracking-wider">
+              {t.ticketCode || "N/A"}
+            </p>
           </div>
-          {booking.status && (
-            <span className={`booking-status status-${booking.status.toLowerCase()}`}>
-              {booking.status}
-            </span>
-          )}
-        </div>
 
-        <div className="booking-details">
-          <div className="detail-item">
-            <span className="detail-label">DATE</span>
-            <span className="detail-value">{booking.date}</span>
-          </div>
-          <div className="detail-item">
-            <span className="detail-label">TIME</span>
-            <span className="detail-value">{booking.time}</span>
-          </div>
-          <div className="detail-item">
-            <span className="detail-label">SEATS</span>
-            <span className="detail-value">{booking.seats}</span>
-          </div>
-        </div>
-
-        <div className="booking-actions">
-          {isPast ? (
-            <>
-              {booking.status !== "REVIEWED" && renderButton("Rate & Review", "secondary")}
-              {renderButton("Rebook", "secondary")}
-            </>
+          {isExpired ? (
+            <div className="px-6 py-3 border border-white/5 rounded-xl bg-zinc-900/40">
+              <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
+                Đã hết hạn xem
+              </span>
+            </div>
           ) : (
-            renderButton("View Ticket", "primary")
+            <button
+              onClick={() => navigate(`/my-booking/${t.id}`)}
+              className="flex items-center gap-2 px-8 py-3 bg-[#e52e2e] hover:bg-white hover:text-black text-white rounded-xl transition-all duration-300"
+            >
+              <Ticket size={18} />
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.15em]">
+                Xem Vé
+              </span>
+            </button>
           )}
-        </div>
+        </BookingTicket>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
-    <div className="mybooking-content">
-      <div className="content-header">
-        <div className="header-left">
-          <h1 className="page-title">My Bookings</h1>
-        </div>
-
-        <div className="header-right">
-          <div className="search-box">
-            <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
-            <input type="text" placeholder="Search movies..." />
-          </div>
-
-          <div className="filter-group">
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="filter-select"
-            >
-              {monthFilters.map((filter) => (
-                <option key={filter.id} value={filter.id}>
-                  {filter.label}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={selectedGenre}
-              onChange={(e) => setSelectedGenre(e.target.value)}
-              className="filter-select"
-            >
-              {genreFilters.map((filter) => (
-                <option key={filter.id} value={filter.id}>
-                  {filter.label}
-                </option>
-              ))}
-            </select>
-          </div>
+    <div className="w-full">
+      {/* Header Profile Style */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
+        <h1 className="text-xl md:text-3xl font-black text-white uppercase tracking-tight">
+          My Bookings
+        </h1>
+        <div className="flex gap-2">
+          <Input
+            placeholder="Search movies..."
+            prefix={<SearchOutlined className="text-zinc-500" />}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="!bg-white/5 !border-white/10 !rounded-xl !text-white !h-10 placeholder:!text-zinc-500"
+          />
+          <Select
+            defaultValue="all"
+            onChange={setSelectedMonth}
+            options={[
+              { value: "all", label: "All Months" },
+              { value: "current", label: "Current Month" },
+            ]}
+            className="!h-10 custom-select"
+            popupClassName="!bg-[#1a1a1a]"
+            style={{ width: 140 }}
+          />
         </div>
       </div>
 
-      <div className="bookings-section">
-        <h2 className="section-heading">
-          <span className="heading-icon">⏰</span>
-          Upcoming
-        </h2>
-        <div className="bookings-list">
-          {upcomingBookings.length > 0 ? (
-            upcomingBookings.map((booking) => renderBookingCard(booking, false))
-          ) : (
-            <div className="empty-state">No upcoming bookings</div>
-          )}
-        </div>
-      </div>
+      {/* Main Content Container */}
+      <div className="w-full bg-white/5 border border-white/10 rounded-3xl p-4 lg:p-8 backdrop-blur-xl space-y-12">
+        <section>
+          <div className="flex items-center gap-2 mb-6">
+            <Clock
+              className="text-[#e52e2e] mb-3"
+              size={22}
+              strokeWidth={2.0}
+            />
+            <h2 className="text-xl md:text-2xl font-extrabold text-white uppercase tracking-tight">
+              TICKET
+            </h2>
+          </div>
 
-      <div className="bookings-section">
-        <h2 className="section-heading">
-          <span className="heading-icon">📜</span>
-          Past Bookings
-        </h2>
-        <div className="bookings-list">
-          {pastBookings.length > 0 ? (
-            pastBookings.map((booking) => renderBookingCard(booking, true))
-          ) : (
-            <div className="empty-state">No past bookings</div>
-          )}
-        </div>
+          <div className="space-y-4">
+            {isLoading ? (
+              <div className="h-32 bg-white/5 animate-pulse rounded-2xl" />
+            ) : upcomingBookings.length > 0 ? (
+              upcomingBookings.map(renderBookingTicket)
+            ) : (
+              /* EMPTY STATE HIỆN RA KHI KHÔNG CÓ VÉ SẮP TỚI */
+              <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-white/10 rounded-[32px] bg-white/[0.01]">
+                <Ticket
+                  className="text-zinc-800 mb-4"
+                  size={48}
+                  strokeWidth={1}
+                />
+                <p className="text-zinc-500 italic text-sm mb-8 text-center max-w-[250px]">
+                  Bạn chưa có suất chiếu nào sắp tới. Khám phá ngay ngay!
+                </p>
+                <button
+                  onClick={() => navigate("/movielist")}
+                  className="px-10 py-4 bg-white text-black text-[11px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-[#e52e2e] hover:text-white transition-all duration-300"
+                >
+                  Đặt vé ngay
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section>
+          <div className="flex items-center gap-2 mb-6 border-t border-white/5 pt-10">
+            <History
+              className="text-zinc-500 mb-3"
+              size={22}
+              strokeWidth={2.0}
+            />
+            <h2 className="text-xl md:text-2xl font-extrabold text-white uppercase tracking-tight">
+              History
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {isLoading ? (
+              <div className="h-32 bg-white/5 animate-pulse rounded-2xl" />
+            ) : pastBookings.length > 0 ? (
+              pastBookings.map(renderBookingTicket)
+            ) : (
+              <p className="text-zinc-600 italic text-center py-8 text-sm">
+                Lịch sử trống.
+              </p>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

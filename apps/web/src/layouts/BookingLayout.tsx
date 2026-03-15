@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import { useMovie } from "@web/hooks/useMovie";
 import { Button, message, Spin } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { useBooking } from "@web/hooks/useBooking";
 import { IShowTime, IShowTimeSeat } from "@shared/schemas";
@@ -21,6 +21,7 @@ const BookingLayout = () => {
   const location = useLocation();
 
   const navigate = useNavigate();
+  const prevPathRef = useRef(location.pathname);
 
   // Quản lý trạng thái dùng chung
   const [selectedShowtime, setSelectedShowtime] = useState<IShowTime | null>(
@@ -31,13 +32,20 @@ const BookingLayout = () => {
   const activeShowtimeId =
     selectedShowtime?._id ?? showtimeIdFromUrl ?? undefined;
 
-  const { showTime, holdSeats, isHolding, refreshSeats, pendingBooking } =
-    useBooking(activeShowtimeId);
+  const {
+    showTime,
+    holdSeats,
+    isHolding,
+    refreshSeats,
+    pendingBooking,
+    cancelBooking,
+    expireBooking,
+  } = useBooking(activeShowtimeId);
 
   useEffect(() => {
-    if (!pendingBooking?.data) return;
+    if (!pendingBooking) return;
 
-    const seatCodes = pendingBooking.data.seatCodes;
+    const seatCodes = pendingBooking.seatCodes;
 
     if (!seatCodes) return;
 
@@ -69,6 +77,7 @@ const BookingLayout = () => {
             navigate("/payments", {
               state: {
                 bookingId: result.bookingId,
+                holdToken: result.holdToken,
                 totalAmount: result.totalAmount,
                 seats: seatsToHold.map((s) => s.seatCode),
                 movieInfo: {
@@ -103,6 +112,38 @@ const BookingLayout = () => {
     selectedSeats.length > 0
       ? selectedSeats.reduce((sum, s) => sum + s.price, 0)
       : pendingBooking?.totalAmount || 0;
+
+  useEffect(() => {
+    const prevPath = prevPathRef.current;
+    const isLeavingSeats =
+      prevPath.includes("/booking/seats") &&
+      !location.pathname.includes("/booking/seats");
+    const isBackToBooking = location.pathname.startsWith("/booking");
+
+    if (isLeavingSeats && isBackToBooking && pendingBooking?._id) {
+      expireBooking(pendingBooking._id).catch((error) => {
+        console.error("Expire booking quay lại thất bại:", error);
+      });
+      setSelectedSeats([]);
+      setSelectedShowtime(null);
+    }
+
+    prevPathRef.current = location.pathname;
+  }, [location.pathname, pendingBooking?._id, expireBooking]);
+
+  const handleBackToCinema = async () => {
+    if (pendingBooking?._id) {
+      try {
+        await expireBooking(pendingBooking._id);
+      } catch (error) {
+        console.error("Expire booking failed:", error);
+      }
+    }
+
+    setSelectedSeats([]);
+    setSelectedShowtime(null);
+    navigate(`/booking?movieId=${movieId}`);
+  };
   // console.log("user", user);
   // console.log("selectedShowtime", selectedShowtime);
   // console.log("showtimeIdFromUrl", showtimeIdFromUrl);
@@ -163,6 +204,7 @@ const BookingLayout = () => {
       navigate("/payments", {
         state: {
           bookingId: result.bookingId,
+          holdToken: result.holdToken,
           totalAmount: result.totalAmount,
           seats: selectedSeats.map((s) => s.seatCode),
           movieInfo: {
@@ -192,23 +234,26 @@ const BookingLayout = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#120a0a] via-transparent to-transparent opacity-60"></div>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black leading-tight tracking-tight uppercase">
+          <h1 className="text-2xl md:text-3xl font-bold leading-tight tracking-tight uppercase">
             {movie.ten_phim}
           </h1>
           <div className="space-y-4">
-            <div className="flex items-center gap-5">
-              <span className="px-2 py-1 bg-primary/20 text-primary text-[12px] font-black uppercase tracking-widest rounded-md border border-primary/30">
+            <div className="flex items-center gap-4">
+              <span className="px-2 py-1 bg-primary/20 text-primary text-[10px] font-black uppercase tracking-widest rounded-md border border-primary/30">
                 {movie.ngay_cong_chieu
                   ? dayjs(movie.ngay_cong_chieu).format("YYYY")
                   : "2024"}
               </span>
-              <span className="text-[#b89d9f] text-sm font-bold flex items-center gap-1">
+              <span className="text-[#b89d9f] text-xs font-bold flex items-center gap-1">
                 <span className="material-symbols-outlined text-sm">
                   schedule
                 </span>
-                {movie.thoi_luong} phút
-                <span className="mx-2 px-2 py-1 bg-primary/20 text-primary text-[12px] font-black uppercase tracking-widest rounded-md border border-primary/30">
+                {movie.thoi_luong} Min
+                <span className="mx-1 px-2 py-1 bg-primary/20 text-primary text-[10px] font-extrabold uppercase tracking-widest rounded-md border border-primary/30">
                   {movie.do_tuoi}
+                </span>
+                <span className="mx-1 px-2 py-1 bg-primary/20 text-white/70  tracking-widest rounded-md border border-primary/30">
+                  {movie.phu_de}
                 </span>
               </span>
             </div>
@@ -234,6 +279,17 @@ const BookingLayout = () => {
         </aside>
 
         <main className="w-full lg:w-3/4 ">
+          {isSelectSeatStep && (
+            <div className="mb-6">
+              <Button
+                type="default"
+                onClick={handleBackToCinema}
+                className="border-white/20 text-white bg-white/5 hover:bg-white/10"
+              >
+                Quay lại chọn rạp
+              </Button>
+            </div>
+          )}
           <Outlet
             context={{
               movie,
@@ -241,6 +297,9 @@ const BookingLayout = () => {
               setSelectedShowtime,
               selectedSeats,
               setSelectedSeats,
+              pendingBooking,
+              cancelBooking,
+              expireBooking,
             }}
           />
           {(selectedShowtime || showTime) && (
