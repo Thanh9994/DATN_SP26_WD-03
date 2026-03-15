@@ -1,0 +1,15 @@
+.menuItemSelected {
+  background-color: #ff000010 !important;
+  border-right: 4px solid #ec3a3a !important;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  color: #ec3a3a !important;
+}
+
+.menuItem {
+  display: flex !important;
+  align-items: center;
+  margin: 15px 0 !important;
+  height: 45px !important;
+  padding-left: 20px !important;
+}

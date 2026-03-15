@@ -1,12 +1,12 @@
-import { SeatTime } from "@api/modules/cinema-catalog/showtime/showtimeSeat.model";
-import { Booking } from "@api/modules/sales-operations/booking/booking.model";
-import mongoose from "mongoose";
-import cron from "node-cron";
+import { SeatTime } from '@api/modules/cinema-catalog/showtime/showtimeSeat.model';
+import { Booking } from '@api/modules/sales-operations/booking/booking.model';
+import mongoose from 'mongoose';
+import cron from 'node-cron';
 
 let isProcessing = false;
 export const initBookingCron = () => {
   // Chạy mỗi phút 30 sec lần
-  cron.schedule("*/30 * * * *", async () => {
+  cron.schedule('*/30 * * * *', async () => {
     const session = await mongoose.startSession();
     if (isProcessing) return;
     isProcessing = true;
@@ -15,7 +15,7 @@ export const initBookingCron = () => {
       const now = new Date();
       // Sử dụng field holdExpiresAt để đồng bộ với logic giữ ghế
       const expiredBookings = await Booking.find({
-        status: "pending",
+        status: 'pending',
         holdExpiresAt: { $lt: now },
       }).session(session);
 
@@ -27,7 +27,7 @@ export const initBookingCron = () => {
 
         await Booking.updateMany(
           { _id: { $in: bookingIds } },
-          { $set: { status: "expired" } },
+          { $set: { status: 'expired' } },
           { session },
         );
 
@@ -35,18 +35,16 @@ export const initBookingCron = () => {
         await SeatTime.updateMany(
           {
             _id: { $in: allSeatIds },
-            trang_thai: "hold",
+            trang_thai: 'hold',
           },
           {
-            $set: { trang_thai: "empty" },
-            $unset: { heldBy: "", holdExpiresAt: "", bookingId: "" },
+            $set: { trang_thai: 'empty' },
+            $unset: { heldBy: '', holdExpiresAt: '', bookingId: '' },
           },
           { session },
         );
 
-        console.log(
-          `[Cron]: Đã xử lý ${bookingIds.length} đơn hàng và các ghế liên quan hết hạn.`,
-        );
+        console.log(`[Cron]: Đã xử lý ${bookingIds.length} đơn hàng và các ghế liên quan hết hạn.`);
       }
 
       await session.commitTransaction();
@@ -54,7 +52,7 @@ export const initBookingCron = () => {
       if (session.inTransaction()) {
         await session.abortTransaction();
       }
-      console.error("[Cron Error]:", error);
+      console.error('[Cron Error]:', error);
     } finally {
       isProcessing = false;
       session.endSession();
@@ -63,7 +61,7 @@ export const initBookingCron = () => {
 
   //"Xóa booking đã hủy/hết hạn sau 2 ngày"
   // Cleanup expired/cancelled bookings older than 2 days
-  cron.schedule("0 * * * *", async () => {
+  cron.schedule('0 * * * *', async () => {
     const session = await mongoose.startSession();
     if (isProcessing) return;
     isProcessing = true;
@@ -72,7 +70,7 @@ export const initBookingCron = () => {
       const cutoff = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
       const oldBookings = await Booking.find({
-        status: { $in: ["expired", "cancelled"] },
+        status: { $in: ['expired', 'cancelled'] },
         updatedAt: { $lt: cutoff },
       }).session(session);
 
@@ -84,11 +82,11 @@ export const initBookingCron = () => {
           {
             _id: { $in: allSeatIds },
             bookingId: { $in: bookingIds },
-            trang_thai: "hold",
+            trang_thai: 'hold',
           },
           {
-            $set: { trang_thai: "empty" },
-            $unset: { heldBy: "", holdExpiresAt: "", bookingId: "" },
+            $set: { trang_thai: 'empty' },
+            $unset: { heldBy: '', holdExpiresAt: '', bookingId: '' },
           },
           { session },
         );
@@ -96,7 +94,7 @@ export const initBookingCron = () => {
         await Booking.deleteMany({ _id: { $in: bookingIds } }, { session });
 
         console.log(
-          `[Cron]: Đã xóa ${bookingIds.length} đơn hàng hết hạn/đã hủy quá 2 ngày.`,
+          `[Cron]: Đã xóa ${bookingIds.length} đơn hàng hết hạn (expired/cancelled) đã hủy quá 2 ngày.`,
         );
       }
 
@@ -105,7 +103,7 @@ export const initBookingCron = () => {
       if (session.inTransaction()) {
         await session.abortTransaction();
       }
-      console.error("[Cron Error]:", error);
+      console.error('[Cron Error]:', error);
     } finally {
       isProcessing = false;
       session.endSession();

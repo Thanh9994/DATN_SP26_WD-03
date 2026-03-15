@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const postSchema = new mongoose.Schema(
   {
@@ -24,6 +24,11 @@ const postSchema = new mongoose.Schema(
       required: true,
     },
 
+    category: {
+      type: String,
+      required: true,
+    },
+
     featured: {
       type: Boolean,
       default: false,
@@ -31,8 +36,8 @@ const postSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ["promotion", "event", "news"],
-      default: "promotion",
+      enum: ['promotion', 'event', 'news'],
+      default: 'promotion',
     },
 
     startDate: Date,
@@ -41,4 +46,4 @@ const postSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export const Post = mongoose.model("Post", postSchema);
+export const Post = mongoose.model('Post', postSchema);

@@ -128,11 +128,10 @@ export const useAuth = () => {
   const { data: users, isLoading: isLoadingUsers } = useQuery<IUser[]>({
     queryKey: ['users'],
     queryFn: async () => {
-      if (user?.role !== 'admin') return [];
       const { data } = await axiosAuth.get(`${API.USERS}/`);
       return data;
     },
-    enabled: !!getStoredToken() && !!user,
+    enabled: !!getStoredToken() && !!user && ['admin', 'manager'].includes(user.role),
     staleTime: 1000 * 60 * 5,
   });
   const updateMutation = useMutation({
