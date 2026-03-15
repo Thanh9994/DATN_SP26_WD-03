@@ -233,7 +233,4 @@ export default function Cinemas() {
     </div>
   );
 };
-<<<<<<< HEAD
-=======
  
->>>>>>> bb5300ae1a8dad0baf4acd9cc6e0228be757c859
