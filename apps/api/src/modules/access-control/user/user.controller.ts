@@ -1,10 +1,51 @@
 import { Request, Response } from "express";
 import { User } from "./user.model";
+import { Booking } from "@api/modules/sales-operations/booking/booking.model";
 import { UpdateUser } from '@shared/schemas';
 
 export const getAllUsers = async (_req: Request, res: Response) => {
   try {
-    const users = await User.find().select("ho_ten email role trang_thai phone").sort({ createdAt: -1 });
+    const bookingCollection = Booking.collection.name;
+    const users = await User.aggregate([
+      {
+        $lookup: {
+          from: bookingCollection,
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$userId", "$$userId"] },
+                    { $eq: ["$status", "paid"] },
+                  ],
+                },
+              },
+            },
+            { $count: "count" },
+          ],
+          as: "bookingStats",
+        },
+      },
+      {
+        $addFields: {
+          bookingCount: {
+            $ifNull: [{ $arrayElemAt: ["$bookingStats.count", 0] }, 0],
+          },
+        },
+      },
+      {
+        $project: {
+          ho_ten: 1,
+          email: 1,
+          role: 1,
+          trang_thai: 1,
+          phone: 1,
+          bookingCount: 1,
+        },
+      },
+      { $sort: { createdAt: -1 } },
+    ]);
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Không thể lấy danh sách người dùng", error });
