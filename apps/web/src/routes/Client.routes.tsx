@@ -1,47 +1,72 @@
 import { NotFound } from "@web/components/tools/NotFound";
+import { RouteObject } from "react-router-dom";
 
 // Public
 import { Home } from "@web/pages/clients/public/Home";
 import About from "@web/pages/clients/public/About";
 import Event from "@web/pages/clients/public/Event";
 import News from "@web/pages/clients/public/News";
+import Contact from "@web/pages/clients/public/Contact";
 
+// Layouts
 import { ClientLayout } from "@web/layouts/ClientLayout";
+import BookingLayout from "@web/layouts/BookingLayout";
+import { ProfileLayout } from "@web/layouts/ProfileLayout";
+
+// Auth
 import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
 import Login from "@web/pages/clients/auth/Login";
 import Register from "@web/pages/clients/auth/Register";
+import ResetPassword from "@web/pages/clients/auth/ResetPassword";
+
+// Booking
 import SeatBooking from "@web/pages/clients/booking/SeatBooking";
 import Showtime from "@web/pages/clients/booking/ShowTime";
-import { RouteObject } from "react-router-dom";
-import MovieDetail from "@web/pages/clients/MovieDetail";
-import BookingLayout from "@web/layouts/BookingLayout";
 import { BookingCinema } from "@web/pages/clients/booking/BookingCinema";
-import { ProfileLayout } from "@web/layouts/ProfileLayout";
+
+// Movies
+import MovieDetail from "@web/pages/clients/MovieDetail";
+import MovieList from "@web/pages/clients/MovieList";
+
+// Profile
 import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
 import { Setting } from "@web/components/authProfile/Setting";
-import Cinemas from "@web/pages/Cinemas";
 import MyBooking from "@web/components/authProfile/MyBooking";
+
+// Others
+import Cinemas from "@web/pages/Cinemas";
 import DrinkSnack from "@web/pages/DrinkSnack";
 import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
-import MovieList from "@web/pages/clients/MovieList";
 import NewsDetail from "@web/pages/clients/NewDetail";
-import RequireAuth from "@web/services/RequieAuth";
+
+// Payments - Import đúng đường dẫn
 import Checkout from "@web/pages/clients/payments/Checkout";
-import ResetPassword from "@web/pages/clients/auth/ResetPassword";
-import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
-import { Contact } from "lucide-react";
-import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
+import PaymentMethod from "@web/pages/clients/payments/PaymentMethod";
+import { PaymentResult } from "@web/pages/clients/payments/PaymentResult"; // THÊM IMPORT NÀY
+import { PaymentSuccess } from "@web/pages/clients/payments/PaymentSuccess";
+import { PaymentFailed } from "@web/pages/clients/payments/PaymentFailed";
+import PaymentDeclined from "@web/pages/clients/payments/PaymentDeclined";
+
+// Services
+import RequireAuth from "@web/services/RequieAuth";
 
 export const ClientRoutes: RouteObject = {
   path: "/",
   element: <ClientLayout />,
   children: [
+    // Public routes
     { index: true, element: <Home /> },
+    { path: "about", element: <About /> },
+    { path: "event", element: <Event /> },
+    { path: "contact", element: <Contact /> },
+
+    // Auth routes
     { path: "login", element: <Login /> },
     { path: "register", element: <Register /> },
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "reset-password/:token", element: <ResetPassword /> },
 
+    // Profile routes
     {
       path: "profile",
       element: <ProfileLayout />,
@@ -54,9 +79,7 @@ export const ClientRoutes: RouteObject = {
       ],
     },
 
-    { path: "about", element: <About /> },
-    { path: "event", element: <Event /> },
-
+    // News routes
     {
       path: "news",
       children: [
@@ -65,8 +88,12 @@ export const ClientRoutes: RouteObject = {
       ],
     },
 
+    // Cinema & Movies
     { path: "cinema", element: <Cinemas /> },
     { path: "movielist", element: <MovieList /> },
+    { path: "movie/:id", element: <MovieDetail /> },
+
+    // Booking routes
     {
       path: "booking",
       element: <BookingLayout />,
@@ -83,27 +110,29 @@ export const ClientRoutes: RouteObject = {
       ],
     },
 
-    { path: "movie/:id", element: <MovieDetail /> },
     { path: "showtime", element: <Showtime /> },
 
+    // Food & Drinks
     { path: "foods", element: <DrinkSnack /> },
     { path: "recommendfoods", element: <RecommentDrinkSnack /> },
 
+    // Payment routes - Tổ chức lại
     {
       path: "payments",
-      element: <PaymentsMethod />,
       children: [
-        { index: true, element: <Paymentlist /> },
+        { index: true, element: <PaymentMethod /> },
+        { path: "method", element: <PaymentMethod /> },
         { path: "checkout", element: <Checkout /> },
-        { path: "failed", element: <PaymentsMethod /> },
-        { path: "success", element: <PaymentsMethod /> },
+        { path: "success", element: <PaymentSuccess /> },
+        { path: "failed", element: <PaymentFailed /> },
+        { path: "declined", element: <PaymentDeclined /> },
       ],
     },
 
+    // Payment result route riêng (nếu cần)
     { path: "payment-result", element: <PaymentResult /> },
 
-    { path: "contact", element: <Contact /> },
-
+    // 404
     { path: "*", element: <NotFound /> },
   ],
 };

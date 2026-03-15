@@ -9,6 +9,7 @@ import orderRouter from "./modules/sales-operations";
 import { globalErrorHandler } from "./middlewares/error.middleware";
 import paymentRouter from "./modules/sales-operations/payments/payment.route";
 import chatbotRoute from "./modules/chatbot/chatbot.route";
+import compression from "compression";
 const app = express();
 app.set("etag", false);
 app.use(compression());
