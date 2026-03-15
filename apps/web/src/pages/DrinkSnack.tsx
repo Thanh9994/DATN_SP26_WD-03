@@ -1,166 +1,131 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useProducts, type IProduct } from "@web/hooks/useProduct";
 import "../styles/DrinkSnack.css";
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  price: number;
-  originalPrice?: number;
-  badge?: {
-    text: string;
-    color: "gold" | "red";
-  };
-  featured?: boolean;
-  isFeatured?: boolean;
-}
 
 interface CartItem {
   productId: string;
   quantity: number;
 }
 
+const DEFAULT_IMAGE =
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuXqeIFfJ3K9cX43NXgLGxfWvV8G5Fby9Rpg&s";
+
 export const DrinkSnack = (): JSX.Element => {
   const [isOpen, setIsOpen] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const { products, isLoading, isError } = useProducts();
 
-  const products: Product[] = [
-    {
-      id: "mega-combo",
-      title: "Mega Movie Combo",
-      description:
-        "Extra-large popcorn, two sodas, and a box of signature movie candy.",
-      image: "🥤",
-      price: 25.0,
-      originalPrice: 32.0,
-      badge: {
-        text: "LIMITED TIME OFFER",
-        color: "gold",
-      },
-      isFeatured: true,
-    },
-    {
-      id: "family-pack",
-      title: "Family Fun Pack",
-      description: "2 Large Popcorns + 4 Sodas",
-      image: "🍿",
-      price: 38.5,
-    },
-    {
-      id: "sweet-salty",
-      title: "Sweet & Salty Duo",
-      description: "Medium Popcorn + Choco Pretzels",
-      image: "🧂",
-      price: 16.0,
-    },
-    {
-      id: "large-popcorn",
-      title: "Large Popcorn Combo",
-      description: "1 Large Popcorn + 2 Sodas",
-      image: "🍿",
-      price: 18.5,
-    },
-    {
-      id: "nachos-supreme",
-      title: "Nachos Supreme",
-      description: "Premium nachos with all toppings",
-      image: "🧀",
-      price: 12.5,
-    },
-    {
-      id: "candy-box",
-      title: "Movie Candy Mix",
-      description: "Assorted candy selection",
-      image: "🍬",
-      price: 8.0,
-    },
-  ];
+  const activeProducts = useMemo(() => {
+    return (products || []).filter((item) => item.isActive);
+  }, [products]);
 
   const handleAddToCart = (productId: string, quantity: number = 1): void => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find(
-        (item) => item.productId === productId,
-      );
+      const existingItem = prevCart.find((item) => item.productId === productId);
+
       if (existingItem) {
         return prevCart.map((item) =>
           item.productId === productId
             ? { ...item, quantity: item.quantity + quantity }
-            : item,
+            : item
         );
       }
+
       return [...prevCart, { productId, quantity }];
     });
   };
 
   const getCartTotal = (): number => {
     return cart.reduce((total, item) => {
-      const product = products.find((p) => p.id === item.productId);
+      const product = activeProducts.find((p) => p._id === item.productId);
       return total + (product?.price || 0) * item.quantity;
     }, 0);
   };
 
-  const renderBadge = (badge: Product["badge"]): JSX.Element | null => {
-    if (!badge) return null;
-    return (
-      <div className={`product-badge badge-${badge.color}`}>{badge.text}</div>
-    );
+  const getCartCount = (): number => {
+    return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
   const renderSaveBadge = (
     price: number,
-    originalPrice?: number,
+    originalPrice?: number
   ): JSX.Element | null => {
     if (!originalPrice || originalPrice <= price) return null;
-    const savings = (originalPrice - price).toFixed(2);
-    return <div className="product-badge badge-save">SAVE ${savings}</div>;
+
+    const savings = originalPrice - price;
+    return (
+      <div className="product-badge badge-save">
+        Giảm {savings.toLocaleString("vi-VN")}đ
+      </div>
+    );
   };
 
-  const renderProductCard = (product: Product): JSX.Element => (
-    <div
-      key={product.id}
-      className={`product-card ${product.isFeatured ? "featured" : ""}`}
-    >
-      <div className="product-image-wrapper">
-        <div className="product-image">{product.image}</div>
-        {product.badge && renderBadge(product.badge)}
-        {renderSaveBadge(product.price, product.originalPrice)}
-      </div>
+  const renderProductCard = (product: IProduct): JSX.Element => {
+    const isFeatured = !!product.isCombo;
+    const hasDiscount =
+      Number(product.originalPrice || 0) > Number(product.price || 0);
 
-      <div className="product-content">
-        <h3 className="product-title">{product.title}</h3>
-        <p className="product-description">{product.description}</p>
+    return (
+      <div
+        key={product._id}
+        className={`product-card ${isFeatured ? "featured" : ""}`}
+      >
+        <div className="product-image-wrapper">
+          <img
+            src={product.image || DEFAULT_IMAGE}
+            alt={product.name}
+            className="product-image"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_IMAGE;
+            }}
+          />
 
-        <div className="product-footer">
-          <div className="product-price-wrapper">
-            <span className="product-price">${product.price.toFixed(2)}</span>
-            {product.originalPrice && (
-              <span className="product-original-price">
-                ${product.originalPrice.toFixed(2)}
-              </span>
-            )}
-          </div>
-
-          {product.isFeatured ? (
-            <button
-              className="btn-exclusive"
-              onClick={() => handleAddToCart(product.id, 1)}
-            >
-              Claim Exclusive Offer
-            </button>
-          ) : (
-            <button
-              className="btn-add-order"
-              onClick={() => handleAddToCart(product.id, 1)}
-            >
-              <span className="cart-icon">🛒</span>
-              Add to Order
-            </button>
+          {product.isCombo && (
+            <div className="product-badge badge-gold">COMBO</div>
           )}
+
+          {hasDiscount &&
+            renderSaveBadge(product.price, product.originalPrice)}
+        </div>
+
+        <div className="product-content">
+          <h3 className="product-title">{product.name}</h3>
+          <p className="product-description">
+            {product.description || "Snack và đồ uống dùng kèm khi xem phim."}
+          </p>
+
+          <div className="product-footer">
+            <div className="product-price-wrapper">
+              <span className="product-price">
+                {Number(product.price || 0).toLocaleString("vi-VN")}đ
+              </span>
+
+              {!!product.originalPrice && product.originalPrice > product.price && (
+                <span className="product-original-price">
+                  {Number(product.originalPrice).toLocaleString("vi-VN")}đ
+                </span>
+              )}
+            </div>
+
+            <button
+              className={product.isCombo ? "btn-exclusive" : "btn-add-order"}
+              onClick={() => handleAddToCart(product._id || "", 1)}
+              disabled={!product._id}
+            >
+              {product.isCombo ? (
+                "Thêm combo"
+              ) : (
+                <>
+                  <span className="cart-icon">🛒</span>
+                  Thêm vào đơn
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <>
@@ -178,25 +143,37 @@ export const DrinkSnack = (): JSX.Element => {
               <h1 className="modal-title">Recommended Snacks & Combos</h1>
             </div>
 
-            <div className="products-grid">
-              {products.map((product) => renderProductCard(product))}
-            </div>
+            {isLoading ? (
+              <div className="state-box">Đang tải danh sách sản phẩm...</div>
+            ) : isError ? (
+              <div className="state-box error">
+                Không tải được sản phẩm từ hệ thống.
+              </div>
+            ) : !activeProducts.length ? (
+              <div className="state-box">Hiện chưa có sản phẩm đang bán.</div>
+            ) : (
+              <div className="products-grid">
+                {activeProducts.map((product) => renderProductCard(product))}
+              </div>
+            )}
 
             <div className="modal-footer">
               <button className="btn-skip" onClick={() => setIsOpen(false)}>
-                No thanks, go to Checkout
+                Bỏ qua và tiếp tục thanh toán
               </button>
 
               <div className="footer-right">
                 <div className="total-price">
-                  <span className="total-label">Total:</span>
+                  <span className="total-label">
+                    Tổng ({getCartCount()} món):
+                  </span>
                   <span className="total-value">
-                    ${getCartTotal().toFixed(2)}
+                    {getCartTotal().toLocaleString("vi-VN")}đ
                   </span>
                 </div>
 
-                <button className="btn-continue">
-                  Add & Continue
+                <button className="btn-continue" onClick={() => setIsOpen(false)}>
+                  Thêm & Tiếp tục
                   <span className="arrow">→</span>
                 </button>
               </div>
