@@ -9,6 +9,7 @@
     UPLOADS: `${API_URL}/uploads`,
     GENRES: `${API_URL}/content/genres`,
     MOVIES: `${API_URL}/content/movies`,
+    COMMENTS: `${API_URL}/content/comments`,
     SHOWTIME: `${API_URL}/catalog/showtimes`,
     PROMOTION: `${API_URL}/catalog/promotions`,
     BOOKING: `${API_URL}/order/booking`,

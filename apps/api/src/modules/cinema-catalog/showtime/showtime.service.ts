@@ -1,10 +1,10 @@
-import { IPhong, ISeatType, IShowTime } from "@shared/schemas";
-import { SeatTime } from "./showtimeSeat.model";
-import { ShowTimeM } from "./showtime.model";
-import mongoose from "mongoose";
+import { IPhong, ISeatType, IShowTime } from '@shared/schemas';
+import { SeatTime } from './showtimeSeat.model';
+import { ShowTimeM } from './showtime.model';
+import mongoose from 'mongoose';
 
 export const showTimeService = {
-  async autoDeleteOldShowtimes(days: number = 20) {
+  async autoDeleteOldShowtimes(days: number = 25) {
     const thresholdDate = new Date();
     thresholdDate.setDate(thresholdDate.getDate() - days);
 
@@ -21,17 +21,14 @@ export const showTimeService = {
     try {
       await session.withTransaction(async () => {
         // Xóa tất cả ghế của các suất chiếu này
-        await SeatTime.deleteMany(
-          { showTimeId: { $in: idsToDelete } },
-          { session },
-        );
+        await SeatTime.deleteMany({ showTimeId: { $in: idsToDelete } }, { session });
 
         await ShowTimeM.deleteMany({ _id: { $in: idsToDelete } }, { session });
       });
 
       return idsToDelete.length;
     } catch (error) {
-      console.error("Lỗi khi xóa suất chiếu cũ tự động:", error);
+      console.error('Lỗi khi xóa suất chiếu cũ tự động:', error);
       throw error;
     } finally {
       session.endSession();
@@ -39,29 +36,24 @@ export const showTimeService = {
   },
 };
 
-export const generateShowTimeSeats = async (
-  showTime: IShowTime,
-  room: IPhong,
-) => {
-  if (!showTime._id) throw new Error("ShowTime ID không tồn tại");
+export const generateShowTimeSeats = async (showTime: IShowTime, room: IPhong) => {
+  if (!showTime._id) throw new Error('ShowTime ID không tồn tại');
 
   const vipSet = new Set((room.vip || []).map((r) => r.trim().toUpperCase()));
-  const coupleSet = new Set(
-    (room.couple || []).map((r) => r.trim().toUpperCase()),
-  );
+  const coupleSet = new Set((room.couple || []).map((r) => r.trim().toUpperCase()));
   const seats: any[] = [];
 
   for (const row of room.rows) {
     const rowNameUp = row.name.trim().toUpperCase();
     let defaultPrice = showTime.priceNormal;
-    let defaultType: ISeatType = "normal";
+    let defaultType: ISeatType = 'normal';
 
     if (vipSet.has(rowNameUp)) {
       defaultPrice = showTime.priceVip;
-      defaultType = "vip";
+      defaultType = 'vip';
     } else if (coupleSet.has(rowNameUp)) {
       defaultPrice = showTime.priceCouple;
-      defaultType = "couple";
+      defaultType = 'couple';
     }
     for (let i = 1; i <= row.seats; i++) {
       seats.push({
@@ -73,7 +65,7 @@ export const generateShowTimeSeats = async (
         number: i,
         seatType: defaultType,
         price: defaultPrice,
-        trang_thai: "empty",
+        trang_thai: 'empty',
       });
     }
   }
@@ -86,18 +78,14 @@ export const generateShowTimeSeats = async (
       await SeatTime.insertMany(seats, { session, ordered: false });
     });
   } catch (error) {
-    console.error("Lỗi khi tạo sơ đồ ghế cho suất chiếu:", error);
-    throw new Error("Không thể tạo sơ đồ ghế. Vui lòng thử lại.");
+    console.error('Lỗi khi tạo sơ đồ ghế cho suất chiếu:', error);
+    throw new Error('Không thể tạo sơ đồ ghế. Vui lòng thử lại.');
   } finally {
     session.endSession();
   }
 };
 
-export const checkShowTimeOverlap = async (
-  roomId: string,
-  startTime: Date,
-  endTime: Date,
-) => {
+export const checkShowTimeOverlap = async (roomId: string, startTime: Date, endTime: Date) => {
   const CLEANING_TIME = 30 * 60000;
 
   const startWithBuffer = new Date(startTime.getTime() - CLEANING_TIME);
@@ -105,7 +93,7 @@ export const checkShowTimeOverlap = async (
 
   const overlap = await ShowTimeM.findOne({
     roomId,
-    status: { $ne: "cancelled" },
+    status: { $ne: 'cancelled' },
     $or: [
       {
         startTime: { $lt: endWithBuffer }, // Bắt đầu trước khi suất mới dọn xong
