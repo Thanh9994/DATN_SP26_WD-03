@@ -5,7 +5,6 @@ import { axiosAuth } from './useAuth';
 export const useBooking = (showTimeId?: string) => {
   const queryClient = useQueryClient();
   // const token = localStorage.getItem("accessToken");
-  // 1. Lấy thông tin suất chiếu và sơ đồ ghế
   const {
     data: bookingData,
     isLoading,
@@ -49,7 +48,7 @@ export const useBooking = (showTimeId?: string) => {
         bookingId,
         holdToken,
       });
-      console.log('PAYMENT RESPONSE', res.data.data);
+      // console.log('PAYMENT RESPONSE', res.data.data);
       return res.data.data; // chỉ trả link
     },
   });

@@ -246,7 +246,6 @@ export const Movie = Base.extend({
       name: z.string(),
     }),
   ),
-  rap_chieu: z.array(z.string()).optional(),
   quoc_gia: z.string(),
   dao_dien: z.string(),
   dien_vien: z.array(z.string()),
@@ -274,8 +273,8 @@ export const User = Base.extend({
   isVerified: z.boolean().default(false),
   otpCode: z.string().optional(),
   otpExpire: z.coerce.date().optional(),
-});
 
+});
 export const VerifyOtp = z.object({
   email: z.string().email('Email không hợp lệ'),
   otp: z.string().length(6, 'Mã OTP phải có 6 số'),

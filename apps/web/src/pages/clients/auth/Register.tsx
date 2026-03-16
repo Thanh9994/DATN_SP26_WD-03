@@ -30,7 +30,7 @@ const Register = () => {
     }
     setErrorMsg(null);
     try {
-      await register({
+       await register({
         ho_ten: values.ho_ten,
         email: values.email,
         password: values.password,

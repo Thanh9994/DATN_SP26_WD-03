@@ -12,7 +12,9 @@ export const useShowTime = (movieId?: string) => {
     queryKey: ['showtimes', 'movie', movieId],
     queryFn: async () => {
       if (!movieId) return [];
-      const { data } = await axios.get(`${API.SHOWTIME}/movie/${movieId}`);
+      const { data } = await axios.get(`${API.SHOWTIME}/movie/${movieId}`, {
+        params: { includePast: true },
+      });
       // console.log("Dữ liệu lịch chiếu trả về:", data.data);
       return data.data;
     },
