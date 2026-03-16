@@ -1,64 +1,50 @@
-import { NotFound } from "@web/components/tools/NotFound";
-import { RouteObject } from "react-router-dom";
 import { NotFound } from '@web/components/tools/NotFound';
 
 // Public
-import { Home } from "@web/pages/clients/public/Home";
-import About from "@web/pages/clients/public/About";
-import Event from "@web/pages/clients/public/Event";
-import News from "@web/pages/clients/public/News";
+import { Home } from '@web/pages/clients/public/Home';
+import About from '@web/pages/clients/public/About';
+import Event from '@web/pages/clients/public/Event';
+import News from '@web/pages/clients/public/News';
+import { ClientLayout } from '@web/layouts/ClientLayout';
+import ForgotPassword from '@web/pages/clients/auth/ForgotPassword';
+import Login from '@web/pages/clients/auth/Login';
+import SeatBooking from '@web/pages/clients/booking/SeatBooking';
+import Showtime from '@web/pages/clients/booking/ShowTime';
+import { RouteObject } from 'react-router-dom';
+import MovieDetail from '@web/pages/clients/MovieDetail';
+import BookingLayout from '@web/layouts/BookingLayout';
+import { BookingCinema } from '@web/pages/clients/booking/BookingCinema';
+import { ProfileLayout } from '@web/layouts/ProfileLayout';
+import { ProfileInfo } from '@web/components/authProfile/ProfileInfo';
+import { Setting } from '@web/components/authProfile/Setting';
+import Cinemas from '@web/pages/Cinemas';
+import MyBooking from '@web/components/authProfile/MyBooking';
+import DrinkSnack from '@web/pages/DrinkSnack';
+import RecommentDrinkSnack from '@web/pages/RecommentDrinkSnack';
+import MovieList from '@web/pages/clients/MovieList';
+import NewsDetail from '@web/pages/clients/NewDetail';
+import RequireAuth from '@web/services/RequieAuth';
+import ResetPassword from '@web/pages/clients/auth/ResetPassword';
+import { PaymentResult } from '@web/pages/clients/payments/PaymentResult';
+import CinemaDetail from '@web/pages/CinemaDetail';
+import Contact from '@web/pages/clients/public/Contact';
 
-import { ClientLayout } from "@web/layouts/ClientLayout";
-import BookingLayout from "@web/layouts/BookingLayout";
-import { ProfileLayout } from "@web/layouts/ProfileLayout";
-
-// Auth
-import ForgotPassword from "@web/pages/clients/auth/ForgotPassword";
-import Login from "@web/pages/clients/auth/Login";
-import Register from "@web/pages/clients/auth/Register";
-import ResetPassword from "@web/pages/clients/auth/ResetPassword";
-
-// Booking
-import SeatBooking from "@web/pages/clients/booking/SeatBooking";
-import Showtime from "@web/pages/clients/booking/ShowTime";
-import { BookingCinema } from "@web/pages/clients/booking/BookingCinema";
-
-// Movies
-import MovieDetail from "@web/pages/clients/MovieDetail";
-import MovieList from "@web/pages/clients/MovieList";
-
-// Profile
-import { ProfileInfo } from "@web/components/authProfile/ProfileInfo";
-import { Setting } from "@web/components/authProfile/Setting";
-import MyBooking from "@web/components/authProfile/MyBooking";
-
-// Others
-import Cinemas from "@web/pages/Cinemas";
-import DrinkSnack from "@web/pages/DrinkSnack";
-import RecommentDrinkSnack from "@web/pages/RecommentDrinkSnack";
-import NewsDetail from "@web/pages/clients/NewDetail";
-import RequireAuth from "@web/services/RequieAuth";
-import { Ticket } from "lucide-react";
-import ResetPassword from "@web/pages/clients/auth/ResetPassword";
-import { PaymentResult } from "@web/pages/clients/payments/PaymentResult";
-import CinemaDetail from "@web/pages/CinemaDetail";
-import Contact from "@web/pages/clients/public/Contact";
-import PaymentsMethod from "@web/pages/clients/payments/PaymentMethod";
-import { PaymentFailed } from "@web/pages/clients/payments/PaymentFailed";
-import { PaymentSuccess } from "@web/pages/clients/payments/PaymentSuccess";
+import PaymentsMethod from '@web/pages/clients/payments/PaymentMethod';
+import { PaymentFailed } from '@web/pages/clients/payments/PaymentFailed';
+import { PaymentSuccess } from '@web/pages/clients/payments/PaymentSuccess';
+import Ticket from '@web/pages/Ticket';
+import Register from '@web/pages/clients/auth/Register';
 
 export const ClientRoutes: RouteObject = {
   path: '/',
   element: <ClientLayout />,
   children: [
-    // Public routes
     { index: true, element: <Home /> },
-    { path: "login", element: <Login /> },
-    { path: "register", element: <Register /> },
-    { path: "forgot-password", element: <ForgotPassword /> },
-    { path: "reset-password/:token", element: <ResetPassword /> },
+    { path: 'login', element: <Login /> },
+    { path: 'register', element: <Register /> },
+    { path: 'forgot-password', element: <ForgotPassword /> },
+    { path: 'reset-password/:token', element: <ResetPassword /> },
 
-    // Profile routes
     {
       path: 'profile',
       element: <ProfileLayout />,
@@ -71,7 +57,6 @@ export const ClientRoutes: RouteObject = {
       ],
     },
 
-    // News routes
     { path: 'about', element: <About /> },
     { path: 'event', element: <Event /> },
 
@@ -110,7 +95,6 @@ export const ClientRoutes: RouteObject = {
     { path: 'foods', element: <DrinkSnack /> },
     { path: 'recommendfoods', element: <RecommentDrinkSnack /> },
 
-    // Payment routes - Tổ chức lại
     {
       path: 'payments',
       element: <PaymentsMethod />,
