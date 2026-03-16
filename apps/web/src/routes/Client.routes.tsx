@@ -37,12 +37,14 @@ export const ClientRoutes: RouteObject = {
   path: '/',
   element: <ClientLayout />,
   children: [
+    // Public routes
     { index: true, element: <Home /> },
     { path: 'login', element: <Login /> },
     { path: 'register', element: <Register /> },
     { path: 'forgot-password', element: <ForgotPassword /> },
     { path: 'reset-password/:token', element: <ResetPassword /> },
 
+    // Profile routes
     {
       path: 'profile',
       element: <ProfileLayout />,
@@ -55,6 +57,7 @@ export const ClientRoutes: RouteObject = {
       ],
     },
 
+    // News routes
     { path: 'about', element: <About /> },
     { path: 'event', element: <Event /> },
 
@@ -90,6 +93,7 @@ export const ClientRoutes: RouteObject = {
     { path: 'foods', element: <DrinkSnack /> },
     { path: 'recommendfoods', element: <RecommentDrinkSnack /> },
 
+    // Payment routes - Tổ chức lại
     {
       path: 'payments',
       element: <PaymentsMethod />,

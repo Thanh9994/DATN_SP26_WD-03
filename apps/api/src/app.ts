@@ -10,9 +10,7 @@ import adminDashboardRouter from "./modules/admin-dashboard";
 import { globalErrorHandler } from "./middlewares/error.middleware";
 import paymentRouter from "./modules/sales-operations/payments/payment.route";
 import chatbotRoute from "./modules/chatbot/chatbot.route";
-import { notFoundMiddleware } from "./middlewares/notFound.middleware";
 import compression from "compression";
-
 const app = express();
 app.set("etag", false);
 app.use(compression());
@@ -42,7 +40,6 @@ api.use("/chatbot", chatbotRoute);
 app.use("/api", api);
 app.use("/api/uploads", uploadRouter);
 app.use("/payments", paymentRouter);
-
-app.use(notFoundMiddleware);
+app.use("/api/chatbot", chatbotRoute);
 app.use(globalErrorHandler);
 export default app;
