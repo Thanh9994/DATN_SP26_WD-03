@@ -1,10 +1,34 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Dropdown, MenuProps } from "antd";
-import { useAuth } from "@web/hooks/useAuth"; // Giả sử bạn dùng hook này
+import { useAuth } from "@web/hooks/useAuth";
+import { useMovies } from "@web/hooks/useMovie";
+import { useState, useRef, useEffect } from "react";
 
 export const Header = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { movies } = useMovies();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showResults, setShowResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const searchResults = searchQuery.trim()
+    ? movies
+        .filter((m) =>
+          m.ten_phim.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+        .slice(0, 6)
+    : [];
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -132,7 +156,7 @@ export const Header = () => {
           </nav>
         </div>
         <div className="flex flex-1 justify-end items-center gap-6">
-          <div className="relative w-full max-w-sm hidden lg:block">
+          <div ref={searchRef} className="relative w-full max-w-sm hidden lg:block">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/40">
               search
             </span>
@@ -140,7 +164,42 @@ export const Header = () => {
               className="w-full bg-white/5 border border-white/10 rounded-full py-2.5 pl-12 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-white/30"
               placeholder="Search movies, theaters..."
               type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowResults(true);
+              }}
+              onFocus={() => setShowResults(true)}
             />
+            {showResults && searchResults.length > 0 && (
+              <div className="absolute top-full mt-2 w-full bg-[#1a1a2e] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
+                {searchResults.map((movie) => (
+                  <div
+                    key={movie._id}
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 cursor-pointer transition-colors"
+                    onMouseDown={() => {
+                      navigate(`/movie/${movie._id}`);
+                      setSearchQuery("");
+                      setShowResults(false);
+                    }}
+                  >
+                    <img
+                      src={movie.poster?.url}
+                      alt={movie.ten_phim}
+                      className="w-9 h-12 object-cover rounded"
+                    />
+                    <div>
+                      <p className="text-white text-sm font-semibold line-clamp-1">
+                        {movie.ten_phim}
+                      </p>
+                      <p className="text-white/40 text-xs">
+                        {movie.the_loai?.slice(0, 2).map((g) => g.name).join(", ")} • {movie.thoi_luong} phút
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="hidden sm:flex items-center gap-3">
             <button className="size-9 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors">
