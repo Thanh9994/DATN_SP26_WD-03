@@ -246,7 +246,6 @@ export const Movie = Base.extend({
       name: z.string(),
     }),
   ),
-  rap_chieu: z.array(z.string()).optional(),
   quoc_gia: z.string(),
   dao_dien: z.string(),
   dien_vien: z.array(z.string()),

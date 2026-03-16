@@ -1,22 +1,14 @@
-import { Request, Response } from "express";
-import { ShowTime as ShowTimeSchema } from "@shared/schemas";
-import { generateShowTimeSeats } from "./showtime.service";
-import { ShowTimeM } from "./showtime.model";
-import { SeatTime } from "./showtimeSeat.model";
-import { Room } from "../room/room.model";
-import { Movie } from "../../movie-content/movie/movie.model";
-import {
-  CalculateShowTimeStatus,
-  ShowTimeDisplay,
-} from "@api/utils/showtime/showtime.util";
-import mongoose from "mongoose";
+import { Request, Response } from 'express';
+import { ShowTime as ShowTimeSchema } from '@shared/schemas';
+import { generateShowTimeSeats } from './showtime.service';
+import { ShowTimeM } from './showtime.model';
+import { SeatTime } from './showtimeSeat.model';
+import { Room } from '../room/room.model';
+import { Movie } from '../../movie-content/movie/movie.model';
+import { CalculateShowTimeStatus, ShowTimeDisplay } from '@api/utils/showtime/showtime.util';
+import mongoose from 'mongoose';
 
-const sendError = (
-  res: Response,
-  status: number,
-  message: string,
-  error?: any,
-) => {
+const sendError = (res: Response, status: number, message: string, error?: any) => {
   return res.status(status).json({ message, error: error?.message || error });
 };
 
@@ -26,21 +18,19 @@ export const createShowTime = async (req: Request, res: Response) => {
     const cleaning_TIME = 30 * 60000;
 
     const movie = await Movie.findById(movieId);
-    if (!movie) return res.status(404).json({ message: "Phim không tồn tại" });
+    if (!movie) return res.status(404).json({ message: 'Phim không tồn tại' });
     const room = await Room.findById(roomId);
-    if (!room) return res.status(404).json({ message: "không tồn tại phòng" });
+    if (!room) return res.status(404).json({ message: 'không tồn tại phòng' });
 
     let startTime: Date;
     if (req.body.startTime) {
       startTime = new Date(req.body.startTime);
     } else if (date && timeSlot) {
-      const [hours, minutes] = timeSlot.split(":").map(Number);
+      const [hours, minutes] = timeSlot.split(':').map(Number);
       startTime = new Date(date);
       startTime.setHours(hours, minutes, 0, 0);
     } else {
-      return res
-        .status(400)
-        .json({ message: "Thiếu thông tin thời gian chiếu" });
+      return res.status(400).json({ message: 'Thiếu thông tin thời gian chiếu' });
     }
     //Chặn suất chiếu ngày hôm nay
     const now = new Date();
@@ -48,7 +38,7 @@ export const createShowTime = async (req: Request, res: Response) => {
       return sendError(
         res,
         400,
-        "Ngày chiếu không hợp lệ. Không thể tạo suất chiếu trong quá khứ!",
+        'Ngày chiếu không hợp lệ. Không thể tạo suất chiếu trong quá khứ!',
       );
     }
 
@@ -80,8 +70,8 @@ export const createShowTime = async (req: Request, res: Response) => {
         start: isOver.startTime,
         end: isOver.endTime,
         suggestedNextAvailable: suggestedStart.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
+          hour: '2-digit',
+          minute: '2-digit',
         }),
       });
     }
@@ -92,7 +82,7 @@ export const createShowTime = async (req: Request, res: Response) => {
       roomId,
       startTime,
       endTime: movieEndTime,
-      status: "upcoming",
+      status: 'upcoming',
     });
 
     const newShowTime = await ShowTimeM.create(payload);
@@ -105,13 +95,11 @@ export const createShowTime = async (req: Request, res: Response) => {
       });
     } catch (error) {
       await ShowTimeM.findByIdAndDelete(newShowTime._id);
-      return res
-        .status(400)
-        .json({ message: "Lỗi hệ thống khi khởi tạo sơ đồ ghế", error });
+      return res.status(400).json({ message: 'Lỗi hệ thống khi khởi tạo sơ đồ ghế', error });
     }
   } catch (error) {
     return res.status(400).json({
-      message: "Dữ liệu không hợp lệ",
+      message: 'Dữ liệu không hợp lệ',
       error,
     });
   }
@@ -132,9 +120,7 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
       const monthNum = Number(month);
       const yearNum = Number(year);
       if (!Number.isFinite(monthNum) || !Number.isFinite(yearNum)) {
-        return res
-          .status(400)
-          .json({ message: "ThÃ¡ng hoáº·c nÄƒm khÃ´ng há»£p lá»‡" });
+        return res.status(400).json({ message: 'Tháng hoặc năm không hợp lệ' });
       }
       const startOfMonth = new Date(yearNum, monthNum - 1, 1, 0, 0, 0, 0);
       const endOfMonth = new Date(yearNum, monthNum, 0, 23, 59, 59, 999);
@@ -142,7 +128,7 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
     } else if (year) {
       const yearNum = Number(year);
       if (!Number.isFinite(yearNum)) {
-        return res.status(400).json({ message: "NÄƒm khÃ´ng há»£p lá»‡" });
+        return res.status(400).json({ message: 'Năm không hợp lệ' });
       }
       const startOfYear = new Date(yearNum, 0, 1, 0, 0, 0, 0);
       const endOfYear = new Date(yearNum, 11, 31, 23, 59, 59, 999);
@@ -150,17 +136,17 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
     }
 
     const showtimes = await ShowTimeM.find(query)
-      .populate("movieId", "ten_phim thoi_luong")
+      .populate('movieId', 'ten_phim thoi_luong')
       // rooms -> rạp -> tên - địa chỉ - thành phố
       .populate({
-        path: "roomId",
-        select: "ten_phong cinema_id",
+        path: 'roomId',
+        select: 'ten_phong cinema_id',
         populate: {
-          path: "cinema_id",
-          select: "name city address",
+          path: 'cinema_id',
+          select: 'name city address',
         },
       })
-      .sort({ startTime: 1 });
+      .sort({ startTime: -1 });
 
     const dataWithStatus = showtimes.map((st) => {
       const item = st.toObject();
@@ -173,37 +159,47 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
     });
 
     return res.json({
-      message: "Lấy danh sách suất chiếu thành công",
+      message: 'Lấy danh sách suất chiếu thành công',
       data: dataWithStatus,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Lỗi server", error });
+    return res.status(500).json({ message: 'Lỗi server', error });
   }
 };
 
 export const getShowTimeByMovie = async (req: Request, res: Response) => {
   try {
     const { movieId } = req.params;
+    const { includePast } = req.query as { includePast?: string };
     const now = new Date(Date.now() - 15 * 60 * 1000);
+    const baseQuery: Record<string, any> = { movieId };
+    if (includePast !== 'true') {
+      baseQuery.startTime = { $gt: now };
+    }
 
-    const showtimes = await ShowTimeM.find({ movieId, startTime: { $gt: now } })
+    const showtimes = await ShowTimeM.find(baseQuery)
       .populate({
-        path: "roomId",
-        select: "ten_phong cinema_id",
-        populate: { path: "cinema_id", select: "name city address" },
+        path: 'roomId',
+        select: 'ten_phong cinema_id',
+        populate: { path: 'cinema_id', select: 'name city address' },
       })
-      .sort({ startTime: 1 });
+      .sort({ startTime: -1 });
     const showtimeIds = showtimes.map((st) => st._id);
 
     const seatStats = await SeatTime.aggregate([
       { $match: { showTimeId: { $in: showtimeIds } } },
       {
         $group: {
-          _id: "$showTimeId",
+          _id: '$showTimeId',
           total: { $sum: 1 },
           booked: {
             $sum: {
-              $cond: [{ $in: ["$trang_thai", ["booked", "hold"]] }, 1, 0],
+              $cond: [{ $in: ['$trang_thai', ['booked', 'hold']] }, 1, 0],
+            },
+          },
+          bookedOnly: {
+            $sum: {
+              $cond: [{ $eq: ['$trang_thai', 'booked'] }, 1, 0],
             },
           },
         },
@@ -214,11 +210,18 @@ export const getShowTimeByMovie = async (req: Request, res: Response) => {
 
     const dataWithStatus = showtimes.map((st) => {
       const item = st.toObject();
-      const status = CalculateShowTimeStatus(item);
+      const timeStatus = CalculateShowTimeStatus({
+        ...item,
+        status: 'upcoming',
+      });
       const stats = statsMap.get(item._id.toString()) || {
         total: 0,
         booked: 0,
+        bookedOnly: 0,
       };
+      const isSoldOut =
+        stats.total > 0 && stats.bookedOnly >= stats.total && item.status !== 'cancelled';
+      const status = item.status === 'cancelled' ? 'cancelled' : isSoldOut ? 'sold_out' : timeStatus;
 
       return {
         ...item,
@@ -229,11 +232,11 @@ export const getShowTimeByMovie = async (req: Request, res: Response) => {
     });
 
     return res.json({
-      message: "Lấy suất chiếu thành công",
+      message: 'Lấy suất chiếu thành công',
       data: dataWithStatus,
     });
   } catch {
-    return res.status(500).json({ message: "Lỗi server" });
+    return res.status(500).json({ message: 'Lỗi server' });
   }
 };
 
@@ -241,15 +244,15 @@ export const getShowTimeDetail = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const showTime = await ShowTimeM.findById(id)
-      .populate("movieId")
+      .populate('movieId')
       .populate({
-        path: "roomId",
+        path: 'roomId',
         populate: {
-          path: "cinema_id",
-          select: "name city address",
+          path: 'cinema_id',
+          select: 'name city address',
         },
       });
-    if (!showTime) return res.status(404).json({ message: "Không tìm thấy" });
+    if (!showTime) return res.status(404).json({ message: 'Không tìm thấy' });
 
     const seats = await SeatTime.find({
       showTimeId: id,
@@ -260,7 +263,7 @@ export const getShowTimeDetail = async (req: Request, res: Response) => {
       seats,
     });
   } catch (error) {
-    return sendError(res, 500, "Lỗi lấy chi tiết suất chiếu", error);
+    return sendError(res, 500, 'Lỗi lấy chi tiết suất chiếu', error);
   }
 };
 
@@ -268,19 +271,19 @@ export const deleteShowTime = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const showTimeInfo = await ShowTimeM.findById(id).populate("roomId");
+    const showTimeInfo = await ShowTimeM.findById(id).populate('roomId');
     if (!showTimeInfo) {
-      return res.status(404).json({ message: "Không tìm thấy suất chiếu" });
+      return res.status(404).json({ message: 'Không tìm thấy suất chiếu' });
     }
 
     const hasActiveSeats = await SeatTime.exists({
       showTimeId: id,
-      trang_thai: { $in: ["booked", "hold"] },
+      trang_thai: { $in: ['booked', 'hold'] },
     });
 
     if (hasActiveSeats) {
       return res.status(400).json({
-        message: "Không thể xóa suất chiếu này vì đã có vé được đặt!",
+        message: 'Không thể xóa suất chiếu này vì đã có vé được đặt!',
       });
     }
     const totalToDelete = await SeatTime.countDocuments({ showTimeId: id });
@@ -291,11 +294,11 @@ export const deleteShowTime = async (req: Request, res: Response) => {
     });
 
     return res.json({
-      message: "Xoá suất chiếu và toàn bộ ghế trống thành công",
+      message: 'Xoá suất chiếu và toàn bộ ghế trống thành công',
       totalSeats: totalToDelete,
     });
   } catch (error) {
-    return sendError(res, 400, "Lỗi xoá suất chiếu", error);
+    return sendError(res, 400, 'Lỗi xoá suất chiếu', error);
   }
 };
 
@@ -312,7 +315,7 @@ export const getShowTimeSeats = async (req: Request, res: Response) => {
       data: seats,
     });
   } catch (error) {
-    return sendError(res, 500, "Lỗi lấy danh sách ghế", error);
+    return sendError(res, 500, 'Lỗi lấy danh sách ghế', error);
   }
 };
 
@@ -327,13 +330,13 @@ export const getSeatStats = async (req: Request, res: Response) => {
           _id: null,
           total: { $sum: 1 },
           booked: {
-            $sum: { $cond: [{ $eq: ["$trang_thai", "booked"] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ['$trang_thai', 'booked'] }, 1, 0] },
           },
           held: {
-            $sum: { $cond: [{ $eq: ["$trang_thai", "hold"] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ['$trang_thai', 'hold'] }, 1, 0] },
           },
           available: {
-            $sum: { $cond: [{ $eq: ["$trang_thai", "empty"] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ['$trang_thai', 'empty'] }, 1, 0] },
           },
         },
       },
@@ -346,6 +349,6 @@ export const getSeatStats = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    return sendError(res, 500, "Lỗi lấy thống kê ghế", error);
+    return sendError(res, 500, 'Lỗi lấy thống kê ghế', error);
   }
 };

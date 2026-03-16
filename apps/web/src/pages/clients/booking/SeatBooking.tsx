@@ -54,13 +54,13 @@ const SeatBooking = () => {
   }, [showtimeId, setSelectedSeats]);
 
   const handleSeatClick = (seat: IShowTimeSeat) => {
-    console.log('=== Debug Seat Click ===');
-    console.log('Ghế đang click:', seat.seatCode);
-    console.log('Trạng thái ghế (DB):', seat.trang_thai);
-    console.log('ID người giữ (heldBy):', seat.heldBy);
-    console.log('ID của bạn (user?._id):', user?._id);
-    console.log('So sánh ID:', seat.heldBy === user?._id ? 'KHỚP' : 'KHÔNG KHỚP');
-    console.log('========================');
+    // console.log('=== Debug Seat Click ===');
+    // console.log('Ghế đang click:', seat.seatCode);
+    // console.log('Trạng thái ghế (DB):', seat.trang_thai);
+    // console.log('ID người giữ (heldBy):', seat.heldBy);
+    // console.log('ID của bạn (user?._id):', user?._id);
+    // console.log('So sánh ID:', seat.heldBy === user?._id ? 'KHỚP' : 'KHÔNG KHỚP');
+    // console.log('========================');
 
     if (seat.trang_thai === 'booked') return;
 
