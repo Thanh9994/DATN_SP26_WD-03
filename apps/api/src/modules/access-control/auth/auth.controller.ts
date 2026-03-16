@@ -6,32 +6,34 @@ import Jwt from 'jsonwebtoken';
 import { User } from '../user/user.model';
 import { AppError } from '@api/middlewares/error.middleware';
 import { catchAsync } from '@api/utils/catchAsync';
+import { ResendOtp, VerifyOtp } from '@shared/schemas';
 
 export const Register = catchAsync(async (req, res) => {
   const { email, password, ho_ten, phone } = req.body;
 
-  const exitingUser = await User.findOne({ email });
-  if (exitingUser) {
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
     throw new AppError('Email đã tồn tại', 400);
   }
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-  const verifyToken = crypto.randomBytes(32).toString("hex");
 
-  const user = await User.create({
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const otp = Math.floor(100000 + Math.random() * 900000)
+    .toString()
+    .padStart(6, '0');
+
+  await User.create({
     ho_ten,
     email,
     phone,
     password: hashedPassword,
-    emailVerifyToken: verifyToken,
-    emailVerifyExpire: Date.now() + 1000 * 60 * 60, // 1h
+    otpCode: otp,
+    otpExpire: Date.now() + 6 * 60 * 1000,
+    isVerified: false,
   });
 
-  const verifyUrl = `http://localhost:5000/api/access/auth/verify-email?token=${verifyToken}`;
-
-  // transporter gmail
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
@@ -40,40 +42,158 @@ export const Register = catchAsync(async (req, res) => {
 
   await transporter.sendMail({
     to: email,
-    subject: "Xác nhận email",
+    subject: `[PvM.app] ${otp} là mã xác thực của bạn`,
     html: `
-      <h3>Xin chào ${ho_ten}</h3>
-      <p>Nhấn vào link để xác nhận email:</p>
-      <a href="${verifyUrl}">${verifyUrl}</a>
+      <div style="background-color: #020617; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #0f172a; border-radius: 24px; border: 1px solid #1e293b; overflow: hidden;">
+          <tr>
+            <td style="padding: 40px 20px; text-align: center; color: #ffffff;">
+              
+              <h1 style="margin: 0; font-size: 28px; color: #ef4444; letter-spacing: -1px;">
+                CINEMA<span style="color: #ffffff;">APP</span>
+              </h1>
+              
+              <p style="color: #94a3b8; font-size: 16px; margin-top: 10px;">Xác thực tài khoản của bạn</p>
+              
+              <div style="margin: 30px 0; padding: 30px; background-color: #1e293b; border-radius: 16px; border: 1px solid #334155;">
+                <p style="margin: 0 0 10px 0; font-size: 13px; text-transform: uppercase; color: #64748b; font-weight: bold; letter-spacing: 2px;">Mã OTP của bạn là</p>
+                
+                <div style="
+                  font-size: 42px; 
+                  font-weight: 800; 
+                  letter-spacing: 10px; 
+                  color: #ffffff; 
+                  text-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+                  user-select: all; /* Hỗ trợ một số trình duyệt tự chọn toàn bộ khi chạm */
+                  -webkit-user-select: all;
+                ">
+                  <span style="font-family: monospace; cursor: pointer;">${otp}</span>
+                </div>
+                
+                <p style="margin-top: 15px; font-size: 11px; color: #475569;">(Nhấn giữ vào số trên để sao chép)</p>
+              </div>
+
+              <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 0;">
+                Mã này sẽ hết hạn trong <strong style="color: #f1f5f9;">10 phút</strong>.<br>
+                Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này.
+</p>
+              
+            </td>
+          </tr>
+        </table>
+      </div>
     `,
   });
 
   res.status(201).json({
-    message: "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận.",
+    message: 'Đăng ký thành công. Mã OTP đã được gửi vào email.',
   });
 });
-export const verifyEmail = catchAsync(async (req, res) => {
-  const { token } = req.query;
 
+export const verifyOtp = catchAsync(async (req, res) => {
+  const validated = VerifyOtp.parse(req.body);
   const user = await User.findOne({
-    emailVerifyToken: token,
-    emailVerifyExpire: { $gt: Date.now() },
+    email: validated.email,
+    otpCode: validated.otp,
+    otpExpire: { $gt: new Date() },
   });
 
   if (!user) {
-    throw new AppError("Token không hợp lệ hoặc đã hết hạn", 400);
+    throw new AppError('Mã OTP không hợp lệ hoặc đã hết hạn', 400);
   }
 
   user.isVerified = true;
-  user.emailVerifyToken = undefined;
-  user.emailVerifyExpire = undefined;
+  user.otpCode = undefined; // Xóa mã sau khi dùng xong
+  user.otpExpire = undefined;
+  user.trang_thai = 'active';
 
   await user.save();
 
-  res.json({
-    message: "Xác nhận email thành công",
+  res.status(200).json({
+    status: 'success',
+    message: 'Xác nhận tài khoản thành công! Chào mừng bạn.',
   });
 });
+
+export const resendOtp = catchAsync(async (req, res) => {
+  const { email } = ResendOtp.parse(req.body);
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new AppError('Không tìm thấy người dùng với email này', 404);
+  }
+
+  if (user.isVerified) {
+    throw new AppError('Tài khoản này đã được xác thực rồi', 400);
+  }
+
+  const newOtp = Math.floor(100000 + Math.random() * 900000)
+    .toString()
+    .padStart(6, '0');
+
+  user.otpCode = newOtp;
+  user.otpExpire = new Date(Date.now() + 10 * 60 * 1000);
+  await user.save();
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    to: email,
+    subject: `[PVM.app] ${newOtp} là mã xác thực của bạn`,
+    html: `
+      <div style="background-color: #020617; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #0f172a; border-radius: 24px; border: 1px solid #1e293b; overflow: hidden;">
+          <tr>
+            <td style="padding: 40px 20px; text-align: center; color: #ffffff;">
+              
+              <h1 style="margin: 0; font-size: 28px; color: #ef4444; letter-spacing: -1px;">
+                PVM<span style="color: #ffffff;">APP</span>
+              </h1>
+              
+              <p style="color: #94a3b8; font-size: 16px; margin-top: 10px;">Xác thực tài khoản của bạn</p>
+              
+              <div style="margin: 30px 0; padding: 30px; background-color: #1e293b; border-radius: 16px; border: 1px solid #334155;">
+                <p style="margin: 0 0 10px 0; font-size: 13px; text-transform: uppercase; color: #64748b; font-weight: bold; letter-spacing: 2px;">Mã OTP của bạn là</p>
+                
+                <div style="
+                  font-size: 42px; 
+                  font-weight: 800;
+letter-spacing: 10px; 
+                  color: #ffffff; 
+                  text-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+                  user-select: all; /* Hỗ trợ một số trình duyệt tự chọn toàn bộ khi chạm */
+                  -webkit-user-select: all;
+                ">
+                  <span style="font-family: monospace; cursor: pointer;">${newOtp}</span>
+                </div>
+                
+                <p style="margin-top: 15px; font-size: 11px; color: #475569;">(Nhấn giữ vào số trên để sao chép)</p>
+              </div>
+
+              <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 0;">
+                Mã này sẽ hết hạn trong <strong style="color: #f1f5f9;">10 phút</strong>.<br>
+                Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này.
+              </p>
+              
+            </td>
+          </tr>
+        </table>
+      </div>
+  `,
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Mã OTP mới đã được gửi vào email của bạn!',
+  });
+});
+
 export const Login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 
