@@ -274,8 +274,8 @@ export const User = Base.extend({
   isVerified: z.boolean().default(false),
   otpCode: z.string().optional(),
   otpExpire: z.coerce.date().optional(),
-});
 
+});
 export const VerifyOtp = z.object({
   email: z.string().email('Email không hợp lệ'),
   otp: z.string().length(6, 'Mã OTP phải có 6 số'),
