@@ -13,26 +13,25 @@ import {
   message,
   Upload,
   Tag,
-} from "antd";
+} from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   UploadOutlined,
   EyeOutlined,
-} from "@ant-design/icons";
-import { useState } from "react";
-import dayjs from "dayjs";
-import { useMovies } from "@web/hooks/useMovie";
-import { useGenres } from "@web/hooks/useGenre";
-import { useUpload } from "@web/hooks/useUploads";
-import { ICloudinaryImage } from "@shared/schemas";
-import { ShowTime } from "../Showtime";
-import { useNavigate } from "react-router-dom";
+} from '@ant-design/icons';
+import { useState } from 'react';
+import dayjs from 'dayjs';
+import { useMovies } from '@web/hooks/useMovie';
+import { useGenres } from '@web/hooks/useGenre';
+import { useUpload } from '@web/hooks/useUploads';
+import { ICloudinaryImage } from '@shared/schemas';
+import { ShowTime } from '../Showtime';
+import { useNavigate } from 'react-router-dom';
 
 export const Movie = () => {
-  const { movies, isLoading, createMovie, updateMovie, deleteMovie } =
-    useMovies();
+  const { movies, isLoading, createMovie, updateMovie, deleteMovie } = useMovies();
   const [submitting, setSubmitting] = useState(false);
   const { genres } = useGenres();
   const { upload } = useUpload();
@@ -79,9 +78,9 @@ export const Movie = () => {
         banner: bannerData,
         the_loai: values.genre_id,
         dien_vien: values.dien_vien || [],
-        quoc_gia: values.quoc_gia || "Global",
-        phu_de: values.phu_de || "Tiếng Việt",
-        do_tuoi: values.do_tuoi || "P",
+        quoc_gia: values.quoc_gia || 'Global',
+        phu_de: values.phu_de || 'Tiếng Việt',
+        do_tuoi: values.do_tuoi || 'P',
       };
       // console.log("UPLOAD RESULT", posterData);
       // console.log("FINAL PAYLOAD", payload);
@@ -93,8 +92,8 @@ export const Movie = () => {
       }
       closeModal();
     } catch (error) {
-      console.error("Lỗi khi lưu phim:", error);
-      message.error("Thao tác thất bại, vui lòng thử lại.");
+      console.error('Lỗi khi lưu phim:', error);
+      message.error('Thao tác thất bại, vui lòng thử lại.');
     } finally {
       setSubmitting(false);
     }
@@ -109,10 +108,10 @@ export const Movie = () => {
       ngay_cong_chieu: r.ngay_cong_chieu ? dayjs(r.ngay_cong_chieu) : null,
       ngay_ket_thuc: r.ngay_ket_thuc ? dayjs(r.ngay_ket_thuc) : null,
       poster: r.poster?.url
-        ? [{ uid: "-1", name: r.ten_phim, status: "done", url: r.poster.url }]
+        ? [{ uid: '-1', name: r.ten_phim, status: 'done', url: r.poster.url }]
         : [],
       banner: r.banner?.url
-        ? [{ uid: "-1", name: "Banner", status: "done", url: r.banner.url }]
+        ? [{ uid: '-1', name: 'Banner', status: 'done', url: r.banner.url }]
         : [],
       genre_id: r.the_loai?.map((g: any) => g._id),
     });
@@ -129,75 +128,73 @@ export const Movie = () => {
 
   const columns: any[] = [
     {
-      key: "poster",
-      title: "Poster",
-      dataIndex: "poster",
+      key: 'poster',
+      title: 'Poster',
+      dataIndex: 'poster',
       render: (p: any) => (
-        <Image
-          src={p?.url}
-          width={50}
-          height={70}
-          style={{ objectFit: "cover" }}
-          fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-        />
+        <Image src={p?.url} width={60} height={70} style={{ objectFit: 'cover' }} />
       ),
     },
-    { key: "ten_phim", title: "Tên phim", dataIndex: "ten_phim" },
-    { key: "dao_dien", title: "Đạo diễn", dataIndex: "dao_dien" },
-    { key: "do_tuoi", title: "Độ tuổi", dataIndex: "do_tuoi" },
+    { key: 'ten_phim', title: 'Tên phim', dataIndex: 'ten_phim' },
+    { key: 'dao_dien', title: 'Đạo diễn', dataIndex: 'dao_dien' },
+    { key: 'do_tuoi', title: 'Độ tuổi', dataIndex: 'do_tuoi' },
     {
-      key: "thoi_luong",
-      title: "Thời lượng",
-      dataIndex: "thoi_luong",
+      key: 'showtimeCount',
+      title: 'Số suất chiếu',
+      dataIndex: 'showtimeCount',
+      render: (val: number) => val ?? 0,
+      sorter: (a: any, b: any) => (a.showtimeCount ?? 0) - (b.showtimeCount ?? 0),
+    },
+    {
+      key: 'thoi_luong',
+      title: 'Thời lượng',
+      dataIndex: 'thoi_luong',
       render: (m: number) => `${m} phút`,
     },
     {
-      key: "ngay_cong_chieu",
-      title: "Ngày chiếu",
-      dataIndex: "ngay_cong_chieu",
-      render: (d: string) => (d ? dayjs(d).format("DD/MM/YYYY") : "-"),
+      key: 'ngay_cong_chieu',
+      title: 'Ngày chiếu',
+      dataIndex: 'ngay_cong_chieu',
+      render: (d: string) => (d ? dayjs(d).format('DD/MM/YYYY') : '-'),
     },
     {
-      key: "ngay_ket_thuc",
-      title: "Ngày kết thúc",
-      dataIndex: "ngay_ket_thuc",
-      render: (d: string) => (d ? dayjs(d).format("DD/MM/YYYY") : "-"),
+      key: 'ngay_ket_thuc',
+      title: 'Ngày kết thúc',
+      dataIndex: 'ngay_ket_thuc',
+      render: (d: string) => (d ? dayjs(d).format('DD/MM/YYYY') : '-'),
     },
     {
-      key: "trang_thai",
-      title: "Trạng Thái",
-      dataIndex: "trang_thai",
+      key: 'trang_thai',
+      title: 'Trạng Thái',
+      dataIndex: 'trang_thai',
+      filters: [
+        { text: 'Dang chiếu', value: 'dang_chieu' },
+        { text: 'Sắp chiếu', value: 'sap_chieu' },
+        { text: 'Ngưng chiếu', value: 'ngung_chieu' },
+      ],
+      onFilter: (value: any, record: any) => record.trang_thai === value,
       render: (status: string) => {
-        const color =
-          status === "dang_chieu"
-            ? "green"
-            : status === "sap_chieu"
-              ? "gold"
-              : "red";
+        const color = status === 'dang_chieu' ? 'green' : status === 'sap_chieu' ? 'gold' : 'red';
         const text =
-          status === "dang_chieu"
-            ? "Đang chiếu"
-            : status === "sap_chieu"
-              ? "Sắp chiếu"
-              : "Ngừng chiếu";
+          status === 'dang_chieu'
+            ? 'Đang chiếu'
+            : status === 'sap_chieu'
+              ? 'Sắp chiếu'
+              : 'Ngừng chiếu';
 
         return <Tag color={color}>{text}</Tag>;
       },
     },
     {
-      key: "action",
-      title: "Action",
+      key: 'action',
+      title: 'Action',
       render: (_: any, r: any) => (
         <Space onClick={(e) => e.stopPropagation()}>
           <Button icon={<EditOutlined />} onClick={() => handleEdit(r)} />
           <Popconfirm title="Xóa phim?" onConfirm={() => deleteMovie(r._id)}>
             <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>
-          <Button
-            type="link"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/movie/${r._id}`)}
-          />
+          <Button type="link" icon={<EyeOutlined />} onClick={() => navigate(`/movie/${r._id}`)} />
         </Space>
       ),
     },
@@ -205,13 +202,9 @@ export const Movie = () => {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between mb-4">
+      <div className="mb-4 flex justify-between">
         <h1 className="text-xl font-bold">🎬 Quản lý Phim</h1>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setOpen(true)}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>
           Thêm phim
         </Button>
       </div>
@@ -225,11 +218,11 @@ export const Movie = () => {
         scroll={{ x: 900 }}
         expandable={{
           expandedRowRender: (record) => (
-            <div className="bg-slate-50 border-t border-slate-100 shadow-inner">
+            <div className="border-t border-slate-100 bg-slate-50 shadow-inner">
               <ShowTime movieId={record._id!} />
             </div>
           ),
-          rowExpandable: (record) => record.ten_phim !== "Not Expandable",
+          rowExpandable: (record) => record.ten_phim !== 'Not Expandable',
           showExpandColumn: false,
           expandRowByClick: true,
           columnWidth: 0,
@@ -237,7 +230,7 @@ export const Movie = () => {
       />
 
       <Modal
-        title={editingId ? "Cập nhật phim" : "Thêm phim mới"}
+        title={editingId ? 'Cập nhật phim' : 'Thêm phim mới'}
         open={open}
         onCancel={closeModal}
         onOk={() => form.submit()}
@@ -254,9 +247,7 @@ export const Movie = () => {
             <Form.Item
               name="ten_phim"
               label="Tên phim"
-              rules={[
-                { required: true, message: "Tên phim không được để trống" },
-              ]}
+              rules={[{ required: true, message: 'Tên phim không được để trống' }]}
             >
               <Input />
             </Form.Item>
@@ -264,7 +255,7 @@ export const Movie = () => {
             <Form.Item
               name="genre_id"
               label="Thể loại"
-              rules={[{ required: true, message: "Nhập thể loại" }]}
+              rules={[{ required: true, message: 'Nhập thể loại' }]}
             >
               <Select mode="multiple" allowClear placeholder="Chọn thể loại">
                 {genres?.map((g: any) => (
@@ -283,14 +274,14 @@ export const Movie = () => {
               <Select mode="tags" placeholder="Nhập tên diễn viên" />
             </Form.Item>
 
-            <Form.Item name="phu_de" label="Phụ đề" initialValue={"Tiếng Việt"}>
+            <Form.Item name="phu_de" label="Phụ đề" initialValue={'Tiếng Việt'}>
               <Select mode="tags" placeholder="Tiếng Việt, Tiếng Anh..." />
             </Form.Item>
 
             <Form.Item
               name="thoi_luong"
               label="Thời lượng"
-              rules={[{ required: true, message: "Nhập thời gian phim" }]}
+              rules={[{ required: true, message: 'Nhập thời gian phim' }]}
             >
               <InputNumber min={90} className="w-full" />
             </Form.Item>
@@ -308,9 +299,7 @@ export const Movie = () => {
             </Form.Item>
 
             <Form.Item name="do_tuoi" label="Độ tuổi" initialValue="P">
-              <Select
-                options={["P", "C13", "C16", "C18"].map((v) => ({ value: v }))}
-              />
+              <Select options={['P', 'C13', 'C16', 'C18'].map((v) => ({ value: v }))} />
             </Form.Item>
 
             <Form.Item name="trailer" label="Trailer">
@@ -320,7 +309,7 @@ export const Movie = () => {
               <Form.Item
                 name="ngay_cong_chieu"
                 label="Ngày chiếu"
-                rules={[{ required: true, message: "Chọn ngày chiếu" }]}
+                rules={[{ required: true, message: 'Chọn ngày chiếu' }]}
               >
                 <DatePicker className="w-full" />
               </Form.Item>
@@ -328,7 +317,7 @@ export const Movie = () => {
               <Form.Item
                 name="ngay_ket_thuc"
                 label="Ngày kết thúc"
-                rules={[{ required: true, message: "Chọn ngày kết thúc" }]}
+                rules={[{ required: true, message: 'Chọn ngày kết thúc' }]}
               >
                 <DatePicker className="w-full" />
               </Form.Item>
@@ -342,15 +331,11 @@ export const Movie = () => {
               rules={[
                 {
                   required: !editingId,
-                  message: "Poster không được trống",
+                  message: 'Poster không được trống',
                 },
               ]}
             >
-              <Upload
-                beforeUpload={() => false}
-                maxCount={1}
-                listType="picture"
-              >
+              <Upload beforeUpload={() => false} maxCount={1} listType="picture">
                 <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
             </Form.Item>
@@ -363,15 +348,11 @@ export const Movie = () => {
               rules={[
                 {
                   required: !editingId,
-                  message: "Banner không được trống",
+                  message: 'Banner không được trống',
                 },
               ]}
             >
-              <Upload
-                beforeUpload={() => false}
-                maxCount={1}
-                listType="picture"
-              >
+              <Upload beforeUpload={() => false} maxCount={1} listType="picture">
                 <Button icon={<UploadOutlined />}>Upload Banner</Button>
               </Upload>
             </Form.Item>
