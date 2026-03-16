@@ -4,6 +4,8 @@ import type { ICreateMovie, IMovie, IUpdateMovie } from "@shared/schemas";
 import { message } from "antd";
 import { API } from "@web/api/api.service";
 
+type MovieWithShowtimeCount = IMovie & { showtimeCount?: number };
+
 export const useMovies = () => {
   const queryClient = useQueryClient();
 
@@ -11,7 +13,7 @@ export const useMovies = () => {
     data: movies = [],
     isLoading,
     isError,
-  } = useQuery<IMovie[]>({
+  } = useQuery<MovieWithShowtimeCount[]>({
     queryKey: ["movies"],
     queryFn: async () => {
       const { data } = await axios.get(API.MOVIES);

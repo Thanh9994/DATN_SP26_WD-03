@@ -246,7 +246,6 @@ export const Movie = Base.extend({
       name: z.string(),
     }),
   ),
-  rap_chieu: z.array(z.string()).optional(),
   quoc_gia: z.string(),
   dao_dien: z.string(),
   dien_vien: z.array(z.string()),
@@ -274,8 +273,8 @@ export const User = Base.extend({
   isVerified: z.boolean().default(false),
   otpCode: z.string().optional(),
   otpExpire: z.coerce.date().optional(),
-});
 
+});
 export const VerifyOtp = z.object({
   email: z.string().email('Email không hợp lệ'),
   otp: z.string().length(6, 'Mã OTP phải có 6 số'),
@@ -321,6 +320,15 @@ export const AuthResponse = z.object({
   remember: z.boolean().optional(),
 });
 
+export const CleanupLog = z.object({
+  _id: z.string().optional(),
+  type: z.enum(['booking', 'payment']),
+  details: z.array(z.any()),
+  notified: z.boolean().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+});
+
 export type IPopulatedShowTime = Omit<IShowTime, 'roomId' | 'movieId'> & {
   movieId: IMovie;
   roomId: IPopulatedRoom;
@@ -353,6 +361,7 @@ export type IUpdateUser = z.infer<typeof UpdateUser>;
 export type ILogin = z.infer<typeof Login>;
 export type IRegister = z.infer<typeof Register>;
 export type IAuthResponse = z.infer<typeof AuthResponse>;
+export type ICleanupLog = z.infer<typeof CleanupLog>;
 
 export type ICinema = z.infer<typeof Cinema>;
 export type ICreateCinema = z.infer<typeof CreateCinema>;
