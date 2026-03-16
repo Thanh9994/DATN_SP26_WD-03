@@ -65,7 +65,6 @@ export const ClientRoutes: RouteObject = {
         { path: ':slug', element: <NewsDetail /> },
       ],
     },
-
     { path: 'cinema', element: <Cinemas /> },
     { path: 'movielist', element: <MovieList /> },
     { path: 'cinemadetail/:id', element: <CinemaDetail /> },
@@ -85,9 +84,6 @@ export const ClientRoutes: RouteObject = {
       ],
     },
 
-    { path: "showtime", element: <Showtime /> },
-
-    // Food & Drinks
     { path: 'movie/:id', element: <MovieDetail /> },
     { path: 'showtime', element: <Showtime /> },
     { path: 'foods', element: <DrinkSnack /> },
@@ -96,10 +92,11 @@ export const ClientRoutes: RouteObject = {
     {
       path: 'payments',
       element: <PaymentsMethod />,
-      children: [{ path: 'result', element: <PaymentResult /> }],
+      children: [
+       
+        { path: 'result', element: <PaymentResult /> },
+      ],
     },
-
-
 
     { path: 'payment-result', element: <PaymentResult /> },
     { path: 'ticket', element: <Ticket /> },
