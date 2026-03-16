@@ -1,5 +1,5 @@
-import { IPaymentStatus, PaymentMethod, PaymentStatus } from "@shared/schemas";
-import mongoose from "mongoose";
+import { IPaymentStatus, PaymentMethod, PaymentStatus } from '@shared/schemas';
+import mongoose from 'mongoose';
 
 export interface IPayment extends Document {
   bookingId: mongoose.Types.ObjectId;
@@ -19,12 +19,12 @@ const paymentSchema = new mongoose.Schema(
   {
     bookingId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Booking",
+      ref: 'Booking',
       required: true,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     finalAmount: { type: Number, required: true },
@@ -45,7 +45,7 @@ const paymentSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: PaymentStatus.options,
-      default: "pending",
+      default: 'pending',
     },
     transactionNo: { type: String, unique: true, sparse: true },
     gatewayDataResponse: { type: mongoose.Schema.Types.Mixed },
@@ -57,6 +57,6 @@ paymentSchema.index({ userId: 1, createdAt: -1 });
 paymentSchema.index({ status: 1 });
 paymentSchema.index(
   { bookingId: 1, status: 1 },
-  { unique: true, partialFilterExpression: { status: "pending" } },
+  { unique: true, partialFilterExpression: { status: 'pending' } },
 );
-export const Payment = mongoose.model<IPayment>("Payments", paymentSchema);
+export const Payment = mongoose.model<IPayment>('Payments', paymentSchema);

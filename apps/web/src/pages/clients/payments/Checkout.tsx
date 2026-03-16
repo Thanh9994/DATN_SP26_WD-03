@@ -36,15 +36,15 @@ const { Title, Text } = Typography;
 // Types for Google Pay
 declare global {
     interface Window {
-        google: {
-            payments: {
-                api: {
+        google?: {
+            payments?: {
+                api?: {
                     PaymentsClient: new (config: any) => any;
                 };
             };
         };
         ApplePaySession?: {
-            new(version: number, request: any): ApplePaySession;
+            new (version: number, request: any): ApplePaySession;
             canMakePayments(): boolean;
             STATUS_SUCCESS: number;
         };
@@ -67,7 +67,7 @@ interface PaymentInfo {
     description?: string;
 }
 
-// Interface for Seat Info (thông tin ghế từ trang trước)
+// Interface for Seat Info
 interface SeatInfo {
     id: string;
     row: string;
@@ -76,14 +76,14 @@ interface SeatInfo {
     type: string;
 }
 
-// Interface for Booking Data từ trang trước
+// Interface for Booking Data
 interface BookingData {
     movieId: string;
     movieName: string;
     theater: string;
     showTime: string;
     showDate: string;
-    selectedSeats: SeatInfo[]; // Mảng ghế với đầy đủ thông tin
+    selectedSeats: SeatInfo[];
     totalAmount: number;
     ticketCount: number;
     cinemaId?: string;
@@ -109,25 +109,25 @@ interface ScannerConfig {
 // Hàm xử lý tiếng Việt (bỏ dấu)
 const removeVietnameseTones = (str: string): string => {
     return str
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/đ/g, 'd')
-        .replace(/Đ/g, 'D')
-        .replace(/[^a-zA-Z0-9 ]/g, '')
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .replace(/[^a-zA-Z0-9 ]/g, "")
         .trim();
 };
 
 // Hàm tính CRC16 cho VietQR
 const calculateCRC16 = (data: string): string => {
-    let crc = 0xFFFF;
+    let crc = 0xffff;
     for (let i = 0; i < data.length; i++) {
         crc ^= data.charCodeAt(i) << 8;
         for (let j = 0; j < 8; j++) {
             crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
         }
     }
-    crc &= 0xFFFF;
-    return crc.toString(16).toUpperCase().padStart(4, '0');
+    crc &= 0xffff;
+    return crc.toString(16).toUpperCase().padStart(4, "0");
 };
 
 const Checkout: React.FC = () => {
@@ -145,20 +145,23 @@ const Checkout: React.FC = () => {
     const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
     const [processingPayment, setProcessingPayment] = useState<boolean>(false);
 
-    // Bank info (fixed for demo)
+    // Bank info
     const [selectedBank] = useState<string>("970436"); // Vietcombank
     const [accountNumber] = useState<string>("0881000458086");
     const [accountName] = useState<string>("CINEMA COMPANY");
 
-    // Booking data từ trang trước
+    // Booking data
     const [bookingData, setBookingData] = useState<BookingData | null>(null);
     const [loadingBooking, setLoadingBooking] = useState<boolean>(true);
+
+    // QR Scanner reference
+    const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+    const qrCodeIdRef = useRef<string>(`qr-scanner-${Date.now()}`);
 
     // Lấy dữ liệu từ location state khi component mount
     useEffect(() => {
         const loadBookingData = () => {
             try {
-                // Thử lấy từ location.state (khi dùng navigate)
                 if (location.state) {
                     const data = location.state as BookingData;
                     setBookingData(data);
@@ -167,8 +170,7 @@ const Checkout: React.FC = () => {
                     return;
                 }
 
-                // Thử lấy từ sessionStorage (dự phòng)
-                const savedData = sessionStorage.getItem('bookingData');
+                const savedData = sessionStorage.getItem("bookingData");
                 if (savedData) {
                     const data = JSON.parse(savedData) as BookingData;
                     setBookingData(data);
@@ -177,7 +179,6 @@ const Checkout: React.FC = () => {
                     return;
                 }
 
-                // Nếu không có dữ liệu, tạo dữ liệu mẫu để test
                 const mockData: BookingData = {
                     movieId: "movie1",
                     movieName: "Dune: Part Two",
@@ -193,9 +194,9 @@ const Checkout: React.FC = () => {
                     ticketCount: 3,
                     room: "Screen 4",
                 };
+
                 setBookingData(mockData);
                 setLoadingBooking(false);
-
                 message.info("Đang sử dụng dữ liệu mẫu để test");
             } catch (error) {
                 console.error("Error loading booking data:", error);
@@ -206,10 +207,6 @@ const Checkout: React.FC = () => {
 
         loadBookingData();
     }, [location.state]);
-
-    // QR Scanner reference
-    const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-    const qrCodeId = `qr-scanner-${Date.now()}`;
 
     // Check orientation
     useEffect(() => {
@@ -229,7 +226,8 @@ const Checkout: React.FC = () => {
     useEffect(() => {
         return () => {
             if (scannerRef.current) {
-                scannerRef.current.clear();
+                scannerRef.current.clear().catch(() => {});
+                scannerRef.current = null;
             }
         };
     }, []);
@@ -240,7 +238,7 @@ const Checkout: React.FC = () => {
             initScanner();
         } else {
             if (scannerRef.current) {
-                scannerRef.current.clear();
+                scannerRef.current.clear().catch(() => {});
                 scannerRef.current = null;
             }
         }
@@ -252,7 +250,7 @@ const Checkout: React.FC = () => {
         setPaymentInfo(null);
 
         setTimeout(() => {
-            const scannerElement = document.getElementById(qrCodeId);
+            const scannerElement = document.getElementById(qrCodeIdRef.current);
             if (!scannerElement) return;
 
             const config: ScannerConfig = {
@@ -264,8 +262,13 @@ const Checkout: React.FC = () => {
                 defaultZoomValueIfSupported: 2,
             };
 
+            if (scannerRef.current) {
+                scannerRef.current.clear().catch(() => {});
+                scannerRef.current = null;
+            }
+
             scannerRef.current = new Html5QrcodeScanner(
-                qrCodeId,
+                qrCodeIdRef.current,
                 config,
                 false
             );
@@ -279,7 +282,7 @@ const Checkout: React.FC = () => {
         }, 500);
     };
 
-    // Tạo VietQR payload với số tiền từ booking
+    // Tạo VietQR payload
     const generateVietQRPayload = (): string => {
         try {
             if (!bookingData) {
@@ -287,53 +290,42 @@ const Checkout: React.FC = () => {
             }
 
             const totalAmount = bookingData.totalAmount;
-            const seatList = bookingData.selectedSeats.map(s => s.id).join(',');
+            const seatList = bookingData.selectedSeats.map((s) => s.id).join(",");
 
-            // 1. Payload Format Indicator
-            let payload = '000201';
+            let payload = "000201";
+            payload += "010212";
 
-            // 2. Point of Initiation Method - Dynamic QR
-            payload += '010212';
-
-            // 3. Merchant Account Information (NAPAS)
-            const napasGUID = '0010A000000727';
-            const serviceCode = '0208QRIBFTTA';
+            const napasGUID = "0010A000000727";
+            const serviceCode = "0208QRIBFTTA";
             const bankInfo = `0126${selectedBank}0110${accountNumber}`;
 
             const merchantInfoContent = napasGUID + bankInfo + serviceCode;
-            const merchantInfoLength = merchantInfoContent.length.toString().padStart(2, '0');
+            const merchantInfoLength = merchantInfoContent.length.toString().padStart(2, "0");
 
             payload += `38${merchantInfoLength}${merchantInfoContent}`;
+            payload += "52045411";
+            payload += "5303704";
 
-            // 4. Merchant Category Code
-            payload += '52045411';
-
-            // 5. Transaction Currency (VND)
-            payload += '5303704';
-
-            // 6. Transaction Amount - Số tiền từ booking
             const amountStr = totalAmount.toString();
-            payload += `54${amountStr.length.toString().padStart(2, '0')}${amountStr}`;
+            payload += `54${amountStr.length.toString().padStart(2, "0")}${amountStr}`;
 
-            // 7. Country Code
-            payload += '5802VN';
+            payload += "5802VN";
 
-            // 8. Merchant Name
             const merchantName = removeVietnameseTones(accountName).substring(0, 25);
-            payload += `59${merchantName.length.toString().padStart(2, '0')}${merchantName}`;
+            payload += `59${merchantName.length.toString().padStart(2, "0")}${merchantName}`;
 
-            // 9. Merchant City (optional)
-            payload += '6002';
+            payload += "6002";
 
-            // 10. Additional Data - Nội dung chuyển khoản với số lượng vé
             const content = removeVietnameseTones(
                 `Thanh toan ${bookingData.ticketCount} ve ${bookingData.movieName} ${seatList}`
             ).substring(0, 25);
-            const contentLength = content.length.toString().padStart(2, '0');
-            payload += `62${(contentLength.length + contentLength + content).length.toString().padStart(2, '0')}08${contentLength}${content}`;
 
-            // 11. CRC
-            const crcData = payload + '6304';
+            const contentLength = content.length.toString().padStart(2, "0");
+            payload += `62${(contentLength.length + contentLength + content).length
+                .toString()
+                .padStart(2, "0")}08${contentLength}${content}`;
+
+            const crcData = payload + "6304";
             const crc = calculateCRC16(crcData);
             payload += `6304${crc}`;
 
@@ -348,31 +340,31 @@ const Checkout: React.FC = () => {
     // Parse QR code data
     const parseQRData = (qrData: string): PaymentInfo | null => {
         try {
-            // VietQR/NAPAS format
             if (qrData.startsWith("000201")) {
                 const amountMatch = qrData.match(/54(\d{2})(\d+)/);
-                const amount = amountMatch ? parseInt(amountMatch[2]) : (bookingData?.totalAmount || 0);
+                const amount = amountMatch
+                    ? parseInt(amountMatch[2], 10)
+                    : bookingData?.totalAmount || 0;
 
                 const contentMatch = qrData.match(/08(\d{2})([A-Z0-9 ]+)/);
                 const content = contentMatch ? contentMatch[2] : "Thanh toan ve phim";
 
                 return {
-                    amount: amount,
+                    amount,
                     orderId: `VIETQR${Date.now()}`,
                     bankCode: "VietQR",
                     description: content,
                 };
             }
 
-            // Payment URL format
             if (qrData.startsWith("https://payment.demo/")) {
                 const url = new URL(qrData);
-                const amount = url.searchParams.get('amount');
-                const pathParts = url.pathname.split('/');
+                const amount = url.searchParams.get("amount");
+                const pathParts = url.pathname.split("/");
                 const orderId = pathParts[pathParts.length - 1];
 
                 return {
-                    amount: amount ? parseInt(amount) : (bookingData?.totalAmount || 0),
+                    amount: amount ? parseInt(amount, 10) : bookingData?.totalAmount || 0,
                     orderId: orderId || `ORDER${Date.now()}`,
                     description: "Thanh toán trực tuyến",
                 };
@@ -388,7 +380,7 @@ const Checkout: React.FC = () => {
     // Handle successful QR scan
     const handleScanSuccess = (decodedText: string): void => {
         if (scannerRef.current) {
-            scannerRef.current.clear();
+            scannerRef.current.clear().catch(() => {});
         }
 
         const parsedInfo = parseQRData(decodedText);
@@ -397,10 +389,11 @@ const Checkout: React.FC = () => {
             setScanResult(decodedText);
             setPaymentInfo(parsedInfo);
 
-            // Check amount with booking data
             if (parsedInfo.amount !== bookingData.totalAmount) {
                 message.warning({
-                    content: `Số tiền QR (${formatMoney(parsedInfo.amount)}) không khớp với đơn hàng (${formatMoney(bookingData.totalAmount)})`,
+                    content: `Số tiền QR (${formatMoney(parsedInfo.amount)}) không khớp với đơn hàng (${formatMoney(
+                        bookingData.totalAmount
+                    )})`,
                     duration: 5,
                 });
             } else {
@@ -427,21 +420,20 @@ const Checkout: React.FC = () => {
         setProcessingPayment(true);
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise((resolve) => setTimeout(resolve, 2000));
 
             if (bookingData && info.amount !== bookingData.totalAmount) {
                 throw new Error("Số tiền không khớp");
             }
 
             message.open({
-                type: 'success',
+                type: "success",
                 content: `Thanh toán thành công! Số tiền: ${formatMoney(info.amount)}`,
-                icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+                icon: <CheckCircleOutlined style={{ color: "#52c41a" }} />,
                 duration: 3,
             });
 
-            // Clear booking data from sessionStorage
-            sessionStorage.removeItem('bookingData');
+            sessionStorage.removeItem("bookingData");
 
             setTimeout(() => {
                 setQrVisible(false);
@@ -452,12 +444,11 @@ const Checkout: React.FC = () => {
                         amount: info.amount,
                         orderId: info.orderId,
                         transactionId: `TXN${Date.now()}`,
-                        paymentMethod: paymentMethod,
-                        bookingData: bookingData,
-                    }
+                        paymentMethod,
+                        bookingData,
+                    },
                 });
             }, 1000);
-
         } catch (error) {
             message.error({
                 content: "Thanh toán thất bại. Vui lòng thử lại.",
@@ -469,16 +460,16 @@ const Checkout: React.FC = () => {
 
     // Format money
     const formatMoney = (amount: number): string => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
+        return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
         }).format(amount);
     };
 
     // Stop scanner
     const stopScanner = (): void => {
         if (scannerRef.current) {
-            scannerRef.current.clear();
+            scannerRef.current.clear().catch(() => {});
             scannerRef.current = null;
         }
         setScanMode(false);
@@ -507,6 +498,7 @@ const Checkout: React.FC = () => {
 
         if (window.ApplePaySession && window.ApplePaySession.canMakePayments()) {
             const amountUSD = (bookingData.totalAmount / 23000).toFixed(2);
+
             const session = new window.ApplePaySession(6, {
                 countryCode: "US",
                 currencyCode: "USD",
@@ -522,6 +514,7 @@ const Checkout: React.FC = () => {
                 if (window.ApplePaySession) {
                     session.completePayment(window.ApplePaySession.STATUS_SUCCESS);
                 }
+
                 setLoading(false);
                 message.success({
                     content: `Apple Pay successful! Amount: $${amountUSD}`,
@@ -553,6 +546,7 @@ const Checkout: React.FC = () => {
             });
 
             const amountUSD = (bookingData.totalAmount / 23000).toFixed(2);
+
             const paymentDataRequest = {
                 apiVersion: 2,
                 apiVersionMinor: 0,
@@ -614,7 +608,7 @@ const Checkout: React.FC = () => {
     };
 
     // Handle wallet payment
-    const handleWalletPayment = (wallet: string): void => {
+    const handleWalletPayment = (_wallet: string): void => {
         if (!bookingData) return;
 
         setLoading(true);
@@ -684,15 +678,16 @@ const Checkout: React.FC = () => {
         return bookingData.bookingId || `DH${Date.now()}`;
     };
 
-    // Calculate total amount by seat type (for display)
+    // Calculate total amount by seat type
     const getSeatTypeSummary = (): { type: string; count: number; total: number }[] => {
         if (!bookingData) return [];
 
         const summary = new Map<string, { count: number; total: number }>();
 
-        bookingData.selectedSeats.forEach(seat => {
-            const type = seat.type || 'standard';
+        bookingData.selectedSeats.forEach((seat) => {
+            const type = seat.type || "standard";
             const current = summary.get(type) || { count: 0, total: 0 };
+
             summary.set(type, {
                 count: current.count + 1,
                 total: current.total + seat.price,
@@ -706,25 +701,25 @@ const Checkout: React.FC = () => {
         }));
     };
 
-    // Loading state
     if (loadingBooking) {
         return (
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100vh',
-                background: '#0f1219'
-            }}>
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 24, color: '#3e80e4', marginBottom: 16 }}>⏳</div>
-                    <Text style={{ color: '#fff' }}>Đang tải thông tin đặt vé...</Text>
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100vh",
+                    background: "#0f1219",
+                }}
+            >
+                <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 24, color: "#3e80e4", marginBottom: 16 }}>⏳</div>
+                    <Text style={{ color: "#fff" }}>Đang tải thông tin đặt vé...</Text>
                 </div>
             </div>
         );
     }
 
-    // No booking data
     if (!bookingData) {
         return (
             <Card
@@ -741,7 +736,7 @@ const Checkout: React.FC = () => {
                 <Title level={3} style={{ color: "#fff" }}>
                     Không tìm thấy thông tin đặt vé
                 </Title>
-                <Text type="secondary" style={{ display: 'block', marginBottom: 20 }}>
+                <Text type="secondary" style={{ display: "block", marginBottom: 20 }}>
                     Vui lòng chọn ghế trước khi thanh toán
                 </Text>
                 <Button
@@ -770,7 +765,6 @@ const Checkout: React.FC = () => {
                     Thanh toán
                 </Title>
 
-                {/* Order Information with Seat Details */}
                 <Card
                     size="small"
                     style={{
@@ -786,29 +780,36 @@ const Checkout: React.FC = () => {
                         contentStyle={{ color: "#fff" }}
                     >
                         <Descriptions.Item label="Phim">
-                            <Text strong style={{ color: '#fff' }}>{bookingData.movieName}</Text>
+                            <Text strong style={{ color: "#fff" }}>
+                                {bookingData.movieName}
+                            </Text>
                         </Descriptions.Item>
+
                         <Descriptions.Item label="Suất chiếu">
                             {bookingData.showDate} - {bookingData.showTime}
                         </Descriptions.Item>
+
                         <Descriptions.Item label="Rạp">
-                            {bookingData.theater} {bookingData.room ? `• ${bookingData.room}` : ''}
+                            {bookingData.theater} {bookingData.room ? `• ${bookingData.room}` : ""}
                         </Descriptions.Item>
+
                         <Descriptions.Item label="Ghế đã chọn">
                             <Space wrap>
-                                {bookingData.selectedSeats.map(seat => (
-                                    <Tag key={seat.id} color="#3e80e4" style={{ padding: '4px 8px' }}>
+                                {bookingData.selectedSeats.map((seat) => (
+                                    <Tag key={seat.id} color="#3e80e4" style={{ padding: "4px 8px" }}>
                                         {seat.id} ({formatMoney(seat.price)})
                                     </Tag>
                                 ))}
                             </Space>
                         </Descriptions.Item>
+
                         <Descriptions.Item label="Chi tiết giá">
-                            {getSeatTypeSummary().map(item => (
+                            {getSeatTypeSummary().map((item) => (
                                 <div key={item.type} style={{ marginBottom: 4 }}>
                                     <Text type="secondary">{item.type.toUpperCase()}: </Text>
-                                    <Text style={{ color: '#fff' }}>
-                                        {item.count} ghế × {formatMoney(item.total / item.count)} = {formatMoney(item.total)}
+                                    <Text style={{ color: "#fff" }}>
+                                        {item.count} ghế × {formatMoney(item.total / item.count)} ={" "}
+                                        {formatMoney(item.total)}
                                     </Text>
                                 </div>
                             ))}
@@ -819,19 +820,18 @@ const Checkout: React.FC = () => {
 
                     <Row justify="space-between" align="middle">
                         <Col>
-                            <Text style={{ color: '#8c8c8c', fontSize: 16 }}>Tổng tiền:</Text>
+                            <Text style={{ color: "#8c8c8c", fontSize: 16 }}>Tổng tiền:</Text>
                             <br />
                             <Text type="secondary">{bookingData.ticketCount} vé</Text>
                         </Col>
                         <Col>
-                            <Title level={2} style={{ color: '#3e80e4', margin: 0 }}>
+                            <Title level={2} style={{ color: "#3e80e4", margin: 0 }}>
                                 {formatMoney(bookingData.totalAmount)}
                             </Title>
                         </Col>
                     </Row>
                 </Card>
 
-                {/* Payment Methods Tabs */}
                 <Tabs
                     activeKey={paymentMethod}
                     onChange={(key: string) => setPaymentMethod(key)}
@@ -872,8 +872,8 @@ const Checkout: React.FC = () => {
                                         Apple Pay
                                     </Title>
                                     <Text type="secondary">
-                                        Thanh toán {formatMoney(bookingData.totalAmount)}
-                                        ({bookingData.ticketCount} vé)
+                                        Thanh toán {formatMoney(bookingData.totalAmount)} (
+                                        {bookingData.ticketCount} vé)
                                     </Text>
                                 </div>
                             ),
@@ -892,8 +892,8 @@ const Checkout: React.FC = () => {
                                         Google Pay
                                     </Title>
                                     <Text type="secondary">
-                                        Thanh toán {formatMoney(bookingData.totalAmount)}
-                                        ({bookingData.ticketCount} vé)
+                                        Thanh toán {formatMoney(bookingData.totalAmount)} (
+                                        {bookingData.ticketCount} vé)
                                     </Text>
                                 </div>
                             ),
@@ -913,11 +913,22 @@ const Checkout: React.FC = () => {
                                     <Alert
                                         message="Thông tin thanh toán"
                                         description={
-                                            <div style={{ textAlign: 'left' }}>
-                                                <p><strong>Số tiền:</strong> {formatMoney(bookingData.totalAmount)}</p>
-                                                <p><strong>Số vé:</strong> {bookingData.ticketCount}</p>
-                                                <p><strong>Ghế:</strong> {bookingData.selectedSeats.map(s => s.id).join(', ')}</p>
-                                                <p><strong>Nội dung:</strong> Thanh toan {bookingData.ticketCount} ve {bookingData.movieName}</p>
+                                            <div style={{ textAlign: "left" }}>
+                                                <p>
+                                                    <strong>Số tiền:</strong>{" "}
+                                                    {formatMoney(bookingData.totalAmount)}
+                                                </p>
+                                                <p>
+                                                    <strong>Số vé:</strong> {bookingData.ticketCount}
+                                                </p>
+                                                <p>
+                                                    <strong>Ghế:</strong>{" "}
+                                                    {bookingData.selectedSeats.map((s) => s.id).join(", ")}
+                                                </p>
+                                                <p>
+                                                    <strong>Nội dung:</strong> Thanh toan{" "}
+                                                    {bookingData.ticketCount} ve {bookingData.movieName}
+                                                </p>
                                             </div>
                                         }
                                         type="info"
@@ -940,8 +951,8 @@ const Checkout: React.FC = () => {
                                         Momo QR
                                     </Title>
                                     <Text type="secondary">
-                                        Quét mã để thanh toán {formatMoney(bookingData.totalAmount)}
-                                        ({bookingData.ticketCount} vé)
+                                        Quét mã để thanh toán {formatMoney(bookingData.totalAmount)} (
+                                        {bookingData.ticketCount} vé)
                                     </Text>
                                 </div>
                             ),
@@ -951,8 +962,7 @@ const Checkout: React.FC = () => {
 
                 <Divider />
 
-                {/* Action Buttons */}
-                <Space direction="vertical" style={{ width: '100%' }} size="small">
+                <Space direction="vertical" style={{ width: "100%" }} size="small">
                     <Button
                         type="link"
                         icon={<ArrowLeftOutlined />}
@@ -976,13 +986,12 @@ const Checkout: React.FC = () => {
                 </Space>
             </Card>
 
-            {/* QR Code Modal */}
             <Modal
                 title={
-                    <div style={{ textAlign: 'center' }}>
-                        {scanMode ? 'Quét mã QR thanh toán' : 'Mã VietQR thanh toán'}
+                    <div style={{ textAlign: "center" }}>
+                        {scanMode ? "Quét mã QR thanh toán" : "Mã VietQR thanh toán"}
                         {!isLandscape && scanMode && (
-                            <div style={{ fontSize: 14, color: '#faad14', marginTop: 8 }}>
+                            <div style={{ fontSize: 14, color: "#faad14", marginTop: 8 }}>
                                 ⚠️ Vui lòng xoay ngang màn hình để quét QR dễ dàng hơn
                             </div>
                         )}
@@ -992,30 +1001,31 @@ const Checkout: React.FC = () => {
                 footer={null}
                 onCancel={handleModalClose}
                 centered
-                width={isLandscape ? '80%' : 500}
-                style={{ maxWidth: isLandscape ? '80%' : 500 }}
+                width={isLandscape ? "80%" : 500}
+                style={{ maxWidth: isLandscape ? "80%" : 500 }}
             >
-                <div style={{ padding: isLandscape ? '20px 40px' : '20px' }}>
-                    {/* Amount Display */}
+                <div style={{ padding: isLandscape ? "20px 40px" : "20px" }}>
                     <Card
                         size="small"
                         style={{
                             marginBottom: 20,
-                            background: '#f0f5ff',
-                            borderColor: '#3e80e4',
-                            textAlign: 'center'
+                            background: "#f0f5ff",
+                            borderColor: "#3e80e4",
+                            textAlign: "center",
                         }}
                     >
                         <Statistic
                             title="Số tiền thanh toán"
                             value={formatMoney(paymentInfo?.amount || bookingData.totalAmount)}
-                            valueStyle={{ color: '#3e80e4', fontSize: 28 }}
+                            valueStyle={{ color: "#3e80e4", fontSize: 28 }}
                             prefix={<DollarOutlined />}
                         />
+
                         {bookingData && (
                             <div style={{ marginTop: 8 }}>
                                 <Text type="secondary">
-                                    {bookingData.ticketCount} vé - Ghế: {bookingData.selectedSeats.map(s => s.id).join(", ")}
+                                    {bookingData.ticketCount} vé - Ghế:{" "}
+                                    {bookingData.selectedSeats.map((s) => s.id).join(", ")}
                                 </Text>
                                 <br />
                                 <Text type="secondary" style={{ fontSize: 12 }}>
@@ -1025,8 +1035,14 @@ const Checkout: React.FC = () => {
                         )}
                     </Card>
 
-                    {/* Mode Switch Buttons */}
-                    <div style={{ marginBottom: 20, display: 'flex', gap: 10, justifyContent: 'center' }}>
+                    <div
+                        style={{
+                            marginBottom: 20,
+                            display: "flex",
+                            gap: 10,
+                            justifyContent: "center",
+                        }}
+                    >
                         <Button
                             type={!scanMode ? "primary" : "default"}
                             onClick={() => {
@@ -1039,6 +1055,7 @@ const Checkout: React.FC = () => {
                         >
                             Hiển thị QR
                         </Button>
+
                         <Button
                             type={scanMode ? "primary" : "default"}
                             onClick={() => {
@@ -1054,7 +1071,6 @@ const Checkout: React.FC = () => {
                     </div>
 
                     {scanMode ? (
-                        // Scanner Mode
                         <div>
                             {scanError && (
                                 <Alert
@@ -1077,13 +1093,13 @@ const Checkout: React.FC = () => {
                             )}
 
                             <div
-                                id={qrCodeId}
+                                id={qrCodeIdRef.current}
                                 style={{
-                                    width: '100%',
+                                    width: "100%",
                                     minHeight: 300,
-                                    background: '#f0f2f5',
+                                    background: "#f0f2f5",
                                     borderRadius: 8,
-                                    overflow: 'hidden'
+                                    overflow: "hidden",
                                 }}
                             />
 
@@ -1110,38 +1126,68 @@ const Checkout: React.FC = () => {
                             )}
                         </div>
                     ) : (
-                        // QR Display Mode
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: isLandscape ? 'row' : 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: isLandscape ? 40 : 20,
-                        }}>
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: isLandscape ? "row" : "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: isLandscape ? 40 : 20,
+                            }}
+                        >
                             <div>
                                 <QRCode
-                                    value={paymentMethod === "vnpay" ? generateVietQRPayload() : `https://payment.demo/order/${getOrderReference()}?amount=${bookingData.totalAmount}`}
+                                    value={
+                                        paymentMethod === "vnpay"
+                                            ? generateVietQRPayload()
+                                            : `https://payment.demo/order/${getOrderReference()}?amount=${bookingData.totalAmount}`
+                                    }
                                     size={isLandscape ? 300 : 250}
-                                    bordered={true}
-                                    icon={paymentMethod === "vnpay" ? "https://vietqr.net/logo.png" : undefined}
+                                    bordered
+                                    icon={
+                                        paymentMethod === "vnpay"
+                                            ? "https://vietqr.net/logo.png"
+                                            : undefined
+                                    }
                                     iconSize={40}
                                 />
-                                <Text type="secondary" style={{ display: 'block', marginTop: 8, textAlign: 'center' }}>
+                                <Text
+                                    type="secondary"
+                                    style={{
+                                        display: "block",
+                                        marginTop: 8,
+                                        textAlign: "center",
+                                    }}
+                                >
                                     Mã đơn hàng: {getOrderReference()}
                                 </Text>
                             </div>
 
-                            <div style={{ textAlign: 'center', maxWidth: 300 }}>
-                                <Title level={isLandscape ? 3 : 4} style={{ marginTop: 0, color: '#3e80e4' }}>
+                            <div style={{ textAlign: "center", maxWidth: 300 }}>
+                                <Title
+                                    level={isLandscape ? 3 : 4}
+                                    style={{ marginTop: 0, color: "#3e80e4" }}
+                                >
                                     {formatMoney(bookingData.totalAmount)}
                                 </Title>
 
-                                <div style={{ background: '#f5f5f5', padding: 12, borderRadius: 8, marginBottom: 12 }}>
+                                <div
+                                    style={{
+                                        background: "#f5f5f5",
+                                        padding: 12,
+                                        borderRadius: 8,
+                                        marginBottom: 12,
+                                    }}
+                                >
                                     <Text strong>{bookingData.movieName}</Text>
                                     <br />
-                                    <Text>{bookingData.showDate} - {bookingData.showTime}</Text>
+                                    <Text>
+                                        {bookingData.showDate} - {bookingData.showTime}
+                                    </Text>
                                     <br />
-                                    <Text>Ghế: {bookingData.selectedSeats.map(s => s.id).join(', ')}</Text>
+                                    <Text>
+                                        Ghế: {bookingData.selectedSeats.map((s) => s.id).join(", ")}
+                                    </Text>
                                     <br />
                                     <Text type="success">{bookingData.ticketCount} vé</Text>
                                 </div>
@@ -1168,9 +1214,8 @@ const Checkout: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Scan Button for Portrait Mode */}
                     {!scanMode && !isLandscape && (
-                        <div style={{ marginTop: 20, textAlign: 'center' }}>
+                        <div style={{ marginTop: 20, textAlign: "center" }}>
                             <Button
                                 type="primary"
                                 size="large"

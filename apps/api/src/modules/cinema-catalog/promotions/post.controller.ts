@@ -1,160 +1,59 @@
-import { Request, Response } from "express";
-import slugify from "../../../utils/assets/slugify";
-import { catchAsync } from "@api/utils/catchAsync";
-import { Post } from "./post.model";
+import { Request, Response } from 'express';
+import slugify from '../../../utils/assets/slugify';
+import { catchAsync } from '@api/utils/catchAsync';
+import { Post } from './post.model';
 
-// @desc    Create a new post
-// @route   POST /api/posts
-// @access  Private/Admin
+const notFound = (res: Response) => res.status(404).json({ message: 'Post not found' });
+
 export const createPost = catchAsync(async (req: Request, res: Response) => {
-  const {
-    avatar,
-    title,
-    content,
-    summary,
-    type,
-    status,
-    startDate,
-    endDate,
-    featured,
-  } = req.body;
+  const { title, content, category, ...rest } = req.body;
+  if (!title || !content)
+    return res.status(400).json({ message: 'Title and content are required' });
 
-  if (!title || !content) {
-    res.status(400).json({ message: "Title and content are required" });
-    return;
-  }
-
-  const slug = slugify(title);
-
-  const newPost = await Post.create({
-    avatar,
-    title,
-    slug,
-    content,
-    summary,
-    type,
-    status,
-    startDate,
-    endDate,
-    featured,
-  });
-
-  res.status(201).json({
-    message: "Post created successfully",
-    data: newPost,
-  });
+  const newPost = await Post.create({ ...rest, title, content, category, slug: slugify(title) });
+  res.status(201).json({ message: 'Post created successfully', data: newPost });
 });
 
-// @desc    Get all posts
-// @route   GET /api/posts
-// @access  Public
 export const getPosts = catchAsync(async (_req: Request, res: Response) => {
-  const posts = await Post.find().select("-__v").sort({ createdAt: -1 });
-  res.status(200).json({
-    message: "Posts fetched successfully",
-    data: posts,
-  });
+  const posts = await Post.find().select('-__v').sort({ createdAt: -1 });
+  res.status(200).json({ message: 'Posts fetched successfully', data: posts });
 });
 
 export const getPostById = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const post = await Post.findById(id);
-
-  if (!post) {
-    res.status(404).json({ message: "Post not found" });
-    return;
-  }
-
-  res.status(200).json({
-    message: "Post fetched successfully",
-    data: post,
-  });
+  const post = await Post.findById(req.params.id);
+  if (!post) return notFound(res);
+  res.status(200).json({ message: 'Post fetched successfully', data: post });
 });
 
-// @desc    Get single post by slug
-// @route   GET /api/posts/:slug
-// @access  Public
 export const getPostBySlug = catchAsync(async (req: Request, res: Response) => {
-  const { slug } = req.params;
-  const post = await Post.findOne({ slug });
-
-  if (!post) {
-    res.status(404).json({ message: "Post not found" });
-    return;
-  }
-
-  res.status(200).json({
-    message: "Post fetched successfully",
-    data: post,
-  });
+  const post = await Post.findOne({ slug: req.params.slug });
+  if (!post) return notFound(res);
+  res.status(200).json({ message: 'Post fetched successfully', data: post });
 });
 
-// @desc    Update a post
 // @route   PATCH /api/posts/:id
-// @access  Private/Admin
 export const updatePost = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const {
-    avatar,
-    title,
-    content,
-    summary,
-    type,
-    status,
-    startDate,
-    endDate,
-    featured,
-  } = req.body;
-
-  const post = await Post.findById(id);
-
-  if (!post) {
-    res.status(404).json({ message: "Post not found" });
-    return;
-  }
-
-  const updatedData: any = {
-    avatar,
-    title,
-    content,
-    summary,
-    type,
-    status,
-    startDate,
-    endDate,
-    featured,
-  };
-
+  const { title, content, category, ...rest } = req.body;
+  const updatedData: any = { ...rest };
   if (title) {
+    updatedData.title = title;
     updatedData.slug = slugify(title);
   }
+  if (content) updatedData.content = content;
+  if (category) updatedData.category = category;
+  if (req.body.title) updatedData.slug = slugify(req.body.title);
 
   const updatedPost = await Post.findByIdAndUpdate(id, updatedData, {
     new: true,
     runValidators: true,
   });
-
-  res.status(200).json({
-    message: "Post updated successfully",
-    data: updatedPost,
-  });
+  if (!updatedPost) return notFound(res);
+  res.status(200).json({ message: 'Post updated successfully', data: updatedPost });
 });
 
-// @desc    Delete a post
-// @route   DELETE /api/posts/:id
-// @access  Private/Admin
 export const deletePost = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const post = await Post.findById(id);
-
-  if (!post) {
-    res.status(404).json({ message: "Post not found" });
-    return;
-  }
-
-  await Post.findByIdAndDelete(id);
-
-  res.status(200).json({ message: "Post deleted successfully" });
+  const post = await Post.findByIdAndDelete(req.params.id);
+  if (!post) return notFound(res);
+  res.status(200).json({ message: 'Post deleted successfully' });
 });
