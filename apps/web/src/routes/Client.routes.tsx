@@ -30,8 +30,6 @@ import CinemaDetail from '@web/pages/CinemaDetail';
 import Contact from '@web/pages/clients/public/Contact';
 
 import PaymentsMethod from '@web/pages/clients/payments/PaymentMethod';
-import { PaymentFailed } from '@web/pages/clients/payments/PaymentFailed';
-import { PaymentSuccess } from '@web/pages/clients/payments/PaymentSuccess';
 import Ticket from '@web/pages/Ticket';
 import Register from '@web/pages/clients/auth/Register';
 
@@ -98,12 +96,7 @@ export const ClientRoutes: RouteObject = {
     {
       path: 'payments',
       element: <PaymentsMethod />,
-      children: [
-        { path: 'failed', element: <PaymentFailed /> },
-        { path: 'success', element: <PaymentSuccess /> },
-        { path: "payment-result", element: <PaymentResult /> },
-        { path: 'result', element: <PaymentResult /> },
-      ],
+      children: [{ path: 'result', element: <PaymentResult /> }],
     },
 
 
