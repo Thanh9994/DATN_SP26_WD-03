@@ -11,6 +11,7 @@ import paymentRouter from "./modules/sales-operations/payments/payment.route";
 import chatbotRoute from "./modules/chatbot/chatbot.route";
 import { notFoundMiddleware } from "./middlewares/notFound.middleware";
 import compression from "compression";
+import contactRoute from "./modules/contact/contact.route";
 
 const app = express();
 app.set("etag", false);
@@ -36,6 +37,7 @@ api.use("/catalog", catalogRouter);
 api.use("/content", contentRouter);
 api.use("/order", orderRouter);
 api.use("/chatbot", chatbotRoute);
+api.use("/contact", contactRoute);
 
 app.use("/api", api);
 app.use("/api/uploads", uploadRouter);
@@ -43,4 +45,5 @@ app.use("/payments", paymentRouter);
 
 app.use(notFoundMiddleware);
 app.use(globalErrorHandler);
+
 export default app;
