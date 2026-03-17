@@ -1,140 +1,102 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Footer = () => {
   const navigate = useNavigate();
+
   return (
     <div>
+      {/* DESKTOP */}
       <footer className="hidden md:block bg-background-dark py-14 px-6 lg:px-10 border-t border-white/5 md:m-auto mt-20">
         <div className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-16">
-          {/* Logo + Description */}
+          
+          {/* Logo */}
           <div className="col-span-1">
-            <div className="flex items-center gap-1 mb-2">
-              <div
-                className="rounded-lg flex items-center justify-center gap-2"
-                onClick={() => navigate("/")}
-              >
-                <img
-                  src="https://res.cloudinary.com/dcyzkqb1r/image/upload/t_PVM3/f_webp/q_40/H%E1%BB%8Fa_T%E1%BB%91c_fh4emr"
-                  alt="Cinema logo"
-                  className="w-[70px] h-[70px] object-cover"
-                />
-                <h2 className="text-white text-xl font-black uppercase">
-                  Cinema
-                </h2>
-              </div>
+            <div
+              className="flex items-center gap-2 mb-2 cursor-pointer"
+              onClick={() => navigate("/")}
+            >
+              <img
+                src="https://res.cloudinary.com/dcyzkqb1r/image/upload/t_PVM3/f_webp/q_40/H%E1%BB%8Fa_T%E1%BB%91c_fh4emr"
+                alt="Cinema logo"
+                className="w-[70px] h-[70px] object-cover"
+              />
+              <h2 className="text-white text-xl font-black uppercase">
+                Cinema
+              </h2>
             </div>
 
             <p className="text-white/40 text-sm leading-loose mb-3">
               Experience the magic of cinema from your theater seat to your
-              living room. The premium destination for movie enthusiasts.
+              living room.
             </p>
-
-            <div className="flex gap-4">
-              <a
-                className="w-12 h-12 rounded-full flex items-center justify-center text-white/60 hover:text-white transition-all bg-white/5"
-                href="#"
-              >
-                <span className="material-symbols-outlined">
-                  social_leaderboard
-                </span>
-              </a>
-
-              <a
-                className="w-12 h-12 rounded-full flex items-center justify-center text-white/60 hover:text-white transition-all bg-white/5"
-                href="#"
-              >
-                <span className="material-symbols-outlined">mail</span>
-              </a>
-            </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-bold mb-8 uppercase tracking-widest text-xs">
+            <h4 className="text-white font-bold mb-8 uppercase text-xs">
               Quick Links
             </h4>
+
             <ul className="space-y-4 text-sm text-white/50">
               <li>
-                <a
-                  className="hover:text-primary transition-colors font-medium"
-                  href="#"
-                >
+                <Link to="/movielist" className="hover:text-primary font-medium">
                   Latest Releases
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  className="hover:text-primary transition-colors font-medium"
-                  href="#"
-                >
+                <Link to="/movielist" className="hover:text-primary font-medium">
                   Upcoming Movies
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  className="hover:text-primary transition-colors font-medium"
-                  href="#"
-                >
-                  IMAX Experience
-                </a>
+                <Link to="/cinema" className="hover:text-primary font-medium">
+                  Cinemas
+                </Link>
               </li>
               <li>
-                <a
-                  className="hover:text-primary transition-colors font-medium"
-                  href="#"
-                >
-                  Gift Cards
-                </a>
+                <Link to="/foods" className="hover:text-primary font-medium">
+                  Foods & Drinks
+                </Link>
               </li>
             </ul>
           </div>
 
           {/* Support */}
           <div>
-            <h4 className="text-white font-bold mb-8 uppercase tracking-widest text-xs">
+            <h4 className="text-white font-bold mb-8 uppercase text-xs">
               Support
             </h4>
+
             <ul className="space-y-4 text-sm text-white/50">
               <li>
-                <a
-                  className="hover:text-primary transition-colors font-medium"
-                  href="#"
-                >
+                <Link to="/contact" className="hover:text-primary font-medium">
                   Help Center
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  className="hover:text-primary transition-colors font-medium"
-                  href="#"
-                >
+                <Link to="/contact" className="hover:text-primary font-medium">
                   Refund Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  className="hover:text-primary transition-colors font-medium"
-                  href="#"
-                >
+                <Link to="/about" className="hover:text-primary font-medium">
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  className="hover:text-primary transition-colors font-medium"
-                  href="#"
-                >
+                <Link to="/about" className="hover:text-primary font-medium">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Get our App */}
-          <div className="mx-auto">
-            <h4 className="text-white font-bold mb-4 uppercase tracking-widest text-xs">
+          {/* App */}
+          <div>
+            <h4 className="text-white font-bold mb-4 uppercase text-xs">
               Get our App
             </h4>
+
             <div className="space-y-2">
               <button className="w-full bg-white/5 hover:bg-white/10 rounded-2xl px-4 py-4 flex items-center">
                 <span className="material-symbols-outlined text-3xl px-2 text-white">
@@ -164,43 +126,54 @@ export const Footer = () => {
           </p>
         </div>
       </footer>
-      <footer className="md:hidden ">
-        <nav className="fixed bottom-0 left-0 w-full bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/10 px-6 py-3 flex items-center justify-between z-[60">
-          <button
-            className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ff000d] transition-colors"
-            onClick={() => navigate("/")}
-          >
-            <span className="material-symbols-outlined text-[24px]">home</span>
-            <span className="text-[10px] font-medium text-white">Home</span>
+
+      {/* MOBILE */}
+      <footer className="md:hidden">
+        <nav className="fixed bottom-0 left-0 w-full bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/10 px-6 py-3 flex items-center justify-between z-[60]">
+          
+          <button onClick={() => navigate("/")}>
+            <div className="flex flex-col items-center text-white/60">
+              <span className="material-symbols-outlined text-[24px]">home</span>
+              <span className="text-[10px] text-white">Home</span>
+            </div>
           </button>
 
-          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ff000d] transition-colors">
-            <span className="material-symbols-outlined text-[24px] filled">
-              confirmation_number
-            </span>
-            <span className="text-[10px] font-medium text-white">Events</span>
+          <button onClick={() => navigate("/event")}>
+            <div className="flex flex-col items-center text-white/60">
+              <span className="material-symbols-outlined text-[24px]">
+                confirmation_number
+              </span>
+              <span className="text-[10px] text-white">Events</span>
+            </div>
           </button>
 
-          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ea2a33] transition-colors">
-            <span className="material-symbols-outlined text-[24px] filled">
-              confirmation_number
-            </span>
-            <span className="text-[10px] font-medium text-white">Ticket</span>
+          <button onClick={() => navigate("/ticket")}>
+            <div className="flex flex-col items-center text-white/60">
+              <span className="material-symbols-outlined text-[24px]">
+                confirmation_number
+              </span>
+              <span className="text-[10px] text-white">Ticket</span>
+            </div>
           </button>
 
-          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ea2a33] transition-colors">
-            <span className="material-symbols-outlined text-[24px]">
-              live_tv
-            </span>
-            <span className="text-[10px] font-medium text-white">Streams</span>
+          <button onClick={() => navigate("/showtime")}>
+            <div className="flex flex-col items-center text-white/60">
+              <span className="material-symbols-outlined text-[24px]">
+                live_tv
+              </span>
+              <span className="text-[10px] text-white">Showtime</span>
+            </div>
           </button>
 
-          <button className="flex flex-col items-center gap-1 text-white/60 hover:text-[#ea2a33] transition-colors">
-            <span className="material-symbols-outlined text-[24px]">
-              person
-            </span>
-            <span className="text-[10px] font-medium text-white">Profile</span>
+          <button onClick={() => navigate("/profile")}>
+            <div className="flex flex-col items-center text-white/60">
+              <span className="material-symbols-outlined text-[24px]">
+                person
+              </span>
+              <span className="text-[10px] text-white">Profile</span>
+            </div>
           </button>
+
         </nav>
       </footer>
     </div>
