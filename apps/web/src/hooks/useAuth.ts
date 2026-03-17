@@ -115,6 +115,22 @@ export const useAuth = () => {
       showNotify('error', 'Lỗi', err.response?.data?.message || 'Không thể gửi lại mã');
     },
   });
+  
+const verifyEmailMutation = useMutation({
+  mutationFn: async (token: string) => {
+    const { data } = await axios.get(`${API.AUTH}/verify-email`, {
+      params: { token },
+    });
+    return data;
+  },
+  onSuccess: () => {
+    showNotify("success", "Xác nhận email thành công");
+  },
+  onError: (err: any) => {
+    showNotify("error", err?.response?.data?.message || "Xác nhận email thất bại");
+    console.error(err?.message || "Xác nhận email thất bại");
+  },
+});
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -128,11 +144,10 @@ export const useAuth = () => {
   const { data: users, isLoading: isLoadingUsers } = useQuery<IUser[]>({
     queryKey: ['users'],
     queryFn: async () => {
-      if (user?.role !== 'admin') return [];
       const { data } = await axiosAuth.get(`${API.USERS}/`);
       return data;
     },
-    enabled: !!getStoredToken() && !!user,
+    enabled: !!getStoredToken() && !!user && ['admin', 'manager'].includes(user.role),
     staleTime: 1000 * 60 * 5,
   });
   const updateMutation = useMutation({
@@ -163,6 +178,8 @@ export const useAuth = () => {
   });
 
   return {
+    verifyEmail:
+    verifyEmailMutation.mutateAsync,
     user,
     users,
     isLoading,

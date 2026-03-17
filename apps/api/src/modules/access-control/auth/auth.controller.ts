@@ -76,7 +76,7 @@ export const Register = catchAsync(async (req, res) => {
               <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 0;">
                 Mã này sẽ hết hạn trong <strong style="color: #f1f5f9;">10 phút</strong>.<br>
                 Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này.
-              </p>
+</p>
               
             </td>
           </tr>
@@ -163,8 +163,8 @@ export const resendOtp = catchAsync(async (req, res) => {
                 
                 <div style="
                   font-size: 42px; 
-                  font-weight: 800; 
-                  letter-spacing: 10px; 
+                  font-weight: 800;
+letter-spacing: 10px; 
                   color: #ffffff; 
                   text-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
                   user-select: all; /* Hỗ trợ một số trình duyệt tự chọn toàn bộ khi chạm */
@@ -249,7 +249,7 @@ export const forgotPassword = catchAsync(async (req, res) => {
 
   await user.save();
 
-  const resetUrl = `${process.env.FRONTEND_RP_URL}/${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL}/${resetToken}`;
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
