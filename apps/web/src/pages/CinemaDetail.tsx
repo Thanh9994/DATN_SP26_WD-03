@@ -4,12 +4,9 @@ import {
   Camera,
   Clapperboard,
   Clock3,
-  Heart,
   Mail,
   MapPin,
   Phone,
-  Share2,
-  Ticket,
   UtensilsCrossed,
   Volume2,
 } from "lucide-react";
@@ -77,12 +74,11 @@ export default function CinemaDetail() {
       <div className="mx-auto max-w-[1600px]">
 
         {/* HEADER */}
-        <header className="flex items-center justify-between border-b border-white/10 px-4 md:px-8 py-4">
+        {/* <header className="flex items-center justify-between border-b border-white/10 px-4 md:px-8 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#ff3b3b]">
               <Ticket size={16} />
             </div>
-            <span className="text-xl md:text-[28px] font-bold">CineStream</span>
           </div>
 
           <nav className="hidden md:flex items-center gap-10">
@@ -108,7 +104,7 @@ export default function CinemaDetail() {
               <Share2 size={18} />
             </button>
           </div>
-        </header>
+        </header> */}
 
         <main className="px-4 md:px-8 pb-16 pt-4">
 
