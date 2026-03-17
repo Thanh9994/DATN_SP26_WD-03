@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { sendContactMail } from "./contact.controller";
 
-const contactRoute = Router();
+const contactRouter = Router();
 
-contactRoute.post("/", sendContactMail);
+contactRouter.post("/", sendContactMail);
 
-export default contactRoute;
+export default contactRouter;
