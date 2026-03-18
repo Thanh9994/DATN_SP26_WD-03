@@ -8,6 +8,7 @@ import {
   message,
   DatePicker,
   Space,
+  Select,
 } from "antd";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,6 +21,15 @@ import TiptapEditor from "@web/components/tools/Editor";
 const { Title } = Typography;
 const { TextArea } = Input;
 
+const categoryOptions = [
+  { label: "Promotion", value: "promotion" },
+  { label: "Film Festival", value: "film-festival" },
+  { label: "Live Premiere", value: "live-premiere" },
+  { label: "Film Meetup", value: "film-meetup" },
+  { label: "Q&A Session", value: "qa-session" },
+  { label: "Special Screening", value: "special-screening" },
+];
+
 const PromotionForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -31,6 +41,7 @@ const PromotionForm = () => {
   const [loading, setLoading] = useState(false);
 
   const title = Form.useWatch("title", form);
+
   const fetchPromotion = async () => {
     if (!id) return;
 
@@ -44,6 +55,7 @@ const PromotionForm = () => {
         ...post,
         startDate: post.startDate ? dayjs(post.startDate) : null,
         endDate: post.endDate ? dayjs(post.endDate) : null,
+        category: post.category || "promotion",
       });
 
       setContent(post.content || "");
@@ -60,6 +72,8 @@ const PromotionForm = () => {
 
   const onFinish = async (values: any) => {
     try {
+      setLoading(true);
+
       const payload = {
         ...values,
         slug: toSlug(values.title),
@@ -67,6 +81,7 @@ const PromotionForm = () => {
         startDate: values.startDate?.toISOString() || null,
         endDate: values.endDate?.toISOString() || null,
         type: "promotion",
+        category: values.category || "promotion",
       };
 
       if (isEdit) {
@@ -78,8 +93,10 @@ const PromotionForm = () => {
       }
 
       navigate("/admin/promotions");
-    } catch {
-      message.error("Save failed");
+    } catch (error: any) {
+      message.error(error?.response?.data?.message || "Save failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,12 +111,13 @@ const PromotionForm = () => {
         initialValues={{
           featured: false,
           status: "published",
+          category: "promotion",
         }}
       >
         <Form.Item label="Avatar" name="avatar" rules={[{ required: true }]}>
-          <Input
-          />
+          <Input />
         </Form.Item>
+
         <Form.Item label="Title" name="title" rules={[{ required: true }]}>
           <Input
             onChange={(e) => {
@@ -117,18 +135,23 @@ const PromotionForm = () => {
           <Input />
         </Form.Item>
 
-        {/* SUMMARY */}
+        <Form.Item
+          label="Category"
+          name="category"
+          rules={[{ required: true, message: "Vui lòng chọn category" }]}
+        >
+          <Select options={categoryOptions} placeholder="Chọn category" />
+        </Form.Item>
+
         <Form.Item label="Summary" name="summary">
           <TextArea rows={3} />
         </Form.Item>
 
-        {/* CONTENT */}
         <Form.Item label="Content">
           <TiptapEditor value={content} onChange={setContent} />
         </Form.Item>
 
-        {/* DATES */}
-        <Space size={20}>
+        <Space size={20} wrap>
           <Form.Item label="Start Date" name="startDate">
             <DatePicker />
           </Form.Item>
@@ -137,7 +160,7 @@ const PromotionForm = () => {
             <DatePicker
               disabledDate={(current) => {
                 const start = form.getFieldValue("startDate");
-                return start && current.isBefore(start);
+                return start && current && current.isBefore(start, "day");
               }}
             />
           </Form.Item>
@@ -147,7 +170,6 @@ const PromotionForm = () => {
           </Form.Item>
         </Space>
 
-        {/* SUBMIT */}
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading}>
             {isEdit ? "Update" : "Create"}
