@@ -8,6 +8,7 @@ import {
   message,
   DatePicker,
   Space,
+  Select,
 } from "antd";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -18,6 +19,15 @@ import TiptapEditor from "@web/components/tools/Editor";
 
 const { Title } = Typography;
 const { TextArea } = Input;
+
+const categoryOptions = [
+  { label: "Promotion", value: "promotion" },
+  { label: "Film Festival", value: "film-festival" },
+  { label: "Live Premiere", value: "live-premiere" },
+  { label: "Film Meetup", value: "film-meetup" },
+  { label: "Q&A Session", value: "qa-session" },
+  { label: "Special Screening", value: "special-screening" },
+];
 
 const PromotionForm = () => {
   const [form] = Form.useForm();
@@ -42,6 +52,7 @@ const PromotionForm = () => {
         ...post,
         startDate: post.startDate ? dayjs(post.startDate) : null,
         endDate: post.endDate ? dayjs(post.endDate) : null,
+        category: post.category || "promotion",
       });
 
       setContent(post.content || "");
@@ -64,8 +75,8 @@ const PromotionForm = () => {
         ...values,
         slug: toSlug(values.title),
         content,
-        category: "promotion",
         type: "promotion",
+        category: values.category || "promotion",
         startDate: values.startDate ? values.startDate.toISOString() : null,
         endDate: values.endDate ? values.endDate.toISOString() : null,
       };
@@ -80,9 +91,7 @@ const PromotionForm = () => {
 
       navigate("/admin/promotions");
     } catch (error: any) {
-      message.error(
-        error?.response?.data?.message || "Save failed"
-      );
+      message.error(error?.response?.data?.message || "Save failed");
     } finally {
       setLoading(false);
     }
@@ -98,21 +107,15 @@ const PromotionForm = () => {
         onFinish={onFinish}
         initialValues={{
           featured: false,
+          status: "published",
+          category: "promotion",
         }}
       >
-        <Form.Item
-          label="Avatar"
-          name="avatar"
-          rules={[{ required: true, message: "Vui lòng nhập link ảnh" }]}
-        >
-          <Input placeholder="Nhập URL ảnh..." />
+        <Form.Item label="Avatar" name="avatar" rules={[{ required: true }]}>
+          <Input />
         </Form.Item>
 
-        <Form.Item
-          label="Title"
-          name="title"
-          rules={[{ required: true, message: "Vui lòng nhập tiêu đề" }]}
-        >
+        <Form.Item label="Title" name="title" rules={[{ required: true }]}>
           <Input
             onChange={(e) => {
               const value = e.target.value;
@@ -129,11 +132,19 @@ const PromotionForm = () => {
           <Input />
         </Form.Item>
 
+        <Form.Item
+          label="Category"
+          name="category"
+          rules={[{ required: true, message: "Vui lòng chọn category" }]}
+        >
+          <Select options={categoryOptions} placeholder="Chọn category" />
+        </Form.Item>
+
         <Form.Item label="Summary" name="summary">
           <TextArea rows={3} />
         </Form.Item>
 
-        <Form.Item label="Content" required>
+        <Form.Item label="Content">
           <TiptapEditor value={content} onChange={setContent} />
         </Form.Item>
 
