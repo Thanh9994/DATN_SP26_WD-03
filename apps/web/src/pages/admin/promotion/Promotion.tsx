@@ -25,7 +25,7 @@ interface Promotion {
   _id: string;
   title: string;
   slug: string;
-  isActive: boolean;
+  featured: boolean;
   createdAt: string;
 }
 
@@ -39,11 +39,12 @@ const PromotionList = () => {
     setLoading(true);
     try {
       const res = await axios.get(API.PROMOTION);
-      setData(res.data.data || res.data);
-    } catch (error) {
+      setData(res.data.data || []);
+    } catch {
       message.error("Failed to fetch promotions");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -61,7 +62,7 @@ const PromotionList = () => {
   };
 
   const filteredData = data.filter((item) =>
-    item.title.toLowerCase().includes(searchText.toLowerCase()),
+    item.title.toLowerCase().includes(searchText.toLowerCase())
   );
 
   const columns = [
@@ -121,14 +122,15 @@ const PromotionList = () => {
         }}
       >
         <Title level={3}>Promotion Manager</Title>
+
         <div className="flex gap-3">
           <Button
             type="primary"
             onClick={() => navigate("/admin/promotions/create")}
           >
-            <PlusIcon />
-            Thêm Bài Viết
+            <PlusIcon /> Thêm Bài Viết
           </Button>
+
           <Button icon={<ReloadOutlined />} onClick={fetchPromotions}>
             Refresh
           </Button>
@@ -138,6 +140,7 @@ const PromotionList = () => {
       <Search
         placeholder="Search promotion..."
         onSearch={(value) => setSearchText(value)}
+        onChange={(e) => setSearchText(e.target.value)}
         allowClear
         style={{ marginBottom: 20, maxWidth: 300 }}
       />
