@@ -11,6 +11,8 @@ import { globalErrorHandler } from "./middlewares/error.middleware";
 import paymentRouter from "./modules/sales-operations/payments/payment.route";
 import chatbotRoute from "./modules/chatbot/chatbot.route";
 import compression from "compression";
+import contactRoute from "./modules/contact/contact.route";
+
 const app = express();
 app.set("etag", false);
 app.use(compression());
@@ -36,10 +38,12 @@ api.use("/content", contentRouter);
 api.use("/order", orderRouter);
 api.use("/admin", adminDashboardRouter);
 api.use("/chatbot", chatbotRoute);
+api.use("/contact", contactRoute);
 
 app.use("/api", api);
 app.use("/api/uploads", uploadRouter);
 app.use("/payments", paymentRouter);
 app.use("/api/chatbot", chatbotRoute);
 app.use(globalErrorHandler);
+
 export default app;

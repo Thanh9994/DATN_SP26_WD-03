@@ -1,4 +1,6 @@
 import React, { useMemo, useState } from "react";
+import axios from "axios";
+import { API } from "@web/api/api.service";
 import "../../../styles/Contact.css";
 
 interface MissionCard {
@@ -150,7 +152,12 @@ export const Contact = (): JSX.Element => {
     try {
       setIsSubmitting(true);
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await axios.post(API.CONTACT, {
+        fullName: formData.fullName,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+      });
 
       setIsSubmitted(true);
       setFormData({
@@ -160,6 +167,8 @@ export const Contact = (): JSX.Element => {
         message: "",
       });
       setErrors({});
+    } catch (error: any) {
+      alert(error?.response?.data?.message || "Gửi liên hệ thất bại");
     } finally {
       setIsSubmitting(false);
     }

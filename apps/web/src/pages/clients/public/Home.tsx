@@ -138,101 +138,77 @@ export const Home = () => {
           </div>
         </section>
         <section className="border-y border-white/10 bg-white/[0.02] py-16 sm:py-20">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-8 flex-col justify-between gap-4 px-4 sm:mb-10 sm:flex-row sm:items-center sm:px-2 lg:flex">
-              <div>
-                <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
-                  Top Rated
-                </h2>
-              </div>
-              <div className="flex gap-3">
-                <button className="flex size-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white sm:size-10">
-                  <span className="material-symbols-outlined text-lg">chevron_left</span>
-                </button>
-                <button className="flex size-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white sm:size-10">
-                  <span className="material-symbols-outlined text-lg">chevron_right</span>
-                </button>
-              </div>
-            </div>
-            <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 sm:gap-5 sm:px-6 lg:gap-3">
-              <div className="relative aspect-video min-w-96 cursor-pointer overflow-hidden rounded-md sm:min-w-80">
-                <img
-                  alt="The Night Agent"
-                  className="h-full w-full object-cover"
-                  src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772216798813-ooto"
-                />
-                <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/20 to-transparent p-3 sm:p-5">
-                  <div className="mb-2 flex items-center gap-2">
-                    <span className="rounded bg-yellow-400 px-2 py-0.5 text-[8px] font-bold uppercase text-black">
-                      TOP 10
-                    </span>
-                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/70">
-                      Action Series
-                    </span>
-                  </div>
-                  <h3 className="mb-2 text-lg font-bold text-white sm:text-xl">The Night Agent</h3>
-                  <div className="flex flex-wrap items-center gap-2 text-[10px] text-white/70 sm:gap-3 sm:text-xs">
-                    <span className="flex items-center gap-1 font-semibold text-primary">
-                      <span className="material-symbols-outlined text-xs">thumb_up</span> 98% Match
-                    </span>
-                    <span className="font-medium">2024</span>
-                    <span className="font-medium">1 Season</span>
-                  </div>
-                </div>
-              </div>
-              <div className="relative aspect-video min-w-[240px] cursor-pointer overflow-hidden rounded-md sm:min-w-[300px]">
-                <img
-                  alt="The Night Agent"
-                  className="h-full w-full object-cover"
-                  src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772216798813-ooto"
-                />
-                <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/20 to-transparent p-3 sm:p-5">
-                  <div className="mb-2 flex items-center gap-2">
-                    <span className="rounded bg-yellow-400 px-2 py-0.5 text-[8px] font-bold uppercase text-black">
-                      TOP 10
-                    </span>
-                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/70">
-                      Action Series
-                    </span>
-                  </div>
-                  <h3 className="mb-2 text-lg font-bold text-white sm:text-xl">The Night Agent</h3>
-                  <div className="flex flex-wrap items-center gap-2 text-[10px] text-white/70 sm:gap-3 sm:text-xs">
-                    <span className="flex items-center gap-1 font-semibold text-primary">
-                      <span className="material-symbols-outlined text-xs">thumb_up</span> 98% Match
-                    </span>
-                    <span className="font-medium">2024</span>
-                    <span className="font-medium">1 Season</span>
-                  </div>
-                </div>
-              </div>
-              <div className="relative aspect-video min-w-[240px] cursor-pointer overflow-hidden rounded-md sm:min-w-[300px]">
-                <img
-                  alt="The Night Agent"
-                  className="h-full w-full object-cover"
-                  src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772216798813-ooto"
-                />
-                <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/20 to-transparent p-3 sm:p-5">
-                  <div className="mb-2 flex items-center gap-2">
-                    <span className="rounded bg-yellow-400 px-2 py-0.5 text-[8px] font-bold uppercase text-black">
-                      TOP 10
-                    </span>
-                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/70">
-                      Action Series
-                    </span>
-                  </div>
-                  <h3 className="mb-2 text-lg font-bold text-white sm:text-xl">The Night Agent</h3>
-                  <div className="flex flex-wrap items-center gap-2 text-[10px] text-white/70 sm:gap-3 sm:text-xs">
-                    <span className="flex items-center gap-1 font-semibold text-primary">
-                      <span className="material-symbols-outlined text-xs">thumb_up</span> 98% Match
-                    </span>
-                    <span className="font-medium">2024</span>
-                    <span className="font-medium">1 Season</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <div className="mx-auto max-w-7xl">
+
+        {/* HEADER */}
+        <div className="mb-8 flex flex-col justify-between gap-4 px-4 sm:mb-10 sm:flex-row sm:items-center sm:px-6">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+              Top Rated
+            </h2>
           </div>
-        </section>
+
+          {/* BUTTONS */}
+          <div className="flex gap-3">
+            <button className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10">
+              <span className="material-symbols-outlined text-lg">chevron_left</span>
+            </button>
+            <button className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10">
+              <span className="material-symbols-outlined text-lg">chevron_right</span>
+            </button>
+          </div>
+        </div>
+
+        {/* SLIDER */}
+        <div className="no-scrollbar flex gap-3 overflow-x-auto snap-x snap-mandatory px-4 sm:px-6">
+
+          {/* CARD */}
+          {[1, 2, 3, 4, 5].map((item) => (
+            <div
+              key={item}
+              className="relative aspect-video w-[240px] shrink-0 snap-start cursor-pointer overflow-hidden rounded-lg sm:w-[300px]"
+            >
+              {/* IMAGE */}
+              <img
+                src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772216798813-ooto"
+                alt="movie"
+                className="h-full w-full object-cover transition duration-500 hover:scale-110"
+              />
+
+              {/* OVERLAY */}
+              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/30 to-transparent p-3 sm:p-5">
+
+                {/* TAG */}
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="rounded bg-yellow-400 px-2 py-0.5 text-[9px] font-bold uppercase text-black">
+                    TOP 10
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">
+                    Action Series
+                  </span>
+                </div>
+
+                {/* TITLE */}
+                <h3 className="mb-2 text-base font-bold text-white sm:text-lg">
+                  The Night Agent
+                </h3>
+
+                {/* META */}
+                <div className="flex flex-wrap items-center gap-2 text-[10px] text-white/70 sm:text-xs">
+                  <span className="flex items-center gap-1 font-semibold text-primary">
+                    <span className="material-symbols-outlined text-xs">thumb_up</span>
+                    98% Match
+                  </span>
+                  <span>2024</span>
+                  <span>1 Season</span>
+                </div>
+              </div>
+            </div>
+          ))}
+
+        </div>
+      </div>
+    </section>
         <section className="py-20 sm:py-24">
           <div className="mx-auto max-w-7xl overflow-hidden">
             <div className="mb-10 flex flex-col justify-between gap-6 px-4 sm:mb-12 sm:px-6 lg:flex-row lg:items-end lg:px-8">
@@ -245,236 +221,124 @@ export const Home = () => {
                 All Events
               </button>
             </div>
-            <div className="grid grid-cols-1 gap-3 px-4 sm:gap-5 sm:px-6 md:grid-cols-2 lg:grid-cols-3 lg:px-8">
-              <div className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-all hover:border-primary/50">
-                <div className="relative h-32 overflow-hidden sm:h-36">
-                  <img
-                    alt="Film Festival"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
-                  />
-                  <div className="absolute left-1 top-1">
-                    <span className="rounded bg-primary px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white shadow-lg">
-                      Film Festival
-                    </span>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                </div>
-                <div className="p-3 sm:p-5">
-                  <div className="mb-2 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-primary">
-                    <span className="material-symbols-outlined text-xs">calendar_month</span>
-                    Nov 12 - 18, 2024
-                  </div>
-                  <h3 className="mb-2 text-base font-bold leading-tight text-white sm:text-lg">
-                    Metropolis Indie Film Festival
-                  </h3>
-                  <p className="mb-3 text-[11px] leading-relaxed text-white/50 sm:mb-4 sm:text-xs">
-                    Experience a week-long celebration of independent storytelling with over 50
-                    exclusive premieres and director Q&As.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-[10px] text-white/70 sm:text-xs">
-                      <span className="material-symbols-outlined text-sm">location_on</span>
-                      Grand Theater
-                    </div>
-                    <button className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline sm:text-xs">
-                      Register{' '}
-                      <span className="material-symbols-outlined text-xs">arrow_forward</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-all hover:border-primary/50">
-                <div className="relative h-32 overflow-hidden sm:h-36">
-                  <img
-                    alt="Film Festival"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
-                  />
-                  <div className="absolute left-1 top-1">
-                    <span className="rounded bg-primary px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white shadow-lg">
-                      Film Festival
-                    </span>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                </div>
-                <div className="p-3 sm:p-5">
-                  <div className="mb-2 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-primary">
-                    <span className="material-symbols-outlined text-xs">calendar_month</span>
-                    Nov 12 - 18, 2024
-                  </div>
-                  <h3 className="mb-2 text-base font-bold leading-tight text-white sm:text-lg">
-                    Metropolis Indie Film Festival
-                  </h3>
-                  <p className="mb-3 text-[11px] leading-relaxed text-white/50 sm:mb-4 sm:text-xs">
-                    Experience a week-long celebration of independent storytelling with over 50
-                    exclusive premieres and director Q&As.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-[10px] text-white/70 sm:text-xs">
-                      <span className="material-symbols-outlined text-sm">location_on</span>
-                      Grand Theater
-                    </div>
-                    <button className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline sm:text-xs">
-                      Register{' '}
-                      <span className="material-symbols-outlined text-xs">arrow_forward</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-all hover:border-primary/50">
-                <div className="relative h-32 overflow-hidden sm:h-36">
-                  <img
-                    alt="Film Festival"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
-                  />
-                  <div className="absolute left-1 top-1">
-                    <span className="rounded bg-primary px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white shadow-lg">
-                      Film Festival
-                    </span>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                </div>
-                <div className="p-3 sm:p-5">
-                  <div className="mb-2 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-primary">
-                    <span className="material-symbols-outlined text-xs">calendar_month</span>
-                    Nov 12 - 18, 2024
-                  </div>
-                  <h3 className="mb-2 text-base font-bold leading-tight text-white sm:text-lg">
-                    Metropolis Indie Film Festival
-                  </h3>
-                  <p className="mb-3 text-[11px] leading-relaxed text-white/50 sm:mb-4 sm:text-xs">
-                    Experience a week-long celebration of independent storytelling with over 50
-                    exclusive premieres and director Q&As.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-[10px] text-white/70 sm:text-xs">
-                      <span className="material-symbols-outlined text-sm">location_on</span>
-                      Grand Theater
-                    </div>
-                    <button className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline sm:text-xs">
-                      Register{' '}
-                      <span className="material-symbols-outlined text-xs">arrow_forward</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-all hover:border-primary/50">
-                <div className="relative h-32 overflow-hidden sm:h-36">
-                  <img
-                    alt="Film Festival"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
-                  />
-                  <div className="absolute left-1 top-1">
-                    <span className="rounded bg-primary px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white shadow-lg">
-                      Film Festival
-                    </span>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                </div>
-                <div className="p-3 sm:p-5">
-                  <div className="mb-2 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-primary">
-                    <span className="material-symbols-outlined text-xs">calendar_month</span>
-                    Nov 12 - 18, 2024
-                  </div>
-                  <h3 className="mb-2 text-base font-bold leading-tight text-white sm:text-lg">
-                    Metropolis Indie Film Festival
-                  </h3>
-                  <p className="mb-3 text-[11px] leading-relaxed text-white/50 sm:mb-4 sm:text-xs">
-                    Experience a week-long celebration of independent storytelling with over 50
-                    exclusive premieres and director Q&As.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-[10px] text-white/70 sm:text-xs">
-                      <span className="material-symbols-outlined text-sm">location_on</span>
-                      Grand Theater
-                    </div>
-                    <button className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline sm:text-xs">
-                      Register{' '}
-                      <span className="material-symbols-outlined text-xs">arrow_forward</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-all hover:border-primary/50">
-                <div className="relative h-32 overflow-hidden sm:h-36">
-                  <img
-                    alt="Film Festival"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
-                  />
-                  <div className="absolute left-1 top-1">
-                    <span className="rounded bg-primary px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white shadow-lg">
-                      Film Festival
-                    </span>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                </div>
-                <div className="p-3 sm:p-5">
-                  <div className="mb-2 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-primary">
-                    <span className="material-symbols-outlined text-xs">calendar_month</span>
-                    Nov 12 - 18, 2024
-                  </div>
-                  <h3 className="mb-2 text-base font-bold leading-tight text-white sm:text-lg">
-                    Metropolis Indie Film Festival
-                  </h3>
-                  <p className="mb-3 text-[11px] leading-relaxed text-white/50 sm:mb-4 sm:text-xs">
-                    Experience a week-long celebration of independent storytelling with over 50
-                    exclusive premieres and director Q&As.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-[10px] text-white/70 sm:text-xs">
-                      <span className="material-symbols-outlined text-sm">location_on</span>
-                      Grand Theater
-                    </div>
-                    <button className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline sm:text-xs">
-                      Register{' '}
-                      <span className="material-symbols-outlined text-xs">arrow_forward</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-all hover:border-primary/50">
-                <div className="relative h-32 overflow-hidden sm:h-36">
-                  <img
-                    alt="Film Festival"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772007983547-phim-5"
-                  />
-                  <div className="absolute left-1 top-1">
-                    <span className="rounded bg-primary px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white shadow-lg">
-                      Film Festival
-                    </span>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-                </div>
-                <div className="p-3 sm:p-5">
-                  <div className="mb-2 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-primary">
-                    <span className="material-symbols-outlined text-xs">calendar_month</span>
-                    Nov 12 - 18, 2024
-                  </div>
-                  <h3 className="mb-2 text-base font-bold leading-tight text-white sm:text-lg">
-                    Metropolis Indie Film Festival
-                  </h3>
-                  <p className="mb-3 text-[11px] leading-relaxed text-white/50 sm:mb-4 sm:text-xs">
-                    Experience a week-long celebration of independent storytelling with over 50
-                    exclusive premieres and director Q&As.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-[10px] text-white/70 sm:text-xs">
-                      <span className="material-symbols-outlined text-sm">location_on</span>
-                      Grand Theater
-                    </div>
-                    <button className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline sm:text-xs">
-                      Register{' '}
-                      <span className="material-symbols-outlined text-xs">arrow_forward</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+
+                
+    <div className="bg-black px-4 py-10 lg:px-8">
+
+      {/* TITLE */}
+      <div className="mb-8">
+        <div className="text-2xl font-extrabold text-white">
+          EXCLUSIVE EVENTS
+        </div>
+        <div className="mt-2 text-sm text-white/60">
+          Join the community for special screenings, premieres, and meetups you won’t find anywhere else.
+        </div>
+      </div>
+
+      {/* GRID */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+        {/* CARD 1 */}
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5 transition hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/10">
+          <div className="relative h-48 overflow-hidden">
+            <img
+              src="https://images.unsplash.com/photo-1521119989659-a83eee488004"
+              alt="event"
+              className="h-full w-full object-cover transition duration-700 hover:scale-110"
+            />
+            <div className="absolute left-3 top-3 rounded bg-red-500 px-2 py-1 text-xs font-bold text-white">
+              FILM FESTIVAL
             </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+          </div>
+
+          <div className="p-5">
+            <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-red-400">
+              <span className="material-symbols-outlined text-sm">
+                calendar_month
+              </span>
+              NOV 12 - 18, 2024
+            </div>
+
+            <div className="mb-3 text-lg font-bold text-white">
+              Metropolis Indie Film Festival
+            </div>
+
+            <div className="text-sm font-semibold text-red-400 hover:underline cursor-pointer">
+              Register →
+            </div>
+          </div>
+        </div>
+
+        {/* CARD 2 */}
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5 transition hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/10">
+          <div className="relative h-48 overflow-hidden">
+            <img
+              src="https://images.unsplash.com/photo-1536440136628-849c177e76a1"
+              alt="event"
+              className="h-full w-full object-cover transition duration-700 hover:scale-110"
+            />
+            <div className="absolute left-3 top-3 rounded bg-blue-500 px-2 py-1 text-xs font-bold text-white">
+              LIVE PREMIERE
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+          </div>
+
+          <div className="p-5">
+            <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-red-400">
+              <span className="material-symbols-outlined text-sm">
+                schedule
+              </span>
+              STREAMING LIVE 8:00 PM
+            </div>
+
+            <div className="mb-3 text-lg font-bold text-white">
+              John Wick Exclusive Premiere
+            </div>
+
+            <div className="text-sm font-semibold text-red-400 hover:underline cursor-pointer">
+              Notify Me →
+            </div>
+          </div>
+        </div>
+
+        {/* CARD 3 */}
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5 transition hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/10">
+          <div className="relative h-48 overflow-hidden">
+            <img
+              src="https://images.unsplash.com/photo-1549924231-f129b911e442"
+              alt="event"
+              className="h-full w-full object-cover transition duration-700 hover:scale-110"
+            />
+            <div className="absolute left-3 top-3 rounded bg-green-500 px-2 py-1 text-xs font-bold text-white">
+              FAN MEETUP
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+          </div>
+
+          <div className="p-5">
+            <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-red-400">
+              <span className="material-symbols-outlined text-sm">
+                groups
+              </span>
+              LIMITED TO 100 FANS
+            </div>
+
+            <div className="mb-3 text-lg font-bold text-white">
+              Supercar Fan Meetup
+            </div>
+
+            <div className="text-sm font-semibold text-red-400 opacity-60 cursor-not-allowed">
+              Sold Out
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+          
           </div>
         </section>
       </div>

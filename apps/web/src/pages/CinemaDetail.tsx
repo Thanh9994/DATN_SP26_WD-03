@@ -1,17 +1,37 @@
+import { useParams } from "react-router-dom";
 import {
   Armchair,
   Camera,
   Clapperboard,
   Clock3,
-  Heart,
   Mail,
   MapPin,
   Phone,
-  Share2,
-  Ticket,
   UtensilsCrossed,
   Volume2,
 } from "lucide-react";
+
+/* MOCK DATA */
+const cinemas = [
+  {
+    id: 1,
+    name: "CineStream Grand Plaza",
+    address: "452 Cinema Blvd, New York",
+    phone: "+1 (555) 123-4567",
+    email: "grandplaza@cinestream.com",
+    hero:
+      "https://images.unsplash.com/photo-1595769816263-9b910be24d5f?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    id: 2,
+    name: "CineStream Northside Hub",
+    address: "456 Skyline Blvd, Metropolis North",
+    phone: "+1 (555) 222-8888",
+    email: "northside@cinestream.com",
+    hero:
+      "https://images.unsplash.com/photo-1595769816263-9b910be24d5f?auto=format&fit=crop&w=1600&q=80",
+  },
+];
 
 const gallery = [
   "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80",
@@ -30,33 +50,35 @@ const showtimes = [
   {
     title: "Neon Horizon: Origins",
     meta: "Action, Sci-Fi • 2h 15m • Rated PG-13",
-    tag: "IMAX",
     poster:
-      "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=300&q=80",
+      "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c",
     times: ["10:30 AM", "01:45 PM", "04:30 PM", "07:15 PM", "10:00 PM"],
-  },
-  {
-    title: "The Last Whisper",
-    meta: "Drama, Mystery • 1h 50m • Rated R",
-    tag: "GOLD CLASS",
-    poster:
-      "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=300&q=80",
-    times: ["12:00 PM", "03:30 PM", "06:45 PM", "09:30 PM"],
   },
 ];
 
 export default function CinemaDetail() {
+  const { id } = useParams();
+
+  const cinema = cinemas.find((c) => c.id === Number(id));
+
+  if (!cinema) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        Cinema not found
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0b0002] text-white">
       <div className="mx-auto max-w-[1600px]">
 
         {/* HEADER */}
-        <header className="flex items-center justify-between border-b border-white/10 px-4 md:px-8 py-4">
+        {/* <header className="flex items-center justify-between border-b border-white/10 px-4 md:px-8 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#ff3b3b]">
               <Ticket size={16} />
             </div>
-            <span className="text-xl md:text-[28px] font-bold">CineStream</span>
           </div>
 
           <nav className="hidden md:flex items-center gap-10">
@@ -82,7 +104,7 @@ export default function CinemaDetail() {
               <Share2 size={18} />
             </button>
           </div>
-        </header>
+        </header> */}
 
         <main className="px-4 md:px-8 pb-16 pt-4">
 
