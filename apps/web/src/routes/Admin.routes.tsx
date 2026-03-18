@@ -12,6 +12,8 @@ import Promotion from "@web/pages/admin/promotion/Promotion";
 import PromotionForm from "@web/pages/admin/promotion/PromotionForm";
 import { AdminLayouts } from "@web/layouts/AdminLayout";
 import Dashboard from "@web/pages/admin/Dashboard";
+import Settings from "@web/pages/admin/Settings";
+
 
 
 export const AdminRoutes: RouteObject = {
@@ -29,6 +31,7 @@ export const AdminRoutes: RouteObject = {
         { path: "cinemas", element: <Cinemas /> },
         { path: "product", element: <Product /> },
         { path: "rooms", element: <Rooms /> },
+      { path: "settings", element: <Settings /> },
         {
           path: "promotions",
           children: [

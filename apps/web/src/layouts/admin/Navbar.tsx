@@ -96,6 +96,18 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       label: 'Media',
       onClick: () => navigate('/admin/media'),
     },
+    {
+      key: 'settings',
+      icon: <UserOutlined />,
+      label: 'Settings',
+      onClick: () => navigate('/admin/settings'),
+    },
+    {
+      key:'chatbot',
+      icon: <UserOutlined />,
+      label: 'Chatbot',
+      onClick: () => navigate('/admin/chatbot'),
+    }
   ];
 
   const textColor = themeMode === 'dark' ? '#fff' : '#000';

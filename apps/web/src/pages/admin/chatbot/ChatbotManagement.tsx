@@ -19,7 +19,7 @@ const ChatbotManagement = () => {
         byCategory: [],
         mostUsed: []
     });
-
+   // Luồng xử lý dữ liệu 
     useEffect(() => {
         loadQuestions();
     }, []);
