@@ -13,6 +13,8 @@ import PromotionForm from "@web/pages/admin/promotion/PromotionForm";
 import { AdminLayouts } from "@web/layouts/AdminLayout";
 import Dashboard from "@web/pages/admin/Dashboard";
 import Settings from "@web/pages/admin/Settings";
+import ChangePassword from "@web/pages/admin/ChangePassword";
+
 
 
 
@@ -32,6 +34,8 @@ export const AdminRoutes: RouteObject = {
         { path: "product", element: <Product /> },
         { path: "rooms", element: <Rooms /> },
       { path: "settings", element: <Settings /> },
+      {path: "change-password", element: <ChangePassword />},
+      {path: "chatbot", element: <div>Chatbot Management</div>},
         {
           path: "promotions",
           children: [
