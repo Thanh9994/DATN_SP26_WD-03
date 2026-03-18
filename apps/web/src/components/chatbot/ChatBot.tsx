@@ -3,7 +3,7 @@ import axios from "axios";
 import "./ChatBot.css"; // Tạo file CSS riêng
 
 const ChatBot = () => {
-    const [isOpen, setIsOpen] = useState(true); // true để test, sau đổi lại false
+    const [isOpen, setIsOpen] = useState(false); // true để test, sau đổi lại false
     const [message, setMessage] = useState("");
     const [chat, setChat] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
