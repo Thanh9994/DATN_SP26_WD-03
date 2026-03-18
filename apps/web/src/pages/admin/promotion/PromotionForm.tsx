@@ -75,9 +75,10 @@ const PromotionForm = () => {
         ...values,
         slug: toSlug(values.title),
         content,
-        category: "promotion",
         type: "promotion",
         category: values.category || "promotion",
+        startDate: values.startDate ? values.startDate.toISOString() : null,
+        endDate: values.endDate ? values.endDate.toISOString() : null,
       };
 
       if (isEdit) {
