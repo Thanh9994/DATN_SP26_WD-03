@@ -8,7 +8,7 @@ import {
   message,
   DatePicker,
   Space,
-  Select,
+  Radio,
 } from "antd";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -21,12 +21,11 @@ const { Title } = Typography;
 const { TextArea } = Input;
 
 const categoryOptions = [
-  { label: "Promotion", value: "promotion" },
-  { label: "Film Festival", value: "film-festival" },
-  { label: "Live Premiere", value: "live-premiere" },
-  { label: "Film Meetup", value: "film-meetup" },
-  { label: "Q&A Session", value: "qa-session" },
-  { label: "Special Screening", value: "special-screening" },
+  { label: "FILM FESTIVALS", value: "film-festival" },
+  { label: "LIVE PREMIERES", value: "live-premiere" },
+  { label: "FILM MEETUPS", value: "film-meetup" },
+  { label: "Q&A SESSIONS", value: "qa-session" },
+  { label: "SPECIAL SCREENINGS", value: "special-screening" },
 ];
 
 const PromotionForm = () => {
@@ -52,7 +51,7 @@ const PromotionForm = () => {
         ...post,
         startDate: post.startDate ? dayjs(post.startDate) : null,
         endDate: post.endDate ? dayjs(post.endDate) : null,
-        category: post.category || "promotion",
+        category: post.category || "film-festival",
       });
 
       setContent(post.content || "");
@@ -75,9 +74,10 @@ const PromotionForm = () => {
         ...values,
         slug: toSlug(values.title),
         content,
-        category: "promotion",
-        type: "promotion",
-        category: values.category || "promotion",
+        category: values.category,
+        type: values.category,
+        startDate: values.startDate ? values.startDate.toISOString() : null,
+        endDate: values.endDate ? values.endDate.toISOString() : null,
       };
 
       if (isEdit) {
@@ -107,24 +107,31 @@ const PromotionForm = () => {
         initialValues={{
           featured: false,
           status: "published",
-          category: "promotion",
+          category: "film-festival",
         }}
       >
-        <Form.Item label="Avatar" name="avatar" rules={[{ required: true }]}>
-          <Input />
+        <Form.Item
+          label="Avatar"
+          name="avatar"
+          rules={[{ required: true, message: "Nhập link ảnh" }]}
+        >
+          <Input placeholder="https://..." />
         </Form.Item>
 
-        <Form.Item label="Title" name="title" rules={[{ required: true }]}>
+        <Form.Item
+          label="Title"
+          name="title"
+          rules={[{ required: true, message: "Nhập title" }]}
+        >
           <Input
             onChange={(e) => {
-              const value = e.target.value;
-              form.setFieldValue("slug", toSlug(value));
+              form.setFieldValue("slug", toSlug(e.target.value));
             }}
           />
         </Form.Item>
 
         <div className="mb-4 text-gray-500">
-          Đường url: <b>/promotion/{toSlug(title || "")}</b>
+          URL: <b>/promotion/{toSlug(title || "")}</b>
         </div>
 
         <Form.Item name="slug" hidden>
@@ -134,13 +141,23 @@ const PromotionForm = () => {
         <Form.Item
           label="Category"
           name="category"
-          rules={[{ required: true, message: "Vui lòng chọn category" }]}
+          rules={[{ required: true, message: "Chọn category" }]}
         >
-          <Select options={categoryOptions} placeholder="Chọn category" />
+          <Radio.Group className="promotion-category-group">
+            {categoryOptions.map((item) => (
+              <Radio.Button key={item.value} value={item.value}>
+                {item.label}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
         </Form.Item>
 
         <Form.Item label="Summary" name="summary">
           <TextArea rows={3} />
+        </Form.Item>
+
+        <Form.Item label="Location" name="location">
+          <Input placeholder="Nhập địa điểm sự kiện" />
         </Form.Item>
 
         <Form.Item label="Content">
@@ -152,13 +169,24 @@ const PromotionForm = () => {
             <DatePicker />
           </Form.Item>
 
-          <Form.Item label="End Date" name="endDate">
-            <DatePicker
-              disabledDate={(current) => {
-                const start = form.getFieldValue("startDate");
-                return start && current && current.isBefore(start, "day");
-              }}
-            />
+          <Form.Item
+            label="End Date"
+            name="endDate"
+            rules={[
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const startDate = getFieldValue("startDate");
+                  if (!value || !startDate || !value.isBefore(startDate, "day")) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("End Date không được nhỏ hơn Start Date")
+                  );
+                },
+              }),
+            ]}
+          >
+            <DatePicker />
           </Form.Item>
 
           <Form.Item
