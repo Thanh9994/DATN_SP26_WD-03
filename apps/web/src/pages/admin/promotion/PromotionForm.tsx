@@ -12,7 +12,6 @@ import {
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
-
 import { API } from "@web/api/api.service";
 import { toSlug } from "@web/utils/slugify";
 import TiptapEditor from "@web/components/tools/Editor";
@@ -24,19 +23,18 @@ const PromotionForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { id } = useParams();
-
   const isEdit = Boolean(id);
 
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
 
   const title = Form.useWatch("title", form);
+
   const fetchPromotion = async () => {
     if (!id) return;
 
     try {
       setLoading(true);
-
       const res = await axios.get(`${API.PROMOTION}/id/${id}`);
       const post = res.data.data;
 
@@ -60,13 +58,16 @@ const PromotionForm = () => {
 
   const onFinish = async (values: any) => {
     try {
+      setLoading(true);
+
       const payload = {
         ...values,
         slug: toSlug(values.title),
         content,
-        startDate: values.startDate?.toISOString() || null,
-        endDate: values.endDate?.toISOString() || null,
+        category: "promotion",
         type: "promotion",
+        startDate: values.startDate ? values.startDate.toISOString() : null,
+        endDate: values.endDate ? values.endDate.toISOString() : null,
       };
 
       if (isEdit) {
@@ -78,8 +79,12 @@ const PromotionForm = () => {
       }
 
       navigate("/admin/promotions");
-    } catch {
-      message.error("Save failed");
+    } catch (error: any) {
+      message.error(
+        error?.response?.data?.message || "Save failed"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,14 +98,21 @@ const PromotionForm = () => {
         onFinish={onFinish}
         initialValues={{
           featured: false,
-          status: "published",
         }}
       >
-        <Form.Item label="Avatar" name="avatar" rules={[{ required: true }]}>
-          <Input
-          />
+        <Form.Item
+          label="Avatar"
+          name="avatar"
+          rules={[{ required: true, message: "Vui lòng nhập link ảnh" }]}
+        >
+          <Input placeholder="Nhập URL ảnh..." />
         </Form.Item>
-        <Form.Item label="Title" name="title" rules={[{ required: true }]}>
+
+        <Form.Item
+          label="Title"
+          name="title"
+          rules={[{ required: true, message: "Vui lòng nhập tiêu đề" }]}
+        >
           <Input
             onChange={(e) => {
               const value = e.target.value;
@@ -117,18 +129,15 @@ const PromotionForm = () => {
           <Input />
         </Form.Item>
 
-        {/* SUMMARY */}
         <Form.Item label="Summary" name="summary">
           <TextArea rows={3} />
         </Form.Item>
 
-        {/* CONTENT */}
-        <Form.Item label="Content">
+        <Form.Item label="Content" required>
           <TiptapEditor value={content} onChange={setContent} />
         </Form.Item>
 
-        {/* DATES */}
-        <Space size={20}>
+        <Space size={20} wrap>
           <Form.Item label="Start Date" name="startDate">
             <DatePicker />
           </Form.Item>
@@ -137,17 +146,20 @@ const PromotionForm = () => {
             <DatePicker
               disabledDate={(current) => {
                 const start = form.getFieldValue("startDate");
-                return start && current.isBefore(start);
+                return start && current && current.isBefore(start, "day");
               }}
             />
           </Form.Item>
 
-          <Form.Item label="Ẩn / Hiện" name="featured" valuePropName="checked">
+          <Form.Item
+            label="Ẩn / Hiện"
+            name="featured"
+            valuePropName="checked"
+          >
             <Switch />
           </Form.Item>
         </Space>
 
-        {/* SUBMIT */}
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading}>
             {isEdit ? "Update" : "Create"}

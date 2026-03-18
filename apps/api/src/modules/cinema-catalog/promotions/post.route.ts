@@ -12,10 +12,8 @@ const postRouter = express.Router();
 
 postRouter.post("/", createPost);
 postRouter.get("/", getPosts);
-
 postRouter.get("/slug/:slug", getPostBySlug);
 postRouter.get("/id/:id", getPostById);
-
 postRouter.patch("/:id", updatePost);
 postRouter.delete("/:id", deletePost);
 
