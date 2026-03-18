@@ -13,7 +13,6 @@ import {
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
-
 import { API } from "@web/api/api.service";
 import { toSlug } from "@web/utils/slugify";
 import TiptapEditor from "@web/components/tools/Editor";
@@ -34,7 +33,6 @@ const PromotionForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { id } = useParams();
-
   const isEdit = Boolean(id);
 
   const [content, setContent] = useState("");
@@ -47,7 +45,6 @@ const PromotionForm = () => {
 
     try {
       setLoading(true);
-
       const res = await axios.get(`${API.PROMOTION}/id/${id}`);
       const post = res.data.data;
 
@@ -78,8 +75,7 @@ const PromotionForm = () => {
         ...values,
         slug: toSlug(values.title),
         content,
-        startDate: values.startDate?.toISOString() || null,
-        endDate: values.endDate?.toISOString() || null,
+        category: "promotion",
         type: "promotion",
         category: values.category || "promotion",
       };
@@ -165,7 +161,11 @@ const PromotionForm = () => {
             />
           </Form.Item>
 
-          <Form.Item label="Ẩn / Hiện" name="featured" valuePropName="checked">
+          <Form.Item
+            label="Ẩn / Hiện"
+            name="featured"
+            valuePropName="checked"
+          >
             <Switch />
           </Form.Item>
         </Space>

@@ -1,15 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const cities = [
-  { name: "Metropolis", cinemas: 12, active: true },
-  { name: "Gotham City", cinemas: 8, active: false },
-  { name: "Star City", cinemas: 5, active: false },
-  { name: "Central City", cinemas: 9, active: false },
-  { name: "Coast City", cinemas: 4, active: false },
+  { id: 1, name: "Metropolis", cinemas: 12, active: true },
+  { id: 2, name: "Gotham City", cinemas: 8, active: false },
+  { id: 3, name: "Star City", cinemas: 5, active: false },
+  { id: 4, name: "Central City", cinemas: 9, active: false },
+  { id: 5, name: "Coast City", cinemas: 4, active: false },
 ];
 
 const cinemas = [
   {
+    id: 1,
     name: "CineStream Grand Plaza",
     address: "123 Luxury Avenue, Metropolis Downtown",
     distance: "1.2 KM",
@@ -18,6 +20,7 @@ const cinemas = [
       "https://images.unsplash.com/photo-1560109947-543149eceb16?auto=format&fit=crop&w=800&q=80",
   },
   {
+    id: 2,
     name: "CineStream Northside Hub",
     address: "456 Skyline Blvd, Metropolis North",
     distance: "4.8 KM",
@@ -31,6 +34,7 @@ const filterTabs = ["ALL", "IMAX", "4DX", "VIP"];
 
 export default function Cinemas() {
   const [openSidebar, setOpenSidebar] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -50,7 +54,6 @@ export default function Cinemas() {
           ${openSidebar ? "translate-x-0" : "-translate-x-full"}
           lg:static lg:translate-x-0`}
         >
-          {/* Close button mobile */}
           <button
             onClick={() => setOpenSidebar(false)}
             className="absolute right-4 top-4 text-xl lg:hidden"
@@ -59,7 +62,7 @@ export default function Cinemas() {
           </button>
 
           <div className="mb-10">
-            <h2 className="text-2xl font-extrabold tracking-tight">LOCATIONS</h2>
+            <h2 className="text-2xl font-extrabold">LOCATIONS</h2>
             <p className="mt-2 text-sm text-white/50">Select your city</p>
           </div>
 
@@ -67,7 +70,7 @@ export default function Cinemas() {
             {cities.map((city) => (
               <button
                 key={city.name}
-                className={`flex w-full items-center justify-between rounded-full border px-4 py-3 text-left transition-all duration-200 hover:scale-[1.02]
+                className={`flex w-full items-center justify-between rounded-full border px-4 py-3 text-left transition hover:scale-[1.02]
                 ${
                   city.active
                     ? "border-red-500 bg-red-500"
@@ -87,24 +90,10 @@ export default function Cinemas() {
               </button>
             ))}
           </div>
-
-          <div className="mt-10 border-t border-white/10 pt-6">
-            <button className="w-full rounded-full border border-white/10 py-3 transition hover:bg-white/5">
-              🌐 Change Country
-            </button>
-          </div>
         </aside>
 
         {/* Main */}
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-10">
-
-          {/* Mobile menu */}
-          <button
-            className="mb-6 text-2xl transition active:scale-90 lg:hidden"
-            onClick={() => setOpenSidebar(true)}
-          >
-            ☰
-          </button>
 
           {/* Header */}
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -117,12 +106,11 @@ export default function Cinemas() {
               </p>
             </div>
 
-            {/* Filters */}
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex gap-3 overflow-x-auto pb-2">
               {filterTabs.map((tab, index) => (
                 <button
                   key={tab}
-                  className={`rounded-full px-5 py-2 text-sm font-medium transition
+                  className={`rounded-full px-5 py-2 text-sm font-medium
                   ${
                     index === 0
                       ? "bg-red-500 text-white"
@@ -139,7 +127,7 @@ export default function Cinemas() {
           <div className="mt-8 space-y-6">
             {cinemas.map((cinema) => (
               <div
-                key={cinema.name}
+                key={cinema.id}
                 className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/10 md:flex-row md:items-center"
               >
                 <img
@@ -158,7 +146,11 @@ export default function Cinemas() {
                   </div>
                 </div>
 
-                <button className="rounded-full bg-red-500 px-5 py-2 text-sm font-bold transition hover:bg-red-400">
+                {/* VIEW BUTTON */}
+                <button
+                  onClick={() => navigate(`/cinemadetail/${cinema.id}`)}
+                  className="rounded-full bg-red-500 px-5 py-2 text-sm font-bold transition hover:bg-red-400"
+                >
                   View →
                 </button>
               </div>
