@@ -1,16 +1,21 @@
 import { Layout, Menu, Avatar, Switch, MenuProps } from 'antd';
 import {
-  DashboardOutlined,
-  ShoppingOutlined,
   UserOutlined,
-  ContainerOutlined,
   ProductOutlined,
-  CloudUploadOutlined,
   VideoCameraAddOutlined,
   ArrowLeftOutlined,
-  BarChartOutlined,
+  SettingFilled,
 } from '@ant-design/icons';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import {
+  BarChart3,
+  Film,
+  FolderOpen,
+  Image,
+  LayoutDashboard,
+  MonitorPlay,
+  Users,
+} from 'lucide-react';
 
 type SidebarProps = {
   collapsed: boolean;
@@ -35,13 +40,13 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       children: [
         {
           key: 'dashboard',
-          icon: <DashboardOutlined />,
+          icon: <LayoutDashboard size={18} />,
           label: 'Dashboard',
           onClick: () => navigate('/admin'),
         },
         {
           key: 'analytics',
-          icon: <BarChartOutlined />,
+          icon: <BarChart3 size={18} />,
           label: 'Analytics',
           onClick: () => navigate('/admin/analytics'),
         },
@@ -50,19 +55,19 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
     { type: 'divider' },
     {
       key: 'genres',
-      icon: <ContainerOutlined />,
+      icon: <FolderOpen size={18} />,
       label: 'Thể Loại',
       onClick: () => navigate('/admin/genres'),
     },
     {
       key: 'movies',
-      icon: <ShoppingOutlined />,
+      icon: <Film size={18} />,
       label: 'Phim',
       onClick: () => navigate('/admin/movies'),
     },
     {
       key: 'users',
-      icon: <UserOutlined />,
+      icon: <Users size={18} />,
       label: 'Users',
       onClick: () => navigate('/admin/users'),
     },
@@ -74,7 +79,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
     },
     {
       key: 'rooms',
-      icon: <VideoCameraAddOutlined />,
+      icon: <MonitorPlay size={18} />,
       label: 'Phòng Chiếu',
       onClick: () => navigate('/admin/rooms'),
     },
@@ -85,16 +90,29 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       onClick: () => navigate('/admin/promotions'),
     },
     {
-      key: 'product',
-      icon: <ProductOutlined />,
-      label: 'Product',
-      onClick: () => navigate('/admin/product'),
+      type: 'group',
+      label: 'Assets',
+      children: [
+        {
+          key: 'product',
+          icon: <ProductOutlined />,
+          label: 'Product',
+          onClick: () => navigate('/admin/product'),
+        },
+        {
+          key: 'media',
+          icon: <Image size={18} />,
+          label: 'Media',
+          onClick: () => navigate('/admin/media'),
+        },
+      ],
     },
+    { type: 'divider' },
     {
-      key: 'media',
-      icon: <CloudUploadOutlined />,
-      label: 'Media',
-      onClick: () => navigate('/admin/media'),
+      key: 'setting',
+      icon: <SettingFilled />,
+      label: 'Cài đặt',
+      onClick: () => navigate('/admim/setting'),
     },
   ];
 

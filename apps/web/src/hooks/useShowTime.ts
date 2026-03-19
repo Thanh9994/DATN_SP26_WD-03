@@ -33,6 +33,7 @@ export const useShowTime = (movieId?: string) => {
       message.success('Tạo suất chiếu thành công!');
       queryClient.invalidateQueries({ queryKey: ['showtimes'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-showtimes'] });
+      queryClient.invalidateQueries({ queryKey: ['movies'] });
     },
     onError: (error: any) => {
       const serverMessage = error.response?.data?.message;
@@ -58,6 +59,7 @@ export const useShowTime = (movieId?: string) => {
       message.success('Đã xóa suất chiếu');
       queryClient.invalidateQueries({ queryKey: ['showtimes'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-showtimes'] });
+      queryClient.invalidateQueries({ queryKey: ['movies'] });
     },
     onError: (error: any) => {
       message.error(error.message || 'Không thể xóa');
@@ -156,3 +158,6 @@ export const useShowTimesByMovie = (movieId?: string) => {
     refetch,
   };
 };
+
+
+

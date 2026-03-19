@@ -19,8 +19,10 @@ import { PlusOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useShowTime } from "@web/hooks/useShowTime";
 import { useRooms } from "@web/hooks/useCinema";
+import { useSeatsByShowtime } from "@web/hooks/useSeat";
 import { ICreateShowTimePl, IPhong } from "@shared/schemas";
 import { useMovie } from "@web/hooks/useMovie";
+import SeatMap from "@web/components/skeleton/SeatMap";
 
 interface ShowTimeFormValues {
   roomId: string;
@@ -33,11 +35,17 @@ interface ShowTimeFormValues {
 
 export const ShowTime = ({ movieId }: { movieId: string }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSeatMapOpen, setIsSeatMapOpen] = useState(false);
+  const [selectedShowtimeId, setSelectedShowtimeId] = useState<string | null>(
+    null,
+  );
   const [form] = Form.useForm<ShowTimeFormValues>();
   const { rooms = [] } = useRooms();
   const { data: movie, isLoading: isMovieLoading } = useMovie(movieId);
   const { showtimes, isLoading, createShowTime, isCreating, deleteShowTime } =
     useShowTime(movieId);
+  const { data: seatMapSeats = [], isLoading: isSeatLoading } =
+    useSeatsByShowtime(selectedShowtimeId || undefined);
 
   const handleSubmit = (values: ShowTimeFormValues) => {
     const startDayjs = values.date
@@ -63,6 +71,40 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
         form.resetFields();
       },
     });
+  };
+
+  const handleViewSeatMap = (showtimeId: string) => {
+    setSelectedShowtimeId(showtimeId);
+    setIsSeatMapOpen(true);
+  };
+
+  const disabledDate = (current: dayjs.Dayjs) => {
+    if (!movie) return false;
+    const start = dayjs(movie.ngay_cong_chieu).startOf("day");
+    const end = dayjs(movie.ngay_ket_thuc).endOf("day");
+    const todayStart = dayjs().startOf("day");
+    return (
+      (current && current < todayStart) ||
+      (current && (current < start || current > end))
+    );
+  };
+
+  const disabledTime = () => {
+    const selectedDate = form.getFieldValue("date") as dayjs.Dayjs | undefined;
+    if (!selectedDate) return {};
+
+    const now = dayjs();
+    if (!selectedDate.isSame(now, "day")) return {};
+
+    const disabledHours = () =>
+      Array.from({ length: now.hour() }, (_, i) => i);
+
+    const disabledMinutes = (hour: number) => {
+      if (hour !== now.hour()) return [];
+      return Array.from({ length: now.minute() + 1 }, (_, i) => i);
+    };
+
+    return { disabledHours, disabledMinutes };
   };
 
   const columns = [
@@ -159,7 +201,7 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
       key: "action",
       render: (_: any, record: any) => (
         <Space>
-          <Button icon={<EyeOutlined />} size="small">
+          <Button icon={<EyeOutlined />} size="small" onClick={() => handleViewSeatMap(record._id)}>
             Chi tiết
           </Button>
           <Popconfirm
@@ -268,17 +310,7 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
                     },
                   }}
                   format="DD/MM/YYYY"
-                  disabledDate={(current) => {
-                    if (!movie) return false;
-                    const start = dayjs(movie.ngay_cong_chieu).startOf("day"); //ngày công chiếu
-                    const end = dayjs(movie.ngay_ket_thuc).endOf("day"); //ngày kết thúc
-
-                    const today = dayjs().endOf("day");
-                    return (
-                      (current && current <= today) ||
-                      (current && (current < start || current > end)) // Chặn ngoài lịch phim
-                    );
-                  }}
+                  disabledDate={disabledDate}
                 />
               </Form.Item>
 
@@ -287,7 +319,7 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
                 label="Giờ bắt đầu"
                 rules={[{ required: true, message: "Chọn giờ" }]}
               >
-                <TimePicker className="w-full" format="HH:mm" minuteStep={5} />
+                <TimePicker className="w-full" format="HH:mm" minuteStep={5} disabledTime={disabledTime} />
               </Form.Item>
 
               <Form.Item
@@ -338,6 +370,28 @@ export const ShowTime = ({ movieId }: { movieId: string }) => {
           </Form>
         )}
       </Modal>
+      <Modal
+        title="So do ghe"
+        open={isSeatMapOpen}
+        onCancel={() => setIsSeatMapOpen(false)}
+        footer={null}
+        width={900}
+      >
+        {isSeatLoading ? (
+          <Spin className="w-full py-10" />
+        ) : (
+          <SeatMap
+            seats={seatMapSeats}
+            selectedSeatCodes={[]}
+            onSeatClick={() => undefined}
+            currentUserId=""
+          />
+        )}
+      </Modal>
     </div>
   );
 };
+
+
+
+
