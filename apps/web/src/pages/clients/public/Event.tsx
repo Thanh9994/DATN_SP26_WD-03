@@ -1,19 +1,22 @@
-import { useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import "../../../styles/Event.css";
+import { API } from "@web/api/api.service";
 
 interface EventData {
-  id: number;
+  _id: string;
   title: string;
   description: string;
-  date: string;
-  location: string;
-  image: string;
-  category: string;
+  summary?: string;
+  startDate?: string;
+  endDate?: string;
+  location?: string;
+  image?: string;
+  avatar?: string;
+  category?: string;
+  type?: string;
   badge: string;
   status?: string;
-  actionButton: {
-    text: string;
-    icon?: string;
-  };
+  slug?: string;
 }
 
 interface FilterTab {
@@ -21,242 +24,272 @@ interface FilterTab {
   label: string;
 }
 
-const Event = (): JSX.Element => {
+const filterTabs: FilterTab[] = [
+  { id: "all", label: "ALL EVENTS" },
+  { id: "film-festival", label: "FILM FESTIVALS" },
+  { id: "live-premiere", label: "LIVE PREMIERES" },
+  { id: "film-meetup", label: "FILM MEETUPS" },
+  { id: "qa-session", label: "Q&A SESSIONS" },
+  { id: "special-screening", label: "SPECIAL SCREENINGS" },
+];
+
+const FALLBACK_IMAGE = "https://via.placeholder.com/400x250?text=Event";
+const INITIAL_VISIBLE = 6;
+const LOAD_MORE_STEP = 3;
+
+export const Event = (): JSX.Element => {
+  const [events, setEvents] = useState<EventData[]>([]);
+  const [loading, setLoading] = useState(false);
+
   const [activeFilter, setActiveFilter] = useState<string>("all");
-  const [visibleEvents, setVisibleEvents] = useState<number>(6);
+  const [visibleEvents, setVisibleEvents] = useState<number>(INITIAL_VISIBLE);
+  const [searchText, setSearchText] = useState("");
+  const [openSearchPopup, setOpenSearchPopup] = useState(false);
 
-  const filterTabs: FilterTab[] = [
-    { id: "all", label: "All Events" },
-    { id: "festival", label: "Film Festivals" },
-    { id: "premiere", label: "Live Premieres" },
-    { id: "meetup", label: "Film Meetups" },
-    { id: "qa", label: "Q&A Sessions" },
-  ];
+  const searchRef = useRef<HTMLDivElement | null>(null);
 
-  const events: EventData[] = [
-    {
-      id: 1,
-      title: "Metropolis Indie Days",
-      description:
-        "A week-long celebration of independent cinema showcasing storytelling with over 50 exclusive premieres and events.",
-      date: "NOV 12 - 18",
-      location: "GRAND THEATER",
-      image:
-        "https://images.unsplash.com/photo-1552667466-07d71e725e34?w=400&h=500&fit=crop",
-      category: "FILM FESTIVAL",
-      badge: "film-festival",
-      actionButton: { text: "Get Tickets", icon: "🎫" },
-    },
-    {
-      id: 2,
-      title: "Shadow Realm Red Carpet",
-      description:
-        "Join the global cast for a virtual red carpet event followed by the first 15 minutes of the season finale.",
-      date: "8:00 PM TONIGHT",
-      location: "VIRTUAL HALL",
-      image:
-        "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=400&h=500&fit=crop",
-      category: "LIVE PREMIERE",
-      badge: "live-premiere",
-      actionButton: { text: "Notify Me" },
-    },
-    {
-      id: 3,
-      title: "Director's Lounge: Sci-Fi Night",
-      description:
-        "An intimate evening discussing the future of sci-fi and industry leaders creating the next generation.",
-      date: "DEC 03",
-      location: "THE CINEMA CLUB",
-      image:
-        "https://images.unsplash.com/photo-1594908900066-3f47337549d8?w=400&h=500&fit=crop",
-      category: "FILM MEETUP",
-      badge: "film-meetup",
-      status: "Sold Out",
-      actionButton: { text: "Sold Out" },
-    },
-    {
-      id: 4,
-      title: "The Writer's Room Live",
-      description:
-        "Watch the writers of the year's biggest hit series break down a pivotal scene in real-time.",
-      date: "NOV 20",
-      location: "CINESTREAM LIVE",
-      image:
-        "https://images.unsplash.com/photo-1533537022481-4be17b5c9bff?w=400&h=500&fit=crop",
-      category: "Q&A SESSION",
-      badge: "qa-session",
-      actionButton: { text: "Set Reminder" },
-    },
-    {
-      id: 5,
-      title: "Oppenheimer: The IMAX Cut",
-      description:
-        "A special one-night-only screening featuring never-before-seen behind-the-scenes footage.",
-      date: "OCT 29",
-      location: "IMAX DOME",
-      image:
-        "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=400&h=500&fit=crop",
-      category: "SPECIAL SCREENING",
-      badge: "special-screening",
-      actionButton: { text: "Get Tickets" },
-    },
-    {
-      id: 6,
-      title: "Spider-Verse: Artist Panel",
-      description:
-        "Meet the visual artists behind the groundbreaking visual style and learn about the future of animation.",
-      date: "NOV 02",
-      location: "CREATIVE STUDIO",
-      image:
-        "https://images.unsplash.com/photo-1595395686482-c7e58658f6f6?w=400&h=500&fit=crop",
-      category: "FILM MEETUP",
-      badge: "film-meetup",
-      actionButton: { text: "Join Waitlist", icon: "+" },
-    },
-  ];
+  const getCategoryId = (item: Partial<EventData>) => {
+    const raw = `${item.category || item.type || ""}`.toLowerCase().trim();
 
-  const filteredEvents = events.filter(
-    (event) => activeFilter === "all" || event.badge === activeFilter,
-  );
+    if (raw.includes("festival")) return "film-festival";
+    if (raw.includes("premiere")) return "live-premiere";
+    if (raw.includes("meetup")) return "film-meetup";
+    if (raw.includes("q&a") || raw.includes("qa")) return "qa-session";
+    if (raw.includes("special")) return "special-screening";
 
-  const renderButton = (
-    text: string,
-    variant: "primary" | "secondary" | "sold-out" = "primary",
-    onClick?: () => void,
-    disabled: boolean = false,
-  ): JSX.Element => (
-    <button
-      className={`btn btn-${variant}`}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      {text}
-    </button>
-  );
+    return "all";
+  };
 
-  const handleLoadMore = (): void => {
-    setVisibleEvents((prev) => prev + 3);
+  const formatDate = (date?: string) => {
+    if (!date) return "Đang cập nhật";
+    const parsed = new Date(date);
+    if (Number.isNaN(parsed.getTime())) return date;
+    return parsed.toLocaleDateString("vi-VN");
+  };
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+
+      const res = await fetch(API.PROMOTION);
+      const data = await res.json();
+      const rawEvents = data?.data || data || [];
+
+      const mapped: EventData[] = rawEvents.map((item: any) => ({
+        _id: item._id || item.id || Math.random().toString(),
+        title: item.title || "",
+        description: item.summary || item.description || "",
+        summary: item.summary || "",
+        startDate: item.startDate || "",
+        endDate: item.endDate || "",
+        location: item.location || "",
+        image: item.avatar || item.image || "",
+        avatar: item.avatar || item.image || "",
+        category: item.category || "",
+        type: item.type || "",
+        badge: getCategoryId(item),
+        status: item.status || "",
+        slug: item.slug || "",
+      }));
+
+      setEvents(mapped);
+    } catch (error) {
+      console.error("Fetch events error:", error);
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!searchRef.current) return;
+      if (!searchRef.current.contains(event.target as Node)) {
+        setOpenSearchPopup(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const filteredEvents = useMemo(() => {
+    const keyword = searchText.trim().toLowerCase();
+
+    return events.filter((event) => {
+      const matchFilter =
+        activeFilter === "all" || event.badge === activeFilter;
+
+      const matchSearch =
+        !keyword || event.title.toLowerCase().includes(keyword);
+
+      return matchFilter && matchSearch;
+    });
+  }, [events, activeFilter, searchText]);
+
+  const searchResults = useMemo(() => {
+    const keyword = searchText.trim().toLowerCase();
+
+    if (!keyword) return [];
+
+    return events
+      .filter((event) => event.title.toLowerCase().includes(keyword))
+      .slice(0, 6);
+  }, [events, searchText]);
+
+  const visibleList = filteredEvents.slice(0, visibleEvents);
+
+  const handleChangeFilter = (tabId: string) => {
+    setActiveFilter(tabId);
+    setVisibleEvents(INITIAL_VISIBLE);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchText(value);
+    setVisibleEvents(INITIAL_VISIBLE);
+    setOpenSearchPopup(Boolean(value.trim()));
+  };
+
+  const handleChooseSearchItem = (title: string) => {
+    setSearchText(title);
+    setVisibleEvents(INITIAL_VISIBLE);
+    setOpenSearchPopup(false);
+  };
+
+  const formatPopupMeta = (event: EventData) => {
+    const parts = [
+      event.category || event.type || "",
+      event.startDate ? formatDate(event.startDate) : "",
+    ].filter(Boolean);
+
+    return parts.join(" • ");
   };
 
   return (
-    <>
-      <main className="event-container">
-        {/* Hero Section */}
-        <section
-          className="event-hero"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1489749798305-4fea3ba63d60?w=1200&h=600&fit=crop')",
-          }}
-        >
-          <div className="hero-overlay"></div>
-          <div className="hero-content">
-            <div className="hero-badge">FEATURED EVENT</div>
-            <div className="hero-date">October 15 - 22, 2024</div>
-            <h1 className="hero-title">
-              INTERNATIONAL
-              <br />
-              AUTEUR FILM
-              <br />
-              FESTIVAL
-            </h1>
-            <p className="hero-description">
-              Experience the pinnacle of global cinema with 40+ world premieres,
-              exclusive director panels, and midnight screenings of restored
-              classics.
-            </p>
-            <div className="hero-buttons">
-              {renderButton("Register Now", "primary")}
-              {renderButton("View Schedule", "secondary")}
-            </div>
-          </div>
-        </section>
-
-        {/* Filter Tabs */}
-        <section className="events-section">
-          <div className="filter-container">
-            <div className="filter-tabs">
-              {filterTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  className={`filter-tab ${activeFilter === tab.id ? "active" : ""}`}
-                  onClick={() => setActiveFilter(tab.id)}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-            <div className="search-box">
-              <svg
-                className="search-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
+    <main className="event-container">
+      <section className="events-section">
+        <div className="filter-container">
+          <div className="filter-tabs">
+            {filterTabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                className={`filter-tab ${activeFilter === tab.id ? "active" : ""}`}
+                onClick={() => handleChangeFilter(tab.id)}
               >
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-              </svg>
-              <input type="text" placeholder="Find an event..." />
-            </div>
-          </div>
-
-          {/* Events Grid */}
-          <div className="events-grid">
-            {filteredEvents.slice(0, visibleEvents).map((event) => (
-              <div key={event.id} className="event-card">
-                <div className="event-image">
-                  <img src={event.image} alt={event.title} />
-                  <div className={`event-badge badge-${event.badge}`}>
-                    {event.category}
-                  </div>
-                  {event.status && (
-                    <div className="event-status">{event.status}</div>
-                  )}
-                </div>
-                <div className="event-info">
-                  <h3 className="event-title">{event.title}</h3>
-                  <p className="event-description">{event.description}</p>
-                  <div className="event-meta">
-                    <div className="meta-item">
-                      <svg
-                        className="meta-icon"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
-                      </svg>
-                      <span>{event.date}</span>
-                    </div>
-                    <div className="meta-item">
-                      <svg
-                        className="meta-icon"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z" />
-                      </svg>
-                      <span>{event.location}</span>
-                    </div>
-                  </div>
-                  {event.status
-                    ? renderButton("Sold Out", "sold-out", undefined, true)
-                    : renderButton(event.actionButton.text, "primary")}
-                </div>
-              </div>
+                {tab.label}
+              </button>
             ))}
           </div>
 
-          {/* Load More */}
-          {visibleEvents < filteredEvents.length && (
-            <div className="load-more-container">
-              {renderButton("LOAD MORE EVENTS", "secondary", handleLoadMore)}
+          <div className="search-wrapper" ref={searchRef}>
+            <div className="search-box">
+              <span className="search-icon">🔍</span>
+              <input
+                type="text"
+                placeholder="Find an event..."
+                value={searchText}
+                onFocus={() => setOpenSearchPopup(Boolean(searchText.trim()))}
+                onChange={(e) => handleSearchChange(e.target.value)}
+              />
             </div>
-          )}
-        </section>
-      </main>
 
-      {/* <Footer /> */}
-    </>
+            {openSearchPopup && (
+              <div className="search-popup">
+                {searchResults.length > 0 ? (
+                  searchResults.map((event) => (
+                    <button
+                      key={event._id}
+                      type="button"
+                      className="search-item"
+                      onClick={() => handleChooseSearchItem(event.title)}
+                    >
+                      <img
+                        src={event.image || FALLBACK_IMAGE}
+                        alt={event.title}
+                        className="search-item-image"
+                      />
+                      <div className="search-item-content">
+                        <div className="search-item-title">{event.title}</div>
+                        <div className="search-item-meta">
+                          {formatPopupMeta(event) || "Đang cập nhật"}
+                        </div>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="search-empty">Không tìm thấy sự kiện</div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="events-grid">
+          {loading ? (
+            <div className="event-empty">Đang tải dữ liệu...</div>
+          ) : visibleList.length > 0 ? (
+            visibleList.map((event) => (
+              <div key={event._id} className="event-card">
+                <div className="event-image">
+                  <img src={event.image || FALLBACK_IMAGE} alt={event.title} />
+                  <div className={`event-badge badge-${event.badge}`}>
+                    {event.category || event.type || "EVENT"}
+                  </div>
+                  {event.status ? (
+                    <div className="event-status">{event.status}</div>
+                  ) : null}
+                </div>
+
+                <div className="event-info">
+                  <h3 className="event-title">{event.title}</h3>
+
+                  <p className="event-description">
+                    {event.description || "Đang cập nhật nội dung sự kiện."}
+                  </p>
+
+                  <div className="event-meta">
+                    <div className="meta-item">
+                      <span className="meta-icon">📅</span>
+                      <span>{formatDate(event.startDate)}</span>
+                    </div>
+
+                    <div className="meta-item">
+                      <span className="meta-icon">📍</span>
+                      <span>{event.location || "Đang cập nhật"}</span>
+                    </div>
+                  </div>
+
+                  <button type="button" className="btn btn-primary">
+                    Get Tickets
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="event-empty">Không có sự kiện phù hợp</div>
+          )}
+        </div>
+
+        {!loading && visibleEvents < filteredEvents.length && (
+          <div className="load-more-container">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setVisibleEvents((prev) => prev + LOAD_MORE_STEP)}
+            >
+              LOAD MORE EVENTS
+            </button>
+          </div>
+        )}
+      </section>
+    </main>
   );
 };
 

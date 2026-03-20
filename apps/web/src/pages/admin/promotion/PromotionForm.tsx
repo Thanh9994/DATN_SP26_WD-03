@@ -8,11 +8,11 @@ import {
   message,
   DatePicker,
   Space,
+  Radio,
 } from "antd";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
-
 import { API } from "@web/api/api.service";
 import { toSlug } from "@web/utils/slugify";
 import TiptapEditor from "@web/components/tools/Editor";
@@ -20,23 +20,30 @@ import TiptapEditor from "@web/components/tools/Editor";
 const { Title } = Typography;
 const { TextArea } = Input;
 
+const categoryOptions = [
+  { label: "FILM FESTIVALS", value: "film-festival" },
+  { label: "LIVE PREMIERES", value: "live-premiere" },
+  { label: "FILM MEETUPS", value: "film-meetup" },
+  { label: "Q&A SESSIONS", value: "qa-session" },
+  { label: "SPECIAL SCREENINGS", value: "special-screening" },
+];
+
 const PromotionForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { id } = useParams();
-
   const isEdit = Boolean(id);
 
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
 
   const title = Form.useWatch("title", form);
+
   const fetchPromotion = async () => {
     if (!id) return;
 
     try {
       setLoading(true);
-
       const res = await axios.get(`${API.PROMOTION}/id/${id}`);
       const post = res.data.data;
 
@@ -44,6 +51,7 @@ const PromotionForm = () => {
         ...post,
         startDate: post.startDate ? dayjs(post.startDate) : null,
         endDate: post.endDate ? dayjs(post.endDate) : null,
+        category: post.category || "film-festival",
       });
 
       setContent(post.content || "");
@@ -60,13 +68,16 @@ const PromotionForm = () => {
 
   const onFinish = async (values: any) => {
     try {
+      setLoading(true);
+
       const payload = {
         ...values,
         slug: toSlug(values.title),
         content,
-        startDate: values.startDate?.toISOString() || null,
-        endDate: values.endDate?.toISOString() || null,
-        type: "promotion",
+        category: values.category,
+        type: values.category,
+        startDate: values.startDate ? values.startDate.toISOString() : null,
+        endDate: values.endDate ? values.endDate.toISOString() : null,
       };
 
       if (isEdit) {
@@ -78,8 +89,10 @@ const PromotionForm = () => {
       }
 
       navigate("/admin/promotions");
-    } catch {
-      message.error("Save failed");
+    } catch (error: any) {
+      message.error(error?.response?.data?.message || "Save failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,60 +107,97 @@ const PromotionForm = () => {
         initialValues={{
           featured: false,
           status: "published",
+          category: "film-festival",
         }}
       >
-        <Form.Item label="Avatar" name="avatar" rules={[{ required: true }]}>
-          <Input
-          />
+        <Form.Item
+          label="Avatar"
+          name="avatar"
+          rules={[{ required: true, message: "Nhập link ảnh" }]}
+        >
+          <Input placeholder="https://..." />
         </Form.Item>
-        <Form.Item label="Title" name="title" rules={[{ required: true }]}>
+
+        <Form.Item
+          label="Title"
+          name="title"
+          rules={[{ required: true, message: "Nhập title" }]}
+        >
           <Input
             onChange={(e) => {
-              const value = e.target.value;
-              form.setFieldValue("slug", toSlug(value));
+              form.setFieldValue("slug", toSlug(e.target.value));
             }}
           />
         </Form.Item>
 
         <div className="mb-4 text-gray-500">
-          Đường url: <b>/promotion/{toSlug(title || "")}</b>
+          URL: <b>/promotion/{toSlug(title || "")}</b>
         </div>
 
         <Form.Item name="slug" hidden>
           <Input />
         </Form.Item>
 
-        {/* SUMMARY */}
+        <Form.Item
+          label="Category"
+          name="category"
+          rules={[{ required: true, message: "Chọn category" }]}
+        >
+          <Radio.Group className="promotion-category-group">
+            {categoryOptions.map((item) => (
+              <Radio.Button key={item.value} value={item.value}>
+                {item.label}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
+        </Form.Item>
+
         <Form.Item label="Summary" name="summary">
           <TextArea rows={3} />
         </Form.Item>
 
-        {/* CONTENT */}
+        <Form.Item label="Location" name="location">
+          <Input placeholder="Nhập địa điểm sự kiện" />
+        </Form.Item>
+
         <Form.Item label="Content">
           <TiptapEditor value={content} onChange={setContent} />
         </Form.Item>
 
-        {/* DATES */}
-        <Space size={20}>
+        <Space size={20} wrap>
           <Form.Item label="Start Date" name="startDate">
             <DatePicker />
           </Form.Item>
 
-          <Form.Item label="End Date" name="endDate">
-            <DatePicker
-              disabledDate={(current) => {
-                const start = form.getFieldValue("startDate");
-                return start && current.isBefore(start);
-              }}
-            />
+          <Form.Item
+            label="End Date"
+            name="endDate"
+            rules={[
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const startDate = getFieldValue("startDate");
+                  if (!value || !startDate || !value.isBefore(startDate, "day")) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("End Date không được nhỏ hơn Start Date")
+                  );
+                },
+              }),
+            ]}
+          >
+            <DatePicker />
           </Form.Item>
 
-          <Form.Item label="Ẩn / Hiện" name="featured" valuePropName="checked">
+          <Form.Item
+            label="Ẩn / Hiện"
+            name="featured"
+            valuePropName="checked"
+          >
             <Switch />
           </Form.Item>
         </Space>
 
-        {/* SUBMIT */}
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading}>
             {isEdit ? "Update" : "Create"}

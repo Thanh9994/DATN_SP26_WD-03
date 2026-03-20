@@ -23,6 +23,23 @@ const ChatbotSchema = new mongoose.Schema(
             enum: ['general', 'showtime', 'pricing', 'booking', 'cinema', 'support', 'food', 'payment', 'policy', 'movies'],
             index: true,
         },
+        sessionId: {
+            type: String,
+            default: null,
+            index: true,
+        },
+        role:{
+            type: String,
+            enum:["user","admin"],
+            default: null,
+        },
+        type: {
+            type: String,
+            enum:["faq", "history"],
+            default: "faq",
+             index: true,
+        },
+        
         usageCount: {
             type: Number,
             default: 0,

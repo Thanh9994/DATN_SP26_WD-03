@@ -12,6 +12,7 @@ import Promotion from '@web/pages/admin/promotion/Promotion';
 import PromotionForm from '@web/pages/admin/promotion/PromotionForm';
 import { AdminLayouts } from '@web/layouts/AdminLayout';
 import { Dashboard } from '@web/pages/admin/Dashboard';
+import Settings from "@web/pages/admin/Settings";
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
@@ -21,13 +22,14 @@ export const AdminRoutes: RouteObject = {
       element: <AdminLayouts />,
       children: [
         { index: true, element: <Dashboard /> },
-        { path: 'movies', element: <Movie /> },
-        { path: 'genres', element: <Genre /> },
-        { path: 'media', element: <Upload /> },
-        { path: 'users', element: <User /> },
-        { path: 'cinemas', element: <Cinemas /> },
-        { path: 'product', element: <Product /> },
-        { path: 'rooms', element: <Rooms /> },
+        { path: "movies", element: <Movie /> },
+        { path: "genres", element: <Genre /> },
+        { path: "media", element: <Upload /> },
+        { path: "users", element: <User /> },
+        { path: "cinemas", element: <Cinemas /> },
+        { path: "product", element: <Product /> },
+        { path: "rooms", element: <Rooms /> },
+      { path: "settings", element: <Settings /> },
         {
           path: 'promotions',
           children: [

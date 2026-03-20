@@ -81,15 +81,29 @@ export const PaymentResult = () => {
         {booking && (
           <div className="w-full max-w-md space-y-3 rounded-2xl border border-white/10 bg-white/5 p-6 text-left">
             <h3 className="mb-4 text-lg font-bold">Booking Details</h3>
+            {booking.ticketCode && (
+              <div className="flex justify-between text-sm">
+                <span className="text-white/60">Ticket Code:</span>
+                <span className="font-mono font-bold text-primary">{booking.ticketCode}</span>
+              </div>
+            )}
             <div className="flex justify-between text-sm">
               <span className="text-white/60">Seats:</span>
               <span className="font-bold">{booking.seatCodes?.join(', ')}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-white/60">Total Amount:</span>
-              <span className="font-bold text-primary">
-                {booking.finalAmount?.toLocaleString()} VND
-              </span>
+              <span className="font-bold">{booking.totalAmount?.toLocaleString()} VND</span>
+            </div>
+            {booking.discountAmount > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-white/60">Discount:</span>
+                <span className="font-bold text-green-400">-{booking.discountAmount?.toLocaleString()} VND</span>
+              </div>
+            )}
+            <div className="flex justify-between border-t border-white/10 pt-2 text-sm">
+              <span className="text-white/60">Final Amount:</span>
+              <span className="font-bold text-primary">{booking.finalAmount?.toLocaleString()} VND</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-white/60">Status:</span>
