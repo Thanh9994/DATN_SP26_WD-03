@@ -9,6 +9,7 @@ import {
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   BarChart3,
+  CalendarPlus,
   Film,
   FolderOpen,
   Image,
@@ -82,6 +83,12 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       icon: <MonitorPlay size={18} />,
       label: 'Phòng Chiếu',
       onClick: () => navigate('/admin/rooms'),
+    },
+    {
+      key: 'showtime',
+      icon: <CalendarPlus size={18}/>,
+      label: 'Suất Chiếu',
+      onClick: () => navigate('/admin/showtime'),
     },
     {
       key: 'promotions',

@@ -11,8 +11,9 @@ import { Rooms } from '@web/pages/admin/cinema-catalog/Rooms';
 import Promotion from '@web/pages/admin/promotion/Promotion';
 import PromotionForm from '@web/pages/admin/promotion/PromotionForm';
 import { AdminLayouts } from '@web/layouts/AdminLayout';
-import { Dashboard } from '@web/pages/admin/Dashboard';
 import Settings from "@web/pages/admin/Settings";
+import Dashboard from '@web/pages/admin/Dashboard';
+import { ShowTime } from '@web/pages/admin/Showtime';
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
@@ -29,7 +30,8 @@ export const AdminRoutes: RouteObject = {
         { path: "cinemas", element: <Cinemas /> },
         { path: "product", element: <Product /> },
         { path: "rooms", element: <Rooms /> },
-      { path: "settings", element: <Settings /> },
+        { path: "settings", element: <Settings /> },
+        { path: "showtime", element: <ShowTime /> },
         {
           path: 'promotions',
           children: [
