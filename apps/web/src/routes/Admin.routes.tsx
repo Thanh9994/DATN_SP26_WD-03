@@ -6,14 +6,14 @@ import { Movie } from '@web/pages/admin/cinema-catalog/Movie';
 import { User } from '@web/pages/admin/access-control/User';
 import { AdminGuard } from '@web/components/admin/AdminGuard';
 import Cinemas from '@web/pages/admin/cinema-catalog/Cinemas';
-import Product from '@web/pages/admin/Product';
+import Product from '@web/pages/admin/order/Product';
 import { Rooms } from '@web/pages/admin/cinema-catalog/Rooms';
 import Promotion from '@web/pages/admin/promotion/Promotion';
 import PromotionForm from '@web/pages/admin/promotion/PromotionForm';
 import { AdminLayouts } from '@web/layouts/AdminLayout';
 import Settings from "@web/pages/admin/Settings";
 import Dashboard from '@web/pages/admin/Dashboard';
-import { ShowTime } from '@web/pages/admin/Showtime';
+import { ShowTime } from '@web/pages/admin/order/Showtime';
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
