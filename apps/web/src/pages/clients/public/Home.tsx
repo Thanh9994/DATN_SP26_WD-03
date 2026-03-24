@@ -9,24 +9,31 @@ export const Home = () => {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const featuredMovie = movies?.[currentIndex];
+  const sortedMovies = [...(movies ?? [])]
+    .filter((movie) => movie.trang_thai === 'dang_chieu')
+    .sort(
+    (a, b) => Number(b.rateting ?? 0) - Number(a.rateting ?? 0),
+    );
+  const featuredMovie = sortedMovies[currentIndex];
 
   useEffect(() => {
-    if (!movies?.length) return;
+    if (!sortedMovies.length) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % movies.length);
+      setCurrentIndex((prev) => (prev + 1) % sortedMovies.length);
     }, 16000); // 16s chuyển phim
 
     return () => clearInterval(interval);
-  }, [movies]);
+  }, [movies, sortedMovies.length]);
 
   const nextMovie = () => {
-    setCurrentIndex((prev) => (prev + 1) % movies.length);
+    if (!sortedMovies.length) return;
+    setCurrentIndex((prev) => (prev + 1) % sortedMovies.length);
   };
 
   const prevMovie = () => {
-    setCurrentIndex((prev) => (prev - 1 + movies.length) % movies.length);
+    if (!sortedMovies.length) return;
+    setCurrentIndex((prev) => (prev - 1 + sortedMovies.length) % sortedMovies.length);
   };
 
   if (isLoading) return <Spin fullscreen />;
@@ -46,7 +53,7 @@ export const Home = () => {
               className="duration-600 flex h-full transition-transform ease-in-out"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
-              {movies?.map((movie) => (
+              {sortedMovies.map((movie) => (
                 <div key={movie._id} className="relative h-full min-w-full">
                   <div className="absolute inset-0 z-10 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent"></div>
 
@@ -75,25 +82,25 @@ export const Home = () => {
                 </span>
                 <div className="flex items-center gap-1 text-yellow-400">
                   <span className="material-symbols-outlined text-sm">star</span>
-                  <span className="text-sm font-bold text-white">4.9</span>
+                  <span className="text-sm font-bold text-white">{featuredMovie?.rateting ?? 0}</span>
                 </div>
               </div>
               <h1 className="mb-4 line-clamp-2 text-2xl font-black uppercase leading-tight tracking-tight text-white sm:text-4xl">
-                {featuredMovie.ten_phim}
+                {featuredMovie?.ten_phim}
               </h1>
               <p className="mb-6 line-clamp-3 max-w-lg text-sm leading-relaxed text-white/80 sm:text-base">
-                {featuredMovie.mo_ta}
+                {featuredMovie?.mo_ta}
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <button
-                  onClick={() => navigate(`/booking?movieId=${featuredMovie._id}`)}
+                  onClick={() => featuredMovie && navigate(`/booking?movieId=${featuredMovie._id}`)}
                   className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-bold uppercase tracking-wider text-white transition-all hover:scale-105"
                 >
                   <span className="material-symbols-outlined text-lg">confirmation_number</span>
                   Đặt vé ngay
                 </button>
                 <button
-                  onClick={() => navigate(`/movie/${featuredMovie._id}`)}
+                  onClick={() => featuredMovie && navigate(`/movie/${featuredMovie._id}`)}
                   className="flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md"
                 >
                   <span className="material-symbols-outlined text-lg">info</span>

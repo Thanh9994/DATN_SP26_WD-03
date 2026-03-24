@@ -18,7 +18,7 @@ export const Genre = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 10 }}>
       <Button 
         type="primary" 
         icon={<PlusOutlined />} 

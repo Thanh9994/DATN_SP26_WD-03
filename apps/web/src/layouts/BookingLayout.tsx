@@ -7,6 +7,20 @@ import { useBooking } from '@web/hooks/useBooking';
 import { IShowTime, IShowTimeSeat } from '@shared/schemas';
 import { useAuth } from '@web/hooks/useAuth';
 import { ArrowLeft, MapPin } from 'lucide-react';
+import DrinkSnack, { type DrinkSnackSelection } from '@web/pages/DrinkSnack';
+
+interface PaymentNavigationState {
+  bookingId: string;
+  holdToken: string;
+  totalAmount: number;
+  seats: string[];
+  movieInfo: {
+    title?: string;
+    poster?: string;
+    showtime: string;
+  };
+  snackSelection?: DrinkSnackSelection;
+}
 
 const BookingLayout = () => {
   const [searchParams] = useSearchParams();
@@ -21,6 +35,8 @@ const BookingLayout = () => {
   // Quản lý trạng thái dùng chung
   const [selectedShowtime, setSelectedShowtime] = useState<IShowTime | null>(null);
   const [selectedSeats, setSelectedSeats] = useState<IShowTimeSeat[]>([]);
+  const [isSnackModalOpen, setIsSnackModalOpen] = useState(false);
+  const [paymentState, setPaymentState] = useState<PaymentNavigationState | null>(null);
 
   const activeShowtimeId = selectedShowtime?._id ?? showtimeIdFromUrl ?? undefined;
 
@@ -67,23 +83,20 @@ const BookingLayout = () => {
         seats: seatsToHold.map((s) => s.seatCode),
       })
         .then((result) => {
-          setTimeout(() => {
-            navigate('/payments', {
-              state: {
-                bookingId: result.bookingId,
-                holdToken: result.holdToken,
-                totalAmount: result.totalAmount,
-                seats: seatsToHold.map((s) => s.seatCode),
-                movieInfo: {
-                  title: movie?.ten_phim,
-                  poster: movie?.poster?.url,
-                  showtime: showTime?.startTime
-                    ? dayjs(showTime.startTime).format('HH:mm - DD/MM/YYYY')
-                    : 'Showtime',
-                },
-              },
-            });
-          }, 400);
+          setPaymentState({
+            bookingId: result.bookingId,
+            holdToken: result.holdToken,
+            totalAmount: result.totalAmount,
+            seats: seatsToHold.map((s) => s.seatCode),
+            movieInfo: {
+              title: movie?.ten_phim,
+              poster: movie?.poster?.url,
+              showtime: showTime?.startTime
+                ? dayjs(showTime.startTime).format('HH:mm - DD/MM/YYYY')
+                : 'Showtime',
+            },
+          });
+          setIsSnackModalOpen(true);
         })
         .catch((err) => {
           console.error('Auto hold failed:', err);
@@ -136,6 +149,20 @@ const BookingLayout = () => {
     setSelectedSeats([]);
     setSelectedShowtime(null);
     navigate(`/booking?movieId=${movieId}`);
+  };
+
+  const handleGoToPayments = (snackSelection?: DrinkSnackSelection) => {
+    if (!paymentState) return;
+
+    navigate('/payments', {
+      state: {
+        ...paymentState,
+        snackSelection,
+      },
+    });
+
+    setIsSnackModalOpen(false);
+    setPaymentState(null);
   };
   // console.log('user', user);
   // console.log('selectedShowtime', selectedShowtime);
@@ -193,21 +220,20 @@ const BookingLayout = () => {
 
       message.success('Giữ ghế thành công!');
 
-      navigate('/payments', {
-        state: {
-          bookingId: result.bookingId,
-          holdToken: result.holdToken,
-          totalAmount: result.totalAmount,
-          seats: selectedSeats.map((s) => s.seatCode),
-          movieInfo: {
-            title: movie.ten_phim,
-            poster: movie.poster?.url,
-            showtime: currentData?.startTime
-              ? dayjs(currentData.startTime).format('HH:mm - DD/MM/YYYY')
-              : 'Showtime',
-          },
+      setPaymentState({
+        bookingId: result.bookingId,
+        holdToken: result.holdToken,
+        totalAmount: result.totalAmount,
+        seats: selectedSeats.map((s) => s.seatCode),
+        movieInfo: {
+          title: movie.ten_phim,
+          poster: movie.poster?.url,
+          showtime: currentData?.startTime
+            ? dayjs(currentData.startTime).format('HH:mm - DD/MM/YYYY')
+            : 'Showtime',
         },
       });
+      setIsSnackModalOpen(true);
     } catch (error) {
       refreshSeats();
     }
@@ -349,6 +375,12 @@ const BookingLayout = () => {
           )}
         </main>
       </div>
+      <DrinkSnack
+        open={isSnackModalOpen}
+        onClose={() => setIsSnackModalOpen(false)}
+        onSkip={() => handleGoToPayments()}
+        onContinue={(selection) => handleGoToPayments(selection)}
+      />
     </div>
   );
 };
