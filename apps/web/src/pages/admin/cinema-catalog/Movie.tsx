@@ -27,7 +27,6 @@ import { useMovies } from '@web/hooks/useMovie';
 import { useGenres } from '@web/hooks/useGenre';
 import { useUpload } from '@web/hooks/useUploads';
 import { ICloudinaryImage } from '@shared/schemas';
-import { ShowTime } from '../Showtime';
 import { useNavigate } from 'react-router-dom';
 
 export const Movie = () => {
@@ -216,17 +215,6 @@ export const Movie = () => {
         loading={isLoading}
         pagination={{ pageSize: 8 }}
         scroll={{ x: 900 }}
-        expandable={{
-          expandedRowRender: (record) => (
-            <div className="border-t border-slate-100 bg-slate-50 shadow-inner">
-              <ShowTime movieId={record._id!} />
-            </div>
-          ),
-          rowExpandable: (record) => record.ten_phim !== 'Not Expandable',
-          showExpandColumn: false,
-          expandRowByClick: true,
-          columnWidth: 0,
-        }}
       />
 
       <Modal

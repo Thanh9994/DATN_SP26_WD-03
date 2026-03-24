@@ -3,74 +3,120 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { message } from 'antd';
 import { API } from '@web/api/api.service';
-import { ICreateShowTimePl, ShowTime, IShowTime } from '@shared/schemas';
+import { ICreateShowTimePl, IMovie, IPhong, IShowTime, IShowTimeStatus, ShowTime } from '@shared/schemas';
+
+type PopulatedCinema = {
+  _id?: string;
+  name?: string;
+  city?: string;
+  address?: string;
+};
+
+type ApiError = {
+  message?: string;
+  response?: {
+    data?: {
+      message?: string;
+      overlappingWith?: {
+        start: string | Date;
+        end: string | Date;
+      };
+    };
+  };
+};
+
+export type AdminShowtimeSeatInfo = {
+  total: number;
+  booked: number;
+  held?: number;
+  available: number;
+};
+
+export type AdminShowtimeRow = IShowTime & {
+  _id?: string;
+  movieId: string | Pick<IMovie, '_id' | 'ten_phim' | 'thoi_luong' | 'ngay_cong_chieu' | 'ngay_ket_thuc'>;
+  roomId:
+    | string
+    | (IPhong & {
+        cinema_id: string | PopulatedCinema;
+      });
+  status: IShowTimeStatus;
+  display?: {
+    label: string;
+    color: string;
+  };
+  seatInfo?: AdminShowtimeSeatInfo;
+  canDelete?: boolean;
+};
 
 export const useShowTime = (movieId?: string) => {
   const queryClient = useQueryClient();
 
-  const { data: showtimes = [], isLoading } = useQuery<IShowTime[]>({
+  const { data: showtimes = [], isLoading } = useQuery<AdminShowtimeRow[]>({
     queryKey: ['showtimes', 'movie', movieId],
     queryFn: async () => {
-      if (!movieId) return [];
-      const { data } = await axios.get(`${API.SHOWTIME}/movie/${movieId}`, {
-        params: { includePast: true },
-      });
-      // console.log("Dữ liệu lịch chiếu trả về:", data.data);
+      const { data } = movieId
+        ? await axios.get(`${API.SHOWTIME}/movie/${movieId}`, {
+            params: { includePast: true },
+          })
+        : await axios.get(API.SHOWTIME);
       return data.data;
     },
-    enabled: !!movieId,
-    staleTime: 1000 * 60 * 5, //tươi 5 phút
-    refetchOnWindowFocus: false, // tắt chuyển tab call lại api
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
   });
 
-  const { mutate: createShowTime, isPending: isCreating } = useMutation({
+  const createMutation = useMutation({
     mutationFn: async (payload: ICreateShowTimePl) => {
       const validatedData = ShowTime.parse(payload);
       const { data } = await axios.post(API.SHOWTIME, validatedData);
       return data;
     },
     onSuccess: () => {
-      message.success('Tạo suất chiếu thành công!');
+      message.success('Tao suat chieu thanh cong!');
       queryClient.invalidateQueries({ queryKey: ['showtimes'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-showtimes'] });
+      queryClient.invalidateQueries({ queryKey: ['movies'] });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       const serverMessage = error.response?.data?.message;
       const overlap = error.response?.data?.overlappingWith;
 
       if (overlap) {
-        // 2. Nếu có thông tin trùng lịch, hiển thị chi tiết giờ trùng
         const start = dayjs(overlap.start).format('HH:mm');
         const end = dayjs(overlap.end).format('HH:mm');
-        message.error(`${serverMessage} (Trùng từ ${start} - ${end})`, 4);
+        message.error(`${serverMessage} (Trung tu ${start} - ${end})`, 4);
       } else {
-        message.error(serverMessage || 'Lỗi tạo suất chiếu');
+        message.error(serverMessage || 'Loi tao suat chieu');
       }
     },
   });
 
-  const { mutate: deleteShowTime, isPending: isDeleting } = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { data } = await axios.delete(`${API.SHOWTIME}/${id}`);
       return data;
     },
     onSuccess: () => {
-      message.success('Đã xóa suất chiếu');
+      message.success('Da xoa suat chieu');
       queryClient.invalidateQueries({ queryKey: ['showtimes'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-showtimes'] });
+      queryClient.invalidateQueries({ queryKey: ['movies'] });
     },
-    onError: (error: any) => {
-      message.error(error.message || 'Không thể xóa');
+    onError: (error: ApiError) => {
+      message.error(error.message || 'Khong the xoa');
     },
   });
 
   return {
     showtimes,
     isLoading,
-    createShowTime,
-    isCreating,
-    deleteShowTime,
-    isDeleting,
+    createShowTime: createMutation.mutate,
+    createShowTimeAsync: createMutation.mutateAsync,
+    isCreating: createMutation.isPending,
+    deleteShowTime: deleteMutation.mutate,
+    deleteShowTimeAsync: deleteMutation.mutateAsync,
+    isDeleting: deleteMutation.isPending,
   };
 };
 
@@ -119,34 +165,37 @@ export const useShowTimeCountByYear = (year?: number) => {
 };
 
 export const useShowTimesByMovie = (movieId?: string) => {
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery<AdminShowtimeRow[] | null>({
     queryKey: ['movie-showtimes', movieId],
     queryFn: async () => {
       if (!movieId) return null;
       const { data } = await axios.get(`${API.SHOWTIME}/movie/${movieId}`);
-      return data.data; // showtimes từ backend
+      return data.data;
     },
     enabled: !!movieId,
-    staleTime: 1000 * 60 * 5, // dữ liệu tươi 5 phút
+    staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
 
-  const groupedByCinema = data?.reduce((acc: any, st: any) => {
-    const cinema = st.roomId?.cinema_id;
-    const cinemaId = cinema?._id;
+  const groupedByCinema = data?.reduce<Record<string, { cinemaInfo: PopulatedCinema; showtimes: AdminShowtimeRow[] }>>(
+    (acc, showtime) => {
+      const cinema = typeof showtime.roomId === 'object' ? showtime.roomId.cinema_id : undefined;
+      const cinemaId = typeof cinema === 'object' ? cinema?._id : undefined;
 
-    if (!cinemaId) return acc;
+      if (!cinemaId || typeof cinema !== 'object') return acc;
 
-    if (!acc[cinemaId]) {
-      acc[cinemaId] = {
-        cinemaInfo: cinema,
-        showtimes: [],
-      };
-    }
+      if (!acc[cinemaId]) {
+        acc[cinemaId] = {
+          cinemaInfo: cinema,
+          showtimes: [],
+        };
+      }
 
-    acc[cinemaId].showtimes.push(st);
-    return acc;
-  }, {});
+      acc[cinemaId].showtimes.push(showtime);
+      return acc;
+    },
+    {},
+  );
 
   return {
     showtimes: data || [],

@@ -140,7 +140,7 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
       // rooms -> rạp -> tên - địa chỉ - thành phố
       .populate({
         path: 'roomId',
-        select: 'ten_phong cinema_id',
+        select: 'ten_phong cinema_id loai_phong',
         populate: {
           path: 'cinema_id',
           select: 'name city address',
@@ -148,13 +148,51 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
       })
       .sort({ startTime: -1 });
 
+    const showtimeIds = showtimes.map((st) => st._id);
+
+    const seatStats = await SeatTime.aggregate([
+      { $match: { showTimeId: { $in: showtimeIds } } },
+      {
+        $group: {
+          _id: '$showTimeId',
+          total: { $sum: 1 },
+          booked: {
+            $sum: {
+              $cond: [{ $eq: ['$trang_thai', 'booked'] }, 1, 0],
+            },
+          },
+          held: {
+            $sum: {
+              $cond: [{ $eq: ['$trang_thai', 'hold'] }, 1, 0],
+            },
+          },
+          available: {
+            $sum: {
+              $cond: [{ $eq: ['$trang_thai', 'empty'] }, 1, 0],
+            },
+          },
+        },
+      },
+    ]);
+
+    const statsMap = new Map(seatStats.map((s) => [s._id.toString(), s]));
+
     const dataWithStatus = showtimes.map((st) => {
       const item = st.toObject();
       const status = CalculateShowTimeStatus(item);
+      const stats = statsMap.get(item._id.toString()) || {
+        total: 0,
+        booked: 0,
+        held: 0,
+        available: 0,
+      };
+
       return {
         ...item,
         status,
         display: ShowTimeDisplay(status),
+        seatInfo: stats,
+        canDelete: stats.booked === 0 && stats.held === 0,
       };
     });
 
@@ -180,7 +218,7 @@ export const getShowTimeByMovie = async (req: Request, res: Response) => {
     const showtimes = await ShowTimeM.find(baseQuery)
       .populate({
         path: 'roomId',
-        select: 'ten_phong cinema_id',
+        select: 'ten_phong cinema_id loai_phong',
         populate: { path: 'cinema_id', select: 'name city address' },
       })
       .sort({ startTime: -1 });
@@ -227,7 +265,13 @@ export const getShowTimeByMovie = async (req: Request, res: Response) => {
         ...item,
         status,
         display: ShowTimeDisplay(status),
-        seatInfo: { total: stats.total, booked: stats.booked },
+        seatInfo: {
+          total: stats.total,
+          booked: stats.bookedOnly,
+          held: stats.booked - stats.bookedOnly,
+          available: Math.max(stats.total - stats.booked, 0),
+        },
+        canDelete: stats.bookedOnly === 0 && stats.booked === 0,
       };
     });
 
@@ -247,6 +291,7 @@ export const getShowTimeDetail = async (req: Request, res: Response) => {
       .populate('movieId')
       .populate({
         path: 'roomId',
+        select: 'ten_phong cinema_id loai_phong',
         populate: {
           path: 'cinema_id',
           select: 'name city address',

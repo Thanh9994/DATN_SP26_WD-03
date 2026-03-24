@@ -20,6 +20,7 @@ export const useGenres = () => {
     },
     staleTime: 1000 * 60 * 10,
     gcTime: 1000 * 60 * 60,
+    refetchOnWindowFocus: false,
   });
 
   const { mutate: addGenre, isPending: isAdding } = useMutation({

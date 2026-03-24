@@ -133,5 +133,6 @@ export const useMyBookings = (status: string = 'paid') => {
       return res.data.data || [];
     },
     staleTime: 1000 * 60,
+    refetchOnWindowFocus: true,
   });
 };
