@@ -178,4 +178,4 @@ export const Cinema = () => {
   );
 };
 
-export default Cinema;
+export default Cinemas;

@@ -97,6 +97,7 @@ export const useRooms = () => {
       const { data } = await axios.get(API.ROOMS);
       return data.data;
     },
+    refetchOnWindowFocus: false,
   });
 
   const createRoom = useMutation({

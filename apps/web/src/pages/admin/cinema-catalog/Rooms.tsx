@@ -32,6 +32,7 @@ import {
   IShowTimeSeat,
 } from "@shared/schemas";
 import SeatMap from "@web/components/skeleton/SeatMap";
+import RoomTypeTag from "@web/components/admin/RoomTypeTag";
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -159,7 +160,7 @@ export const Rooms = () => {
         <Space>
           <VideoCameraOutlined />
           <Text strong>{text}</Text>
-          <Tag color="blue">{record.loai_phong}</Tag>
+          <RoomTypeTag type={record.loai_phong} />
         </Space>
       ),
     },
@@ -390,6 +391,7 @@ export const Rooms = () => {
             seats={generateMockSeats(selectedRoom)}
             selectedSeatCodes={[]}
             onSeatClick={() => { }}
+            currentUserId=""
           />
         )}
       </Modal>
