@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import type { ICreateMovie, IMovie, IUpdateMovie } from "@shared/schemas";
-import { message } from "antd";
-import { API } from "@web/api/api.service";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import type { ICreateMovie, IMovie, IUpdateMovie } from '@shared/src/schemas';
+import { message } from 'antd';
+import { API } from '@web/api/api.service';
 
 type MovieWithShowtimeCount = IMovie & { showtimeCount?: number };
 
@@ -14,7 +14,7 @@ export const useMovies = () => {
     isLoading,
     isError,
   } = useQuery<MovieWithShowtimeCount[]>({
-    queryKey: ["movies"],
+    queryKey: ['movies'],
     queryFn: async () => {
       const { data } = await axios.get(API.MOVIES);
       return data.data;
@@ -30,10 +30,10 @@ export const useMovies = () => {
       return data;
     },
     onSuccess: () => {
-      message.success("Thêm phim thành công");
-      queryClient.invalidateQueries({ queryKey: ["movies"] });
+      message.success('Thêm phim thành công');
+      queryClient.invalidateQueries({ queryKey: ['movies'] });
     },
-    onError: () => message.error("Thêm thất bại"),
+    onError: () => message.error('Thêm thất bại'),
   });
 
   const { mutate: updateMovie, isPending: isUpdating } = useMutation({
@@ -42,9 +42,9 @@ export const useMovies = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["movies"] });
+      queryClient.invalidateQueries({ queryKey: ['movies'] });
     },
-    onError: () => message.error("Cập nhật thất bại"),
+    onError: () => message.error('Cập nhật thất bại'),
   });
 
   const { mutate: deleteMovie, isPending: isDeleting } = useMutation({
@@ -52,10 +52,10 @@ export const useMovies = () => {
       await axios.delete(`${API.MOVIES}/${id}`);
     },
     onSuccess: () => {
-      message.success("Xóa phim thành công");
-      queryClient.invalidateQueries({ queryKey: ["movies"] });
+      message.success('Xóa phim thành công');
+      queryClient.invalidateQueries({ queryKey: ['movies'] });
     },
-    onError: () => message.error("Xóa thất bại"),
+    onError: () => message.error('Xóa thất bại'),
   });
 
   return {
@@ -73,7 +73,7 @@ export const useMovies = () => {
 
 export const useMovie = (id?: string) => {
   return useQuery<IMovie>({
-    queryKey: ["movie", id],
+    queryKey: ['movie', id],
     queryFn: async () => {
       const { data } = await axios.get(`${API.MOVIES}/${id}`);
       return data.data;

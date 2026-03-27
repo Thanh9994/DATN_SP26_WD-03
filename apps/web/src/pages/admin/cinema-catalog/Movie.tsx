@@ -26,7 +26,7 @@ import dayjs from 'dayjs';
 import { useMovies } from '@web/hooks/useMovie';
 import { useGenres } from '@web/hooks/useGenre';
 import { useUpload } from '@web/hooks/useUploads';
-import { ICloudinaryImage } from '@shared/schemas';
+import { ICloudinaryImage } from '@shared/src/schemas';
 import { useNavigate } from 'react-router-dom';
 
 export const Movie = () => {

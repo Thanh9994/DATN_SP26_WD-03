@@ -2,7 +2,7 @@ import { Card, List, Tag, Typography, Button, Space } from 'antd';
 import dayjs from 'dayjs';
 import { markAllCleanupLogsRead, useCleanupLogList } from '@web/hooks/useAdminDashboard';
 import { useEffect } from 'react';
-import { ICleanupLog } from '@shared/schemas';
+import { ICleanupLog } from '@shared/src/schemas';
 
 export const CleanupLogs = () => {
   const { data: logs = [] } = useCleanupLogList(20);

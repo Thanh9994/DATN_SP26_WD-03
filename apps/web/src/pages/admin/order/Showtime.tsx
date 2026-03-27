@@ -39,7 +39,7 @@ import { useMovie, useMovies } from '@web/hooks/useMovie';
 import { API } from '@web/api/api.service';
 import SeatMap from '@web/components/skeleton/SeatMap';
 import RoomTypeTag from '@web/components/admin/RoomTypeTag';
-import { ICreateShowTimePl, IMovie, IPhong, ShowTime as ShowTimeSchema } from '@shared/schemas';
+import { ICreateShowTimePl, IMovie, IPhong, ShowTime as ShowTimeSchema } from '@shared/src/schemas';
 
 const CLEANING_MINUTES = 30;
 const OPENING_HOUR = 7;

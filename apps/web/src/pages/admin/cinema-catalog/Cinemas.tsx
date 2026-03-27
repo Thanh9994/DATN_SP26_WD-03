@@ -15,7 +15,7 @@ import {
   message,
 } from 'antd';
 import { useCinemas } from '@web/hooks/useCinema';
-import { ICinema, IPhong } from '@shared/schemas';
+import { ICinema, IPhong } from '@shared/src/schemas';
 
 const { Title } = Typography;
 

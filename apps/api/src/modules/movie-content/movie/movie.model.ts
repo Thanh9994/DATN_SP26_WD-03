@@ -1,4 +1,4 @@
-import { AgeRating, IMovie, MovieStatus } from '@shared/schemas';
+import { AgeRating, IMovie, MovieStatus } from '@shared/src/schemas';
 import mongoose from 'mongoose';
 
 const MovieSchema = new mongoose.Schema<IMovie>(

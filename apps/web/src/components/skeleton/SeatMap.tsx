@@ -1,5 +1,6 @@
 import React from 'react';
-import { IShowTimeSeat } from '@shared/schemas'; // Đảm bảo interface này khớp với JSON của bạn
+import { IShowTimeSeat } from '@shared/src/schemas'; // Đảm bảo interface này khớp với JSON của bạn
+import { UserCheck2 } from 'lucide-react';
 
 interface SeatMapProps {
   seats: IShowTimeSeat[];
@@ -99,9 +100,13 @@ const SeatMap: React.FC<SeatMapProps> = ({
                       className={`${isCouple ? 'h-6 w-8 md:h-8 md:w-10' : 'h-6 w-6 md:h-8 md:w-8'} ${isSeatShell ? 'seat-shell overflow-visible border' : 'rounded-md border-2'} relative flex items-center justify-center text-[10px] font-semibold transition-all md:text-xs ${getSeatColor(seat)}`}
                     >
                       {isSeatShell && <span className="foot" aria-hidden="true" />}
-                      <span className={isSeatShell ? 'relative z-[3]' : undefined}>
-                        {seat.number}
-                      </span>
+                      {seat.trang_thai === 'booked' ? (
+                        <UserCheck2 className="h-4 w-4 text-zinc-400" />
+                      ) : (
+                        <span className={isSeatShell ? 'relative z-[3]' : undefined}>
+                          {seat.number}
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -140,7 +145,8 @@ const SeatMap: React.FC<SeatMapProps> = ({
           <span>Đang giữ</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded bg-zinc-700" /> <span>Đã Chọn</span>
+          {/* <div className="h-4 w-4 rounded bg-zinc-700" />  */}
+          <UserCheck2 /> <span>Đã đặt</span>
         </div>
       </div>
     </div>

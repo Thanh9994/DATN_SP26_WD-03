@@ -4,7 +4,7 @@ import { Button, message, Spin } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { useBooking } from '@web/hooks/useBooking';
-import { IShowTime, IShowTimeSeat } from '@shared/schemas';
+import { IShowTime, IShowTimeSeat } from '@shared/src/schemas';
 import { useAuth } from '@web/hooks/useAuth';
 import { ArrowLeft, MapPin } from 'lucide-react';
 import DrinkSnack, { type DrinkSnackSelection } from '@web/pages/DrinkSnack';

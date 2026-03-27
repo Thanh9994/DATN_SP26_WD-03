@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { API } from "@web/api/api.service";
-import { axiosAuth } from "@web/hooks/useAuth";
-import { ICleanupLog } from "@shared/schemas";
+import { useQuery } from '@tanstack/react-query';
+import { API } from '@web/api/api.service';
+import { axiosAuth } from '@web/hooks/useAuth';
+import { ICleanupLog } from '@shared/src/schemas';
 
 type CleanupLogResponse = {
   success: boolean;
@@ -10,9 +10,9 @@ type CleanupLogResponse = {
 };
 
 const buildCleanupSummary = (log?: ICleanupLog) => {
-  if (!log) return "Chưa có log cleanup";
+  if (!log) return 'Chưa có log cleanup';
 
-  if (log.type === "booking") {
+  if (log.type === 'booking') {
     const expired = (log.details as { expired?: number })?.expired ?? 0;
     const cancelled = (log.details as { cancelled?: number })?.cancelled ?? 0;
     return `Cleanup booking: expired ${expired}, cancelled ${cancelled}`;
@@ -24,7 +24,7 @@ const buildCleanupSummary = (log?: ICleanupLog) => {
 
 export const useCleanupLogs = () => {
   return useQuery({
-    queryKey: ["cleanup-logs", "latest"],
+    queryKey: ['cleanup-logs', 'latest'],
     queryFn: async () => {
       const [{ data: logRes }, { data: unreadRes }] = await Promise.all([
         axiosAuth.get<CleanupLogResponse>(`${API.ADMIN_DASHBOARD}/cleanup-logs`, {
@@ -49,7 +49,7 @@ export const useCleanupLogs = () => {
 
 export const useCleanupLogList = (limit: number = 20) => {
   return useQuery({
-    queryKey: ["cleanup-logs", "list", limit],
+    queryKey: ['cleanup-logs', 'list', limit],
     queryFn: async () => {
       const { data } = await axiosAuth.get<CleanupLogResponse>(
         `${API.ADMIN_DASHBOARD}/cleanup-logs`,

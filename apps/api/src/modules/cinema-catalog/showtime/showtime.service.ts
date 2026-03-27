@@ -1,4 +1,4 @@
-import { IPhong, ISeatType, IShowTime } from '@shared/schemas';
+import { IPhong, ISeatType, IShowTime } from '@shared/src/schemas';
 import { SeatTime } from './showtimeSeat.model';
 import { ShowTimeM } from './showtime.model';
 import mongoose from 'mongoose';
