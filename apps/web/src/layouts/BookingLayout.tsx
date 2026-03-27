@@ -266,9 +266,6 @@ const BookingLayout = () => {
                 <span className="mx-1 rounded-md border border-primary/30 bg-primary/20 px-2 py-1 text-[10px] font-extrabold uppercase tracking-widest text-primary">
                   {movie.do_tuoi}
                 </span>
-                <span className="mx-1 rounded-md border border-primary/30 bg-primary/20 px-2 py-1 tracking-widest text-white/70">
-                  {movie.phu_de}
-                </span>
               </span>
             </div>
             {cinema && (
