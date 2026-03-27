@@ -1,4 +1,4 @@
-import { IPhong, ISeatsStatus, ISeatType } from '@shared/src/schemas';
+import { IPhong, ISeatsStatus, ISeatType } from "../schemas";
 
 export interface ISeatResult {
   seatNumber: string;

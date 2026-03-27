@@ -58,7 +58,7 @@ const SeatBooking = () => {
     modal.warning({
       centered: true,
       title: 'Thông báo',
-      content: 'Bạn không thể chọn nhiều loại ghế một lúc hoặc ghế không liền kề quá 2 hàng',
+      content: 'Bạn không thể chọn nhiều loại ghế một lúc hoặc ghế không liền kề quá 3 hàng',
       okText: 'Đã hiểu',
     });
   };
@@ -95,14 +95,14 @@ const SeatBooking = () => {
       ...new Set(nextSelectedSeats.map((selectedSeat) => selectedSeat.row)),
     ].sort((a, b) => getRowIndex(a) - getRowIndex(b));
 
-    if (selectedRows.length > 2) {
+    if (selectedRows.length > 3) {
       showSeatValidationModal();
       return;
     }
 
     if (
-      selectedRows.length === 2 &&
-      getRowIndex(selectedRows[1]) - getRowIndex(selectedRows[0]) !== 1
+      selectedRows.length === 3 &&
+      getRowIndex(selectedRows[2]) - getRowIndex(selectedRows[0]) !== 2
     ) {
       showSeatValidationModal();
       return;
