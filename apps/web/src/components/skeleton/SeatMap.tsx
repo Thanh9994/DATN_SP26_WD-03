@@ -53,16 +53,16 @@ const SeatMap: React.FC<SeatMapProps> = ({
 
     switch (seat.seatType) {
       case 'vip':
-        return 'border-orange-500 text-orange-500 hover:bg-orange-500/20';
+        return 'bg-[#ef444499] text-white border-[#131313] hover:bg-[#ef4444]';
       case 'couple':
-        return 'border-cyan-500 text-cyan-400 hover:bg-cyan-500/20';
+        return 'bg-[#f9a8d499] text-white border-[#131313] hover:bg-[#f9a8d4]';
       default:
-        return 'border-zinc-500 text-zinc-400 hover:bg-zinc-500/20';
+        return 'bg-[#9ca3afab] text-white border-[#131313] hover:bg-[#9ca3af]';
     }
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 rounded-xl bg-[#0a0a0a] p-4">
+    <div className="flex flex-col items-center gap-4 rounded-xl bg-[#0a0a0a] p-4">
       {/* Màn hình */}
       <div className="mb-12 w-full max-w-lg">
         <div className="mb-2 h-2 rounded-t-[120px] bg-red-800/40 shadow-[0_35px_90px_rgba(220,220,220,0.9)]" />
@@ -87,15 +87,21 @@ const SeatMap: React.FC<SeatMapProps> = ({
                     seat.trang_thai === 'booked' ||
                     (seat.trang_thai === 'hold' && seat.heldBy !== currentUserId);
                   const isCouple = seat.seatType === 'couple';
+                  const isStandard = seat.seatType === 'normal';
+                  const isMedium = seat.seatType === 'vip';
+                  const isSeatShell = isStandard || isCouple || isMedium;
 
                   return (
                     <button
                       key={seat._id}
                       disabled={isDisabled}
                       onClick={() => onSeatClick(seat)}
-                      className={` ${isCouple ? 'h-7 w-8 md:h-8 md:w-9' : 'h-6 w-6 md:h-7 md:w-7'} flex items-center justify-center rounded-md border-2 text-[8px] font-semibold transition-all md:text-xs ${getSeatColor(seat)} `}
+                      className={`${isCouple ? 'h-6 w-8 md:h-8 md:w-10' : 'h-6 w-6 md:h-8 md:w-8'} ${isSeatShell ? 'seat-shell overflow-visible border' : 'rounded-md border-2'} relative flex items-center justify-center text-[10px] font-semibold transition-all md:text-xs ${getSeatColor(seat)}`}
                     >
-                      {seat.number}
+                      {isSeatShell && <span className="foot" aria-hidden="true" />}
+                      <span className={isSeatShell ? 'relative z-[3]' : undefined}>
+                        {seat.number}
+                      </span>
                     </button>
                   );
                 })}
@@ -107,16 +113,24 @@ const SeatMap: React.FC<SeatMapProps> = ({
         ))}
       </div>
 
-      {/* Chú thích (Legend) */}
-      <div className="mt-8 flex flex-wrap justify-center gap-6 border-t border-zinc-800 pt-6 text-sm text-zinc-400">
+      <div className="mt-8 flex flex-wrap justify-center gap-5 border-t border-zinc-800 pt-6 text-sm text-zinc-400">
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded border-2 border-zinc-500" /> <span>Thường</span>
+          <div className="seat-shell standard relative h-5 w-5 border border-[#131313] bg-[#9ca3afab]">
+            <span className="foot" aria-hidden="true" />
+          </div>{' '}
+          <span>Thường</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded border-2 border-orange-500" /> <span>Vip</span>
+          <div className="seat-shell relative h-5 w-5 border border-[#131313] bg-[#ef444499]">
+            <span className="foot" aria-hidden="true" />
+          </div>{' '}
+          <span>Medium</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded border-2 border-cyan-500" /> <span>Couple</span>
+          <div className="seat-shell relative h-5 w-6 border border-[#131313] bg-[#f9a8d499]">
+            <span className="foot" aria-hidden="true" />
+          </div>{' '}
+          <span>Couple</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="h-4 w-4 rounded bg-red-600" /> <span>Đang chọn</span>
@@ -126,7 +140,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
           <span>Đang giữ</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded bg-zinc-700" /> <span>Đã bán</span>
+          <div className="h-4 w-4 rounded bg-zinc-700" /> <span>Đã Chọn</span>
         </div>
       </div>
     </div>

@@ -1,21 +1,21 @@
-import { Home } from "lucide-react";
-import "../../styles/404.css";
+import { Home } from 'lucide-react';
+import '../../styles/public/404.css';
 
 export const NotFound = () => {
   return (
-    <main className="flex-grow flex flex-col">
-      <section className="relative flex-grow w-full flex flex-col items-center justify-center overflow-hidden py-20">
+    <main className="flex flex-grow flex-col">
+      <section className="relative flex w-full flex-grow flex-col items-center justify-center overflow-hidden py-20">
         <div className="absolute inset-0 z-0">
           <img
             alt="Empty vintage cinema theater"
-            className="w-full h-full object-cover opacity-60 grayscale-[0.5]"
+            className="h-full w-full object-cover opacity-60 grayscale-[0.5]"
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4PL2b3l-oslzfiGrp6BMbFEL3n2DBCsXc8azFdjrxGuVru0dpr4IXpYLVJ-GZ9A-DSJU96KuyawGEVyhgN5fO3Iit9OIYSgBdSj9QLJBI7AOLdtzJ5iWCQC7aTqRNd6w286UWvdN0Oz0ruNRvo7Kg0_y41l2YMsdEtWITFtZYCe36VDLOLR-QPZaN7EZDm1xC7VPieiuLlrkxEnGco5NUjW8BFOZuobDEhb8RinxEdHFTzdw4hERitgpftL9GvhQe4TPxrOQ_7NS4"
             referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/80 to-background-dark/40"></div>
         </div>
 
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 text-center">
+        <div className="relative z-10 mx-auto w-full max-w-4xl px-6 text-center">
           {/* <div className="relative mx-auto w-full max-w-2xl mb-8 md:mb-12 transform -rotate-1">
             <div className="aspect-video bg-white/5 border-2 md:border-4 border-white/10 rounded-sm shadow-[0_0_100px_rgba(255,255,255,0.05)] flex items-center justify-center overflow-hidden relative spotlight-glow">
               <div className="absolute inset-0 bg-white/5 animate-pulse"></div>
@@ -70,17 +70,17 @@ export const NotFound = () => {
             </div>
           </div>
 
-          <div className="max-w-xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">
+          <div className="mx-auto max-w-xl">
+            <h2 className="mb-4 text-2xl font-bold text-white md:mb-6 md:text-3xl">
               Oops! Nothing to see here...
             </h2>
-            <p className="text-white/50 text-base md:text-lg mb-8 md:mb-12 font-medium">
+            <p className="mb-8 text-base font-medium text-white/50 md:mb-12 md:text-lg">
               Let's get you back to the main feature before the credits roll.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6">
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row md:gap-6">
               <a
-                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white px-8 md:px-10 py-4 md:py-5 rounded-full font-bold flex items-center justify-center gap-3 transition-all hover:scale-105 shadow-2xl shadow-primary/40"
+                className="flex w-full items-center justify-center gap-3 rounded-full bg-primary px-8 py-4 font-bold text-white shadow-2xl shadow-primary/40 transition-all hover:scale-105 hover:bg-primary/90 sm:w-auto md:px-10 md:py-5"
                 href="/"
               >
                 <Home className="size-5" />
@@ -97,7 +97,7 @@ export const NotFound = () => {
           </div>
         </div>
 
-        <div className="absolute inset-0 pointer-events-none opacity-20">
+        <div className="pointer-events-none absolute inset-0 opacity-20">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
         </div>
       </section>

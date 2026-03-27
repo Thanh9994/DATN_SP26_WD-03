@@ -22,7 +22,7 @@ interface DrinkSnackProps {
 const DEFAULT_IMAGE =
   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuXqeIFfJ3K9cX43NXgLGxfWvV8G5Fby9Rpg&s';
 
-export const DrinkSnack = ({ open, onClose, onSkip, onContinue }: DrinkSnackProps): JSX.Element => {
+export const DrinkSnack = ({ open, onClose, onSkip, onContinue }: DrinkSnackProps): React.ReactNode => {
   const [internalOpen, setInternalOpen] = useState(true);
   const [cart, setCart] = useState<SnackCartItem[]>([]);
   const { products, isLoading, isError } = useProducts();
@@ -81,14 +81,14 @@ export const DrinkSnack = ({ open, onClose, onSkip, onContinue }: DrinkSnackProp
     return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
-  const renderSaveBadge = (price: number, originalPrice?: number): JSX.Element | null => {
+  const renderSaveBadge = (price: number, originalPrice?: number): React.ReactNode | null => {
     if (!originalPrice || originalPrice <= price) return null;
 
     const savings = originalPrice - price;
     return <div className="product-badge badge-save">Giảm {savings.toLocaleString('vi-VN')}đ</div>;
   };
 
-  const renderProductCard = (product: IProduct): JSX.Element => {
+  const renderProductCard = (product: IProduct): React.ReactNode => {
     const isFeatured = !!product.isCombo;
     const hasDiscount = Number(product.originalPrice || 0) > Number(product.price || 0);
 
@@ -148,7 +148,7 @@ export const DrinkSnack = ({ open, onClose, onSkip, onContinue }: DrinkSnackProp
     );
   };
 
-  if (!isOpen) return <div>Content here</div>;
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">

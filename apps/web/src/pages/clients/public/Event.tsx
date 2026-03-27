@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import "../../../styles/Event.css";
-import { API } from "@web/api/api.service";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import '../../../styles/public/Event.css';
+import { API } from '@web/api/api.service';
 
 interface EventData {
   _id: string;
@@ -25,15 +25,15 @@ interface FilterTab {
 }
 
 const filterTabs: FilterTab[] = [
-  { id: "all", label: "ALL EVENTS" },
-  { id: "film-festival", label: "FILM FESTIVALS" },
-  { id: "live-premiere", label: "LIVE PREMIERES" },
-  { id: "film-meetup", label: "FILM MEETUPS" },
-  { id: "qa-session", label: "Q&A SESSIONS" },
-  { id: "special-screening", label: "SPECIAL SCREENINGS" },
+  { id: 'all', label: 'ALL EVENTS' },
+  { id: 'film-festival', label: 'FILM FESTIVALS' },
+  { id: 'live-premiere', label: 'LIVE PREMIERES' },
+  { id: 'film-meetup', label: 'FILM MEETUPS' },
+  { id: 'qa-session', label: 'Q&A SESSIONS' },
+  { id: 'special-screening', label: 'SPECIAL SCREENINGS' },
 ];
 
-const FALLBACK_IMAGE = "https://via.placeholder.com/400x250?text=Event";
+const FALLBACK_IMAGE = 'https://via.placeholder.com/400x250?text=Event';
 const INITIAL_VISIBLE = 6;
 const LOAD_MORE_STEP = 3;
 
@@ -41,30 +41,30 @@ export const Event = (): JSX.Element => {
   const [events, setEvents] = useState<EventData[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [activeFilter, setActiveFilter] = useState<string>('all');
   const [visibleEvents, setVisibleEvents] = useState<number>(INITIAL_VISIBLE);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
   const [openSearchPopup, setOpenSearchPopup] = useState(false);
 
   const searchRef = useRef<HTMLDivElement | null>(null);
 
   const getCategoryId = (item: Partial<EventData>) => {
-    const raw = `${item.category || item.type || ""}`.toLowerCase().trim();
+    const raw = `${item.category || item.type || ''}`.toLowerCase().trim();
 
-    if (raw.includes("festival")) return "film-festival";
-    if (raw.includes("premiere")) return "live-premiere";
-    if (raw.includes("meetup")) return "film-meetup";
-    if (raw.includes("q&a") || raw.includes("qa")) return "qa-session";
-    if (raw.includes("special")) return "special-screening";
+    if (raw.includes('festival')) return 'film-festival';
+    if (raw.includes('premiere')) return 'live-premiere';
+    if (raw.includes('meetup')) return 'film-meetup';
+    if (raw.includes('q&a') || raw.includes('qa')) return 'qa-session';
+    if (raw.includes('special')) return 'special-screening';
 
-    return "all";
+    return 'all';
   };
 
   const formatDate = (date?: string) => {
-    if (!date) return "Đang cập nhật";
+    if (!date) return 'Đang cập nhật';
     const parsed = new Date(date);
     if (Number.isNaN(parsed.getTime())) return date;
-    return parsed.toLocaleDateString("vi-VN");
+    return parsed.toLocaleDateString('vi-VN');
   };
 
   const fetchEvents = async () => {
@@ -77,24 +77,24 @@ export const Event = (): JSX.Element => {
 
       const mapped: EventData[] = rawEvents.map((item: any) => ({
         _id: item._id || item.id || Math.random().toString(),
-        title: item.title || "",
-        description: item.summary || item.description || "",
-        summary: item.summary || "",
-        startDate: item.startDate || "",
-        endDate: item.endDate || "",
-        location: item.location || "",
-        image: item.avatar || item.image || "",
-        avatar: item.avatar || item.image || "",
-        category: item.category || "",
-        type: item.type || "",
+        title: item.title || '',
+        description: item.summary || item.description || '',
+        summary: item.summary || '',
+        startDate: item.startDate || '',
+        endDate: item.endDate || '',
+        location: item.location || '',
+        image: item.avatar || item.image || '',
+        avatar: item.avatar || item.image || '',
+        category: item.category || '',
+        type: item.type || '',
         badge: getCategoryId(item),
-        status: item.status || "",
-        slug: item.slug || "",
+        status: item.status || '',
+        slug: item.slug || '',
       }));
 
       setEvents(mapped);
     } catch (error) {
-      console.error("Fetch events error:", error);
+      console.error('Fetch events error:', error);
       setEvents([]);
     } finally {
       setLoading(false);
@@ -113,9 +113,9 @@ export const Event = (): JSX.Element => {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -123,11 +123,9 @@ export const Event = (): JSX.Element => {
     const keyword = searchText.trim().toLowerCase();
 
     return events.filter((event) => {
-      const matchFilter =
-        activeFilter === "all" || event.badge === activeFilter;
+      const matchFilter = activeFilter === 'all' || event.badge === activeFilter;
 
-      const matchSearch =
-        !keyword || event.title.toLowerCase().includes(keyword);
+      const matchSearch = !keyword || event.title.toLowerCase().includes(keyword);
 
       return matchFilter && matchSearch;
     });
@@ -138,9 +136,7 @@ export const Event = (): JSX.Element => {
 
     if (!keyword) return [];
 
-    return events
-      .filter((event) => event.title.toLowerCase().includes(keyword))
-      .slice(0, 6);
+    return events.filter((event) => event.title.toLowerCase().includes(keyword)).slice(0, 6);
   }, [events, searchText]);
 
   const visibleList = filteredEvents.slice(0, visibleEvents);
@@ -164,11 +160,11 @@ export const Event = (): JSX.Element => {
 
   const formatPopupMeta = (event: EventData) => {
     const parts = [
-      event.category || event.type || "",
-      event.startDate ? formatDate(event.startDate) : "",
+      event.category || event.type || '',
+      event.startDate ? formatDate(event.startDate) : '',
     ].filter(Boolean);
 
-    return parts.join(" • ");
+    return parts.join(' • ');
   };
 
   return (
@@ -180,7 +176,7 @@ export const Event = (): JSX.Element => {
               <button
                 key={tab.id}
                 type="button"
-                className={`filter-tab ${activeFilter === tab.id ? "active" : ""}`}
+                className={`filter-tab ${activeFilter === tab.id ? 'active' : ''}`}
                 onClick={() => handleChangeFilter(tab.id)}
               >
                 {tab.label}
@@ -218,7 +214,7 @@ export const Event = (): JSX.Element => {
                       <div className="search-item-content">
                         <div className="search-item-title">{event.title}</div>
                         <div className="search-item-meta">
-                          {formatPopupMeta(event) || "Đang cập nhật"}
+                          {formatPopupMeta(event) || 'Đang cập nhật'}
                         </div>
                       </div>
                     </button>
@@ -240,18 +236,16 @@ export const Event = (): JSX.Element => {
                 <div className="event-image">
                   <img src={event.image || FALLBACK_IMAGE} alt={event.title} />
                   <div className={`event-badge badge-${event.badge}`}>
-                    {event.category || event.type || "EVENT"}
+                    {event.category || event.type || 'EVENT'}
                   </div>
-                  {event.status ? (
-                    <div className="event-status">{event.status}</div>
-                  ) : null}
+                  {event.status ? <div className="event-status">{event.status}</div> : null}
                 </div>
 
                 <div className="event-info">
                   <h3 className="event-title">{event.title}</h3>
 
                   <p className="event-description">
-                    {event.description || "Đang cập nhật nội dung sự kiện."}
+                    {event.description || 'Đang cập nhật nội dung sự kiện.'}
                   </p>
 
                   <div className="event-meta">
@@ -262,7 +256,7 @@ export const Event = (): JSX.Element => {
 
                     <div className="meta-item">
                       <span className="meta-icon">📍</span>
-                      <span>{event.location || "Đang cập nhật"}</span>
+                      <span>{event.location || 'Đang cập nhật'}</span>
                     </div>
                   </div>
 
