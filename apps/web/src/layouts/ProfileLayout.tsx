@@ -1,7 +1,7 @@
 import { PayCircleFilled, SettingOutlined, BookOutlined, DownOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
 import { User } from 'lucide-react';
-import '../styles/profile.css';
+import '../styles/profile/profile.css';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
 export const ProfileLayout = () => {

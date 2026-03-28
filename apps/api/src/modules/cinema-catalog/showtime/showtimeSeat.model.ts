@@ -1,11 +1,11 @@
-import mongoose, { Schema } from "mongoose";
-import { IShowTimeSeat, SeatsStatus, SeatType } from "@shared/schemas";
+import mongoose, { Schema } from 'mongoose';
+import { IShowTimeSeat, SeatsStatus, SeatType } from '@shared/src/schemas';
 
 const showTimeSeatSchema = new Schema<IShowTimeSeat>(
   {
     showTimeId: {
       type: Schema.Types.ObjectId,
-      ref: "ShowTime",
+      ref: 'ShowTime',
       required: true,
       index: true,
     },
@@ -21,19 +21,19 @@ const showTimeSeatSchema = new Schema<IShowTimeSeat>(
     trang_thai: {
       type: String,
       enum: SeatsStatus.options,
-      default: "empty",
+      default: 'empty',
       index: true,
     },
     heldBy: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       default: null,
       index: true,
     },
     holdExpiresAt: Date,
     bookingId: {
       type: Schema.Types.ObjectId,
-      ref: "Booking",
+      ref: 'Booking',
       default: null,
     },
   },
@@ -44,7 +44,4 @@ showTimeSeatSchema.index({ showTimeId: 1, seatCode: 1 }, { unique: true });
 showTimeSeatSchema.index({ showTimeId: 1, trang_thai: 1 });
 showTimeSeatSchema.index({ holdExpiresAt: 1 });
 
-export const SeatTime = mongoose.model<IShowTimeSeat>(
-  "ShowTimeSeat",
-  showTimeSeatSchema,
-);
+export const SeatTime = mongoose.model<IShowTimeSeat>('ShowTimeSeat', showTimeSeatSchema);

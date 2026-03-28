@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState } from 'react';
 // import "./Setting.css";
-import "../../styles/Setting.css";
+import '../../styles/profile/Setting.css';
 interface ToggleSetting {
   id: string;
   label: string;
@@ -15,10 +15,10 @@ interface RadioOption {
 }
 
 export const Setting = (): JSX.Element => {
-  const [appearance, setAppearance] = useState<string>("dark");
-  const [videoQuality, setVideoQuality] = useState<string>("auto");
-  const [language, setLanguage] = useState<string>("en");
-  const [region, setRegion] = useState<string>("us");
+  const [appearance, setAppearance] = useState<string>('dark');
+  const [videoQuality, setVideoQuality] = useState<string>('auto');
+  const [language, setLanguage] = useState<string>('en');
+  const [region, setRegion] = useState<string>('us');
   const [toggleStates, setToggleStates] = useState<Record<string, boolean>>({
     captions: true,
     contrast: false,
@@ -29,76 +29,76 @@ export const Setting = (): JSX.Element => {
   });
 
   const appearanceOptions = [
-    { id: "dark", label: "Dark Mode" },
-    { id: "light", label: "Light Mode" },
-    { id: "system", label: "System Default" },
+    { id: 'dark', label: 'Dark Mode' },
+    { id: 'light', label: 'Light Mode' },
+    { id: 'system', label: 'System Default' },
   ];
 
   const videoQualityOptions = [
-    { id: "auto", label: "Auto" },
-    { id: "fullhd", label: "Full HD" },
-    { id: "4k", label: "Ultra 4K" },
+    { id: 'auto', label: 'Auto' },
+    { id: 'fullhd', label: 'Full HD' },
+    { id: '4k', label: 'Ultra 4K' },
   ];
 
   const languageOptions = [
-    { id: "en", label: "English(USD)" },
-    { id: "es", label: "Español(EUR)" },
-    { id: "fr", label: "Français(EUR)" },
+    { id: 'en', label: 'English(USD)' },
+    { id: 'es', label: 'Español(EUR)' },
+    { id: 'fr', label: 'Français(EUR)' },
   ];
 
   const regionOptions = [
-    { id: "us", label: "United States" },
-    { id: "uk", label: "United Kingdom" },
-    { id: "ca", label: "Canada" },
+    { id: 'us', label: 'United States' },
+    { id: 'uk', label: 'United Kingdom' },
+    { id: 'ca', label: 'Canada' },
   ];
 
   const accessibilityToggles: ToggleSetting[] = [
     {
-      id: "captions",
-      label: "Always Show Captions",
-      description: "Display captions in all supported content",
-      icon: "📝",
+      id: 'captions',
+      label: 'Always Show Captions',
+      description: 'Display captions in all supported content',
+      icon: '📝',
       enabled: toggleStates.captions,
     },
     {
-      id: "contrast",
-      label: "High Contrast Mode",
-      description: "Enhance visibility with high contrast colors",
-      icon: "👁️",
+      id: 'contrast',
+      label: 'High Contrast Mode',
+      description: 'Enhance visibility with high contrast colors',
+      icon: '👁️',
       enabled: toggleStates.contrast,
     },
   ];
 
   const privacyToggles: ToggleSetting[] = [
     {
-      id: "visibility",
-      label: "Public Profile Visibility",
-      description: "Allow others to find and view your profile",
-      icon: "🔓",
+      id: 'visibility',
+      label: 'Public Profile Visibility',
+      description: 'Allow others to find and view your profile',
+      icon: '🔓',
       enabled: toggleStates.visibility,
     },
     {
-      id: "sharing",
-      label: "Data Sharing",
-      description: "Share viewing analytics and improve recommendations",
-      icon: "📊",
+      id: 'sharing',
+      label: 'Data Sharing',
+      description: 'Share viewing analytics and improve recommendations',
+      icon: '📊',
       enabled: toggleStates.sharing,
     },
   ];
 
   const notificationToggles: ToggleSetting[] = [
     {
-      id: "offers",
-      label: "Promotional Offers",
-      description: "Receive offers and updates about events",
-      icon: "🎁",
+      id: 'offers',
+      label: 'Promotional Offers',
+      description: 'Receive offers and updates about events',
+      icon: '🎁',
       enabled: toggleStates.offers,
     },
     {
-      id: "alerts",
-      label: "Booking Alerts",
-      description: "Get notified about upcoming bookings",
-      icon: "🔔",
+      id: 'alerts',
+      label: 'Booking Alerts',
+      description: 'Get notified about upcoming bookings',
+      icon: '🔔',
       enabled: toggleStates.alerts,
     },
   ];
@@ -110,15 +110,8 @@ export const Setting = (): JSX.Element => {
     }));
   };
 
-  const renderButton = (
-    text: string,
-    isSelected: boolean,
-    onClick?: () => void,
-  ): JSX.Element => (
-    <button
-      className={`btn-option ${isSelected ? "selected" : ""}`}
-      onClick={onClick}
-    >
+  const renderButton = (text: string, isSelected: boolean, onClick?: () => void): JSX.Element => (
+    <button className={`btn-option ${isSelected ? 'selected' : ''}`} onClick={onClick}>
       {text}
     </button>
   );
@@ -182,9 +175,7 @@ export const Setting = (): JSX.Element => {
             </div>
             <div className="button-row">
               {appearanceOptions.map((opt) =>
-                renderButton(opt.label, appearance === opt.id, () =>
-                  setAppearance(opt.id),
-                ),
+                renderButton(opt.label, appearance === opt.id, () => setAppearance(opt.id)),
               )}
             </div>
           </section>
@@ -196,9 +187,7 @@ export const Setting = (): JSX.Element => {
             </div>
             <div className="button-row">
               {videoQualityOptions.map((opt) =>
-                renderButton(opt.label, videoQuality === opt.id, () =>
-                  setVideoQuality(opt.id),
-                ),
+                renderButton(opt.label, videoQuality === opt.id, () => setVideoQuality(opt.id)),
               )}
             </div>
           </section>

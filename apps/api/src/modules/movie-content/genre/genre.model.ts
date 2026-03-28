@@ -1,11 +1,11 @@
-import { IGenre } from "@shared/schemas";
-import mongoose from "mongoose";
+import { IGenre } from '@shared/src/schemas';
+import mongoose from 'mongoose';
 
 const genreSchema = new mongoose.Schema<IGenre>(
-    {
-        name: String,
-    },
-    { timestamps: true }
+  {
+    name: String,
+  },
+  { timestamps: true },
 );
 
-export const Genre = mongoose.model<IGenre>("genre", genreSchema);
+export const Genre = mongoose.model<IGenre>('genre', genreSchema);
