@@ -1,18 +1,13 @@
 import { Card, List, Tag, Typography, Button, Space } from 'antd';
 import dayjs from 'dayjs';
-import { markAllCleanupLogsRead, useCleanupLogList } from '@web/hooks/useAdminDashboard';
-import { useEffect } from 'react';
+import { useCleanupLogList, useMarkReadCleanupLogs } from '@web/hooks/useAdminDashboard';
 import { ICleanupLog } from '@shared/src/schemas';
 
 export const CleanupLogs = () => {
   const { data: logs = [] } = useCleanupLogList(20);
   const { Text } = Typography;
 
-  useEffect(() => {
-    if (logs.length > 0) {
-      markAllCleanupLogsRead();
-    }
-  }, [logs]);
+  const markReadMutation = useMarkReadCleanupLogs();
 
   const renderLogDetails = (log: ICleanupLog) => {
     if (log.type === 'booking') {
@@ -30,11 +25,13 @@ export const CleanupLogs = () => {
       <Card
         title="Cleanup Logs"
         extra={
-          <Space>
-            <Button size="small" onClick={() => markAllCleanupLogsRead()}>
-              Đánh dấu đã đọc
-            </Button>
-          </Space>
+          <Button
+            size="small"
+            loading={markReadMutation.isPending}
+            onClick={() => markReadMutation.mutate()}
+          >
+            Đánh dấu đã đọc
+          </Button>
         }
       >
         <List

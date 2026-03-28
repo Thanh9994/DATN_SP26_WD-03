@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { API } from '@web/api/api.service';
 import { axiosAuth } from '@web/hooks/useAuth';
 import { ICleanupLog } from '@shared/src/schemas';
@@ -42,8 +42,10 @@ export const useCleanupLogs = () => {
         unreadCount: unreadRes?.count ?? 0,
       };
     },
-    refetchInterval: 60 * 1000,
-    staleTime: 30 * 1000,
+    refetchInterval: 10 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false, // QUAN TRỌNG: Tắt việc fetch lại khi chuyển tab.
+    refetchOnMount: false,
   });
 };
 
@@ -57,8 +59,8 @@ export const useCleanupLogList = (limit: number = 20) => {
       );
       return data?.data ?? [];
     },
-    staleTime: 30 * 1000,
-    refetchInterval: 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -67,4 +69,15 @@ export const markAllCleanupLogsRead = async () => {
     `${API.ADMIN_DASHBOARD}/cleanup-logs/mark-read`,
   );
   return data;
+};
+
+export const useMarkReadCleanupLogs = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: markAllCleanupLogsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cleanup-logs'] });
+    },
+  });
 };
