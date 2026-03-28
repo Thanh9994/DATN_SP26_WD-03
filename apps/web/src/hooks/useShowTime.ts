@@ -48,6 +48,7 @@ export type AdminShowtimeRow = IShowTime & {
     | string
     | (IPhong & {
         cinema_id: string | PopulatedCinema;
+        loai_phong: string;
       });
   status: IShowTimeStatus;
   display?: {

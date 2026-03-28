@@ -1,11 +1,11 @@
-import { Table, Button, Space, Popconfirm, Modal, Input, Form } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Button, Space, Popconfirm, Modal, Input, Form, List, Card } from 'antd';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { IGenre } from '@shared/src/schemas';
 import { useGenres } from '@web/hooks/useGenre';
 
 export const Genre = () => {
-  const { genres, isLoading, addGenre, updateGenre, deleteGenre } = useGenres();
+  const { genres, addGenre, updateGenre, deleteGenre } = useGenres();
   const [form] = Form.useForm();
   const [editId, setEditId] = useState<string | null>(null);
 
@@ -28,31 +28,31 @@ export const Genre = () => {
         Thêm
       </Button>
 
-      <Table
+      <List
+        grid={{ gutter: 8, xs: 1, sm: 2, md: 3, lg: 4 }} 
         dataSource={genres}
-        loading={isLoading}
-        rowKey="_id"
-        columns={[
-          { title: 'Tên', dataIndex: 'name' },
-          {
-            title: 'Thao tác',
-            render: (_, record: any) => (
-              <Space>
-                <Button
-                  onClick={() => {
-                    setEditId(record._id);
-                    form.setFieldsValue(record);
-                  }}
-                >
-                  Sửa
-                </Button>
-                <Popconfirm title="Xóa?" onConfirm={() => deleteGenre(record._id)}>
-                  <Button danger>Xóa</Button>
-                </Popconfirm>
-              </Space>
-            ),
-          },
-        ]}
+        pagination={false}
+        renderItem={(item) => (
+          <List.Item>
+            <Card size="small" className="transition-all hover:border-blue-500">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium">{item.name}</span>
+                <Space>
+                  <Button
+                    icon={<EditOutlined className="text-blue-500" />}
+                    onClick={() => {
+                      setEditId(item.name);
+                      form.setFieldsValue(item);
+                    }}
+                  />
+                  <Popconfirm title="Xóa?" onConfirm={() => deleteGenre(item.name)}>
+                    <Button type="text" size="small" danger icon={<DeleteOutlined />} />
+                  </Popconfirm>
+                </Space>
+              </div>
+            </Card>
+          </List.Item>
+        )}
       />
 
       <Modal

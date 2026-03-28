@@ -1,21 +1,9 @@
 import { useState } from 'react';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Popconfirm,
-  Card,
-  Form,
-  Modal,
-  Input,
-  Select,
-  Typography,
-  Table,
-  Space,
-  Tag,
-  message,
-} from 'antd';
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Modal, Input, Typography, Table, Space, message, Tooltip } from 'antd';
 import { useCinemas } from '@web/hooks/useCinema';
 import { ICinema, IPhong } from '@shared/src/schemas';
+import RoomTypeTag from '@web/components/admin/RoomTypeTag';
 
 const { Title } = Typography;
 
@@ -23,8 +11,7 @@ export const Cinema = () => {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const { cinemas, isLoading, createCinema, updateCinema, deleteCinema, isProcessing } =
-    useCinemas();
+  const { cinemas, isLoading, createCinema, updateCinema, isProcessing } = useCinemas();
 
   const handleOpenModal = (record?: ICinema) => {
     if (record && record._id) {
@@ -72,20 +59,52 @@ export const Cinema = () => {
       title: 'Danh sách phòng',
       dataIndex: 'danh_sach_phong',
       key: 'danh_sach_phong',
-      width: 300,
-      render: (phong_list: IPhong[]) => (
-        <Space wrap>
-          {phong_list?.length > 0 ? (
-            phong_list.map((p) => (
-              <Tag color="cyan" key={p._id}>
-                {p.ten_phong} - {p.loai_phong}
-              </Tag>
-            ))
-          ) : (
-            <span style={{ color: '#ccc', fontStyle: 'italic' }}>Trống</span>
-          )}
-        </Space>
-      ),
+      width: 700,
+      render: (phong_list: IPhong[]) => {
+        if (!phong_list || phong_list.length === 0) {
+          return <span className="italic text-gray-400">Chưa có phòng</span>;
+        }
+
+        const maxVisible = 3;
+        const displayList = phong_list.slice(0, maxVisible);
+        const remainingList = phong_list.slice(maxVisible);
+
+        return (
+          <div className="flex items-center gap-2">
+            <Space size={[4, 8]} wrap>
+              {displayList.map((p) => (
+                <div key={p._id} className="flex items-center gap-2">
+                  <span className="text-xs font-bold">{p.ten_phong}</span>
+                  <RoomTypeTag type={p.loai_phong} />
+                </div>
+              ))}
+            </Space>
+            {remainingList.length > 0 && (
+              <Tooltip
+                placement="top"
+                title={
+                  <div className="flex flex-col gap-2 p-1">
+                    <div className="mb-1 border-b border-white/20 pb-1 text-[11px] font-bold">
+                      DANH SÁCH PHÒNG KHÁC
+                    </div>
+                    {remainingList.map((p) => (
+                      <div key={p._id} className="flex items-center justify-between gap-4">
+                        <span className="text-xs">{p.ten_phong}</span>
+                        <RoomTypeTag type={p.loai_phong} />
+                      </div>
+                    ))}
+                  </div>
+                }
+                color="#1e293b"
+              >
+                <div className="cursor-help rounded-full bg-blue-50 px-2 py-1 text-xs font-bold text-blue-600 transition-colors hover:bg-blue-100">
+                  +{remainingList.length}
+                </div>
+              </Tooltip>
+            )}
+          </div>
+        );
+      },
     },
     {
       title: 'Hành động',
@@ -94,13 +113,13 @@ export const Cinema = () => {
       render: (_: any, record: ICinema) => (
         <Space size="middle">
           <Button type="text" icon={<EditOutlined />} onClick={() => handleOpenModal(record)} />
-          <Popconfirm
+          {/* <Popconfirm
             title="Xác nhận xóa rạp này?"
             onConfirm={() => deleteCinema(record._id!)}
             okButtonProps={{ danger: true }}
           >
             <Button type="text" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
+          </Popconfirm> */}
         </Space>
       ),
     },
@@ -155,21 +174,7 @@ export const Cinema = () => {
               <Input placeholder="Số nhà, tên đường..." />
             </Form.Item>
             <Form.Item name="city" label="Thành phố" rules={[{ required: true }]}>
-              <Select placeholder="Chọn thành phố">
-                <Select.Option value="Hà Nội">Hà Nội</Select.Option>
-                <Select.Option value="Hồ Chí Minh">Hồ Chí Minh</Select.Option>
-                <Select.Option value="Quảng Ninh">Quảng Ninh</Select.Option>
-                <Select.Option value="Hải Phòng">Hải Phòng</Select.Option>
-                <Select.Option value="Đà Lạt">Đà Lạt</Select.Option>
-                <Select.Option value="Tuyên Quang">Tuyên Quang</Select.Option>
-                <Select.Option value="Ninh Bình">Ninh Bình</Select.Option>
-                <Select.Option value="Quy Nhơn">Quy Nhơn</Select.Option>
-                <Select.Option value="Thái Nguyên">Thái Nguyên</Select.Option>
-                <Select.Option value="Tây Ninh">Tây Ninh</Select.Option>
-                <Select.Option value="Hưng Yên">Hưng Yên</Select.Option>
-                <Select.Option value="Bắc Giang">Bắc Giang</Select.Option>
-                <Select.Option value="Phú Thọ">Phú Thọ</Select.Option>
-              </Select>
+              <Input placeholder="Thành phố, Tỉnh...." />
             </Form.Item>
           </div>
         </Form>

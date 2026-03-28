@@ -13,6 +13,7 @@ import {
   message,
   Upload,
   Tag,
+  Card,
 } from 'antd';
 import {
   PlusOutlined,
@@ -213,6 +214,21 @@ export const Movie = () => {
         <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>
           Thêm phim
         </Button>
+      </div>
+
+      <div className='my-3 grid grid-cols-4 gap-4'>
+        <Card>
+          1
+        </Card>
+        <Card>
+          1
+        </Card>
+        <Card>
+          1
+        </Card>
+        <Card>
+          1
+        </Card>
       </div>
 
       <Table
