@@ -82,7 +82,7 @@ export const Header = () => {
             onClick={() => navigate('/')}
           >
             <img
-              src="https://res.cloudinary.com/dcyzkqb1r/image/upload/t_PVM3/f_webp/q_40/H%E1%BB%8Fa_T%E1%BB%91c_fh4emr"
+              src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1774244353682-pvm-logo"
               alt="Logo"
               className="h-[40px] w-[40px] object-cover lg:h-[55px] lg:w-[55px]" // Giảm size trên mobile
             />

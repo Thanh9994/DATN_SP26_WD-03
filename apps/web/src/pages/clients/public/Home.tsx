@@ -11,9 +11,7 @@ export const Home = () => {
 
   const sortedMovies = [...(movies ?? [])]
     .filter((movie) => movie.trang_thai === 'dang_chieu')
-    .sort(
-    (a, b) => Number(b.rateting ?? 0) - Number(a.rateting ?? 0),
-    );
+    .sort((a, b) => Number(b.rateting ?? 0) - Number(a.rateting ?? 0));
   const featuredMovie = sortedMovies[currentIndex];
 
   useEffect(() => {
@@ -82,7 +80,9 @@ export const Home = () => {
                 </span>
                 <div className="flex items-center gap-1 text-yellow-400">
                   <span className="material-symbols-outlined text-sm">star</span>
-                  <span className="text-sm font-bold text-white">{featuredMovie?.rateting ?? 0}</span>
+                  <span className="text-sm font-bold text-white">
+                    {featuredMovie?.rateting ?? 0}
+                  </span>
                 </div>
               </div>
               <h1 className="mb-4 line-clamp-2 text-2xl font-black uppercase leading-tight tracking-tight text-white sm:text-4xl">
@@ -209,6 +209,16 @@ export const Home = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div className="">
+            <div className=""></div>
+            <div className="">
+              <div className=""></div>
+              <div className=""></div>
             </div>
           </div>
         </section>

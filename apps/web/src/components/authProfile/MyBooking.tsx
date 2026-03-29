@@ -49,34 +49,38 @@ const MyBooking = () => {
     const isExpired = t.isPast && dayjs().diff(dayjs(t.date, 'DD/MM/YYYY'), 'day') >= 2;
 
     return (
-      <div key={t._id} className="mb-4">
+      <div key={t._id} className="">
         <BookingTicket ticket={t}>
-          <div className="flex flex-col">
-            <p className="mb-0.5 text-[8px] font-black uppercase tracking-[0.2em] text-zinc-600">
-              Ticket Code
-            </p>
-            <p className="font-mono text-sm font-bold tracking-wider text-red-500 md:text-base">
-              {t.ticketCode || 'N/A'}
-            </p>
-          </div>
-
-          {isExpired ? (
-            <div className="rounded-xl border border-white/5 bg-zinc-900/40 px-6 py-3">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">
-                Đã hết hạn xem
-              </span>
+          <div className="flex w-full items-center justify-between gap-2">
+            <div className="flex flex-col justify-center leading-tight">
+              <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-600 md:text-[10px]">
+                Ticket Code
+              </p>
+              <p className="font-mono text-[11px] font-black tracking-wider text-red-500 md:text-base">
+                {t.ticketCode || 'N/A'}
+              </p>
             </div>
-          ) : (
-            <button
-              onClick={() => navigate(`/my-booking/${t._id}`)}
-              className="flex items-center gap-2 rounded-xl bg-[#e52e2e] px-8 py-3 text-white transition-all duration-300 hover:bg-white hover:text-black"
-            >
-              <Ticket size={18} />
-              <span className="text-[10px] font-black uppercase tracking-[0.15em] md:text-xs">
-                Xem Vé
-              </span>
-            </button>
-          )}
+            <div className="flex shrink-0 items-center">
+              {isExpired ? (
+                <div className="rounded-xl border border-white/5 bg-zinc-900/40 px-4 py-2 md:px-8 md:py-3">
+                  <span className="text-[8px] font-bold uppercase tracking-widest text-zinc-600 md:text-xs">
+                    Đã hết hạn
+                  </span>
+                </div>
+              ) : (
+                <button
+                  onClick={() => navigate(`/my-booking/${t._id}`)}
+                  // SỬA: Dùng h-fit hoặc py đồng bộ để nút không bị quá cao so với text
+                  className="flex items-center gap-2 rounded-xl bg-[#e52e2e] px-4 py-2.5 text-white transition-all duration-300 hover:bg-white hover:text-black md:px-8 md:py-3"
+                >
+                  <Ticket size={14} className="md:h-4 md:w-4" />
+                  <span className="text-[9px] font-black uppercase tracking-[0.15em] md:text-xs">
+                    Xem Vé
+                  </span>
+                </button>
+              )}
+            </div>
+          </div>
         </BookingTicket>
       </div>
     );
@@ -110,9 +114,9 @@ const MyBooking = () => {
         </div>
       </div>
 
-      <div className="w-full space-y-12 rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl lg:p-8">
+      <div className="w-full space-y-12 p-1 backdrop-blur-xl lg:p-6">
         <section>
-          <div className="mb-6 flex items-center gap-2">
+          <div className="mx-2 flex items-center gap-2 py-2 md:mb-4">
             <Clock className="mb-3 text-[#e52e2e]" size={22} strokeWidth={2.0} />
             <h2 className="text-xl font-extrabold uppercase tracking-tight text-white md:text-2xl">
               TICKET
@@ -121,7 +125,7 @@ const MyBooking = () => {
 
           <div className="space-y-4">
             {isLoading ? (
-              <div className="h-32 animate-pulse rounded-2xl bg-white/5" />
+              <div className="h-32 animate-pulse rounded-xl bg-white/5" />
             ) : upcomingBookings.length > 0 ? (
               upcomingBookings.map(renderBookingTicket)
             ) : (
@@ -143,7 +147,7 @@ const MyBooking = () => {
         </section>
 
         <section>
-          <div className="mb-6 flex items-center gap-2 border-t border-white/5 pt-10">
+          <div className="mx-2 flex items-center gap-2 border-t border-white/5 py-2 pt-10">
             <History className="mb-3 text-zinc-500" size={22} strokeWidth={2.0} />
             <h2 className="text-xl font-extrabold uppercase tracking-tight text-white md:text-2xl">
               History

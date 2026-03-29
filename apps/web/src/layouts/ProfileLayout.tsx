@@ -14,7 +14,7 @@ export const ProfileLayout = () => {
     {
       key: 'info',
       icon: <User size={20} />,
-      label: 'Thông tin cá nhân',
+      label: 'Hồ sơ',
       onClick: () => navigate('/profile/info'),
     },
     {
@@ -46,7 +46,7 @@ export const ProfileLayout = () => {
     menuItems.find((item) => item.key === selectedKey)?.label || 'Thông tin cá nhân';
   return (
     <div className="min-h-full overflow-x-hidden bg-[#120a0a] py-6 text-white lg:py-10">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-3 sm:px-4 lg:flex-row lg:gap-6 lg:px-5">
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-1 sm:px-1 lg:flex-row lg:gap-4 lg:px-1">
         {/* Sidebar */}
         <aside className="hidden h-fit space-y-2 lg:sticky lg:block lg:w-1/4">
           <h1 className="px-4 text-3xl font-bold tracking-tight">Tài khoản</h1>
@@ -75,7 +75,7 @@ export const ProfileLayout = () => {
               </Button>
             </Dropdown>
           </div>
-          <div className="min-h-[60vh] lg:p-4">
+          <div className="min-h-[50vh] lg:p-2">
             <Outlet />
           </div>
         </main>
