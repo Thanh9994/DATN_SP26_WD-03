@@ -1,4 +1,4 @@
-import { generateSeats } from "@shared/script/seatsGenerate";
+import { generateSeats } from "@shared/src/script/seatsGenerate";
 import { createRoomS, getAllRooms, getRoomsByCinemaS } from "./room.service";
 import { Request, Response } from "express";
 import { Cinemas } from "../cinema/cinema.model";

@@ -91,13 +91,7 @@ const Product = () => {
   const handleOpenEdit = (product: IProduct) => {
     setEditingProduct(product);
     editForm.setFieldsValue({
-      name: product.name,
-      image: product.image || DEFAULT_IMAGE,
-      originalPrice: product.originalPrice || 0,
-      price: product.price || 0,
-      isActive: product.isActive ?? true,
-      isCombo: product.isCombo ?? false,
-      description: product.description || "",
+      ...product
     });
     setOpenEdit(true);
   };
@@ -271,7 +265,7 @@ const Product = () => {
         okText="Thêm"
         cancelText="Hủy"
         confirmLoading={isAdding}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={addForm} layout="vertical">
           <Form.Item
@@ -359,7 +353,7 @@ const Product = () => {
         okText="Cập nhật"
         cancelText="Hủy"
         confirmLoading={isUpdating}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={editForm} layout="vertical">
           <Form.Item

@@ -3,7 +3,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { message } from 'antd';
 import { API } from '@web/api/api.service';
-import { ICreateShowTimePl, IMovie, IPhong, IShowTime, IShowTimeStatus, ShowTime } from '@shared/schemas';
+import {
+  ICreateShowTimePl,
+  IMovie,
+  IPhong,
+  IShowTime,
+  IShowTimeStatus,
+  ShowTime,
+} from '@shared/src/schemas';
 
 type PopulatedCinema = {
   _id?: string;
@@ -34,11 +41,14 @@ export type AdminShowtimeSeatInfo = {
 
 export type AdminShowtimeRow = IShowTime & {
   _id?: string;
-  movieId: string | Pick<IMovie, '_id' | 'ten_phim' | 'thoi_luong' | 'ngay_cong_chieu' | 'ngay_ket_thuc'>;
+  movieId:
+    | string
+    | Pick<IMovie, '_id' | 'ten_phim' | 'thoi_luong' | 'ngay_cong_chieu' | 'ngay_ket_thuc'>;
   roomId:
     | string
     | (IPhong & {
         cinema_id: string | PopulatedCinema;
+        loai_phong: string;
       });
   status: IShowTimeStatus;
   display?: {
@@ -177,25 +187,24 @@ export const useShowTimesByMovie = (movieId?: string) => {
     refetchOnWindowFocus: false,
   });
 
-  const groupedByCinema = data?.reduce<Record<string, { cinemaInfo: PopulatedCinema; showtimes: AdminShowtimeRow[] }>>(
-    (acc, showtime) => {
-      const cinema = typeof showtime.roomId === 'object' ? showtime.roomId.cinema_id : undefined;
-      const cinemaId = typeof cinema === 'object' ? cinema?._id : undefined;
+  const groupedByCinema = data?.reduce<
+    Record<string, { cinemaInfo: PopulatedCinema; showtimes: AdminShowtimeRow[] }>
+  >((acc, showtime) => {
+    const cinema = typeof showtime.roomId === 'object' ? showtime.roomId.cinema_id : undefined;
+    const cinemaId = typeof cinema === 'object' ? cinema?._id : undefined;
 
-      if (!cinemaId || typeof cinema !== 'object') return acc;
+    if (!cinemaId || typeof cinema !== 'object') return acc;
 
-      if (!acc[cinemaId]) {
-        acc[cinemaId] = {
-          cinemaInfo: cinema,
-          showtimes: [],
-        };
-      }
+    if (!acc[cinemaId]) {
+      acc[cinemaId] = {
+        cinemaInfo: cinema,
+        showtimes: [],
+      };
+    }
 
-      acc[cinemaId].showtimes.push(showtime);
-      return acc;
-    },
-    {},
-  );
+    acc[cinemaId].showtimes.push(showtime);
+    return acc;
+  }, {});
 
   return {
     showtimes: data || [],

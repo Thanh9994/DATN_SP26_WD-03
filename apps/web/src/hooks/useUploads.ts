@@ -1,7 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { ICloudinaryImage, IUploadParams } from "@shared/schemas";
-import { API } from "@web/api/api.service";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { ICloudinaryImage, IUploadParams } from '@shared/src/schemas';
+import { API } from '@web/api/api.service';
 
 export const useUpload = () => {
   const queryClient = useQueryClient();
@@ -12,7 +12,7 @@ export const useUpload = () => {
     isError,
     refetch,
   } = useQuery<ICloudinaryImage[]>({
-    queryKey: ["images"],
+    queryKey: ['images'],
     queryFn: async () => {
       const { data } = await axios.get(API.UPLOADS);
       return data;
@@ -24,13 +24,13 @@ export const useUpload = () => {
   const uploadMutation = useMutation<ICloudinaryImage, Error, IUploadParams>({
     mutationFn: async ({ file, customName }) => {
       const formData = new FormData();
-      formData.append("customName", customName);
-      formData.append("image", file);
+      formData.append('customName', customName);
+      formData.append('image', file);
       const { data } = await axios.post(API.UPLOADS, formData);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["images"] });
+      queryClient.invalidateQueries({ queryKey: ['images'] });
     },
   });
 
@@ -40,7 +40,7 @@ export const useUpload = () => {
       await axios.delete(`${API.UPLOADS}/${encodeURIComponent(public_Id)}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["images"] });
+      queryClient.invalidateQueries({ queryKey: ['images'] });
     },
   });
 

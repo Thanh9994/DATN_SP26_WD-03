@@ -1,12 +1,12 @@
-import { IMovie } from "@shared/schemas";
-import { Movie } from "./movie.model";
+import { IMovie } from '@shared/src/schemas';
+import { Movie } from './movie.model';
 
 export const movieService = {
   async getAllMovie() {
-    return await Movie.find().populate("the_loai", "name");
+    return await Movie.find().populate('the_loai', 'name');
   },
   async getMovieById(id: string) {
-    return await Movie.findById(id).populate("the_loai", "name");
+    return await Movie.findById(id).populate('the_loai', 'name');
   },
   async createMovie(data: IMovie) {
     return await Movie.create(data);

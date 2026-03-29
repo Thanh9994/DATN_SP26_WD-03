@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import "./DrinkSnack.css";
+import React, { useState } from 'react';
+import './DrinkSnack.css';
 
 interface Product {
   id: string;
@@ -10,7 +10,7 @@ interface Product {
   originalPrice?: number;
   badge?: {
     text: string;
-    color: "gold" | "red";
+    color: 'gold' | 'red';
   };
   featured?: boolean;
   isFeatured?: boolean;
@@ -21,57 +21,57 @@ interface CartItem {
   quantity: number;
 }
 
-export const DrinkSnack = (): JSX.Element => {
+export const DrinkSnack = (): React.ReactNode => {
   const [isOpen, setIsOpen] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
 
   const products: Product[] = [
     {
-      id: "mega-combo",
-      title: "Mega Movie Combo",
-      description: "Extra-large popcorn, two sodas, and a box of signature movie candy.",
-      image: "🥤",
+      id: 'mega-combo',
+      title: 'Mega Movie Combo',
+      description: 'Extra-large popcorn, two sodas, and a box of signature movie candy.',
+      image: '🥤',
       price: 25.0,
       originalPrice: 32.0,
       badge: {
-        text: "LIMITED TIME OFFER",
-        color: "gold",
+        text: 'LIMITED TIME OFFER',
+        color: 'gold',
       },
       isFeatured: true,
     },
     {
-      id: "family-pack",
-      title: "Family Fun Pack",
-      description: "2 Large Popcorns + 4 Sodas",
-      image: "🍿",
+      id: 'family-pack',
+      title: 'Family Fun Pack',
+      description: '2 Large Popcorns + 4 Sodas',
+      image: '🍿',
       price: 38.5,
     },
     {
-      id: "sweet-salty",
-      title: "Sweet & Salty Duo",
-      description: "Medium Popcorn + Choco Pretzels",
-      image: "🧂",
+      id: 'sweet-salty',
+      title: 'Sweet & Salty Duo',
+      description: 'Medium Popcorn + Choco Pretzels',
+      image: '🧂',
       price: 16.0,
     },
     {
-      id: "large-popcorn",
-      title: "Large Popcorn Combo",
-      description: "1 Large Popcorn + 2 Sodas",
-      image: "🍿",
+      id: 'large-popcorn',
+      title: 'Large Popcorn Combo',
+      description: '1 Large Popcorn + 2 Sodas',
+      image: '🍿',
       price: 18.5,
     },
     {
-      id: "nachos-supreme",
-      title: "Nachos Supreme",
-      description: "Premium nachos with all toppings",
-      image: "🧀",
+      id: 'nachos-supreme',
+      title: 'Nachos Supreme',
+      description: 'Premium nachos with all toppings',
+      image: '🧀',
       price: 12.5,
     },
     {
-      id: "candy-box",
-      title: "Movie Candy Mix",
-      description: "Assorted candy selection",
-      image: "🍬",
+      id: 'candy-box',
+      title: 'Movie Candy Mix',
+      description: 'Assorted candy selection',
+      image: '🍬',
       price: 8.0,
     },
   ];
@@ -81,9 +81,7 @@ export const DrinkSnack = (): JSX.Element => {
       const existingItem = prevCart.find((item) => item.productId === productId);
       if (existingItem) {
         return prevCart.map((item) =>
-          item.productId === productId
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
+          item.productId === productId ? { ...item, quantity: item.quantity + quantity } : item,
         );
       }
       return [...prevCart, { productId, quantity }];
@@ -97,26 +95,19 @@ export const DrinkSnack = (): JSX.Element => {
     }, 0);
   };
 
-  const renderBadge = (badge: Product["badge"]): JSX.Element | null => {
+  const renderBadge = (badge: Product['badge']): React.ReactNode | null => {
     if (!badge) return null;
-    return (
-      <div className={`product-badge badge-${badge.color}`}>
-        {badge.text}
-      </div>
-    );
+    return <div className={`product-badge badge-${badge.color}`}>{badge.text}</div>;
   };
 
-  const renderSaveBadge = (price: number, originalPrice?: number): JSX.Element | null => {
+  const renderSaveBadge = (price: number, originalPrice?: number): React.ReactNode | null => {
     if (!originalPrice || originalPrice <= price) return null;
     const savings = (originalPrice - price).toFixed(2);
     return <div className="product-badge badge-save">SAVE ${savings}</div>;
   };
 
-  const renderProductCard = (product: Product): JSX.Element => (
-    <div
-      key={product.id}
-      className={`product-card ${product.isFeatured ? "featured" : ""}`}
-    >
+  const renderProductCard = (product: Product): React.ReactNode => (
+    <div key={product.id} className={`product-card ${product.isFeatured ? 'featured' : ''}`}>
       <div className="product-image-wrapper">
         <div className="product-image">{product.image}</div>
         {product.badge && renderBadge(product.badge)}
@@ -131,24 +122,16 @@ export const DrinkSnack = (): JSX.Element => {
           <div className="product-price-wrapper">
             <span className="product-price">${product.price.toFixed(2)}</span>
             {product.originalPrice && (
-              <span className="product-original-price">
-                ${product.originalPrice.toFixed(2)}
-              </span>
+              <span className="product-original-price">${product.originalPrice.toFixed(2)}</span>
             )}
           </div>
 
           {product.isFeatured ? (
-            <button
-              className="btn-exclusive"
-              onClick={() => handleAddToCart(product.id, 1)}
-            >
+            <button className="btn-exclusive" onClick={() => handleAddToCart(product.id, 1)}>
               Claim Exclusive Offer
             </button>
           ) : (
-            <button
-              className="btn-add-order"
-              onClick={() => handleAddToCart(product.id, 1)}
-            >
+            <button className="btn-add-order" onClick={() => handleAddToCart(product.id, 1)}>
               <span className="cart-icon">🛒</span>
               Add to Order
             </button>
@@ -163,10 +146,7 @@ export const DrinkSnack = (): JSX.Element => {
       {isOpen && (
         <div className="modal-overlay">
           <div className="modal-container">
-            <button
-              className="modal-close"
-              onClick={() => setIsOpen(false)}
-            >
+            <button className="modal-close" onClick={() => setIsOpen(false)}>
               ✕
             </button>
 
@@ -180,10 +160,7 @@ export const DrinkSnack = (): JSX.Element => {
             </div>
 
             <div className="modal-footer">
-              <button
-                className="btn-skip"
-                onClick={() => setIsOpen(false)}
-              >
+              <button className="btn-skip" onClick={() => setIsOpen(false)}>
                 No thanks, go to Checkout
               </button>
 

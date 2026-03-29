@@ -1,46 +1,51 @@
-import { Request, Response } from "express";
-import slugify from "../../../utils/assets/slugify";
-import { catchAsync } from "@api/utils/catchAsync";
-import { Post } from "./post.model";
+import { Request, Response } from 'express';
+import slugify from '../../../utils/assets/slugify';
+import { catchAsync } from '@api/utils/catchAsync';
+import { Post } from './post.model';
 
-const notFound = (res: Response) =>
-  res.status(404).json({ message: "Post not found" });
+const notFound = (res: Response) => res.status(404).json({ message: 'Post not found' });
 
 export const createPost = catchAsync(async (req: Request, res: Response) => {
-  const { title, content, category, type, ...rest } = req.body;
+  const { title, content, category, ...rest } = req.body;
 
+  // 2. Validate nhanh
   if (!title || !content) {
-    return res.status(400).json({ message: "Title and content are required" });
+    return res.status(400).json({ message: 'Tiêu đề và nội dung là bắt buộc' });
   }
 
-  const finalCategory = category || type || "promotion";
-  const finalSlug = slugify(title);
+  const slug = slugify(title);
 
-  const existedPost = await Post.findOne({ slug: finalSlug });
-  if (existedPost) {
-    return res.status(400).json({ message: "Slug already exists" });
+  const isExisted = await Post.exists({ slug });
+  if (isExisted) {
+    return res.status(400).json({ message: 'Tiêu đề này đã được sử dụng' });
   }
+
+  const categories = Array.isArray(category) ? category : [category || 'promotion'];
 
   const newPost = await Post.create({
     ...rest,
     title,
     content,
-    category: finalCategory,
-    type: type || "promotion",
-    slug: finalSlug,
+    slug,
+    category: categories,
   });
 
-  res.status(201).json({
-    message: "Post created successfully",
-    data: newPost,
-  });
+  res.status(201).json({ data: newPost });
 });
 
-export const getPosts = catchAsync(async (_req: Request, res: Response) => {
-  const posts = await Post.find().select("-__v").sort({ createdAt: -1 });
+export const getPosts = catchAsync(async (req: Request, res: Response) => {
+  const { cat } = req.query;
+  const filter: any = {};
+
+  if (cat) {
+    filter.category = cat;
+  }
+
+  const posts = await Post.find(filter).select('-__v').sort({ createdAt: -1 });
 
   res.status(200).json({
-    message: "Posts fetched successfully",
+    message: 'Posts fetched successfully',
+    count: posts.length,
     data: posts,
   });
 });
@@ -51,7 +56,7 @@ export const getPostById = catchAsync(async (req: Request, res: Response) => {
   if (!post) return notFound(res);
 
   res.status(200).json({
-    message: "Post fetched successfully",
+    message: 'Post fetched successfully',
     data: post,
   });
 });
@@ -62,41 +67,32 @@ export const getPostBySlug = catchAsync(async (req: Request, res: Response) => {
   if (!post) return notFound(res);
 
   res.status(200).json({
-    message: "Post fetched successfully",
+    message: 'Post fetched successfully',
     data: post,
   });
 });
 
 export const updatePost = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { title, content, category, type, ...rest } = req.body;
-
-  const updatedData: Record<string, any> = { ...rest };
-
+  const { title, category, ...rest } = req.body;
+  const updatedData: any = { ...rest };
   if (title) {
-    updatedData.title = title;
-    updatedData.slug = slugify(title);
+    rest.title = title;
+    rest.slug = slugify(title);
   }
 
-  if (content) updatedData.content = content;
-  if (category) updatedData.category = category;
-  if (type) updatedData.type = type;
-
-  if (!updatedData.category && type) {
-    updatedData.category = type;
+  if (category) {
+    rest.category = Array.isArray(category) ? category : [category];
   }
-
-  const updatedPost = await Post.findByIdAndUpdate(id, updatedData, {
+  delete updatedData.type;
+  const updatedPost = await Post.findByIdAndUpdate(id, rest, {
     new: true,
     runValidators: true,
   });
 
-  if (!updatedPost) return notFound(res);
+  if (!updatedPost) return res.status(404).json({ message: 'Không tìm thấy bài viết' });
 
-  res.status(200).json({
-    message: "Post updated successfully",
-    data: updatedPost,
-  });
+  res.status(200).json({ data: updatedPost });
 });
 
 export const deletePost = catchAsync(async (req: Request, res: Response) => {
@@ -105,6 +101,6 @@ export const deletePost = catchAsync(async (req: Request, res: Response) => {
   if (!post) return notFound(res);
 
   res.status(200).json({
-    message: "Post deleted successfully",
+    message: 'Post deleted successfully',
   });
 });
