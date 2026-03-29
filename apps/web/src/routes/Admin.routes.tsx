@@ -14,6 +14,7 @@ import { AdminLayouts } from '@web/layouts/AdminLayout';
 import Settings from "@web/pages/admin/Settings";
 import Dashboard from '@web/pages/admin/Dashboard';
 import { ShowTime } from '@web/pages/admin/order/Showtime';
+import AnalyticsPage from '@web/pages/admin/dashboard/AnalyticsPage';
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
@@ -32,6 +33,7 @@ export const AdminRoutes: RouteObject = {
         { path: "rooms", element: <Rooms /> },
         { path: "settings", element: <Settings /> },
         { path: "showtime", element: <ShowTime /> },
+        { path: "analytics", element: <AnalyticsPage /> },
         {
           path: 'promotions',
           children: [
