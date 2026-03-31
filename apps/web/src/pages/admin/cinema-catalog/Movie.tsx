@@ -13,6 +13,7 @@ import {
   message,
   Upload,
   Tag,
+  Card,
 } from 'antd';
 import {
   PlusOutlined,
@@ -26,7 +27,7 @@ import dayjs from 'dayjs';
 import { useMovies } from '@web/hooks/useMovie';
 import { useGenres } from '@web/hooks/useGenre';
 import { useUpload } from '@web/hooks/useUploads';
-import { ICloudinaryImage } from '@shared/schemas';
+import { ICloudinaryImage } from '@shared/src/schemas';
 import { useNavigate } from 'react-router-dom';
 
 export const Movie = () => {
@@ -213,6 +214,21 @@ export const Movie = () => {
         <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>
           Thêm phim
         </Button>
+      </div>
+
+      <div className='my-3 grid grid-cols-4 gap-4'>
+        <Card>
+          1
+        </Card>
+        <Card>
+          1
+        </Card>
+        <Card>
+          1
+        </Card>
+        <Card>
+          1
+        </Card>
       </div>
 
       <Table

@@ -1,14 +1,4 @@
-import {
-  Layout,
-  Input,
-  ConfigProvider,
-  theme,
-  Badge,
-  Tooltip,
-  Typography,
-  Dropdown,
-  Button,
-} from 'antd';
+import { Layout, Input, ConfigProvider, theme, Badge, Tooltip, Dropdown } from 'antd';
 import {
   BellOutlined,
   MailOutlined,
@@ -19,14 +9,11 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Sidebar } from './admin/Navbar';
 import { useAuth } from '@web/hooks/useAuth';
-import {
-  markAllCleanupLogsRead,
-  useCleanupLogList,
-  useCleanupLogs,
-} from '@web/hooks/useAdminDashboard';
+import { useCleanupLogs } from '@web/hooks/useAdminDashboard';
+import { CleanupDropdown } from '@web/components/admin/CleanupDropdown';
 
 const { Content, Header } = Layout;
-const { Text } = Typography;
+// const { Text } = Typography;
 
 export const AdminLayouts = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -36,19 +23,8 @@ export const AdminLayouts = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { data: cleanupInfo } = useCleanupLogs();
-  const { data: cleanupLogs = [] } = useCleanupLogList(10);
   const cleanupSummary = cleanupInfo?.summary ?? 'Chưa có log cleanup';
   const cleanupCount = cleanupInfo?.unreadCount ?? 0;
-
-  const buildLogSummary = (log: { type: string; details?: any }) => {
-    if (log.type === 'booking') {
-      const expired = log.details?.expired ?? 0;
-      const cancelled = log.details?.cancelled ?? 0;
-      return `Expired: ${expired} • Cancelled: ${cancelled}`;
-    }
-    const failed = log.details?.failed ?? 0;
-    return `Failed: ${failed}`;
-  };
 
   const toggleTheme = (checked: boolean) => {
     setThemeMode(checked ? 'dark' : 'light');
@@ -118,42 +94,17 @@ export const AdminLayouts = () => {
               />
             </div>
             <div className="mr-4 flex items-center justify-end gap-5">
-              {cleanupLogs.length === 0 ? (
-                <Tooltip title="Chưa có log cleanup">
-                  <BellOutlined className="cursor-pointer text-xl" />
+              <Dropdown
+                trigger={['click']}
+                placement="bottomRight"
+                popupRender={() => <CleanupDropdown />}
+              >
+                <Tooltip title={cleanupSummary}>
+                  <Badge count={cleanupCount} overflowCount={99} size="default">
+                    <BellOutlined className="cursor-pointer text-xl transition-colors hover:text-blue-500" />
+                  </Badge>
                 </Tooltip>
-              ) : (
-                <Dropdown
-                  trigger={['click']}
-                  popupRender={() => (
-                    <div className="min-w-[320px] rounded-md bg-white p-3 shadow-md">
-                      <div className="mb-2 flex items-center justify-between">
-                        <Text strong>Cleanup Logs</Text>
-                        <Button size="small" onClick={() => markAllCleanupLogsRead()}>
-                          Đánh dấu đã đọc
-                        </Button>
-                      </div>
-                      <div className="max-h-[300px] space-y-2 overflow-auto">
-                        {cleanupLogs.map((log) => (
-                          <div key={log._id} className="border-b pb-2 text-xs last:border-b-0">
-                            <div className="font-semibold">{log.type.toUpperCase()}</div>
-                            <div className="text-gray-500">{buildLogSummary(log)}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                >
-                  <Tooltip title={cleanupSummary}>
-                    <Badge count={cleanupCount}>
-                      <BellOutlined
-                        className="cursor-pointer text-xl"
-                        onClick={() => markAllCleanupLogsRead()}
-                      />
-                    </Badge>
-                  </Tooltip>
-                </Dropdown>
-              )}
+              </Dropdown>
 
               <Badge count={2}>
                 <MailOutlined className="cursor-pointer text-xl" />

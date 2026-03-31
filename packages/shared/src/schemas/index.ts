@@ -4,7 +4,7 @@ export const RoomType = z.enum(['2D', '3D', 'IMAX', '4DX']);
 export const SeatType = z.enum(['normal', 'vip', 'couple']);
 export const MovieStatus = z.enum(['sap_chieu', 'dang_chieu', 'ngung_chieu']);
 export const AgeRating = z.enum(['P', 'C13', 'C16', 'C18']);
-export const UserRole = z.enum(['admin', 'manager', 'khach_hang']);
+export const UserRole = z.enum(['admin', 'manager', 'staff', 'khach_hang']);
 export const UserStatus = z.enum(['active', 'inactive', 'banned']);
 export const SeatsStatus = z.enum(['empty', 'booked', 'hold', 'fix']); // "trống", Đã đặt, giữ ghế, sửa ghế
 export const BookingStatus = z.enum([
@@ -273,7 +273,6 @@ export const User = Base.extend({
   isVerified: z.boolean().default(false),
   otpCode: z.string().optional(),
   otpExpire: z.coerce.date().optional(),
-
 });
 export const VerifyOtp = z.object({
   email: z.string().email('Email không hợp lệ'),

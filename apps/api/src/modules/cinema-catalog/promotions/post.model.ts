@@ -1,58 +1,34 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const postSchema = new mongoose.Schema(
   {
-    avatar: {
-      type: String,
-      trim: true,
-    },
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
-    summary: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-    content: {
-      type: String,
-      required: true,
-    },
-    category: {
-      type: String,
-      required: true,
-      default: "promotion",
-      trim: true,
-    },
+    title: { type: String, required: true, trim: true },
+    slug: { type: String, required: true, unique: true, trim: true },
+    avatar: { type: String, trim: true },
+    summary: { type: String, trim: true },
+    content: { type: String, required: true },
+    category: [
+      {
+        type: String,
+        trim: true,
+        lowercase: true,
+      },
+    ],
     featured: {
       type: Boolean,
       default: false,
     },
-    type: {
+    status: {
       type: String,
-      enum: ["promotion", "event", "news"],
-      default: "promotion",
+      enum: ['draft', 'published', 'archived'],
+      default: 'draft',
     },
-    startDate: {
-      type: Date,
-      default: null,
-    },
-    endDate: {
-      type: Date,
-      default: null,
-    },
+    startDate: { type: Date },
+    endDate: { type: Date },
   },
   {
     timestamps: true,
-  }
+  },
 );
-
-export const Post = mongoose.model("Post", postSchema);
+postSchema.index({ category: 1 });
+export const Post = mongoose.model('Post', postSchema);

@@ -39,7 +39,7 @@ import { useMovie, useMovies } from '@web/hooks/useMovie';
 import { API } from '@web/api/api.service';
 import SeatMap from '@web/components/skeleton/SeatMap';
 import RoomTypeTag from '@web/components/admin/RoomTypeTag';
-import { ICreateShowTimePl, IMovie, IPhong, ShowTime as ShowTimeSchema } from '@shared/schemas';
+import { ICreateShowTimePl, IMovie, IPhong, ShowTime as ShowTimeSchema } from '@shared/src/schemas';
 
 const CLEANING_MINUTES = 30;
 const OPENING_HOUR = 7;
@@ -365,7 +365,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
   const handleCreateMany = async (payloads: ICreateShowTimePl[], successMessage: string) => {
     if (!payloads.length) {
-      message.warning('Chua co suat nao de tao.');
+      message.warning('CHưa có suất chiếu nào để tạo.');
       return;
     }
 
@@ -389,7 +389,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     await queryClient.invalidateQueries({ queryKey: ['movies'] });
 
     if (failedCount === 0) {
-      message.success({ content: `${successMessage}: ${successCount} suat`, key });
+      message.success({ content: `${successMessage}: ${successCount} suất`, key });
       return;
     }
 
@@ -430,7 +430,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
         ),
       );
 
-      await handleCreateMany(payloads, 'Tao suat chieu thanh cong');
+      await handleCreateMany(payloads, 'Tạo suất chiếu theo ngày thành công');
       setIsModalOpen(false);
       singleForm.resetFields();
     } finally {
@@ -463,7 +463,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
         ),
       );
 
-      await handleCreateMany(payloads, 'Tao suat chieu theo khoang ngay thanh cong');
+      await handleCreateMany(payloads, 'Tạo suất chiếu theo khoảng ngày thành công');
       setIsModalOpen(false);
       rangeForm.resetFields();
     } finally {
@@ -607,26 +607,22 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
   return (
     <div className="space-y-4">
-      <Card
-        title={
-          <div className="flex flex-col gap-1">
-            <span className="flex items-center gap-2 text-xl font-bold">
-              <PlayCircleOutlined className="text-blue-500" />
-              Quản lý suất chiếu
-            </span>
-            {/* <span className="text-sm text-slate-500">
-        {movieId && fixedMovie
-          ? `Đang xem suất chiếu của phim: ${fixedMovie.ten_phim}`
-          : 'Quản lý tất cả suất chiếu từ admin.'}
-      </span> */}
-          </div>
-        }
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
-            Tạo suất chiếu
-          </Button>
-        }
-      >
+      <div className="mb-4 flex justify-between">
+        <span className="flex items-center gap-2 text-xl font-bold">
+          <PlayCircleOutlined className="text-blue-500" />
+          Quản lý suất chiếu
+        </span>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
+          Tạo suất chiếu
+        </Button>
+      </div>
+      <div className="my-3 grid grid-cols-4 gap-4">
+        <Card>Tổng suất chiếu (Năm)</Card>
+        <Card>Tổng suất chiếu (Tháng)</Card>
+        <Card>Suất chiếu Hôm nay</Card>
+        <Card>Suất chiếu đã SoldOut</Card>
+      </div>
+      <Card>
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-5">
           {!movieId && (
             <Select

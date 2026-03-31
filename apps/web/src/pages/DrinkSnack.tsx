@@ -87,12 +87,14 @@ export const DrinkSnack = ({
   };
 
   const renderSaveBadge = (price: number, originalPrice?: number): React.ReactNode | null => {
+  const renderSaveBadge = (price: number, originalPrice?: number): React.ReactNode | null => {
     if (!originalPrice || originalPrice <= price) return null;
 
     const savings = originalPrice - price;
     return <div className="product-badge badge-save">Giảm {savings.toLocaleString('vi-VN')}đ</div>;
   };
 
+  const renderProductCard = (product: IProduct): React.ReactNode => {
   const renderProductCard = (product: IProduct): React.ReactNode => {
     const isFeatured = !!product.isCombo;
     const hasDiscount = Number(product.originalPrice || 0) > Number(product.price || 0);
@@ -153,6 +155,7 @@ export const DrinkSnack = ({
     );
   };
 
+  if (!isOpen) return null;
   if (!isOpen) return null;
 
   return (

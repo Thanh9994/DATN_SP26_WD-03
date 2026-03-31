@@ -1,4 +1,4 @@
-import { IUser, ILogin, IRegister, IAuthResponse, IUpdateUser } from '@shared/schemas';
+import { IUser, ILogin, IRegister, IAuthResponse, IUpdateUser } from '@shared/src/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { API } from '@web/api/api.service';
 import { showNotify } from '@web/components/AppNotification';
@@ -115,22 +115,22 @@ export const useAuth = () => {
       showNotify('error', 'Lỗi', err.response?.data?.message || 'Không thể gửi lại mã');
     },
   });
-  
-const verifyEmailMutation = useMutation({
-  mutationFn: async (token: string) => {
-    const { data } = await axios.get(`${API.AUTH}/verify-email`, {
-      params: { token },
-    });
-    return data;
-  },
-  onSuccess: () => {
-    showNotify("success", "Xác nhận email thành công");
-  },
-  onError: (err: any) => {
-    showNotify("error", err?.response?.data?.message || "Xác nhận email thất bại");
-    console.error(err?.message || "Xác nhận email thất bại");
-  },
-});
+
+  const verifyEmailMutation = useMutation({
+    mutationFn: async (token: string) => {
+      const { data } = await axios.get(`${API.AUTH}/verify-email`, {
+        params: { token },
+      });
+      return data;
+    },
+    onSuccess: () => {
+      showNotify('success', 'Xác nhận email thành công');
+    },
+    onError: (err: any) => {
+      showNotify('error', err?.response?.data?.message || 'Xác nhận email thất bại');
+      console.error(err?.message || 'Xác nhận email thất bại');
+    },
+  });
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -178,8 +178,7 @@ const verifyEmailMutation = useMutation({
   });
 
   return {
-    verifyEmail:
-    verifyEmailMutation.mutateAsync,
+    verifyEmail: verifyEmailMutation.mutateAsync,
     user,
     users,
     isLoading,

@@ -4,7 +4,7 @@ import { Button, message, Spin } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { useBooking } from '@web/hooks/useBooking';
-import { IShowTime, IShowTimeSeat } from '@shared/schemas';
+import { IShowTime, IShowTimeSeat } from '@shared/src/schemas';
 import { useAuth } from '@web/hooks/useAuth';
 import { ArrowLeft, MapPin } from 'lucide-react';
 import DrinkSnack, { type DrinkSnackSelection } from '@web/pages/DrinkSnack';
@@ -265,9 +265,6 @@ const BookingLayout = () => {
                 {movie.thoi_luong} Min
                 <span className="mx-1 rounded-md border border-primary/30 bg-primary/20 px-2 py-1 text-[10px] font-extrabold uppercase tracking-widest text-primary">
                   {movie.do_tuoi}
-                </span>
-                <span className="mx-1 rounded-md border border-primary/30 bg-primary/20 px-2 py-1 tracking-widest text-white/70">
-                  {movie.phu_de}
                 </span>
               </span>
             </div>

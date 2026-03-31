@@ -4,8 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConfigProvider, App as AntdApp } from 'antd';
 import './index.css';
-import App from './App.tsx';
 import 'antd/dist/reset.css';
+import App from './App.tsx';
 
 const queryClient = new QueryClient();
 
