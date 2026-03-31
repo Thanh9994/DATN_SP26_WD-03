@@ -14,6 +14,10 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     phone: { type: String, required: true },
 
+    workAt: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Cinema',
+    },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
     avatar: {
@@ -30,6 +34,7 @@ const userSchema = new mongoose.Schema(
       default: 'inactive',
     },
     isVerified: { type: Boolean, default: false },
+    lastLogin: Date,
     otpCode: {
       type: String,
     },
@@ -40,5 +45,11 @@ const userSchema = new mongoose.Schema(
 
   { timestamps: true },
 );
+
+userSchema.virtual('bookings', {
+  ref: 'Booking',
+  localField: '_id',
+  foreignField: 'userId',
+});
 
 export const User = mongoose.model<IUser>('User', userSchema);

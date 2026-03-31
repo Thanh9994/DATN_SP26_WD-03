@@ -607,26 +607,22 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
   return (
     <div className="space-y-4">
-      <Card
-        title={
-          <div className="flex flex-col gap-1">
-            <span className="flex items-center gap-2 text-xl font-bold">
-              <PlayCircleOutlined className="text-blue-500" />
-              Quản lý suất chiếu
-            </span>
-            {/* <span className="text-sm text-slate-500">
-        {movieId && fixedMovie
-          ? `Đang xem suất chiếu của phim: ${fixedMovie.ten_phim}`
-          : 'Quản lý tất cả suất chiếu từ admin.'}
-      </span> */}
-          </div>
-        }
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
-            Tạo suất chiếu
-          </Button>
-        }
-      >
+      <div className="mb-4 flex justify-between">
+        <span className="flex items-center gap-2 text-xl font-bold">
+          <PlayCircleOutlined className="text-blue-500" />
+          Quản lý suất chiếu
+        </span>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
+          Tạo suất chiếu
+        </Button>
+      </div>
+      <div className="my-3 grid grid-cols-4 gap-4">
+        <Card>Tổng suất chiếu (Năm)</Card>
+        <Card>Tổng suất chiếu (Tháng)</Card>
+        <Card>Suất chiếu Hôm nay</Card>
+        <Card>Suất chiếu đã SoldOut</Card>
+      </div>
+      <Card>
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-5">
           {!movieId && (
             <Select

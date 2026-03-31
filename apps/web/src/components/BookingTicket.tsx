@@ -10,8 +10,8 @@ interface Props {
 
 const BookingTicket = ({ ticket, children }: Props) => {
   return (
-    <div className="w-full rounded-[24px] bg-gradient-to-b from-white/10 to-transparent p-[1px] transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)]">
-      <div className="group relative flex flex-row gap-4 overflow-hidden rounded-[23px] border border-white/5 bg-[#120f0f] p-3 md:gap-6 md:p-5">
+    <div className="w-full rounded-2xl bg-gradient-to-b from-white/10 to-transparent transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+      <div className="group relative flex flex-row gap-4 overflow-hidden rounded-2xl border border-white/5 bg-[#120f0f] p-3 md:gap-6 md:p-5">
         {/* Poster Section */}
         <div className="relative h-auto w-28 shrink-0 overflow-hidden rounded-xl border border-white/10 shadow-2xl md:aspect-[2/3] md:h-auto md:w-[150px] md:rounded-xl">
           <img
@@ -22,7 +22,7 @@ const BookingTicket = ({ ticket, children }: Props) => {
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-1 flex-col justify-between py-1">
+        <div className="flex min-w-0 flex-1 flex-col justify-between py-1">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <h3 className="line-clamp-1 text-sm font-semibold tracking-tight text-white/90 md:text-xl md:font-extrabold md:uppercase">
@@ -53,24 +53,26 @@ const BookingTicket = ({ ticket, children }: Props) => {
 
           <div className="my-3 space-y-2 md:hidden">
             <div className="flex items-center justify-between gap-2 text-zinc-400">
-              <div className="flex gap-2">
-                <Calendar size={16} className="text-red-500" />
+              <div className="flex items-center gap-1">
+                <Calendar size={16} className="shrink-0 text-red-500" />
                 <span className="text-xs font-bold">{ticket.date}</span>
               </div>
-              <div className="flex gap-2">
-                <Clock size={16} className="text-red-500" />
+              <div className="flex items-center gap-1 pr-2">
+                <Clock size={16} className="shrink-0 text-red-500" />
                 <span className="text-xs font-bold">{ticket.time}</span>{' '}
               </div>
             </div>
-            <div className="flex items-center gap-2 text-zinc-400">
-              <Armchair size={16} className="text-red-500" />
-              <span className="text-xs font-bold">{ticket.seatCodes}</span>{' '}
+            <div className="flex min-w-0 items-center gap-1 text-zinc-400">
+              <Armchair size={16} className="shrink-0 text-red-500" />
+              <span className="flex-1 truncate pt-0.5 text-xs font-bold leading-none">
+                {ticket.seatCodes}
+              </span>{' '}
             </div>
           </div>
           <div className="hidden md:grid md:grid-cols-3 md:gap-1 md:pt-3">
-            <TicketInfoField label="Date" value={ticket.date} icon={Calendar} />
-            <TicketInfoField label="Time" value={ticket.time} icon={Clock} />
-            <TicketInfoField label="Seats" value={ticket.seatCodes} icon={Armchair} />
+            <TicketInfoField label="Ngày" value={ticket.date} icon={Calendar} />
+            <TicketInfoField label="thời gian" value={ticket.time} icon={Clock} />
+            <TicketInfoField label="Ghế" value={ticket.seatCodes} icon={Armchair} />
           </div>
 
           <div className="mt-auto flex items-center justify-between gap-4 border-t border-dashed border-white/20 pt-4">
