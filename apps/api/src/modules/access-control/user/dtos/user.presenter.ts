@@ -4,10 +4,11 @@ export class UserPresenter {
   static toAdminList(user: any) {
     return {
       id: user._id,
-      name: user.ho_ten,
+      ho_ten: user.ho_ten,
       email: user.email,
+      phone: user.phone,
       role: user.role,
-      status: user.trang_thai,
+      trang_thai: user.trang_thai,
       bookingCount: user.bookingCount || 0,
       createdAt: user.createdAt,
     };
@@ -16,7 +17,7 @@ export class UserPresenter {
   static toProfile(user: IUser) {
     return {
       id: user._id,
-      name: user.ho_ten,
+      ho_ten: user.ho_ten,
       email: user.email,
       phone: user.phone,
       role: user.role,

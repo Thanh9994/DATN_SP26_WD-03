@@ -19,6 +19,7 @@ import {
 } from 'antd';
 import type { TableColumnsType, UploadFile } from 'antd';
 import {
+  CalendarOutlined,
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
@@ -29,20 +30,20 @@ import { useMemo, useState } from 'react';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
-import { LayoutGrid, List } from 'lucide-react';
+import { Filter, LayoutGrid, List, RotateCcw, Search } from 'lucide-react';
 import type { ICloudinaryImage, ICreateMovie, IMovie, IUpdateMovie } from '@shared/src/schemas';
 import { useGenres } from '@web/hooks/useGenre';
 import { useMovies } from '@web/hooks/useMovie';
 import { useUpload } from '@web/hooks/useUploads';
 
 const movieStatusMap = {
-  dang_chieu: { color: 'green', text: 'Dang chieu', order: 1 },
-  sap_chieu: { color: 'gold', text: 'Sap chieu', order: 2 },
-  ngung_chieu: { color: 'red', text: 'Ngung chieu', order: 3 },
+  dang_chieu: { color: 'green', text: 'Đang chiếu', order: 1 },
+  sap_chieu: { color: 'gold', text: 'Sắp chiếu', order: 2 },
+  ngung_chieu: { color: 'red', text: 'Ngưng chiếu', order: 3 },
 } as const;
 
 type MovieStatusKey = keyof typeof movieStatusMap;
-type MovieRow = IMovie & { showtimeCount?: number };
+type MovieRow = IMovie & { showtimeCount?: number; ticketsSold?: number };
 
 type MovieFormValues = {
   ten_phim: string;
@@ -141,8 +142,8 @@ export const Movie = () => {
 
       closeModal();
     } catch (error) {
-      console.error('Loi khi luu phim:', error);
-      message.error('Thao tac that bai, vui long thu lai.');
+      console.error('Lỗi khi lưu phim:', error);
+      message.error(' Vui lòng thử lại.');
     } finally {
       setSubmitting(false);
     }
@@ -210,7 +211,7 @@ export const Movie = () => {
     };
   }, [movies]);
 
-  const gridPageSize = 8;
+  const gridPageSize = 10;
 
   const paginatedGridMovies = useMemo(() => {
     const start = (gridPage - 1) * gridPageSize;
@@ -220,7 +221,7 @@ export const Movie = () => {
   const columns: TableColumnsType<MovieRow> = [
     {
       key: 'movie',
-      title: 'Anh/Ten phim',
+      title: 'Ảnh/Tên phim',
       render: (_, record) => (
         <div className="flex items-center gap-3">
           <Image
@@ -231,43 +232,43 @@ export const Movie = () => {
             fallback="https://placehold.co/120x160?text=No+Image"
           />
           <div className="min-w-0">
-            <div className="line-clamp-2 font-semibold text-slate-800">{record.ten_phim}</div>
+            <div className="line-clamp-2 font-bold">{record.ten_phim}</div>
             <div className="mt-1 text-xs text-slate-500">{getMovieGenresText(record)}</div>
           </div>
         </div>
       ),
       sorter: (a, b) => a.ten_phim.localeCompare(b.ten_phim),
     },
-    { key: 'dao_dien', title: 'Dao dien', dataIndex: 'dao_dien' },
-    { key: 'do_tuoi', title: 'Do tuoi', dataIndex: 'do_tuoi' },
+    { key: 'dao_dien', title: 'Đạo diễn', dataIndex: 'dao_dien' },
+    { key: 'do_tuoi', title: 'Độ tuổi', dataIndex: 'do_tuoi' },
     {
       key: 'showtimeCount',
-      title: 'So suat chieu',
+      title: 'Số suất chiếu',
       dataIndex: 'showtimeCount',
       render: (value: MovieRow['showtimeCount']) => value ?? 0,
       sorter: (a, b) => (a.showtimeCount ?? 0) - (b.showtimeCount ?? 0),
     },
     {
       key: 'thoi_luong',
-      title: 'Thoi luong',
+      title: 'Thời lượng',
       dataIndex: 'thoi_luong',
       render: (minutes: MovieRow['thoi_luong']) => `${minutes} phut`,
     },
     {
       key: 'ngay_cong_chieu',
-      title: 'Ngay chieu',
+      title: 'Ngày chiếu',
       dataIndex: 'ngay_cong_chieu',
       render: (date: MovieRow['ngay_cong_chieu']) => dayjs(date).format('DD/MM/YYYY'),
     },
     {
       key: 'ngay_ket_thuc',
-      title: 'Ngay ket thuc',
+      title: 'Ngày kết thúc',
       dataIndex: 'ngay_ket_thuc',
       render: (date: MovieRow['ngay_ket_thuc']) => dayjs(date).format('DD/MM/YYYY'),
     },
     {
       key: 'trang_thai',
-      title: 'Trang thai',
+      title: 'Trạng Thái',
       dataIndex: 'trang_thai',
       filters: Object.entries(movieStatusMap).map(([value, config]) => ({
         text: config.text,
@@ -288,7 +289,7 @@ export const Movie = () => {
       render: (_, record) => (
         <Space onClick={(event) => event.stopPropagation()}>
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Popconfirm title="Xoa phim?" onConfirm={() => record._id && deleteMovie(record._id)}>
+          <Popconfirm title="Xóa phim?" onConfirm={() => record._id && deleteMovie(record._id)}>
             <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>
           <Button
@@ -304,86 +305,87 @@ export const Movie = () => {
   return (
     <div className="p-6">
       <div className="mb-4 flex justify-between">
-        <h1 className="text-xl font-bold">Quan ly Phim</h1>
+        <h1 className="text-xl font-bold">Thư viện Phim</h1>
         <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>
-          Them phim
+          Thêm phim
         </Button>
       </div>
 
       <div className="my-3 grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card>
           <div className="space-y-1">
-            <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Tong phim
-            </div>
-            <div className="text-2xl font-bold text-slate-900">{stats.total}</div>
-            <div className="text-xs text-slate-500">Tat ca phim trong he thong</div>
+            <div className="text-xs font-medium uppercase tracking-wide">Tổng phim</div>
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="text-xs text-slate-500">Tất cả phim trong hệ thống</div>
           </div>
         </Card>
         <Card>
           <div className="space-y-1">
-            <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Phim thang nay
-            </div>
-            <div className="text-2xl font-bold text-slate-900">{stats.addedThisMonth}</div>
-            <div className="text-xs text-slate-500">Theo ngay cong chieu trong thang hien tai</div>
+            <div className="text-xs font-medium uppercase tracking-wide">Phim tháng này</div>
+            <div className="text-2xl font-bold">{stats.addedThisMonth}</div>
+            <div className="text-xs text-slate-500">Theo ngày công chiếu trong tháng</div>
           </div>
         </Card>
         <Card>
           <div className="space-y-1">
-            <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Dang chieu
-            </div>
+            <div className="text-xs font-medium uppercase tracking-wide">Đang chiếu</div>
             <div className="text-2xl font-bold text-emerald-600">{stats.nowShowing}</div>
-            <div className="text-xs text-slate-500">San sang mo ban ve</div>
+            <div className="text-xs text-slate-500">Sẵn sàng mở vé bán</div>
           </div>
         </Card>
         <Card>
           <div className="space-y-1">
-            <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Sap chieu
-            </div>
+            <div className="text-xs font-medium uppercase tracking-wide">Sắp chiếu</div>
             <div className="text-2xl font-bold text-amber-500">{stats.comingSoon}</div>
-            <div className="text-xs text-slate-500">Chuan bi phat hanh</div>
+            <div className="text-xs text-slate-500">Chuẩn bị phát hành</div>
           </div>
         </Card>
       </div>
 
       <div className="space-y-3 py-3">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-slate-400">tune</span>
-              <span className="text-xs font-bold text-slate-700">Bo loc nang cao</span>
+        <div className="mb-6 flex flex-col gap-4 rounded-lg p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+          {/* Filters */}
+          <div className="flex flex-1 flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 rounded-md px-2 py-1">
+              <Filter className="h-4 w-4" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                Bộ lọc
+              </span>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+
+            {/* Filter Group */}
+            <div className="flex flex-1 flex-wrap items-center gap-2">
               <Input
+                prefix={<Search className="h-4 w-4" />}
                 allowClear
-                placeholder="Tim ten phim, dao dien, the loai..."
+                placeholder="Tìm tên phim..."
+                className="w-full rounded-lg md:w-[240px]"
                 value={searchKeyword}
-                onChange={(event) => {
-                  setSearchKeyword(event.target.value);
+                onChange={(e) => {
+                  setSearchKeyword(e.target.value);
                   setGridPage(1);
                 }}
-                className="w-[280px]"
               />
+
               <Select<MovieStatusKey>
                 allowClear
-                placeholder="Tat ca trang thai"
+                placeholder="Trạng thái"
+                suffixIcon={<Filter className="h-3.5 w-3.5" />}
                 value={statusFilter}
                 onChange={(value) => {
                   setStatusFilter(value);
                   setGridPage(1);
                 }}
-                className="w-[180px]"
+                className="w-[160px]"
                 options={Object.entries(movieStatusMap).map(([value, config]) => ({
                   value: value as MovieStatusKey,
                   label: config.text,
                 }))}
               />
+
               <DatePicker
-                allowClear
-                placeholder="Ngay cong chieu"
+                suffixIcon={<CalendarOutlined />}
+                placeholder="Ngày công chiếu"
                 value={releaseDateFilter ? dayjs(releaseDateFilter) : null}
                 onChange={(date) => {
                   setReleaseDateFilter(date ? date.format('YYYY-MM-DD') : null);
@@ -391,37 +393,41 @@ export const Movie = () => {
                 }}
                 format="DD/MM/YYYY"
               />
+
               <Button
+                type="default"
                 onClick={() => {
                   setSearchKeyword('');
                   setStatusFilter(undefined);
                   setReleaseDateFilter(null);
                   setGridPage(1);
                 }}
+                className="flex items-center gap-2 border-none"
+                icon={<RotateCcw className="h-4 w-4" />}
               >
-                Xoa loc
+                Xóa lọc
               </Button>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="bg-surface-container flex items-center rounded p-0.5 text-[11px]">
+          <div className="flex items-center justify-end border-t pt-3 md:border-none md:pt-0">
+            <div className="flex items-center rounded-lg bg-slate-100 p-1">
               <button
                 onClick={() => setViewMode('table')}
-                className={`rounded px-3 py-1 font-bold transition-all ${
+                className={`flex items-center justify-center rounded-md px-4 py-1.5 transition-all ${
                   viewMode === 'table'
                     ? 'bg-white text-primary shadow-sm'
-                    : 'text-on-surface-variant'
+                    : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
                 <List className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`rounded px-3 py-1 font-bold transition-all ${
+                className={`flex items-center justify-center rounded-md px-4 py-1.5 transition-all ${
                   viewMode === 'grid'
                     ? 'bg-white text-primary shadow-sm'
-                    : 'text-on-surface-variant'
+                    : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
                 <LayoutGrid className="h-4 w-4" />
@@ -444,57 +450,74 @@ export const Movie = () => {
         <div className="space-y-4">
           {filteredMovies.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
+              <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
                 {paginatedGridMovies.map((movie) => {
                   const statusConfig = movieStatusMap[movie.trang_thai as MovieStatusKey];
 
                   return (
-                    <Card
+                    <div
                       key={movie._id}
-                      hoverable
-                      cover={
+                      className="flex h-full flex-col rounded-md border border-gray-500"
+                    >
+                      {/* Ảnh trên cùng */}
+                      <div className="h-[300px] w-full">
                         <img
                           src={movie.poster?.url || 'https://placehold.co/600x900?text=No+Image'}
                           alt={movie.ten_phim}
-                          className="h-full w-full object-cover"
+                          className="h-full w-full rounded-t-md object-cover"
                         />
-                      }
-                      actions={[
-                        <EditOutlined key="edit" onClick={() => handleEdit(movie)} />,
-                        <EyeOutlined
-                          key="view"
-                          onClick={() => movie._id && navigate(`/movie/${movie._id}`)}
-                        />,
-                        <Popconfirm
-                          key="delete"
-                          title="Xoa phim?"
-                          onConfirm={() => movie._id && deleteMovie(movie._id)}
-                        >
-                          <DeleteOutlined />
-                        </Popconfirm>,
-                      ]}
-                    >
-                      <div className="space-y-3">
+                      </div>
+
+                      {/* Nội dung ở giữa */}
+                      <div className="flex-grow space-y-2 px-4 pt-4">
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
-                            <h3 className="line-clamp-2 text-base font-semibold text-slate-900">
-                              {movie.ten_phim}
-                            </h3>
+                            <h3 className="line-clamp-2 text-base font-bold">{movie.ten_phim}</h3>
                             <p className="mt-1 text-xs text-slate-500">
-                              {movie.dao_dien || 'Chua cap nhat dao dien'}
+                              {getMovieGenresText(movie)} • {movie.thoi_luong} Phút
                             </p>
                           </div>
                           <Tag color={statusConfig?.color}>{statusConfig?.text}</Tag>
                         </div>
+                      </div>
 
-                        <div className="space-y-1 text-sm text-slate-600">
-                          <div>Thoi luong: {movie.thoi_luong} phut</div>
-                          <div>Do tuoi: {movie.do_tuoi || '-'}</div>
-                          <div>Cong chieu: {dayjs(movie.ngay_cong_chieu).format('DD/MM/YYYY')}</div>
-                          <div>The loai: {getMovieGenresText(movie)}</div>
+                      {/* Khối thống kê dưới cùng */}
+                      <div className="grid grid-cols-2 gap-4 border-t px-5 pt-5">
+                        <div className="">
+                          <p className="text-on-surface-variant mb-0.5 text-[10px] font-semibold uppercase tracking-wider">
+                            Số vé đã bán
+                          </p>
+                          <p className="text-xl font-bold">{movie.ticketsSold ?? 0}</p>
+                        </div>
+                        <div className="">
+                          <p className="text-on-surface-variant mb-0.5 text-[10px] font-semibold uppercase tracking-wider">
+                            Suất chiếu
+                          </p>
+                          <p className="text-xl font-bold">{movie.showtimeCount ?? 0}</p>
                         </div>
                       </div>
-                    </Card>
+
+                      {/* <div className="mt-auto flex justify-center border-t p-2">
+                        <Button icon={<EditOutlined />} onClick={() => handleEdit(movie)}>
+                          Sửa
+                        </Button>
+                        <Button
+                          type="link"
+                          icon={<EyeOutlined />}
+                          onClick={() => movie._id && navigate(`/movie/${movie._id}`)}
+                        >
+                          Chi tiết
+                        </Button>
+                        <Popconfirm
+                          title="Xóa phim?"
+                          onConfirm={() => movie._id && deleteMovie(movie._id)}
+                        >
+                          <Button danger icon={<DeleteOutlined />}>
+                            Xóa
+                          </Button>
+                        </Popconfirm>
+                      </div> */}
+                    </div>
                   );
                 })}
               </div>
@@ -511,14 +534,14 @@ export const Movie = () => {
             </>
           ) : (
             <Card>
-              <Empty description="Khong co phim phu hop voi bo loc" />
+              <Empty description="Không có phim phù hợp cho bộ lọc" />
             </Card>
           )}
         </div>
       )}
 
       <Modal
-        title={editingId ? 'Cap nhat phim' : 'Them phim moi'}
+        title={editingId ? 'Cập nhật phim' : 'Thêm phim mới'}
         open={open}
         onCancel={closeModal}
         onOk={() => form.submit()}
@@ -534,21 +557,21 @@ export const Movie = () => {
           <div className="grid grid-cols-4 gap-4">
             <Form.Item
               name="ten_phim"
-              label="Ten phim"
-              rules={[{ required: true, message: 'Ten phim khong duoc de trong' }]}
+              label="Tên phim"
+              rules={[{ required: true, message: 'Tên phim không được để trống' }]}
             >
               <Input />
             </Form.Item>
 
             <Form.Item
               name="genre_id"
-              label="The loai"
-              rules={[{ required: true, message: 'Nhap the loai' }]}
+              label="Thể loại"
+              rules={[{ required: true, message: 'Nhập thể loại' }]}
             >
               <Select
                 mode="multiple"
                 allowClear
-                placeholder="Chon the loai"
+                placeholder="Chọn thể loại"
                 options={genres?.map((genre) => ({
                   value: genre.name,
                   label: genre.name,
@@ -556,22 +579,22 @@ export const Movie = () => {
               />
             </Form.Item>
 
-            <Form.Item name="dao_dien" label="Dao dien">
+            <Form.Item name="dao_dien" label="Đạo diễn">
               <Input />
             </Form.Item>
 
-            <Form.Item name="dien_vien" label="Dien vien">
-              <Select mode="tags" placeholder="Nhap ten dien vien" />
+            <Form.Item name="dien_vien" label="Diễn viên">
+              <Select mode="tags" placeholder="Nhập tên diễn viên" />
             </Form.Item>
 
-            <Form.Item name="phu_de" label="Phu de" initialValue={['Tieng Viet']}>
-              <Select mode="tags" placeholder="Tieng Viet, Tieng Anh..." />
+            <Form.Item name="phu_de" label="Phụ đề" initialValue={['Tiếng Việt']}>
+              <Select mode="tags" placeholder="Tiếng Việt, Tiếng Anh..." />
             </Form.Item>
 
             <Form.Item
               name="thoi_luong"
-              label="Thoi luong"
-              rules={[{ required: true, message: 'Nhap thoi gian phim' }]}
+              label="Thời lượng"
+              rules={[{ required: true, message: 'Nhập thời gian phim' }]}
             >
               <InputNumber min={90} className="w-full" />
             </Form.Item>
@@ -580,15 +603,15 @@ export const Movie = () => {
               <InputNumber min={0} max={10} step={0.1} className="w-full" />
             </Form.Item>
 
-            <Form.Item name="quoc_gia" label="Quoc gia">
+            <Form.Item name="quoc_gia" label="Quốc gia">
               <Input />
             </Form.Item>
 
-            <Form.Item name="ngon_ngu" label="Ngon ngu">
+            <Form.Item name="ngon_ngu" label="Ngôn ngữ">
               <Input />
             </Form.Item>
 
-            <Form.Item name="do_tuoi" label="Do tuoi" initialValue="P">
+            <Form.Item name="do_tuoi" label="Độ tuổi" initialValue="P">
               <Select options={['P', 'C13', 'C16', 'C18'].map((value) => ({ value }))} />
             </Form.Item>
 
@@ -599,16 +622,16 @@ export const Movie = () => {
             <div className="flex gap-3">
               <Form.Item
                 name="ngay_cong_chieu"
-                label="Ngay chieu"
-                rules={[{ required: true, message: 'Chon ngay chieu' }]}
+                label="Ngày chiếu"
+                rules={[{ required: true, message: 'Chọn ngày chiếu' }]}
               >
                 <DatePicker className="w-full" />
               </Form.Item>
 
               <Form.Item
                 name="ngay_ket_thuc"
-                label="Ngay ket thuc"
-                rules={[{ required: true, message: 'Chon ngay ket thuc' }]}
+                label="Ngày kết thúc"
+                rules={[{ required: true, message: 'Chọn ngày kết thúc' }]}
               >
                 <DatePicker className="w-full" />
               </Form.Item>
@@ -619,7 +642,7 @@ export const Movie = () => {
               label="Poster"
               valuePropName="fileList"
               getValueFromEvent={(event: { fileList: UploadFile[] }) => event?.fileList}
-              rules={[{ required: !editingId, message: 'Poster khong duoc trong' }]}
+              rules={[{ required: !editingId, message: 'Poster không được trống' }]}
             >
               <Upload beforeUpload={() => false} maxCount={1} listType="picture">
                 <Button icon={<UploadOutlined />}>Upload</Button>
@@ -631,7 +654,7 @@ export const Movie = () => {
               label="Banner"
               valuePropName="fileList"
               getValueFromEvent={(event: { fileList: UploadFile[] }) => event?.fileList}
-              rules={[{ required: !editingId, message: 'Banner khong duoc trong' }]}
+              rules={[{ required: !editingId, message: 'Banner không được trống' }]}
             >
               <Upload beforeUpload={() => false} maxCount={1} listType="picture">
                 <Button icon={<UploadOutlined />}>Upload Banner</Button>
@@ -639,7 +662,7 @@ export const Movie = () => {
             </Form.Item>
           </div>
 
-          <Form.Item name="mo_ta" label="Mo ta">
+          <Form.Item name="mo_ta" label="Mô tả">
             <Input.TextArea rows={4} />
           </Form.Item>
         </Form>
