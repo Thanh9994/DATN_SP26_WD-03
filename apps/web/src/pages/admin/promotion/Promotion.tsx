@@ -1,22 +1,10 @@
-import { useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  Space,
-  Input,
-  Popconfirm,
-  message,
-  Typography,
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  ReloadOutlined,
-} from "@ant-design/icons";
-import axios from "axios";
-import { API } from "@web/api/api.service";
-import { useNavigate } from "react-router-dom";
-import { PlusIcon } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { Table, Button, Space, Input, Popconfirm, message, Typography } from 'antd';
+import { EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
+import axios from 'axios';
+import { API } from '@web/api/api.service';
+import { useNavigate } from 'react-router-dom';
+import { PlusIcon } from 'lucide-react';
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -32,7 +20,7 @@ interface Promotion {
 const PromotionList = () => {
   const [data, setData] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
 
   const fetchPromotions = async () => {
@@ -41,7 +29,7 @@ const PromotionList = () => {
       const res = await axios.get(API.PROMOTION);
       setData(res.data.data || []);
     } catch {
-      message.error("Failed to fetch promotions");
+      message.error('Failed to fetch promotions');
     } finally {
       setLoading(false);
     }
@@ -54,41 +42,55 @@ const PromotionList = () => {
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`${API.PROMOTION}/${id}`);
-      message.success("Deleted Thành công");
+      message.success('Deleted Thành công');
       fetchPromotions();
     } catch {
-      message.error("Delete Thất Bại");
+      message.error('Delete Thất Bại');
     }
   };
 
   const filteredData = data.filter((item) =>
-    item.title.toLowerCase().includes(searchText.toLowerCase())
+    item.title.toLowerCase().includes(searchText.toLowerCase()),
   );
 
   const columns = [
     {
-      title: "Title",
-      dataIndex: "title",
-      key: "title",
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
     },
     {
-      title: "Slug",
-      dataIndex: "slug",
-      key: "slug",
+      title: 'Slug',
+      dataIndex: 'slug',
+      key: 'slug',
     },
     {
-      title: "Active",
-      dataIndex: "featured",
-      key: "featured",
-      render: (value: boolean) => (value ? "✅ Hiện" : "❌ Ẩn"),
+      title: 'Categories',
+      dataIndex: 'category',
+      key: 'category',
+      render: (categories: string[]) => (
+        <>
+          {categories?.map((cat) => (
+            <span key={cat} className="mr-1 rounded bg-blue-100 px-2 py-1 text-xs text-blue-600">
+              {cat}
+            </span>
+          ))}
+        </>
+      ),
     },
     {
-      title: "Created",
-      dataIndex: "createdAt",
+      title: 'Active',
+      dataIndex: 'featured',
+      key: 'featured',
+      render: (value: boolean) => (value ? '✅ Hiện' : '❌ Ẩn'),
+    },
+    {
+      title: 'Created',
+      dataIndex: 'createdAt',
       render: (value: string) => new Date(value).toLocaleDateString(),
     },
     {
-      title: "Action",
+      title: 'Action',
       render: (_: any, record: Promotion) => (
         <Space>
           <Button
@@ -99,10 +101,7 @@ const PromotionList = () => {
             Edit
           </Button>
 
-          <Popconfirm
-            title="Delete this promotion?"
-            onConfirm={() => handleDelete(record._id)}
-          >
+          <Popconfirm title="Delete this promotion?" onConfirm={() => handleDelete(record._id)}>
             <Button danger icon={<DeleteOutlined />}>
               Delete
             </Button>
@@ -116,18 +115,15 @@ const PromotionList = () => {
     <div>
       <Space
         style={{
-          width: "100%",
-          justifyContent: "space-between",
+          width: '100%',
+          justifyContent: 'space-between',
           marginBottom: 20,
         }}
       >
         <Title level={3}>Promotion Manager</Title>
 
         <div className="flex gap-3">
-          <Button
-            type="primary"
-            onClick={() => navigate("/admin/promotions/create")}
-          >
+          <Button type="primary" onClick={() => navigate('/admin/promotions/create')}>
             <PlusIcon /> Thêm Bài Viết
           </Button>
 

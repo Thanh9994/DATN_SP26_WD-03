@@ -1,4 +1,4 @@
-import { ShowTimeDashboard } from "./dashboard/ShowtimeDashboard";
+import { ShowTimeDashboard } from './dashboard/ShowtimeDashboard';
 
 const Dashboard = () => {
     return (

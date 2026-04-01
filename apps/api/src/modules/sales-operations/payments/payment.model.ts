@@ -1,4 +1,4 @@
-import { IPaymentStatus, PaymentMethod, PaymentStatus } from '@shared/schemas';
+import { IPaymentStatus, PaymentMethod, PaymentStatus } from '@shared/src/schemas';
 import mongoose from 'mongoose';
 
 export interface IPayment extends Document {

@@ -1,5 +1,5 @@
 import { API } from '@web/api/api.service';
-import { ICinema, ICreateCinema, IPhong, IPhongCreate } from '@shared/schemas';
+import { ICinema, ICreateCinema, IPhong, IPhongCreate } from '@shared/src/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
 import axios from 'axios';
@@ -97,6 +97,7 @@ export const useRooms = () => {
       const { data } = await axios.get(API.ROOMS);
       return data.data;
     },
+    refetchOnWindowFocus: false,
   });
 
   const createRoom = useMutation({

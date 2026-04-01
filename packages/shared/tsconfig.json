@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declaration": true, // Quan trọng: Tạo file .d.ts cho các app khác dùng
+    "outDir": "./dist", // Nơi chứa file sau khi compile
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"] // Chỉ định quét code trong thư mục src
+}

@@ -6,7 +6,7 @@ import Jwt from 'jsonwebtoken';
 import { User } from '../user/user.model';
 import { AppError } from '@api/middlewares/error.middleware';
 import { catchAsync } from '@api/utils/catchAsync';
-import { ResendOtp, VerifyOtp } from '@shared/schemas';
+import { ResendOtp, VerifyOtp } from '@shared/src/schemas';
 
 export const Register = catchAsync(async (req, res) => {
   const { email, password, ho_ten, phone } = req.body;

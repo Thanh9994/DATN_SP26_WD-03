@@ -1,4 +1,4 @@
-import { IUser, UserRole, UserStatus } from '@shared/schemas';
+import { IUser, UserRole, UserStatus } from '@shared/src/schemas';
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema(
