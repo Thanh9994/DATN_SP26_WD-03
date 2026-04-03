@@ -1,4 +1,4 @@
-import {  useState } from "react";
+import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import {
   Layout,
@@ -106,8 +106,8 @@ function Analytics() {
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#f5f5f5" }}>
-      <Header >
-        <Title >
+      <Header style={{ background: "#001529" }}>
+        <Title style={{ color: "#fff", margin: 0 }} level={3}>
           Analytics Dashboard
         </Title>
       </Header>
