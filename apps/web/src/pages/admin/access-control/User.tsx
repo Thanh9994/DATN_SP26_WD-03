@@ -13,7 +13,7 @@ import {
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useAuth } from '@web/hooks/useAuth';
 import { useState } from 'react';
-import { IUser } from '@shared/schemas';
+import { IUser } from '@shared/src/schemas';
 
 const { Title } = Typography;
 

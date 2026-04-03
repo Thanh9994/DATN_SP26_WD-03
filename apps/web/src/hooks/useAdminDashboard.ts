@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { API } from "@web/api/api.service";
-import { axiosAuth } from "@web/hooks/useAuth";
-import { ICleanupLog } from "@shared/schemas";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { API } from '@web/api/api.service';
+import { axiosAuth } from '@web/hooks/useAuth';
+import { ICleanupLog } from '@shared/src/schemas';
 
 type CleanupLogResponse = {
   success: boolean;
@@ -10,9 +10,9 @@ type CleanupLogResponse = {
 };
 
 const buildCleanupSummary = (log?: ICleanupLog) => {
-  if (!log) return "Chưa có log cleanup";
+  if (!log) return 'Chưa có log cleanup';
 
-  if (log.type === "booking") {
+  if (log.type === 'booking') {
     const expired = (log.details as { expired?: number })?.expired ?? 0;
     const cancelled = (log.details as { cancelled?: number })?.cancelled ?? 0;
     return `Cleanup booking: expired ${expired}, cancelled ${cancelled}`;
@@ -24,7 +24,7 @@ const buildCleanupSummary = (log?: ICleanupLog) => {
 
 export const useCleanupLogs = () => {
   return useQuery({
-    queryKey: ["cleanup-logs", "latest"],
+    queryKey: ['cleanup-logs', 'latest'],
     queryFn: async () => {
       const [{ data: logRes }, { data: unreadRes }] = await Promise.all([
         axiosAuth.get<CleanupLogResponse>(`${API.ADMIN_DASHBOARD}/cleanup-logs`, {
@@ -42,14 +42,16 @@ export const useCleanupLogs = () => {
         unreadCount: unreadRes?.count ?? 0,
       };
     },
-    refetchInterval: 60 * 1000,
-    staleTime: 30 * 1000,
+    refetchInterval: 10 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false, // QUAN TRỌNG: Tắt việc fetch lại khi chuyển tab.
+    refetchOnMount: false,
   });
 };
 
 export const useCleanupLogList = (limit: number = 20) => {
   return useQuery({
-    queryKey: ["cleanup-logs", "list", limit],
+    queryKey: ['cleanup-logs', 'list', limit],
     queryFn: async () => {
       const { data } = await axiosAuth.get<CleanupLogResponse>(
         `${API.ADMIN_DASHBOARD}/cleanup-logs`,
@@ -57,8 +59,8 @@ export const useCleanupLogList = (limit: number = 20) => {
       );
       return data?.data ?? [];
     },
-    staleTime: 30 * 1000,
-    refetchInterval: 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -67,4 +69,15 @@ export const markAllCleanupLogsRead = async () => {
     `${API.ADMIN_DASHBOARD}/cleanup-logs/mark-read`,
   );
   return data;
+};
+
+export const useMarkReadCleanupLogs = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: markAllCleanupLogsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cleanup-logs'] });
+    },
+  });
 };

@@ -1,24 +1,20 @@
-import { Link, useNavigate } from "react-router-dom";
-import { Dropdown, MenuProps } from "antd";
-import { useAuth } from "@web/hooks/useAuth";
-import { useMovies } from "@web/hooks/useMovie";
-import { useState, useRef, useEffect } from "react";
-import { IUserRole } from "@shared/schemas";
+import { Link, useNavigate } from 'react-router-dom';
+import { Dropdown, MenuProps } from 'antd';
+import { useAuth } from '@web/hooks/useAuth';
+import { useMovies } from '@web/hooks/useMovie';
+import { useState, useRef, useEffect } from 'react';
+import { IUserRole } from '@shared/src/schemas';
 
 export const Header = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { movies } = useMovies();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   const searchResults = searchQuery.trim()
-    ? movies
-        .filter((m) =>
-          m.ten_phim.toLowerCase().includes(searchQuery.toLowerCase()),
-        )
-        .slice(0, 6)
+    ? movies.filter((m) => m.ten_phim.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 6)
     : [];
 
   useEffect(() => {
@@ -27,8 +23,8 @@ export const Header = () => {
         setShowResults(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleLogout = () => {
@@ -135,8 +131,8 @@ export const Header = () => {
             </Link>
           </nav>
         </div>
-        <div className="flex flex-1 justify-end items-center gap-6">
-          <div ref={searchRef} className="relative w-full max-w-sm hidden lg:block">
+        <div className="flex flex-1 items-center justify-end gap-6">
+          <div ref={searchRef} className="relative hidden w-full max-w-sm lg:block">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/40">
               search
             </span>
@@ -152,28 +148,32 @@ export const Header = () => {
               onFocus={() => setShowResults(true)}
             />
             {showResults && searchResults.length > 0 && (
-              <div className="absolute top-full mt-2 w-full bg-[#1a1a2e] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
+              <div className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-[#1a1a2e] shadow-2xl">
                 {searchResults.map((movie) => (
                   <div
                     key={movie._id}
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 cursor-pointer transition-colors"
+                    className="flex cursor-pointer items-center gap-3 px-4 py-2.5 transition-colors hover:bg-white/10"
                     onMouseDown={() => {
                       navigate(`/movie/${movie._id}`);
-                      setSearchQuery("");
+                      setSearchQuery('');
                       setShowResults(false);
                     }}
                   >
                     <img
                       src={movie.poster?.url}
                       alt={movie.ten_phim}
-                      className="w-9 h-12 object-cover rounded"
+                      className="h-12 w-9 rounded object-cover"
                     />
                     <div>
-                      <p className="text-white text-sm font-semibold line-clamp-1">
+                      <p className="line-clamp-1 text-sm font-semibold text-white">
                         {movie.ten_phim}
                       </p>
-                      <p className="text-white/40 text-xs">
-                        {movie.the_loai?.slice(0, 2).map((g) => g.name).join(", ")} • {movie.thoi_luong} phút
+                      <p className="text-xs text-white/40">
+                        {movie.the_loai
+                          ?.slice(0, 2)
+                          .map((g) => g.name)
+                          .join(', ')}{' '}
+                        • {movie.thoi_luong} phút
                       </p>
                     </div>
                   </div>

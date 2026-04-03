@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ShowTime as ShowTimeSchema } from '@shared/schemas';
+import { ShowTime as ShowTimeSchema } from '@shared/src/schemas';
 import { generateShowTimeSeats } from './showtime.service';
 import { ShowTimeM } from './showtime.model';
 import { SeatTime } from './showtimeSeat.model';
@@ -259,7 +259,8 @@ export const getShowTimeByMovie = async (req: Request, res: Response) => {
       };
       const isSoldOut =
         stats.total > 0 && stats.bookedOnly >= stats.total && item.status !== 'cancelled';
-      const status = item.status === 'cancelled' ? 'cancelled' : isSoldOut ? 'sold_out' : timeStatus;
+      const status =
+        item.status === 'cancelled' ? 'cancelled' : isSoldOut ? 'sold_out' : timeStatus;
 
       return {
         ...item,

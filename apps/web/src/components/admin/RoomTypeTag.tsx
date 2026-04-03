@@ -1,5 +1,5 @@
 import { Tag } from 'antd';
-import { IRoomType } from '@shared/schemas';
+import { IRoomType } from '@shared/src/schemas';
 
 type RoomTypeTagProps = {
   type: IRoomType;

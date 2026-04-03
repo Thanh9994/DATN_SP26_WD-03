@@ -1,11 +1,11 @@
-import { RoomType, IPhong } from "@shared/schemas";
-import mongoose from "mongoose";
+import { RoomType, IPhong } from '@shared/src/schemas';
+import mongoose from 'mongoose';
 
 const RoomSchema = new mongoose.Schema(
   {
     cinema_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Cinema",
+      ref: 'Cinema',
       required: true,
       index: true,
     },
@@ -30,4 +30,4 @@ const RoomSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export const Room = mongoose.model<IPhong>("Room", RoomSchema);
+export const Room = mongoose.model<IPhong>('Room', RoomSchema);

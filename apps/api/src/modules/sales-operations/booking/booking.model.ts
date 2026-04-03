@@ -1,22 +1,22 @@
-import mongoose, { Schema } from "mongoose";
-import { BookingStatus, IBooking, PaymentMethod } from "@shared/schemas";
+import mongoose, { Schema } from 'mongoose';
+import { BookingStatus, IBooking, PaymentMethod } from '@shared/src/schemas';
 
 const bookingSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     showTimeId: {
       type: Schema.Types.ObjectId,
-      ref: "ShowTime",
+      ref: 'ShowTime',
       required: true,
     },
     seats: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "ShowTimeSeat",
+        ref: 'ShowTimeSeat',
         required: true,
       },
     ],
@@ -32,7 +32,7 @@ const bookingSchema = new Schema(
         {
           snackDrinkId: {
             type: Schema.Types.ObjectId,
-            ref: "SnackDrink",
+            ref: 'SnackDrink',
           },
           name: String,
           quantity: Number,
@@ -56,7 +56,7 @@ const bookingSchema = new Schema(
     status: {
       type: String,
       enum: BookingStatus.options,
-      default: "pending",
+      default: 'pending',
     },
     paymentMethod: {
       type: String,
@@ -64,7 +64,7 @@ const bookingSchema = new Schema(
     },
     paymentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Payments",
+      ref: 'Payments',
     },
     holdToken: {
       type: String,
@@ -93,4 +93,4 @@ bookingSchema.index({ userId: 1, createdAt: -1 });
 bookingSchema.index({ status: 1, holdExpiresAt: 1 });
 bookingSchema.index({ showTimeId: 1 });
 bookingSchema.index({ showTimeId: 1, status: 1 });
-export const Booking = mongoose.model<IBooking>("Booking", bookingSchema);
+export const Booking = mongoose.model<IBooking>('Booking', bookingSchema);

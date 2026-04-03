@@ -19,6 +19,65 @@ body {
   background-color: #120a0a;
 }
 
+.seat-shell {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding-bottom: 8px;
+}
+
+.seat-shell span {
+  z-index: 3;
+}
+
+.seat-shell::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  bottom: 0;
+  width: 6px;
+  height: 15px;
+  background: inherit;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  border: 1px #131313 solid;
+  border-bottom: none;
+  z-index: 2;
+}
+
+.seat-shell::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  bottom: 0;
+  width: 6px;
+  height: 15px;
+  background: inherit;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  border: 1px #131313 solid;
+  border-bottom: none;
+  z-index: 2;
+}
+
+.seat-shell .foot {
+  position: absolute;
+  bottom: 2px;
+  left: 1px;
+  right: 1px;
+  height: 10px;
+  box-shadow: 0 10px 19px rgba(0, 0, 0, 0.473);
+  background: #f9f9f94d;
+  border-top: 1px #000000a6 solid;
+  border-bottom: 1px #000000a6 solid;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  z-index: 1;
+}
+
+.standard {
+  background: #9ca3af99;
+}
+
 /* ================= SCROLLBAR HIDE ================= */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

@@ -1,9 +1,6 @@
-import { IMovieStatus } from "@shared/schemas";
+import { IMovieStatus } from '@shared/src/schemas';
 
-export const calcMovieStatus = (
-  ngay_cong_chieu: Date,
-  ngay_ket_thuc?: Date,
-): IMovieStatus => {
+export const calcMovieStatus = (ngay_cong_chieu: Date, ngay_ket_thuc?: Date): IMovieStatus => {
   const today = new Date();
 
   const start = new Date(ngay_cong_chieu);
@@ -14,26 +11,23 @@ export const calcMovieStatus = (
   start.setHours(0, 0, 0, 0);
   end?.setHours(0, 0, 0, 0);
 
-  if (today < start) return "sap_chieu";
-  if (end && today > end) return "ngung_chieu";
+  if (today < start) return 'sap_chieu';
+  if (end && today > end) return 'ngung_chieu';
 
-  return "dang_chieu";
+  return 'dang_chieu';
 };
 
-export const MOVIE_BADGE: Record<
-  IMovieStatus,
-  { text: string; color: string }
-> = {
+export const MOVIE_BADGE: Record<IMovieStatus, { text: string; color: string }> = {
   dang_chieu: {
-    text: "Đang Chiếu",
-    color: "bg-red-500/50",
+    text: 'Đang Chiếu',
+    color: 'bg-red-500/50',
   },
   sap_chieu: {
-    text: "Sắp Chiếu",
-    color: "bg-yellow-500/50",
+    text: 'Sắp Chiếu',
+    color: 'bg-yellow-500/50',
   },
   ngung_chieu: {
-    text: "Ended",
-    color: "bg-gray-500/50",
+    text: 'Ended',
+    color: 'bg-gray-500/50',
   },
 };

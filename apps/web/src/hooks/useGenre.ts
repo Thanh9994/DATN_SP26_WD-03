@@ -1,9 +1,9 @@
-import { IGenre } from "@shared/schemas";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { API } from "@web/api/api.service";
-import { message } from "antd";
-import axios from "axios";
-import { normalizeIdDeep } from "@web/utils/normalizeId";
+import { IGenre } from '@shared/src/schemas';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { API } from '@web/api/api.service';
+import { message } from 'antd';
+import axios from 'axios';
+import { normalizeIdDeep } from '@web/utils/normalizeId';
 
 export const useGenres = () => {
   const queryClient = useQueryClient();
@@ -13,7 +13,7 @@ export const useGenres = () => {
     isLoading,
     isError,
   } = useQuery<IGenre[]>({
-    queryKey: ["genres"],
+    queryKey: ['genres'],
     queryFn: async () => {
       const { data } = await axios.get(API.GENRES);
       return normalizeIdDeep(data.data);
@@ -29,8 +29,8 @@ export const useGenres = () => {
       return normalizeIdDeep(data);
     },
     onSuccess: () => {
-      message.success("Thêm thể loại thành công");
-      queryClient.invalidateQueries({ queryKey: ["genres"] });
+      message.success('Thêm thể loại thành công');
+      queryClient.invalidateQueries({ queryKey: ['genres'] });
     },
   });
 
@@ -40,8 +40,8 @@ export const useGenres = () => {
       return normalizeIdDeep(data);
     },
     onSuccess: () => {
-      message.success("Cập nhật thể loại thành công");
-      queryClient.invalidateQueries({ queryKey: ["genres"] });
+      message.success('Cập nhật thể loại thành công');
+      queryClient.invalidateQueries({ queryKey: ['genres'] });
     },
   });
 
@@ -50,8 +50,8 @@ export const useGenres = () => {
       await axios.delete(`${API.GENRES}/${id}`);
     },
     onSuccess: () => {
-      message.success("Xóa thể loại thành công");
-      queryClient.invalidateQueries({ queryKey: ["genres"] });
+      message.success('Xóa thể loại thành công');
+      queryClient.invalidateQueries({ queryKey: ['genres'] });
     },
   });
 

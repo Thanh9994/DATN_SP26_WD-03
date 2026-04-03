@@ -13,6 +13,7 @@ import {
   message,
   Upload,
   Tag,
+  Card,
 } from 'antd';
 import {
   PlusOutlined,
@@ -26,7 +27,7 @@ import dayjs from 'dayjs';
 import { useMovies } from '@web/hooks/useMovie';
 import { useGenres } from '@web/hooks/useGenre';
 import { useUpload } from '@web/hooks/useUploads';
-import { ICloudinaryImage } from '@shared/schemas';
+import { ICloudinaryImage } from '@shared/src/schemas';
 import { useNavigate } from 'react-router-dom';
 
 export const Movie = () => {
@@ -125,6 +126,14 @@ export const Movie = () => {
     form.resetFields();
   };
 
+  const movieStatusMap = {
+    dang_chieu: { color: 'green', text: 'Đang chiếu', order: 1 },
+    sap_chieu: { color: 'gold', text: 'Sắp chiếu', order: 2 },
+    ngung_chieu: { color: 'red', text: 'Ngừng chiếu', order: 3 },
+  } as const;
+
+  type MovieStatusKey = keyof typeof movieStatusMap;
+
   const columns: any[] = [
     {
       key: 'poster',
@@ -171,17 +180,16 @@ export const Movie = () => {
         { text: 'Sắp chiếu', value: 'sap_chieu' },
         { text: 'Ngưng chiếu', value: 'ngung_chieu' },
       ],
-      onFilter: (value: any, record: any) => record.trang_thai === value,
+      onFilter: (value: string, record: any) => record.trang_thai === value,
+      sorter: (a: any, b: any) =>
+        (movieStatusMap[a.trang_thai as MovieStatusKey]?.order ?? 0) -
+        (movieStatusMap[b.trang_thai as MovieStatusKey]?.order ?? 0),
       render: (status: string) => {
-        const color = status === 'dang_chieu' ? 'green' : status === 'sap_chieu' ? 'gold' : 'red';
-        const text =
-          status === 'dang_chieu'
-            ? 'Đang chiếu'
-            : status === 'sap_chieu'
-              ? 'Sắp chiếu'
-              : 'Ngừng chiếu';
-
-        return <Tag color={color}>{text}</Tag>;
+        const config = movieStatusMap[status as MovieStatusKey] ?? {
+          color: 'default',
+          text: status,
+        };
+        return <Tag color={config.color}>{config.text}</Tag>;
       },
     },
     {
@@ -206,6 +214,21 @@ export const Movie = () => {
         <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>
           Thêm phim
         </Button>
+      </div>
+
+      <div className='my-3 grid grid-cols-4 gap-4'>
+        <Card>
+          1
+        </Card>
+        <Card>
+          1
+        </Card>
+        <Card>
+          1
+        </Card>
+        <Card>
+          1
+        </Card>
       </div>
 
       <Table

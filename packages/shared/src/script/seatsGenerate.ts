@@ -1,4 +1,4 @@
-import { IPhong, ISeatsStatus, ISeatType } from "@shared/schemas";
+import { IPhong, ISeatsStatus, ISeatType } from "../schemas";
 
 export interface ISeatResult {
   seatNumber: string;
@@ -13,15 +13,15 @@ export const generateSeats = (room: IPhong): ISeatResult[] => {
 
   room.rows.forEach((rowObj: { name: string; seats: number }) => {
     for (let i = 1; i <= rowObj.seats; i++) {
-      let seatType: ISeatType = "normal";
+      let seatType: ISeatType = 'normal';
       let multiplier = 1;
 
       // Logic xác định loại ghế dựa trên các mảng vipRows/coupleRows
       if (room.couple?.includes(rowObj.name)) {
-        seatType = "couple";
+        seatType = 'couple';
         multiplier = 2;
       } else if (room.vip?.includes(rowObj.name)) {
-        seatType = "vip";
+        seatType = 'vip';
         multiplier = 1.5;
       }
 
@@ -30,7 +30,7 @@ export const generateSeats = (room: IPhong): ISeatResult[] => {
         row: rowObj.name,
         type: seatType,
         priceMultiplier: multiplier,
-        isActive: "empty"
+        isActive: 'empty',
       });
     }
   });

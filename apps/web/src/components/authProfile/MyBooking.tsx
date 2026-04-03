@@ -6,7 +6,7 @@ import { Input, Select } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useMyBookings } from '@web/hooks/useBooking';
 import BookingTicket from '@web/components/BookingTicket'; // Component nằm ngang
-import { mapToTicketCl, ITicketCl } from '@shared/schemas/ticket';
+import { mapToTicketCl, ITicketCl } from '@shared/src/schemas/ticket';
 
 const MyBooking = () => {
   const navigate = useNavigate();
