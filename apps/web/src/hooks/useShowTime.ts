@@ -7,7 +7,7 @@ import {
   ICreateShowTimePl,
   IMovie,
   IPhong,
-  IShowTime,
+  IShowTimeApi,
   IShowTimeStatus,
   ShowTime,
 } from '@shared/src/schemas';
@@ -39,14 +39,14 @@ export type AdminShowtimeSeatInfo = {
   available: number;
 };
 
-export type AdminShowtimeRow = IShowTime & {
+export type AdminShowtimeRow = IShowTimeApi & {
   _id?: string;
   movieId:
     | string
     | Pick<IMovie, '_id' | 'ten_phim' | 'thoi_luong' | 'ngay_cong_chieu' | 'ngay_ket_thuc'>;
   roomId:
     | string
-    | (IPhong & {
+    | (Omit<IPhong, 'cinema_id'> & {
         cinema_id: string | PopulatedCinema;
         loai_phong: string;
       });
