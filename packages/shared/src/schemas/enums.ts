@@ -12,6 +12,8 @@ export const BookingStatus = z.enum([
   'paid', // thanh toán
   'cancelled', //hủy
   'expired', //Hết hạn thanh toán trạng thái
+  'picked_up', // Đã lấy vé (Khách đã nhận vé tại quầy/máy)
+  'refunded', // Hoàn tiền (Nếu cần thêm sau này)
 ]);
 export const PaymentStatus = z.enum(['pending', 'paying', 'success', 'failed']);
 export const ShowTimeStatus = z.enum([
@@ -21,4 +23,4 @@ export const ShowTimeStatus = z.enum([
   'sold_out', //Hết vé
   'cancelled', //Đã hủy
 ]);
-export const PaymentMethod = z.enum(['vnpay', 'momo', 'atm']);
+export const PaymentMethod = z.enum(['vnpay', 'momo', 'atm', 'cash']);
