@@ -22,7 +22,12 @@ interface DrinkSnackProps {
 const DEFAULT_IMAGE =
   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuXqeIFfJ3K9cX43NXgLGxfWvV8G5Fby9Rpg&s';
 
-export const DrinkSnack = ({ open, onClose, onSkip, onContinue }: DrinkSnackProps): React.ReactNode => {
+export const DrinkSnack = ({
+  open,
+  onClose,
+  onSkip,
+  onContinue,
+}: DrinkSnackProps): React.ReactNode => {
   const [internalOpen, setInternalOpen] = useState(true);
   const [cart, setCart] = useState<SnackCartItem[]>([]);
   const { products, isLoading, isError } = useProducts();

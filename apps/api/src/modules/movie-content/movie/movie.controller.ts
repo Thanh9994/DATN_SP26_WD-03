@@ -1,5 +1,6 @@
 import { movieService } from "./movie.service";
 import { ShowTimeM } from "../../cinema-catalog/showtime/showtime.model";
+import { Booking } from "../../sales-operations/booking/booking.model";
 import { calcMovieStatus } from "@api/utils/assets/movie.status";
 import { catchAsync } from "@api/utils/catchAsync";
 import { AppError } from "@api/middlewares/error.middleware";
@@ -17,10 +18,30 @@ export const movieController = {
       showtimeCounts.map((item) => [item._id.toString(), item.count]),
     );
 
+    const ticketCounts = await Booking.aggregate([
+      { $match: { status: "paid" } },
+      {
+        $lookup: {
+          from: "showtimes",
+          localField: "showTimeId",
+          foreignField: "_id",
+          as: "showtime",
+        },
+      },
+      { $unwind: "$showtime" },
+      { $addFields: { movieIdStr: { $toString: "$showtime.movieId" } } },
+      { $match: { movieIdStr: { $in: movieIdStrings } } },
+      { $group: { _id: "$movieIdStr", ticketsSold: { $sum: { $size: "$seats" } } } },
+    ]);
+    const ticketMap = new Map(
+      ticketCounts.map((item) => [item._id.toString(), item.ticketsSold]),
+    );
+
     const moviesWithStatus = movies.map((movie) => ({
       ...movie.toObject(),
       trang_thai: calcMovieStatus(movie.ngay_cong_chieu, movie.ngay_ket_thuc),
       showtimeCount: countMap.get(movie._id.toString()) ?? 0,
+      ticketsSold: ticketMap.get(movie._id.toString()) ?? 0,
     }));
     res.status(200).json({
       success: true,
