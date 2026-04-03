@@ -14,7 +14,7 @@ import { AdminLayouts } from '@web/layouts/AdminLayout';
 import Settings from "@web/pages/admin/Settings";
 import Dashboard from '@web/pages/admin/Dashboard';
 import { ShowTime } from '@web/pages/admin/order/Showtime';
-import AnalyticsPage from '@web/pages/admin/dashboard/AnalyticsPage';
+import Analytics from '@web/pages/admin/Analytics';
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
@@ -24,6 +24,7 @@ export const AdminRoutes: RouteObject = {
       element: <AdminLayouts />,
       children: [
         { index: true, element: <Dashboard /> },
+        { path: "analytics", element: <Analytics /> },
         { path: "movies", element: <Movie /> },
         { path: "genres", element: <Genre /> },
         { path: "media", element: <Upload /> },
@@ -33,7 +34,6 @@ export const AdminRoutes: RouteObject = {
         { path: "rooms", element: <Rooms /> },
         { path: "settings", element: <Settings /> },
         { path: "showtime", element: <ShowTime /> },
-        { path: "analytics", element: <AnalyticsPage /> },
         {
           path: 'promotions',
           children: [

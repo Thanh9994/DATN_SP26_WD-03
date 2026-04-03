@@ -12,7 +12,7 @@ import paymentRouter from "./modules/sales-operations/payments/payment.route";
 import chatbotRoute from "./modules/chatbot/chatbot.route";
 import compression from "compression";
 import contactRoute from "./modules/contact/contact.route";
-
+import analyticsRouter from "./modules/analytics";
 const app = express();
 app.set("etag", false);
 app.use(compression());
@@ -39,6 +39,7 @@ api.use("/order", orderRouter);
 api.use("/admin", adminDashboardRouter);
 api.use("/chatbot", chatbotRoute);
 api.use("/contact", contactRoute);
+api.use("/analytics", analyticsRouter);
 
 app.use("/api", api);
 app.use("/api/uploads", uploadRouter);
