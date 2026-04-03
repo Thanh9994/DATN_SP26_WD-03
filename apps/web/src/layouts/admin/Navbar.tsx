@@ -83,6 +83,12 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
             },
           ],
         },
+        {
+          key: 'personnel',
+          icon: <Users size={18} />,
+          label: 'Nhân sự',
+          onClick: () => navigate('/admin/users'),
+        },
       ],
     },
     { type: 'divider' },
@@ -95,7 +101,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
     {
       key: 'movies',
       icon: <Film size={18} />,
-      label: 'Phim',
+      label: 'Thư viện phim',
       onClick: () => navigate('/admin/movies'),
     },
     {
@@ -104,6 +110,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       label: 'Users',
       onClick: () => navigate('/admin/users'),
     },
+
     {
       key: 'cinemas',
       icon: <VideoCameraAddOutlined />,
@@ -118,7 +125,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
     },
     {
       key: 'showtime',
-      icon: <CalendarPlus size={18}/>,
+      icon: <CalendarPlus size={18} />,
       label: 'Suất Chiếu',
       onClick: () => navigate('/admin/showtime'),
     },
@@ -160,11 +167,11 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       onClick: () => navigate('/admin/settings'),
     },
     {
-      key:'chatbot',
+      key: 'chatbot',
       icon: <UserOutlined />,
       label: 'Chatbot',
       onClick: () => navigate('/admin/chatbot'),
-    }
+    },
   ];
 
   const textColor = themeMode === 'dark' ? '#fff' : '#000';

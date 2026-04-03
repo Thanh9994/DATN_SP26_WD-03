@@ -1,19 +1,74 @@
 import PhimCard from '@web/components/skeleton/PhimCard';
 import { useMovies } from '@web/hooks/useMovie';
 import { Spin } from 'antd';
+import { PlayCircle, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+export interface StreamingMovie {
+  id: string;
+  title: string;
+  match: number;
+  year: number;
+  image: string;
+  tag?: 'TOP 10' | 'NEW';
+}
+
+const TOP_STREAMING: StreamingMovie[] = [
+  {
+    id: 's1',
+    title: 'Tóm tắt nội dung',
+    match: 98,
+    year: 2024,
+    image: 'https://picsum.photos/seed/stream1/800/450',
+    tag: 'TOP 10',
+  },
+  {
+    id: 's2',
+    title: 'Tóm tắt nội dung',
+    match: 94,
+    year: 2024,
+    image: 'https://picsum.photos/seed/stream2/800/450',
+    tag: 'NEW',
+  },
+  {
+    id: 's3',
+    title: 'Tóm tắt nội dung',
+    match: 92,
+    year: 2024,
+    image: 'https://picsum.photos/seed/stream3/800/450',
+  },
+  {
+    id: 's4',
+    title: 'Tóm tắt nội dung',
+    match: 92,
+    year: 2024,
+    image: 'https://picsum.photos/seed/stream3/800/450',
+  },
+  {
+    id: 's5',
+    title: 'Tóm tắt nội dung',
+    match: 92,
+    year: 2024,
+    image: 'https://picsum.photos/seed/stream3/800/450',
+  },
+  {
+    id: 's6',
+    title: 'Tóm tắt nội dung',
+    match: 92,
+    year: 2024,
+    image: 'https://picsum.photos/seed/stream3/800/450',
+  },
+];
 export const Home = () => {
   const { movies, isLoading } = useMovies();
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedStreamingMovie, setSelectedStreamingMovie] = useState(TOP_STREAMING[0]);
 
   const sortedMovies = [...(movies ?? [])]
     .filter((movie) => movie.trang_thai === 'dang_chieu')
-    .sort(
-    (a, b) => Number(b.rateting ?? 0) - Number(a.rateting ?? 0),
-    );
+    .sort((a, b) => Number(b.rateting ?? 0) - Number(a.rateting ?? 0));
   const featuredMovie = sortedMovies[currentIndex];
 
   useEffect(() => {
@@ -82,7 +137,9 @@ export const Home = () => {
                 </span>
                 <div className="flex items-center gap-1 text-yellow-400">
                   <span className="material-symbols-outlined text-sm">star</span>
-                  <span className="text-sm font-bold text-white">{featuredMovie?.rateting ?? 0}</span>
+                  <span className="text-sm font-bold text-white">
+                    {featuredMovie?.rateting ?? 0}
+                  </span>
                 </div>
               </div>
               <h1 className="mb-4 line-clamp-2 text-2xl font-black uppercase leading-tight tracking-tight text-white sm:text-4xl">
@@ -121,7 +178,7 @@ export const Home = () => {
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black uppercase tracking-tighter text-white md:text-3xl">
-                Now Showing
+                Đang chiếu
               </h2>
               <span className="xs:block hidden rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] font-bold uppercase text-red-500">
                 New
@@ -130,7 +187,7 @@ export const Home = () => {
 
             <a
               className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-primary"
-              href="#"
+              href="/movielist"
             >
               Tất cả
               <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -144,13 +201,13 @@ export const Home = () => {
               ))}
           </div>
         </section>
+
         <section className="border-y border-white/10 bg-white/[0.02] py-16 sm:py-20">
           <div className="mx-auto max-w-7xl">
-            {/* HEADER */}
             <div className="mb-8 flex flex-col justify-between gap-4 px-4 sm:mb-10 sm:flex-row sm:items-center sm:px-6">
               <div>
                 <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
-                  Top Rated
+                  Tin tức nổi bật
                 </h2>
               </div>
 
@@ -166,52 +223,99 @@ export const Home = () => {
             </div>
 
             {/* SLIDER */}
-            <div className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:px-6">
-              {/* CARD */}
-              {[1, 2, 3, 4].map((item) => (
-                <div
-                  key={item}
-                  className="relative aspect-video w-[240px] shrink-0 cursor-pointer snap-start overflow-hidden rounded-lg sm:w-[300px]"
-                >
-                  {/* IMAGE */}
-                  <img
-                    src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1772216798813-ooto"
-                    alt="movie"
-                    className="h-full w-full object-cover transition duration-500 hover:scale-110"
-                  />
-
-                  {/* OVERLAY */}
-                  <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/30 to-transparent p-3 sm:p-5">
-                    {/* TAG */}
-                    <div className="mb-2 flex items-center gap-2">
-                      <span className="rounded bg-yellow-400 px-2 py-0.5 text-[9px] font-bold uppercase text-black">
-                        TOP 10
-                      </span>
-                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">
-                        Action Series
-                      </span>
-                    </div>
-
-                    {/* TITLE */}
-                    <h3 className="mb-2 text-base font-bold text-white sm:text-lg">
-                      The Night Agent
-                    </h3>
-
-                    {/* META */}
-                    <div className="flex flex-wrap items-center gap-2 text-[10px] text-white/70 sm:text-xs">
-                      <span className="flex items-center gap-1 font-semibold text-primary">
-                        <span className="material-symbols-outlined text-xs">thumb_up</span>
-                        98% Match
-                      </span>
-                      <span>2024</span>
-                      <span>1 Season</span>
+            <section className="p-5">
+              <div className="grid h-[500px] grid-cols-1 gap-8 md:grid-cols-2">
+                {/* Left Side: Large Card (1/2 width) */}
+                {selectedStreamingMovie && (
+                  <div
+                    key={selectedStreamingMovie.id}
+                    className="group relative h-full cursor-pointer overflow-hidden rounded-2xl bg-white/5"
+                  >
+                    <img
+                      src={selectedStreamingMovie.image}
+                      alt={selectedStreamingMovie.title}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/20 to-transparent p-10">
+                      {selectedStreamingMovie.tag && (
+                        <div className="mb-4 flex items-center gap-2">
+                          <span
+                            className={`rounded px-3 py-1 text-[10px] font-black uppercase ${selectedStreamingMovie.tag === 'TOP 10' ? 'bg-yellow-400 text-black' : 'bg-primary text-white'}`}
+                          >
+                            {selectedStreamingMovie.tag}
+                          </span>
+                        </div>
+                      )}
+                      <h3 className="mb-3 text-4xl font-black uppercase italic leading-tight tracking-tighter text-white">
+                        {selectedStreamingMovie.title}
+                      </h3>
+                      <div className="flex items-center gap-6 text-sm text-white/50">
+                        <span className="font-bold text-primary">
+                          {selectedStreamingMovie.match}% Match
+                        </span>
+                        <span>{selectedStreamingMovie.year}</span>
+                        <span className="flex items-center gap-1">
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /> 8.9
+                        </span>
+                      </div>
                     </div>
                   </div>
+                )}
+
+                {/* Right Side: Scrollable List (1/2 width) */}
+                <div className="no-scrollbar space-y-4 overflow-y-auto pr-4">
+                  {TOP_STREAMING.map((movie) => (
+                    <div
+                      key={movie.id}
+                      onClick={() => setSelectedStreamingMovie(movie)}
+                      className={`group flex cursor-pointer items-center gap-4 rounded-xl border p-3 transition-all ${
+                        selectedStreamingMovie.id === movie.id
+                          ? 'border-primary/40 bg-primary/10'
+                          : 'border-white/5 bg-white/5 hover:border-white/20'
+                      }`}
+                    >
+                      <div className="aspect-video w-32 shrink-0 overflow-hidden rounded-lg">
+                        <img
+                          src={movie.image}
+                          alt={movie.title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        {movie.tag && (
+                          <span
+                            className={`mb-1 inline-block rounded px-1.5 py-0.5 text-[7px] font-black uppercase ${movie.tag === 'TOP 10' ? 'bg-yellow-400 text-black' : 'bg-primary text-white'}`}
+                          >
+                            {movie.tag}
+                          </span>
+                        )}
+                        <h4 className="line-clamp-1 text-sm font-bold text-white transition-colors group-hover:text-primary">
+                          {movie.title}
+                        </h4>
+                        <div className="mt-1 flex items-center gap-3 text-[10px] text-white/40">
+                          <span className="font-bold text-primary">{movie.match}% Match</span>
+                          <span>{movie.year}</span>
+                        </div>
+                      </div>
+                      <button
+                        className={`flex h-8 w-8 items-center justify-center rounded-full text-white transition-all ${
+                          selectedStreamingMovie.id === movie.id
+                            ? 'bg-primary opacity-100'
+                            : 'bg-white/10 opacity-0 group-hover:opacity-100'
+                        }`}
+                      >
+                        <PlayCircle className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            </section>
           </div>
         </section>
+
         <section className="py-20 sm:py-24">
           <div className="mx-auto max-w-7xl overflow-hidden">
             <div className="mb-10 flex flex-col justify-between gap-6 px-4 sm:mb-12 sm:px-6 lg:flex-row lg:items-end lg:px-8">

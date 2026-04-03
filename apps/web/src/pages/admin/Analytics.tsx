@@ -30,7 +30,7 @@ import {
 } from "recharts";
 import { useAnalytics } from "../../hooks/useAnalytics";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
