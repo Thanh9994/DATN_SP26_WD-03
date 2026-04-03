@@ -77,6 +77,7 @@ export const analyticsService = {
       bookingStatusRaw,
       revenueTrendRaw,
       topMoviesRaw,
+      topTheatersRaw,
       theaters,
       statuses,
     ] = await Promise.all([
@@ -152,6 +153,30 @@ export const analyticsService = {
         { $sort: { ticketsSold: -1, revenue: -1 } },
         { $limit: 5 },
       ]),
+      Booking.aggregate([
+        { $match: paidOnlyMatch },
+        {
+          $group: {
+            _id: "$theaterName",
+            revenue: { $sum: "$finalAmount" },
+            bookings: { $sum: 1 },
+            ticketsSold: {
+              $sum: { $size: { $ifNull: ["$seatCodes", []] } },
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            theaterName: { $ifNull: ["$_id", "Không xác định"] },
+            revenue: 1,
+            bookings: 1,
+            ticketsSold: 1,
+          },
+        },
+        { $sort: { revenue: -1, ticketsSold: -1 } },
+        { $limit: 5 },
+      ]),
       this.getTheaterOptions(),
       this.getStatusOptions(),
     ]);
@@ -173,6 +198,12 @@ export const analyticsService = {
       count: item.count,
     }));
 
+    const averageRevenuePerBooking =
+      totalPaidBookings > 0 ? totalRevenue / totalPaidBookings : 0;
+
+    const averageTicketsPerBooking =
+      totalPaidBookings > 0 ? totalTicketsSold / totalPaidBookings : 0;
+
     return {
       filters: {
         theaters,
@@ -185,11 +216,14 @@ export const analyticsService = {
         totalMovies,
         totalUsers,
         totalShowtimes,
+        averageRevenuePerBooking,
+        averageTicketsPerBooking,
       },
       charts: {
         revenueTrend: revenueTrendRaw,
         bookingStatus,
         topMovies: topMoviesRaw,
+        topTheaters: topTheatersRaw,
       },
     };
   },

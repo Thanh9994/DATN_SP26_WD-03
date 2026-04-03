@@ -13,6 +13,8 @@ export type AnalyticsResponse = {
     totalMovies: number;
     totalUsers: number;
     totalShowtimes: number;
+    averageRevenuePerBooking: number;
+    averageTicketsPerBooking: number;
   };
   charts: {
     revenueTrend: Array<{
@@ -29,6 +31,12 @@ export type AnalyticsResponse = {
     }>;
     topMovies: Array<{
       movieName: string;
+      revenue: number;
+      bookings: number;
+      ticketsSold: number;
+    }>;
+    topTheaters: Array<{
+      theaterName: string;
       revenue: number;
       bookings: number;
       ticketsSold: number;
