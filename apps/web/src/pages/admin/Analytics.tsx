@@ -105,14 +105,14 @@ function Analytics() {
   );
 
   return (
-    <Layout style={{ minHeight: "100vh"}}>
-   
-        <Title level={3}>
+    <Layout style={{ minHeight: "100vh", background: "#f5f5f5" }}>
+      <Header style={{ background: "#001529" }}>
+        <Title style={{ color: "#fff", margin: 0 }} level={3}>
           Analytics Dashboard
         </Title>
+      </Header>
 
-
-      <Content style={{ padding: 18 }}>
+      <Content style={{ padding: 24 }}>
         {/* FILTER */}
         <Card style={{ marginBottom: 24 }}>
           <Row gutter={16}>
