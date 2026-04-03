@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import {  useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import {
   Layout,
@@ -27,7 +27,6 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from "recharts";
 import { useAnalytics } from "../../hooks/useAnalytics";
 
@@ -107,8 +106,8 @@ function Analytics() {
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#f5f5f5" }}>
-      <Header style={{ background: "#001529" }}>
-        <Title style={{ color: "#fff", margin: 0 }} level={3}>
+      <Header >
+        <Title >
           Analytics Dashboard
         </Title>
       </Header>
