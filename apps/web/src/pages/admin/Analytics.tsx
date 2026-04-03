@@ -41,11 +41,13 @@ const COLORS = ["#1677ff", "#52c41a", "#faad14", "#ff4d4f", "#722ed1"];
 type FilterState = {
   range: [Dayjs | null, Dayjs | null] | null;
   theaterName: string;
+  status: string;
 };
 
 const DEFAULT_FILTERS: FilterState = {
   range: [dayjs().startOf("month"), dayjs().endOf("month")],
   theaterName: "all",
+  status: "all",
 };
 
 const formatCurrency = (value: number) =>
@@ -53,6 +55,12 @@ const formatCurrency = (value: number) =>
 
 const formatNumber = (value: number) =>
   (value ?? 0).toLocaleString("vi-VN");
+
+const formatDecimal = (value: number) =>
+  (value ?? 0).toLocaleString("vi-VN", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
 
 function Analytics() {
   const [draftFilters, setDraftFilters] = useState<FilterState>(DEFAULT_FILTERS);
@@ -66,12 +74,17 @@ function Analytics() {
     fromDate,
     toDate,
     theaterName: appliedFilters.theaterName,
+    status: appliedFilters.status,
   });
 
   const revenueData = useMemo(() => data?.charts?.revenueTrend ?? [], [data]);
   const topMoviesData = useMemo(() => data?.charts?.topMovies ?? [], [data]);
   const bookingStatusData = useMemo(
     () => data?.charts?.bookingStatus ?? [],
+    [data],
+  );
+  const topTheatersData = useMemo(
+    () => data?.charts?.topTheaters ?? [],
     [data],
   );
 
@@ -82,6 +95,17 @@ function Analytics() {
       ...theaters.map((theater) => ({
         label: theater,
         value: theater,
+      })),
+    ];
+  }, [data]);
+
+  const statusOptions = useMemo(() => {
+    const statuses = data?.filters?.statuses ?? [];
+    return [
+      { label: "Tất cả trạng thái", value: "all" },
+      ...statuses.map((status) => ({
+        label: status,
+        value: status,
       })),
     ];
   }, [data]);
@@ -112,6 +136,14 @@ function Analytics() {
         title: "Tổng booking paid",
         value: formatNumber(data?.summary?.totalPaidBookings ?? 0),
       },
+      {
+        title: "Doanh thu / booking",
+        value: formatCurrency(data?.summary?.averageRevenuePerBooking ?? 0),
+      },
+      {
+        title: "Vé / booking",
+        value: formatDecimal(data?.summary?.averageTicketsPerBooking ?? 0),
+      },
     ],
     [data],
   );
@@ -124,6 +156,7 @@ function Analytics() {
     const nextFilters: FilterState = {
       range: [dayjs().startOf("month"), dayjs().endOf("month")],
       theaterName: "all",
+      status: "all",
     };
 
     setDraftFilters(nextFilters);
@@ -160,7 +193,7 @@ function Analytics() {
       <Content style={{ padding: 24 }}>
         <Card style={{ marginBottom: 24 }}>
           <Row gutter={[16, 16]} align="middle">
-            <Col xs={24} md={10}>
+            <Col xs={24} md={8}>
               <RangePicker
                 style={{ width: "100%" }}
                 value={draftFilters.range}
@@ -173,7 +206,7 @@ function Analytics() {
               />
             </Col>
 
-            <Col xs={24} md={8}>
+            <Col xs={24} md={6}>
               <Select
                 style={{ width: "100%" }}
                 value={draftFilters.theaterName}
@@ -187,7 +220,21 @@ function Analytics() {
               />
             </Col>
 
-            <Col xs={24} md={6}>
+            <Col xs={24} md={5}>
+              <Select
+                style={{ width: "100%" }}
+                value={draftFilters.status}
+                onChange={(value) =>
+                  setDraftFilters((prev) => ({
+                    ...prev,
+                    status: value,
+                  }))
+                }
+                options={statusOptions}
+              />
+            </Col>
+
+            <Col xs={24} md={5}>
               <Space style={{ width: "100%", display: "flex" }}>
                 <Button
                   type="primary"
@@ -223,10 +270,10 @@ function Analytics() {
           <>
             <Row gutter={[16, 16]}>
               {summaryCards.map((item) => (
-                <Col xs={24} sm={12} lg={8} key={item.title}>
+                <Col xs={24} sm={12} lg={6} key={item.title}>
                   <Card>
                     <Title level={5}>{item.title}</Title>
-                    <Text style={{ fontSize: 24, fontWeight: 700 }}>
+                    <Text style={{ fontSize: 22, fontWeight: 700 }}>
                       {item.value}
                     </Text>
                   </Card>
@@ -308,7 +355,7 @@ function Analytics() {
             <Divider />
 
             <Row gutter={[16, 16]}>
-              <Col xs={24}>
+              <Col xs={24} lg={12}>
                 <Card title="Top phim bán chạy">
                   {topMoviesData.length === 0 ? (
                     renderNoData("Không có dữ liệu top phim")
@@ -326,6 +373,33 @@ function Analytics() {
                           />
                           <Legend />
                           <Bar dataKey="ticketsSold" name="Vé đã bán" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </Card>
+              </Col>
+
+              <Col xs={24} lg={12}>
+                <Card title="Top rạp theo doanh thu">
+                  {topTheatersData.length === 0 ? (
+                    renderNoData("Không có dữ liệu top rạp")
+                  ) : (
+                    <div style={{ width: "100%", height: 320 }}>
+                      <ResponsiveContainer>
+                        <BarChart data={topTheatersData}>
+                          <XAxis dataKey="theaterName" />
+                          <YAxis />
+                          <Tooltip
+                            formatter={(value, name) => [
+                              String(name) === "Doanh thu"
+                                ? formatCurrency(Number(value ?? 0))
+                                : formatNumber(Number(value ?? 0)),
+                              String(name),
+                            ]}
+                          />
+                          <Legend />
+                          <Bar dataKey="revenue" name="Doanh thu" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
