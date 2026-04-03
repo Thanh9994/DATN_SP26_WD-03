@@ -15,6 +15,7 @@ import Settings from '@web/pages/admin/Settings';
 import Dashboard from '@web/pages/admin/Dashboard';
 import { ShowTime } from '@web/pages/admin/order/Showtime';
 import { Personnel } from '@web/pages/admin/access-control/Personnel';
+import Analytics from '@web/pages/admin/Analytics';
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
@@ -34,6 +35,7 @@ export const AdminRoutes: RouteObject = {
         { path: 'settings', element: <Settings /> },
         { path: 'showtime', element: <ShowTime /> },
         { path: 'personnel', element: <Personnel /> },
+        { path: "analytics", element: <Analytics /> },
         {
           path: 'promotions',
           children: [

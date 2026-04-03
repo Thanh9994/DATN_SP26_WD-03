@@ -154,7 +154,6 @@ export const DrinkSnack = ({
   };
 
   if (!isOpen) return null;
-  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">

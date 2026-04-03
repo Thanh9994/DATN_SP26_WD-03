@@ -42,7 +42,7 @@ export const ClientRoutes: RouteObject = {
     { path: 'register', element: <Register /> },
     { path: 'forgot-password', element: <ForgotPassword /> },
     { path: 'reset-password/:token', element: <ResetPassword /> },
-
+    
     {
       path: 'profile',
       element: <ProfileLayout />,
