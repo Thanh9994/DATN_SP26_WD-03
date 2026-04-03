@@ -34,6 +34,7 @@ export const AdminRoutes: RouteObject = {
         { path: "rooms", element: <Rooms /> },
         { path: "settings", element: <Settings /> },
         { path: "showtime", element: <ShowTime /> },
+        {path: "analytics", element: <Analytics />},
         {
           path: 'promotions',
           children: [

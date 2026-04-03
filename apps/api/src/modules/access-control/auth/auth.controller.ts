@@ -226,6 +226,7 @@ export const Login = catchAsync(async (req, res) => {
       ho_ten: user.ho_ten,
       email: user.email,
       role: user.role,
+      phone: user.phone,
     },
   });
 });
@@ -307,6 +308,26 @@ export const forgotPassword = catchAsync(async (req, res) => {
   });
 
   res.json({ message: 'Đã gửi email reset password' });
+});
+
+export const changePassword = catchAsync(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const userId = (req as any).user?._id;
+
+  if (!userId) throw new AppError('Chưa đăng nhập', 401);
+
+  const user = await User.findById(userId).select('+password');
+  if (!user) throw new AppError('Không tìm thấy người dùng', 404);
+
+  const isMatch = await bcrypt.compare(oldPassword, user.password);
+  if (!isMatch) throw new AppError('Mật khẩu cũ không đúng', 400);
+
+  if (oldPassword === newPassword) throw new AppError('Mật khẩu mới không được trùng mật khẩu cũ', 400);
+
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+
+  res.status(200).json({ message: 'Đổi mật khẩu thành công' });
 });
 
 export const resetPassword = catchAsync(async (req, res) => {
