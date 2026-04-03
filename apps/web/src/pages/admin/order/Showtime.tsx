@@ -14,8 +14,8 @@ import {
   Table,
   Tabs,
   Tag,
+  TreeSelect,
   Typography,
-  message,
 } from 'antd';
 import {
   CheckCircleOutlined,
@@ -40,6 +40,15 @@ import { API } from '@web/api/api.service';
 import SeatMap from '@web/components/skeleton/SeatMap';
 import RoomTypeTag from '@web/components/admin/RoomTypeTag';
 import { ICreateShowTimePl, IMovie, IPhong, ShowTime as ShowTimeSchema } from '@shared/src/schemas';
+import type {
+  AdminRoom,
+  CinemaOption,
+  MovieOption,
+  RangeCreateValues,
+  SingleCreateValues,
+  SlotOption,
+} from '@shared/src/types';
+import { calculateShowtimeStats } from '@web/utils/showtime.util';
 
 const CLEANING_MINUTES = 30;
 const OPENING_HOUR = 7;
@@ -48,58 +57,6 @@ const DEFAULT_PRICES = {
   priceNormal: 75000,
   priceVip: 95000,
   priceCouple: 150000,
-};
-
-type MovieOption = Pick<
-  IMovie,
-  '_id' | 'ten_phim' | 'thoi_luong' | 'ngay_cong_chieu' | 'ngay_ket_thuc'
->;
-
-type CinemaOption = {
-  value: string;
-  label: string;
-};
-
-type PopulatedCinema = {
-  _id?: string;
-  name?: string;
-};
-
-type AdminRoom = IPhong & {
-  cinema_id: string | PopulatedCinema;
-};
-
-type RoomOption = {
-  value: string;
-  label: string;
-  cinemaId?: string;
-};
-
-type SlotOption = {
-  value: string;
-  label: string;
-  disabled?: boolean;
-};
-
-type SingleCreateValues = {
-  movieId?: string;
-  roomId: string;
-  date: Dayjs;
-  timeSlots: string[];
-  priceNormal: number;
-  priceVip: number;
-  priceCouple: number;
-};
-
-type RangeCreateValues = {
-  movieId?: string;
-  roomId: string;
-  startDate: Dayjs;
-  endDate: Dayjs;
-  timeSlots: string[];
-  priceNormal: number;
-  priceVip: number;
-  priceCouple: number;
 };
 
 const getMovieId = (showtime: AdminShowtimeRow) =>
@@ -119,7 +76,7 @@ const getRoomId = (showtime: AdminShowtimeRow) =>
   typeof showtime.roomId === 'string' ? showtime.roomId : showtime.roomId?._id;
 
 const getCinemaInfo = (room?: IPhong | AdminRoom) => {
-  const cinema = room?.cinema_id as string | PopulatedCinema | undefined;
+  const cinema = room?.cinema_id as AdminRoom['cinema_id'] | undefined;
   if (cinema && typeof cinema === 'object') {
     return {
       cinemaId: cinema._id,
@@ -141,6 +98,11 @@ const getMovieOption = (
   if (fixedMovie && fixedMovie._id === movieId) return fixedMovie;
   return movies.find((item) => item._id === movieId);
 };
+
+//  Sinh danh sách slot chiếu liên tiếp trong ngày
+// - Bắt đầu từ 07:00
+// - Mỗi slot = duration phim + 30 phút dọn dẹp
+// - Disable slot nếu bị trùng lịch
 
 const buildSequentialSlotOptions = (
   baseDate: Dayjs | undefined,
@@ -165,7 +127,7 @@ const buildSequentialSlotOptions = (
       const existingStart = dayjs(showtime.startTime);
       const existingEnd = dayjs(showtime.endTime);
       return (
-        start.isBefore(existingEnd.add(CLEANING_MINUTES, 'minute')) &&
+        start.isBefore(existingEnd.clone().add(CLEANING_MINUTES, 'minute')) &&
         cleaningEnd.isAfter(existingStart)
       );
     });
@@ -179,6 +141,10 @@ const buildSequentialSlotOptions = (
 
   return options;
 };
+
+// Tạo payload gửi lên API để tạo suất chiếu
+// - Ghép date + time thành startTime
+// - Tự tính endTime theo duration
 
 const createPayload = (
   movieId: string,
@@ -213,9 +179,14 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
   const [selectedShowtimeId, setSelectedShowtimeId] = useState<string | null>(null);
   const [selectedMovieFilter, setSelectedMovieFilter] = useState<string | undefined>(movieId);
   const [selectedCinemaFilter, setSelectedCinemaFilter] = useState<string | undefined>();
-  const [selectedRoomFilter, setSelectedRoomFilter] = useState<string | undefined>();
+  const [selectedRoomFilter, setSelectedRoomFilter] = useState<string[] | undefined>();
   const [selectedDateFilter, setSelectedDateFilter] = useState<Dayjs | null>(null);
   const [submittingMode, setSubmittingMode] = useState<'single' | 'range' | null>(null);
+  const [createSummary, setCreateSummary] = useState<{
+    type: 'success' | 'warning' | 'error' | 'info';
+    title: string;
+    detail?: string;
+  } | null>(null);
 
   const [singleForm] = Form.useForm<SingleCreateValues>();
   const [rangeForm] = Form.useForm<RangeCreateValues>();
@@ -229,11 +200,11 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
   );
 
   const singleMovieId = Form.useWatch('movieId', singleForm) || movieId;
-  const singleRoomId = Form.useWatch('roomId', singleForm);
+  const singleRoomIds = Form.useWatch('roomIds', singleForm);
   const singleDate = Form.useWatch('date', singleForm);
 
   const rangeMovieId = Form.useWatch('movieId', rangeForm) || movieId;
-  const rangeRoomId = Form.useWatch('roomId', rangeForm);
+  const rangeRoomIds = Form.useWatch('roomIds', rangeForm);
   const rangeStartDate = Form.useWatch('startDate', rangeForm);
   const rangeEndDate = Form.useWatch('endDate', rangeForm);
 
@@ -265,32 +236,71 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     return Array.from(cinemaMap.values()).sort((a, b) => a.label.localeCompare(b.label));
   }, [rooms, showtimes]);
 
-  const roomOptions = useMemo<RoomOption[]>(
-    () =>
-      rooms.map((room) => {
-        const { cinemaId, cinemaName } = getCinemaInfo(room);
-        return {
-          value: room._id || '',
-          label: `${cinemaName} - ${room.ten_phong}`,
-          cinemaId,
-        };
-      }),
-    [rooms],
-  );
+  const roomTreeSelectData = useMemo(() => {
+    const cinemaMap = new Map<
+      string,
+      {
+        title: string;
+        value: string;
+        children: { title: string; value: string }[];
+      }
+    >();
 
-  const filteredRoomOptions = useMemo(() => {
-    if (!selectedCinemaFilter) return roomOptions;
-    return roomOptions.filter((room) => room.cinemaId === selectedCinemaFilter);
-  }, [roomOptions, selectedCinemaFilter]);
+    rooms.forEach((room) => {
+      const { cinemaId, cinemaName } = getCinemaInfo(room);
+      if (!cinemaId) return;
+
+      if (!cinemaMap.has(cinemaId)) {
+        cinemaMap.set(cinemaId, {
+          title: cinemaName,
+          value: cinemaId,
+          children: [],
+        });
+      }
+
+      cinemaMap.get(cinemaId)?.children.push({
+        title: room.ten_phong,
+        value: room._id || '',
+      });
+    });
+
+    return Array.from(cinemaMap.values());
+  }, [rooms]);
 
   const movieOptions = useMemo(
     () =>
-      movieList.map((item) => ({
-        label: item.ten_phim,
-        value: item._id || '',
-      })),
+      movieList
+        .filter((movie) => movie.trang_thai === 'dang_chieu')
+        .map((item) => ({
+          label: item.ten_phim,
+          value: item._id || '',
+        })),
     [movieList],
   );
+
+  const showtimeStats = useMemo(() => calculateShowtimeStats(showtimes), [showtimes]);
+  const roomTreeData = useMemo(() => {
+    const cinemaMap = new Map<
+      string,
+      { title: string; value: string; children: { title: string; value: string }[] }
+    >();
+
+    rooms.forEach((room) => {
+      const { cinemaId, cinemaName } = getCinemaInfo(room);
+      if (!cinemaId) return;
+      if (selectedCinemaFilter && cinemaId !== selectedCinemaFilter) return;
+
+      if (!cinemaMap.has(cinemaId)) {
+        cinemaMap.set(cinemaId, { title: cinemaName, value: cinemaId, children: [] });
+      }
+      cinemaMap.get(cinemaId)?.children.push({
+        title: room.ten_phong,
+        value: room._id || '',
+      });
+    });
+
+    return Array.from(cinemaMap.values()).sort((a, b) => a.title.localeCompare(b.title));
+  }, [rooms, selectedCinemaFilter]);
 
   const filteredShowtimes = useMemo(() => {
     return showtimes.filter((showtime) => {
@@ -302,7 +312,8 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       if (movieId && currentMovieId !== movieId) return false;
       if (selectedMovieFilter && currentMovieId !== selectedMovieFilter) return false;
       if (selectedCinemaFilter && cinemaId !== selectedCinemaFilter) return false;
-      if (selectedRoomFilter && currentRoomId !== selectedRoomFilter) return false;
+      if (selectedRoomFilter?.length && !selectedRoomFilter.includes(currentRoomId || ''))
+        return false;
       if (selectedDateFilter && !dayjs(showtime.startTime).isSame(selectedDateFilter, 'day'))
         return false;
       return true;
@@ -318,12 +329,14 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
   ]);
 
   const existingSingleDayShowtimes = useMemo(() => {
-    if (!singleRoomId || !singleDate) return [] as AdminShowtimeRow[];
+    if (!singleRoomIds?.length || !singleDate) return [];
+
     return showtimes.filter(
       (showtime) =>
-        getRoomId(showtime) === singleRoomId && dayjs(showtime.startTime).isSame(singleDate, 'day'),
+        singleRoomIds.includes(getRoomId(showtime) || '') &&
+        dayjs(showtime.startTime).isSame(singleDate, 'day'),
     );
-  }, [showtimes, singleDate, singleRoomId]);
+  }, [showtimes, singleDate, singleRoomIds]);
 
   const singleSlotOptions = useMemo(
     () => buildSequentialSlotOptions(singleDate, durationMinutes, existingSingleDayShowtimes),
@@ -363,14 +376,24 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     return date.isBefore(start) || date.isAfter(end);
   };
 
+  // Tạo nhiều suất chiếu (loop API)
+  // - Thành công bao nhiêu -> báo
+  // - Fail bao nhiêu -> báo
+  // - Có invalidate cache
+
   const handleCreateMany = async (payloads: ICreateShowTimePl[], successMessage: string) => {
     if (!payloads.length) {
-      message.warning('CHưa có suất chiếu nào để tạo.');
+      setCreateSummary({
+        type: 'warning',
+        title: 'Chưa có suất chiếu nào để tạo.',
+      });
       return;
     }
 
-    const key = 'showtime-batch';
-    message.loading({ content: 'Dang tao suat chieu...', key, duration: 0 });
+    setCreateSummary({
+      type: 'info',
+      title: 'Đang tạo suất chiếu...',
+    });
 
     let successCount = 0;
     let failedCount = 0;
@@ -389,44 +412,62 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     await queryClient.invalidateQueries({ queryKey: ['movies'] });
 
     if (failedCount === 0) {
-      message.success({ content: `${successMessage}: ${successCount} suất`, key });
-      return;
-    }
-
-    if (successCount === 0) {
-      message.error({
-        content: 'Không tạo được suất chiếu nào. Kiểm tra trùng lịch, phòng hoặc khoảng ngày.',
-        key,
+      setCreateSummary({
+        type: 'success',
+        title: `${successMessage}: ${successCount} suất`,
       });
       return;
     }
 
-    message.warning({
-      content: `Đã tạo ${successCount} suất, ${failedCount} suất bị bỏ qua do trùng lịch hoặc không hợp lệ.`,
-      key,
+    if (successCount === 0) {
+      setCreateSummary({
+        type: 'error',
+        title: 'Không tạo được suất chiếu nào.',
+        detail: 'Kiểm tra trùng lịch, phòng hoặc khoảng ngày.',
+      });
+      return;
+    }
+
+    setCreateSummary({
+      type: 'warning',
+      title: `Đã tạo ${successCount} suất, ${failedCount} suất không tạo được.`,
+      detail: 'Một số suất bị bỏ qua do trùng lịch hoặc không hợp lệ.',
     });
   };
 
   const handleSingleSubmit = async (values: SingleCreateValues) => {
     const activeMovieId = values.movieId || movieId;
     if (!activeMovieId) {
-      message.error('Vui lòng chọn phim trước khi tạo suất chiếu.');
+      setCreateSummary({
+        type: 'error',
+        title: 'Vui lòng chọn phim trước khi tạo suất chiếu.',
+      });
+      return;
+    }
+    const activeMovie = getMovieOption(activeMovieId, movieList, fixedMovieOption);
+    if (activeMovie?.trang_thai !== 'dang_chieu') {
+      setCreateSummary({
+        type: 'error',
+        title: 'Chỉ được tạo suất cho phim đang chiếu.',
+      });
       return;
     }
 
     setSubmittingMode('single');
 
     try {
-      const payloads = values.timeSlots.map((timeValue) =>
-        createPayload(
-          activeMovieId,
-          values.roomId,
-          values.date,
-          timeValue,
-          durationMinutes,
-          values.priceNormal,
-          values.priceVip,
-          values.priceCouple,
+      const payloads = values.roomIds.flatMap((roomId) =>
+        values.timeSlots.map((timeValue) =>
+          createPayload(
+            activeMovieId,
+            roomId,
+            values.date,
+            timeValue,
+            durationMinutes,
+            values.priceNormal,
+            values.priceVip,
+            values.priceCouple,
+          ),
         ),
       );
 
@@ -441,24 +482,37 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
   const handleRangeSubmit = async (values: RangeCreateValues) => {
     const activeMovieId = values.movieId || movieId;
     if (!activeMovieId) {
-      message.error('Vui lòng chọn phim trước khi tạo theo khoảng ngày.');
+      setCreateSummary({
+        type: 'error',
+        title: 'Vui lòng chọn phim trước khi tạo theo khoảng ngày.',
+      });
+      return;
+    }
+    const activeMovie = getMovieOption(activeMovieId, movieList, fixedMovieOption);
+    if (activeMovie?.trang_thai !== 'dang_chieu') {
+      setCreateSummary({
+        type: 'error',
+        title: 'Chỉ được tạo suất cho phim đang chiếu.',
+      });
       return;
     }
 
     setSubmittingMode('range');
 
     try {
-      const payloads = rangePreviewDates.flatMap((dateItem) =>
-        values.timeSlots.map((timeValue) =>
-          createPayload(
-            activeMovieId,
-            values.roomId,
-            dateItem,
-            timeValue,
-            durationMinutes,
-            values.priceNormal,
-            values.priceVip,
-            values.priceCouple,
+      const payloads = values.roomIds.flatMap((roomId) =>
+        rangePreviewDates.flatMap((dateItem) =>
+          values.timeSlots.map((timeValue) =>
+            createPayload(
+              activeMovieId,
+              roomId,
+              dateItem,
+              timeValue,
+              durationMinutes,
+              values.priceNormal,
+              values.priceVip,
+              values.priceCouple,
+            ),
           ),
         ),
       );
@@ -607,26 +661,64 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
   return (
     <div className="space-y-4">
-      <Card
-        title={
-          <div className="flex flex-col gap-1">
-            <span className="flex items-center gap-2 text-xl font-bold">
-              <PlayCircleOutlined className="text-blue-500" />
-              Quản lý suất chiếu
-            </span>
-            {/* <span className="text-sm text-slate-500">
-        {movieId && fixedMovie
-          ? `Đang xem suất chiếu của phim: ${fixedMovie.ten_phim}`
-          : 'Quản lý tất cả suất chiếu từ admin.'}
-      </span> */}
+      <div className="mb-4 flex justify-between">
+        <span className="flex items-center gap-2 text-xl font-bold">
+          <PlayCircleOutlined className="text-blue-500" />
+          Quản lý suất chiếu
+        </span>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
+          Tạo suất chiếu
+        </Button>
+      </div>
+      {createSummary && (
+        <Alert
+          type={createSummary.type}
+          showIcon
+          message={createSummary.title}
+          description={createSummary.detail}
+          closable
+          onClose={() => setCreateSummary(null)}
+        />
+      )}
+      <div className="my-3 grid grid-cols-4 gap-4">
+        <Card>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-slate-600">
+              <CalendarOutlined className="text-blue-500" />
+              <span>Tổng suất chiếu (Năm)</span>
+            </div>
+            <div className="text-2xl font-semibold">{showtimeStats.totalYear}</div>
           </div>
-        }
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
-            Tạo suất chiếu
-          </Button>
-        }
-      >
+        </Card>
+        <Card>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-slate-600">
+              <CalendarOutlined className="text-purple-500" />
+              <span>Tổng suất chiếu (Tháng)</span>
+            </div>
+            <div className="text-2xl font-semibold">{showtimeStats.totalMonth}</div>
+          </div>
+        </Card>
+        <Card>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-slate-600">
+              <PlayCircleOutlined className="text-emerald-500" />
+              <span>Suất chiếu Hôm nay</span>
+            </div>
+            <div className="text-2xl font-semibold">{showtimeStats.today}</div>
+          </div>
+        </Card>
+        <Card>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-slate-600">
+              <CheckCircleOutlined className="text-rose-500" />
+              <span>Suất chiếu đã hết vé</span>
+            </div>
+            <div className="text-2xl font-semibold">{showtimeStats.soldOut}</div>
+          </div>
+        </Card>
+      </div>
+      <Card>
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-5">
           {!movieId && (
             <Select
@@ -651,12 +743,16 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
             suffixIcon={<HomeOutlined className="text-slate-400" />}
           />
 
-          <Select
+          <TreeSelect
             allowClear
             placeholder="Lọc theo phòng"
-            options={filteredRoomOptions}
             value={selectedRoomFilter}
-            onChange={(value) => setSelectedRoomFilter(value)}
+            onChange={(value) =>
+              setSelectedRoomFilter((value as string[])?.length ? (value as string[]) : undefined)
+            }
+            treeData={roomTreeData}
+            treeCheckable
+            showCheckedStrategy={TreeSelect.SHOW_PARENT}
             suffixIcon={<FilterOutlined className="text-slate-400" />}
           />
 
@@ -737,15 +833,19 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                     )}
 
                     <Form.Item
-                      name="roomId"
+                      name="roomIds"
                       label="Phòng chiếu"
                       rules={[{ required: true, message: 'Chọn phòng chiếu' }]}
                     >
-                      <Select
+                      <TreeSelect
+                        treeData={roomTreeSelectData}
                         placeholder="Chọn phòng"
-                        options={roomOptions}
-                        showSearch
-                        optionFilterProp="label"
+                        treeCheckable
+                        showCheckedStrategy={TreeSelect.SHOW_CHILD}
+                        multiple
+                        treeDefaultExpandAll
+                        maxTagCount="responsive"
+                        style={{ width: '100%' }}
                       />
                     </Form.Item>
 
@@ -771,7 +871,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                         mode="multiple"
                         placeholder="Chọn một hoặc nhiều ca chiếu"
                         options={singleSlotOptions}
-                        disabled={!singleDate || !singleRoomId || !singleMovieId}
+                        disabled={!singleDate || !singleRoomIds?.length || !singleMovieId}
                       />
                     </Form.Item>
 
@@ -807,7 +907,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                     message={`1 ca chiếu = ${durationMinutes} phút phim + ${CLEANING_MINUTES} phút dọn dẹp.`}
                   />
 
-                  {singleDate && singleRoomId && (
+                  {singleDate && singleRoomIds?.length && (
                     <Card size="small" className="mb-4 bg-slate-50">
                       <Typography.Text strong>
                         <span className="flex items-center gap-2">
@@ -873,15 +973,18 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                     )}
 
                     <Form.Item
-                      name="roomId"
+                      name="roomIds"
                       label="Phòng chiếu"
                       rules={[{ required: true, message: 'Chọn phòng chiếu' }]}
                     >
-                      <Select
+                      <TreeSelect
+                        treeData={roomTreeSelectData}
+                        treeCheckable
+                        multiple
+                        showCheckedStrategy={TreeSelect.SHOW_CHILD}
                         placeholder="Chọn phòng"
-                        options={roomOptions}
-                        showSearch
-                        optionFilterProp="label"
+                        treeDefaultExpandAll
+                        maxTagCount="responsive"
                       />
                     </Form.Item>
 
@@ -933,7 +1036,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                         mode="multiple"
                         placeholder="Chọn các ca chiếu"
                         options={rangeSlotOptions}
-                        disabled={!rangeStartDate || !rangeRoomId || !rangeMovieId}
+                        disabled={!rangeStartDate || !rangeRoomIds?.length || !rangeMovieId}
                       />
                     </Form.Item>
 

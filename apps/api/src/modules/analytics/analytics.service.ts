@@ -44,9 +44,7 @@ export const analyticsService = {
       theaterName: { $exists: true, $ne: "" },
     });
 
-    return theaters
-      .filter(Boolean)
-      .sort((a, b) => String(a).localeCompare(String(b)));
+    return theaters.filter(Boolean).sort();
   },
 
   async getStatusOptions() {
@@ -54,19 +52,15 @@ export const analyticsService = {
       status: { $exists: true, $ne: "" },
     });
 
-    return statuses
-      .filter(Boolean)
-      .sort((a, b) => String(a).localeCompare(String(b)));
+    return statuses.filter(Boolean).sort();
   },
 
   async getOverview(query: AnalyticsQuery = {}) {
     const baseMatch = buildBookingMatch(query);
 
-    const paidOnlyMatch = {
-      ...buildBookingMatch({
-        ...query,
-        status: "paid",
-      }),
+    const paidMatch = {
+      ...baseMatch,
+      status: "paid",
     };
 
     const [
@@ -84,7 +78,9 @@ export const analyticsService = {
       Movie.countDocuments(),
       User.countDocuments(),
       ShowTimeM.countDocuments(),
-      Booking.find(paidOnlyMatch).select("finalAmount seatCodes"),
+
+      Booking.find(paidMatch).select("finalAmount seatCodes"),
+
       Booking.aggregate([
         { $match: baseMatch },
         {
@@ -93,10 +89,10 @@ export const analyticsService = {
             count: { $sum: 1 },
           },
         },
-        { $sort: { count: -1 } },
       ]),
+
       Booking.aggregate([
-        { $match: paidOnlyMatch },
+        { $match: paidMatch },
         {
           $group: {
             _id: {
@@ -104,79 +100,60 @@ export const analyticsService = {
               month: { $month: "$createdAt" },
             },
             revenue: { $sum: "$finalAmount" },
-            bookings: { $sum: 1 },
-            tickets: {
-              $sum: { $size: { $ifNull: ["$seatCodes", []] } },
-            },
           },
         },
         {
           $project: {
-            _id: 0,
             label: {
               $concat: [
                 { $toString: "$_id.month" },
                 "/",
                 { $toString: "$_id.year" },
-],
+              ],
             },
-            year: "$_id.year",
-            month: "$_id.month",
             revenue: 1,
-            bookings: 1,
-            tickets: 1,
           },
         },
-        { $sort: { year: 1, month: 1 } },
       ]),
+
       Booking.aggregate([
-        { $match: paidOnlyMatch },
+        { $match: paidMatch },
         {
           $group: {
             _id: "$movieName",
-            revenue: { $sum: "$finalAmount" },
-            bookings: { $sum: 1 },
-            ticketsSold: {
-              $sum: { $size: { $ifNull: ["$seatCodes", []] } },
-            },
+            ticketsSold: { $sum: { $size: "$seatCodes" } },
           },
         },
+        { $sort: { ticketsSold: -1 } },
+        { $limit: 5 },
         {
           $project: {
-            _id: 0,
             movieName: "$_id",
-            revenue: 1,
-            bookings: 1,
             ticketsSold: 1,
+            _id: 0,
           },
         },
-        { $sort: { ticketsSold: -1, revenue: -1 } },
-        { $limit: 5 },
       ]),
+
       Booking.aggregate([
-        { $match: paidOnlyMatch },
+        { $match: paidMatch },
         {
           $group: {
             _id: "$theaterName",
             revenue: { $sum: "$finalAmount" },
-            bookings: { $sum: 1 },
-            ticketsSold: {
-              $sum: { $size: { $ifNull: ["$seatCodes", []] } },
-            },
           },
         },
+        { $sort: { revenue: -1 } },
+        { $limit: 5 },
         {
           $project: {
-            _id: 0,
-            theaterName: { $ifNull: ["$_id", "Không xác định"] },
+            theaterName: "$_id",
             revenue: 1,
-            bookings: 1,
-            ticketsSold: 1,
+            _id: 0,
           },
         },
-        { $sort: { revenue: -1, ticketsSold: -1 } },
-        { $limit: 5 },
       ]),
+
       this.getTheaterOptions(),
       this.getStatusOptions(),
     ]);
@@ -186,23 +163,10 @@ export const analyticsService = {
       0,
     );
 
-    const totalPaidBookings = paidBookings.length;
-
     const totalTicketsSold = paidBookings.reduce(
       (sum, item) => sum + (item.seatCodes?.length || 0),
       0,
     );
-
-    const bookingStatus = bookingStatusRaw.map((item) => ({
-      status: item._id || "unknown",
-      count: item.count,
-    }));
-
-    const averageRevenuePerBooking =
-      totalPaidBookings > 0 ? totalRevenue / totalPaidBookings : 0;
-
-    const averageTicketsPerBooking =
-      totalPaidBookings > 0 ? totalTicketsSold / totalPaidBookings : 0;
 
     return {
       filters: {
@@ -211,17 +175,14 @@ export const analyticsService = {
       },
       summary: {
         totalRevenue,
-        totalPaidBookings,
         totalTicketsSold,
         totalMovies,
         totalUsers,
         totalShowtimes,
-        averageRevenuePerBooking,
-        averageTicketsPerBooking,
       },
       charts: {
         revenueTrend: revenueTrendRaw,
-        bookingStatus,
+        bookingStatus: bookingStatusRaw,
         topMovies: topMoviesRaw,
         topTheaters: topTheatersRaw,
       },

@@ -4,7 +4,7 @@ import type { ICreateMovie, IMovie, IUpdateMovie } from '@shared/src/schemas';
 import { message } from 'antd';
 import { API } from '@web/api/api.service';
 
-type MovieWithShowtimeCount = IMovie & { showtimeCount?: number };
+type MovieWithShowtimeCount = IMovie & { showtimeCount?: number; ticketsSold?: number };
 
 export const useMovies = () => {
   const queryClient = useQueryClient();
