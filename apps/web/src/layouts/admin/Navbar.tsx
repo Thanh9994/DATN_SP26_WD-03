@@ -50,6 +50,38 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
           icon: <BarChart3 size={18} />,
           label: 'Analytics',
           onClick: () => navigate('/admin/analytics'),
+          children: [
+            {
+              key: 'dashboard',
+              icon: <LayoutDashboard size={18} />,
+              label: 'Dashboard',
+              onClick: () => navigate('/admin'),
+            },
+            {
+              key: 'dashboard',
+              icon: <LayoutDashboard size={18} />,
+              label: 'Dashboard',
+              onClick: () => navigate('/admin'),
+            },
+            {
+              key: 'dashboard',
+              icon: <LayoutDashboard size={18} />,
+              label: 'Dashboard',
+              onClick: () => navigate('/admin'),
+            },
+            {
+              key: 'dashboard',
+              icon: <LayoutDashboard size={18} />,
+              label: 'Dashboard',
+              onClick: () => navigate('/admin'),
+            },
+            {
+              key: 'dashboard',
+              icon: <LayoutDashboard size={18} />,
+              label: 'Dashboard',
+              onClick: () => navigate('/admin'),
+            },
+          ],
         },
       ],
     },
