@@ -1,13 +1,13 @@
 import { catchAsync } from "@api/utils/catchAsync";
 import { analyticsService } from "./analytics.service";
 
-
 export const analyticsController = {
   getOverview: catchAsync(async (req, res) => {
     const data = await analyticsService.getOverview({
       fromDate: req.query.fromDate as string | undefined,
       toDate: req.query.toDate as string | undefined,
       theaterName: req.query.theaterName as string | undefined,
+      status: req.query.status as string | undefined,
     });
 
     res.status(200).json({
