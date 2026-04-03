@@ -24,6 +24,7 @@ export const AdminRoutes: RouteObject = {
       element: <AdminLayouts />,
       children: [
         { index: true, element: <Dashboard /> },
+        { path: "analytics", element: <Analytics /> },
         { path: "movies", element: <Movie /> },
         { path: "genres", element: <Genre /> },
         { path: "media", element: <Upload /> },
