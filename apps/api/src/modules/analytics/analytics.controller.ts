@@ -1,73 +1,29 @@
-import { Request, Response } from 'express';
-import { getTopMovies, getBusyDays } from './analytics.service';
+import { catchAsync } from "@api/utils/catchAsync";
+import { analyticsService } from "./analytics.service";
 
-export const topMoviesController = async (req: Request, res: Response) => {
-  try {
-    const { startDate, endDate, limit = '10' } = req.query;
+export const analyticsController = {
+  getOverview: catchAsync(async (req, res) => {
+    const data = await analyticsService.getOverview({
+      fromDate: req.query.fromDate as string | undefined,
+      toDate: req.query.toDate as string | undefined,
+      theaterName: req.query.theaterName as string | undefined,
+      status: req.query.status as string | undefined,
+    });
 
-    if (!startDate || !endDate) {
-      return res.status(400).json({
-        success: false,
-        message: 'Vui lòng cung cấp startDate và endDate (YYYY-MM-DD)'
-      });
-    }
-
-    const data = await getTopMovies(
-      startDate as string,
-      endDate as string,
-      parseInt(limit as string)
-    );
-
-    res.set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
-    }).json({
+    res.status(200).json({
       success: true,
+      message: "Lấy dữ liệu analytics thành công",
       data,
-      isMock: false,
-      count: data.length
     });
-  } catch (error: any) {
-    console.error('Top movies error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Lỗi server khi lấy top phim'
-    });
-  }
-};
+  }),
 
-export const busyDaysController = async (req: Request, res: Response) => {
-  try {
-    const { startDate, endDate, limit = '10' } = req.query;
+  getTheaterOptions: catchAsync(async (_req, res) => {
+    const data = await analyticsService.getTheaterOptions();
 
-    if (!startDate || !endDate) {
-      return res.status(400).json({
-        success: false,
-        message: 'Vui lòng cung cấp startDate và endDate'
-      });
-    }
-
-    const data = await getBusyDays(
-      startDate as string,
-      endDate as string,
-      parseInt(limit as string)
-    );
-
-    res.set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
-    }).json({
+    res.status(200).json({
       success: true,
+      message: "Lấy danh sách rạp thành công",
       data,
-      isMock: false
     });
-  } catch (error: any) {
-    console.error('Busy days error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Lỗi server khi lấy ngày đông khách'
-    });
-  }
+  }),
 };
