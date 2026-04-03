@@ -4,6 +4,7 @@ import axios from "axios";
 export type AnalyticsResponse = {
   filters: {
     theaters: string[];
+    statuses: string[];
   };
   summary: {
     totalRevenue: number;
@@ -39,6 +40,7 @@ export type UseAnalyticsParams = {
   fromDate?: string;
   toDate?: string;
   theaterName?: string;
+  status?: string;
 };
 
 const API_BASE_URL = "http://localhost:5000";
@@ -53,6 +55,7 @@ export const useAnalytics = (params: UseAnalyticsParams) => {
           fromDate: params?.fromDate,
           toDate: params?.toDate,
           theaterName: params?.theaterName || "all",
+          status: params?.status || "all",
         },
       });
 

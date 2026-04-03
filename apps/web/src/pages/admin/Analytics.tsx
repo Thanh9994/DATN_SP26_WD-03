@@ -13,6 +13,8 @@ import {
   Divider,
   Spin,
   Alert,
+  Space,
+  Empty,
 } from "antd";
 import {
   AreaChart,
@@ -36,39 +38,45 @@ const { RangePicker } = DatePicker;
 
 const COLORS = ["#1677ff", "#52c41a", "#faad14", "#ff4d4f", "#722ed1"];
 
+type FilterState = {
+  range: [Dayjs | null, Dayjs | null] | null;
+  theaterName: string;
+};
+
+const DEFAULT_FILTERS: FilterState = {
+  range: [dayjs().startOf("month"), dayjs().endOf("month")],
+  theaterName: "all",
+};
+
+const formatCurrency = (value: number) =>
+  `${(value ?? 0).toLocaleString("vi-VN")} đ`;
+
+const formatNumber = (value: number) =>
+  (value ?? 0).toLocaleString("vi-VN");
+
 function Analytics() {
-  const [range, setRange] = useState<[Dayjs | null, Dayjs | null] | null>([
-    dayjs().startOf("month"),
-    dayjs().endOf("month"),
-  ]);
-  const [theaterName, setTheaterName] = useState<string>("all");
-  const [submittedRange, setSubmittedRange] = useState<
-    [Dayjs | null, Dayjs | null] | null
-  >([dayjs().startOf("month"), dayjs().endOf("month")]);
+  const [draftFilters, setDraftFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [appliedFilters, setAppliedFilters] =
+    useState<FilterState>(DEFAULT_FILTERS);
 
-  const fromDate = submittedRange?.[0]?.format("YYYY-MM-DD");
-  const toDate = submittedRange?.[1]?.format("YYYY-MM-DD");
+  const fromDate = appliedFilters.range?.[0]?.format("YYYY-MM-DD");
+  const toDate = appliedFilters.range?.[1]?.format("YYYY-MM-DD");
 
-  const { data, isLoading, error, refetch, isFetching } = useAnalytics({
+  const { data, isLoading, error, isFetching } = useAnalytics({
     fromDate,
     toDate,
-    theaterName,
+    theaterName: appliedFilters.theaterName,
   });
 
-  const revenueData = useMemo(() => {
-    return data?.charts?.revenueTrend || [];
-  }, [data]);
-
-  const topMoviesData = useMemo(() => {
-    return data?.charts?.topMovies || [];
-  }, [data]);
-
-  const bookingStatusData = useMemo(() => {
-    return data?.charts?.bookingStatus || [];
-  }, [data]);
+  const revenueData = useMemo(() => data?.charts?.revenueTrend ?? [], [data]);
+  const topMoviesData = useMemo(() => data?.charts?.topMovies ?? [], [data]);
+  const bookingStatusData = useMemo(
+    () => data?.charts?.bookingStatus ?? [],
+    [data],
+  );
 
   const theaterOptions = useMemo(() => {
-    const theaters = data?.filters?.theaters || [];
+    const theaters = data?.filters?.theaters ?? [];
     return [
       { label: "Tất cả rạp", value: "all" },
       ...theaters.map((theater) => ({
@@ -78,10 +86,62 @@ function Analytics() {
     ];
   }, [data]);
 
+  const summaryCards = useMemo(
+    () => [
+      {
+        title: "Tổng doanh thu",
+        value: formatCurrency(data?.summary?.totalRevenue ?? 0),
+      },
+      {
+        title: "Tổng vé đã bán",
+        value: formatNumber(data?.summary?.totalTicketsSold ?? 0),
+      },
+      {
+        title: "Tổng suất chiếu",
+        value: formatNumber(data?.summary?.totalShowtimes ?? 0),
+      },
+      {
+        title: "Tổng phim",
+        value: formatNumber(data?.summary?.totalMovies ?? 0),
+      },
+      {
+        title: "Tổng người dùng",
+        value: formatNumber(data?.summary?.totalUsers ?? 0),
+      },
+      {
+        title: "Tổng booking paid",
+        value: formatNumber(data?.summary?.totalPaidBookings ?? 0),
+      },
+    ],
+    [data],
+  );
+
   const handleApplyFilter = () => {
-    setSubmittedRange(range);
-    refetch();
+    setAppliedFilters(draftFilters);
   };
+
+  const handleResetFilter = () => {
+    const nextFilters: FilterState = {
+      range: [dayjs().startOf("month"), dayjs().endOf("month")],
+      theaterName: "all",
+    };
+
+    setDraftFilters(nextFilters);
+    setAppliedFilters(nextFilters);
+  };
+
+  const renderNoData = (description: string) => (
+    <div
+      style={{
+        height: 320,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Empty description={description} />
+    </div>
+  );
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#f5f5f5" }}>
@@ -99,13 +159,16 @@ function Analytics() {
 
       <Content style={{ padding: 24 }}>
         <Card style={{ marginBottom: 24 }}>
-          <Row gutter={[16, 16]}>
+          <Row gutter={[16, 16]} align="middle">
             <Col xs={24} md={10}>
               <RangePicker
                 style={{ width: "100%" }}
-                value={range}
+                value={draftFilters.range}
                 onChange={(dates) =>
-                  setRange(dates as [Dayjs | null, Dayjs | null] | null)
+                  setDraftFilters((prev) => ({
+                    ...prev,
+                    range: dates as [Dayjs | null, Dayjs | null] | null,
+                  }))
                 }
               />
             </Col>
@@ -113,21 +176,32 @@ function Analytics() {
             <Col xs={24} md={8}>
               <Select
                 style={{ width: "100%" }}
-                value={theaterName}
-                onChange={setTheaterName}
+                value={draftFilters.theaterName}
+                onChange={(value) =>
+                  setDraftFilters((prev) => ({
+                    ...prev,
+                    theaterName: value,
+                  }))
+                }
                 options={theaterOptions}
               />
             </Col>
 
             <Col xs={24} md={6}>
-              <Button
-                type="primary"
-                block
-                onClick={handleApplyFilter}
-                loading={isFetching}
-              >
-                Lọc dữ liệu
-              </Button>
+              <Space style={{ width: "100%", display: "flex" }}>
+                <Button
+                  type="primary"
+                  block
+                  onClick={handleApplyFilter}
+                  loading={isFetching}
+                >
+                  Lọc dữ liệu
+                </Button>
+
+                <Button block onClick={handleResetFilter}>
+                  Đặt lại
+                </Button>
+              </Space>
             </Col>
           </Row>
         </Card>
@@ -148,59 +222,16 @@ function Analytics() {
         ) : (
           <>
             <Row gutter={[16, 16]}>
-              <Col xs={24} sm={12} lg={8}>
-                <Card>
-                  <Title level={5}>Tổng doanh thu</Title>
-                  <Text style={{ fontSize: 24, fontWeight: 700 }}>
-                    {(data?.summary?.totalRevenue ?? 0).toLocaleString("vi-VN")} đ
-                  </Text>
-                </Card>
-              </Col>
-
-              <Col xs={24} sm={12} lg={8}>
-                <Card>
-                  <Title level={5}>Tổng vé đã bán</Title>
-                  <Text style={{ fontSize: 24, fontWeight: 700 }}>
-                    {(data?.summary?.totalTicketsSold ?? 0).toLocaleString("vi-VN")}
-                  </Text>
-                </Card>
-              </Col>
-
-              <Col xs={24} sm={12} lg={8}>
-                <Card>
-                  <Title level={5}>Tổng suất chiếu</Title>
-                  <Text style={{ fontSize: 24, fontWeight: 700 }}>
-                    {(data?.summary?.totalShowtimes ?? 0).toLocaleString("vi-VN")}
-                  </Text>
-                </Card>
-              </Col>
-
-              <Col xs={24} sm={12} lg={8}>
-                <Card>
-                  <Title level={5}>Tổng phim</Title>
-                  <Text style={{ fontSize: 24, fontWeight: 700 }}>
-                    {(data?.summary?.totalMovies ?? 0).toLocaleString("vi-VN")}
-                  </Text>
-                </Card>
-              </Col>
-
-              <Col xs={24} sm={12} lg={8}>
-                <Card>
-                  <Title level={5}>Tổng người dùng</Title>
-                  <Text style={{ fontSize: 24, fontWeight: 700 }}>
-                    {(data?.summary?.totalUsers ?? 0).toLocaleString("vi-VN")}
-                  </Text>
-                </Card>
-              </Col>
-
-              <Col xs={24} sm={12} lg={8}>
-                <Card>
-                  <Title level={5}>Tổng booking paid</Title>
-                  <Text style={{ fontSize: 24, fontWeight: 700 }}>
-                    {(data?.summary?.totalPaidBookings ?? 0).toLocaleString("vi-VN")}
-                  </Text>
-                </Card>
-              </Col>
+              {summaryCards.map((item) => (
+                <Col xs={24} sm={12} lg={8} key={item.title}>
+                  <Card>
+                    <Title level={5}>{item.title}</Title>
+                    <Text style={{ fontSize: 24, fontWeight: 700 }}>
+                      {item.value}
+                    </Text>
+                  </Card>
+                </Col>
+              ))}
             </Row>
 
             <Divider />
@@ -208,48 +239,68 @@ function Analytics() {
             <Row gutter={[16, 16]}>
               <Col xs={24} lg={12}>
                 <Card title="Xu hướng doanh thu">
-                  <div style={{ width: "100%", height: 320 }}>
-                    <ResponsiveContainer>
-                      <AreaChart data={revenueData}>
-                        <XAxis dataKey="label" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Area
-                          type="monotone"
-                          dataKey="revenue"
-                          name="Doanh thu"
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
+                  {revenueData.length === 0 ? (
+                    renderNoData("Không có dữ liệu doanh thu")
+                  ) : (
+                    <div style={{ width: "100%", height: 320 }}>
+                      <ResponsiveContainer>
+                        <AreaChart data={revenueData}>
+                          <XAxis dataKey="label" />
+                          <YAxis />
+                          <Tooltip
+                            formatter={(value, name) => [
+                              String(name) === "Doanh thu"
+                                ? formatCurrency(Number(value ?? 0))
+                                : formatNumber(Number(value ?? 0)),
+                              String(name),
+                            ]}
+                          />
+                          <Legend />
+                          <Area
+                            type="monotone"
+                            dataKey="revenue"
+                            name="Doanh thu"
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
                 </Card>
               </Col>
 
               <Col xs={24} lg={12}>
                 <Card title="Trạng thái booking">
-                  <div style={{ width: "100%", height: 320 }}>
-                    <ResponsiveContainer>
-                      <PieChart>
-                        <Pie
-                          data={bookingStatusData}
-                          dataKey="count"
-                          nameKey="status"
-                          outerRadius={110}
-                          label
-                        >
-                          {bookingStatusData.map((_, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
+                  {bookingStatusData.length === 0 ? (
+                    renderNoData("Không có dữ liệu trạng thái booking")
+                  ) : (
+                    <div style={{ width: "100%", height: 320 }}>
+                      <ResponsiveContainer>
+                        <PieChart>
+                          <Pie
+                            data={bookingStatusData}
+                            dataKey="count"
+                            nameKey="status"
+                            outerRadius={110}
+                            label
+                          >
+                            {bookingStatusData.map((_, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={COLORS[index % COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            formatter={(value) => [
+                              formatNumber(Number(value ?? 0)),
+                              "Số lượng",
+                            ]}
+                          />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
                 </Card>
               </Col>
             </Row>
@@ -259,17 +310,26 @@ function Analytics() {
             <Row gutter={[16, 16]}>
               <Col xs={24}>
                 <Card title="Top phim bán chạy">
-                  <div style={{ width: "100%", height: 320 }}>
-                    <ResponsiveContainer>
-                      <BarChart data={topMoviesData}>
-                        <XAxis dataKey="movieName" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="ticketsSold" name="Vé đã bán" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+                  {topMoviesData.length === 0 ? (
+                    renderNoData("Không có dữ liệu top phim")
+                  ) : (
+                    <div style={{ width: "100%", height: 320 }}>
+                      <ResponsiveContainer>
+                        <BarChart data={topMoviesData}>
+                          <XAxis dataKey="movieName" />
+                          <YAxis />
+                          <Tooltip
+                            formatter={(value) => [
+                              formatNumber(Number(value ?? 0)),
+                              "Vé đã bán",
+                            ]}
+                          />
+                          <Legend />
+                          <Bar dataKey="ticketsSold" name="Vé đã bán" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
                 </Card>
               </Col>
             </Row>

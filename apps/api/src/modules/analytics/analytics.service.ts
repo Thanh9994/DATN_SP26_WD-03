@@ -7,10 +7,11 @@ type AnalyticsQuery = {
   fromDate?: string;
   toDate?: string;
   theaterName?: string;
+  status?: string;
 };
 
 const buildBookingMatch = (query: AnalyticsQuery = {}) => {
-  const { fromDate, toDate, theaterName } = query;
+  const { fromDate, toDate, theaterName, status } = query;
 
   const match: Record<string, any> = {};
 
@@ -30,6 +31,10 @@ const buildBookingMatch = (query: AnalyticsQuery = {}) => {
     match.theaterName = theaterName;
   }
 
+  if (status && status !== "all") {
+    match.status = status;
+  }
+
   return match;
 };
 
@@ -44,11 +49,24 @@ export const analyticsService = {
       .sort((a, b) => String(a).localeCompare(String(b)));
   },
 
+  async getStatusOptions() {
+    const statuses = await Booking.distinct("status", {
+      status: { $exists: true, $ne: "" },
+    });
+
+    return statuses
+      .filter(Boolean)
+      .sort((a, b) => String(a).localeCompare(String(b)));
+  },
+
   async getOverview(query: AnalyticsQuery = {}) {
     const baseMatch = buildBookingMatch(query);
-    const paidMatch = {
-      ...baseMatch,
-      status: "paid",
+
+    const paidOnlyMatch = {
+      ...buildBookingMatch({
+        ...query,
+        status: "paid",
+      }),
     };
 
     const [
@@ -60,11 +78,12 @@ export const analyticsService = {
       revenueTrendRaw,
       topMoviesRaw,
       theaters,
+      statuses,
     ] = await Promise.all([
       Movie.countDocuments(),
       User.countDocuments(),
       ShowTimeM.countDocuments(),
-      Booking.find(paidMatch).select("finalAmount seatCodes"),
+      Booking.find(paidOnlyMatch).select("finalAmount seatCodes"),
       Booking.aggregate([
         { $match: baseMatch },
         {
@@ -76,7 +95,7 @@ export const analyticsService = {
         { $sort: { count: -1 } },
       ]),
       Booking.aggregate([
-        { $match: paidMatch },
+        { $match: paidOnlyMatch },
         {
           $group: {
             _id: {
@@ -110,7 +129,7 @@ export const analyticsService = {
         { $sort: { year: 1, month: 1 } },
       ]),
       Booking.aggregate([
-        { $match: paidMatch },
+        { $match: paidOnlyMatch },
         {
           $group: {
             _id: "$movieName",
@@ -134,6 +153,7 @@ export const analyticsService = {
         { $limit: 5 },
       ]),
       this.getTheaterOptions(),
+      this.getStatusOptions(),
     ]);
 
     const totalRevenue = paidBookings.reduce(
@@ -156,6 +176,7 @@ export const analyticsService = {
     return {
       filters: {
         theaters,
+        statuses,
       },
       summary: {
         totalRevenue,
