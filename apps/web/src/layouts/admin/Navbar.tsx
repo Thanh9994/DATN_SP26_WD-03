@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   MonitorPlay,
   Users,
+  Ticket,
 } from 'lucide-react';
 
 type SidebarProps = {
@@ -32,7 +33,13 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
   const navigate = useNavigate();
   const location = useLocation();
 
-  const selectedKey = location.pathname.split('/')[2] || 'admin';
+  const pathname = location.pathname;
+
+  const selectedKey = pathname.startsWith('/admin/analytics/booking')
+    ? 'analytics-booking'
+    : pathname.startsWith('/admin/analytics')
+    ? 'analytics'
+    : location.pathname.split('/')[2] || 'admin';
 
   const items: MenuProps['items'] = [
     {
@@ -49,37 +56,18 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
           key: 'analytics',
           icon: <BarChart3 size={18} />,
           label: 'Analytics',
-          onClick: () => navigate('/admin/analytics'),
           children: [
             {
-              key: 'dashboard',
-              icon: <LayoutDashboard size={18} />,
-              label: 'Dashboard',
-              onClick: () => navigate('/admin'),
+              key: 'analytics-overview',
+              icon: <BarChart3 size={18} />,
+              label: 'Tổng quan analytics',
+              onClick: () => navigate('/admin/analytics'),
             },
             {
-              key: 'dashboard',
-              icon: <LayoutDashboard size={18} />,
-              label: 'Dashboard',
-              onClick: () => navigate('/admin'),
-            },
-            {
-              key: 'dashboard',
-              icon: <LayoutDashboard size={18} />,
-              label: 'Dashboard',
-              onClick: () => navigate('/admin'),
-            },
-            {
-              key: 'dashboard',
-              icon: <LayoutDashboard size={18} />,
-              label: 'Dashboard',
-              onClick: () => navigate('/admin'),
-            },
-            {
-              key: 'dashboard',
-              icon: <LayoutDashboard size={18} />,
-              label: 'Dashboard',
-              onClick: () => navigate('/admin'),
+              key: 'analytics-booking',
+              icon: <Ticket size={18} />,
+              label: 'Phân tích đặt vé',
+              onClick: () => navigate('/admin/analytics/booking'),
             },
           ],
         },
@@ -118,7 +106,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
     },
     {
       key: 'showtime',
-      icon: <CalendarPlus size={18}/>,
+      icon: <CalendarPlus size={18} />,
       label: 'Suất Chiếu',
       onClick: () => navigate('/admin/showtime'),
     },
@@ -151,7 +139,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       key: 'setting',
       icon: <SettingFilled />,
       label: 'Cài đặt',
-      onClick: () => navigate('/admim/setting'),
+      onClick: () => navigate('/admin/settings'),
     },
     {
       key: 'settings',
@@ -160,7 +148,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       onClick: () => navigate('/admin/settings'),
     },
     {
-      key:'chatbot',
+      key: 'chatbot',
       icon: <UserOutlined />,
       label: 'Chatbot',
       onClick: () => navigate('/admin/chatbot'),
@@ -186,7 +174,6 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       }}
     >
       <div className="flex h-full flex-col">
-        {/* HEADER */}
         <div
           className="mb-2 flex h-16 items-center gap-3 border-b px-6 text-lg font-bold"
           style={{ color: textColor }}
@@ -200,7 +187,6 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
           )}
         </div>
 
-        {/* MENU (SCROLLABLE) */}
         <div
           style={{
             flex: 1,
@@ -210,7 +196,6 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
           <Menu theme={themeMode} mode="inline" selectedKeys={[selectedKey]} items={items} />
         </div>
 
-        {/* FOOTER */}
         <div
           style={{
             padding: 16,

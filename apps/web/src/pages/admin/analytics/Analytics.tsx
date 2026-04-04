@@ -28,7 +28,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useAnalytics } from "../../hooks/useAnalytics";
+import { useAnalytics } from "../../../hooks/useAnalytics";
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
