@@ -11,10 +11,11 @@ import { Rooms } from '@web/pages/admin/cinema-catalog/Rooms';
 import Promotion from '@web/pages/admin/promotion/Promotion';
 import PromotionForm from '@web/pages/admin/promotion/PromotionForm';
 import { AdminLayouts } from '@web/layouts/AdminLayout';
-import Settings from "@web/pages/admin/Settings";
+import Settings from '@web/pages/admin/Settings';
 import Dashboard from '@web/pages/admin/Dashboard';
 import { ShowTime } from '@web/pages/admin/order/Showtime';
-import Analytics from '@web/pages/admin/Analytics';
+import Analytics from '@web/pages/admin/analytics/Analytics';
+import BookingAnalytics from '@web/pages/admin/analytics/BookingAnalytics';
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
@@ -24,17 +25,20 @@ export const AdminRoutes: RouteObject = {
       element: <AdminLayouts />,
       children: [
         { index: true, element: <Dashboard /> },
-        { path: "analytics", element: <Analytics /> },
-        { path: "movies", element: <Movie /> },
-        { path: "genres", element: <Genre /> },
-        { path: "media", element: <Upload /> },
-        { path: "users", element: <User /> },
-        { path: "cinemas", element: <Cinemas /> },
-        { path: "product", element: <Product /> },
-        { path: "rooms", element: <Rooms /> },
-        { path: "settings", element: <Settings /> },
-        { path: "showtime", element: <ShowTime /> },
-        {path: "analytics", element: <Analytics />},
+
+        { path: 'analytics', element: <Analytics /> },
+        { path: 'analytics/booking', element: <BookingAnalytics /> },
+
+        { path: 'movies', element: <Movie /> },
+        { path: 'genres', element: <Genre /> },
+        { path: 'media', element: <Upload /> },
+        { path: 'users', element: <User /> },
+        { path: 'cinemas', element: <Cinemas /> },
+        { path: 'product', element: <Product /> },
+        { path: 'rooms', element: <Rooms /> },
+        { path: 'settings', element: <Settings /> },
+        { path: 'showtime', element: <ShowTime /> },
+
         {
           path: 'promotions',
           children: [
