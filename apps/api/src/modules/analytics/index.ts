@@ -1,8 +1,12 @@
-import { Router } from "express";
-import analyticsTicketRoute from "./analytics-ticket/analyticsTicket.route";
+import { Router } from 'express';
+import analyticsOverviewRoute from './analytics-overview/analyticsOverview.route';
+import analyticsTicketRoute from './analytics-ticket/analyticsTicket.route';
+// import analyticsStaffRoute from './analytics-staff/staff.route';
 
-const analyticsRouter = Router();
+const router = Router();
 
-analyticsRouter.use("/ticket", analyticsTicketRoute);
+router.use('/overview', analyticsOverviewRoute);
+router.use('/ticket', analyticsTicketRoute);
+// router.use('/staff', analyticsStaffRoute);
 
-export default analyticsRouter;
+export default router;
