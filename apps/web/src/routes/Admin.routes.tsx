@@ -16,6 +16,7 @@ import Dashboard from '@web/pages/admin/Dashboard';
 import { ShowTime } from '@web/pages/admin/order/Showtime';
 import { Personnel } from '@web/pages/admin/access-control/Personnel';
 import Analytics from '@web/pages/admin/Analytics';
+import Ticketlog from '@web/pages/admin/analytics/analyticsTicket/Ticketlog';
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
@@ -44,6 +45,13 @@ export const AdminRoutes: RouteObject = {
             { path: 'edit/:id', element: <PromotionForm /> },
           ],
         },
+        {
+          path: "analytics",
+          children: [
+            { index: true, element: <Analytics /> }, 
+            { path: "ticket", element: <Ticketlog /> }, 
+          ]
+        }
       ],
     },
   ],

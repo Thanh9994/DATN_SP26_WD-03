@@ -49,7 +49,39 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
           key: 'analytics',
           icon: <BarChart3 size={18} />,
           label: 'Analytics',
-          onClick: () => navigate('/admin/analytics'),
+          children: [
+            {
+              key: 'analytics-overview',
+              icon: <LayoutDashboard size={18} />,
+              label: 'Tổng quan',
+              onClick: () => navigate('/admin/analytics'),
+            },
+            {
+              key: 'analytics-ticket',
+              icon: <BarChart3 size={18} />,
+              label: 'Phân tích vé',
+              onClick: () => navigate('/admin/analytics/ticket'),
+            },
+            // chuẩn bị scale sau này
+            {
+              key: 'analytics-revenue',
+              icon: <BarChart3 size={18} />,
+              label: 'Doanh thu',
+              onClick: () => navigate('/admin/analytics/revenue'),
+            },
+            {
+              key: 'analytics-cinema',
+              icon: <BarChart3 size={18} />,
+              label: 'Rạp chiếu',
+              onClick: () => navigate('/admin/analytics/cinema'),
+            },
+          ],
+        },
+        {
+          key: 'personnel',
+          icon: <Users size={18} />,
+          label: 'Nhân sự',
+          onClick: () => navigate('/admin/users'),
         },
         {
           key: 'personnel',
