@@ -156,76 +156,142 @@ class AnalyticsOverviewService {
   }
 
   private async getTopMovies(matchStage: MatchStage) {
-    const result = (await Booking.aggregate([
-      { $match: matchStage },
-      {
-        $project: {
-          movieName: { $ifNull: ['$movieName', 'Không xác định'] },
-          totalAmount: { $ifNull: ['$totalAmount', 0] },
-          ticketCount: {
-            $size: { $ifNull: ['$seatCodes', []] },
-          },
-        },
+  return Booking.aggregate([
+    { $match: matchStage },
+    {
+      $lookup: {
+        from: 'showtimes',
+        localField: 'showTimeId',
+        foreignField: '_id',
+        as: 'showTime',
       },
-      {
-        $group: {
-          _id: '$movieName',
-          revenue: { $sum: '$totalAmount' },
-          tickets: { $sum: '$ticketCount' },
-          bookings: { $sum: 1 },
-        },
+    },
+    {
+      $unwind: {
+        path: '$showTime',
+        preserveNullAndEmptyArrays: true,
       },
-      { $sort: { revenue: -1, tickets: -1 } },
-      { $limit: 5 },
-      {
-        $project: {
-          _id: 0,
-          movieName: '$_id',
-          revenue: 1,
-          tickets: 1,
-          bookings: 1,
-        },
+    },
+    {
+      $lookup: {
+        from: 'movies',
+        localField: 'showTime.movieId',
+        foreignField: '_id',
+        as: 'movie',
       },
-    ])) as TopMovieResult[];
+    },
+    {
+      $unwind: {
+        path: '$movie',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $project: {
+        movieName: {
+          $ifNull: ['$movie.name', { $ifNull: ['$movie.title', 'Không xác định'] }],
+        },
+        totalAmount: { $ifNull: ['$finalAmount', '$totalAmount'] },
+        ticketCount: { $size: { $ifNull: ['$seatCodes', []] } },
+      },
+    },
+    {
+      $group: {
+        _id: '$movieName',
+        revenue: { $sum: '$totalAmount' },
+        tickets: { $sum: '$ticketCount' },
+        bookings: { $sum: 1 },
+      },
+    },
+    { $sort: { revenue: -1, tickets: -1 } },
+    { $limit: 5 },
+    {
+      $project: {
+        _id: 0,
+        movieName: '$_id',
+        revenue: 1,
+        tickets: 1,
+        bookings: 1,
+      },
+    },
+  ]);
+}
 
-    return result;
-  }
-
-  private async getTopCinemas(matchStage: MatchStage) {
-    const result = (await Booking.aggregate([
-      { $match: matchStage },
-      {
-        $project: {
-          theaterName: { $ifNull: ['$theaterName', 'Không xác định'] },
-          totalAmount: { $ifNull: ['$totalAmount', 0] },
-          ticketCount: {
-            $size: { $ifNull: ['$seatCodes', []] },
-          },
-        },
+private async getTopCinemas(matchStage: MatchStage) {
+  return Booking.aggregate([
+    { $match: matchStage },
+    {
+      $lookup: {
+        from: 'showtimes',
+        localField: 'showTimeId',
+        foreignField: '_id',
+        as: 'showTime',
       },
-      {
-        $group: {
-          _id: '$theaterName',
-          revenue: { $sum: '$totalAmount' },
-          tickets: { $sum: '$ticketCount' },
-          bookings: { $sum: 1 },
-        },
+    },
+    {
+      $unwind: {
+        path: '$showTime',
+        preserveNullAndEmptyArrays: true,
       },
-      { $sort: { revenue: -1, tickets: -1 } },
-      { $limit: 5 },
-      {
-        $project: {
-          _id: 0,
-          theaterName: '$_id',
-          revenue: 1,
-          tickets: 1,
-          bookings: 1,
-        },
+    },
+    {
+      $lookup: {
+        from: 'rooms',
+        localField: 'showTime.roomId',
+        foreignField: '_id',
+        as: 'room',
       },
-    ])) as TopCinemaResult[];
-
-    return result;
-  }
+    },
+    {
+      $unwind: {
+        path: '$room',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'cinemas',
+        localField: 'room.cinemaId',
+        foreignField: '_id',
+        as: 'cinema',
+      },
+    },
+    {
+      $unwind: {
+        path: '$cinema',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $project: {
+        theaterName: {
+          $ifNull: ['$cinema.name', { $ifNull: ['$cinema.ten_rap', 'Không xác định'] }],
+        },
+        totalAmount: { $ifNull: ['$finalAmount', '$totalAmount'] },
+        ticketCount: { $size: { $ifNull: ['$seatCodes', []] } },
+      },
+    },
+    {
+      $group: {
+        _id: '$theaterName',
+        revenue: { $sum: '$totalAmount' },
+        tickets: { $sum: '$ticketCount' },
+        bookings: { $sum: 1 },
+      },
+    },
+    { $sort: { revenue: -1, tickets: -1 } },
+    { $limit: 5 },
+    {
+      $project: {
+        _id: 0,
+        theaterName: '$_id',
+        revenue: 1,
+        tickets: 1,
+        bookings: 1,
+      },
+    },
+  ]);
+}
 }
 
 export const analyticsOverviewService = new AnalyticsOverviewService();

@@ -87,15 +87,20 @@ export const useAnalyticsOverview = ({
       setLoading(true);
       setError(null);
 
-      const response = await axios.get('/analytics/overview', {
-        params: {
-          startDate,
-          endDate,
+      const response = await axios.get(
+        'http://localhost:5000/api/analytics/overview',
+        {
+          params: {
+            startDate,
+            endDate,
+          },
         },
-      });
+      );
 
+      console.log('Overview API response:', response.data);
       setData(response?.data?.data || defaultOverviewData);
     } catch (err: any) {
+      console.error('Overview API error:', err?.response || err);
       setError(
         err?.response?.data?.message || 'Không thể tải dữ liệu tổng quan',
       );
