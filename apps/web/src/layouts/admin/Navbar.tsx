@@ -54,7 +54,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
               key: 'analytics-overview',
               icon: <LayoutDashboard size={18} />,
               label: 'Tổng quan',
-              onClick: () => navigate('/admin/analytics'),
+              onClick: () => navigate('/admin/analytics/overview'),
             },
             {
               key: 'analytics-ticket',
