@@ -12,6 +12,33 @@ type MatchStage = {
   };
 };
 
+type SummaryResult = {
+  totalRevenue: number;
+  totalTickets: number;
+  totalBookings: number;
+};
+
+type RevenueByDateResult = {
+  _id: string;
+  revenue: number;
+  tickets: number;
+  bookings: number;
+};
+
+type TopMovieResult = {
+  movieName: string;
+  revenue: number;
+  tickets: number;
+  bookings: number;
+};
+
+type TopCinemaResult = {
+  theaterName: string;
+  revenue: number;
+  tickets: number;
+  bookings: number;
+};
+
 class AnalyticsOverviewService {
   async getOverview(query: OverviewQuery) {
     const matchStage = this.buildMatchStage(query);
@@ -45,7 +72,9 @@ class AnalyticsOverviewService {
       }
 
       if (endDate) {
-        matchStage.createdAt.$lte = new Date(endDate);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        matchStage.createdAt.$lte = end;
       }
     }
 
@@ -53,12 +82,14 @@ class AnalyticsOverviewService {
   }
 
   private async getSummary(matchStage: MatchStage) {
-    const result = await Booking.aggregate([
+    const result = (await Booking.aggregate([
       { $match: matchStage },
       {
         $project: {
           totalAmount: { $ifNull: ['$totalAmount', 0] },
-          ticketCount: { $size: { $ifNull: ['$seatCodes', []] } },
+          ticketCount: {
+            $size: { $ifNull: ['$seatCodes', []] },
+          },
         },
       },
       {
@@ -69,7 +100,7 @@ class AnalyticsOverviewService {
           totalBookings: { $sum: 1 },
         },
       },
-    ]);
+    ])) as SummaryResult[];
 
     const summary = result[0] || {
       totalRevenue: 0,
@@ -89,7 +120,7 @@ class AnalyticsOverviewService {
   }
 
   private async getRevenueByDate(matchStage: MatchStage) {
-    const result = await Booking.aggregate([
+    const result = (await Booking.aggregate([
       { $match: matchStage },
       {
         $project: {
@@ -100,7 +131,9 @@ class AnalyticsOverviewService {
             },
           },
           totalAmount: { $ifNull: ['$totalAmount', 0] },
-          ticketCount: { $size: { $ifNull: ['$seatCodes', []] } },
+          ticketCount: {
+            $size: { $ifNull: ['$seatCodes', []] },
+          },
         },
       },
       {
@@ -112,31 +145,26 @@ class AnalyticsOverviewService {
         },
       },
       { $sort: { _id: 1 } },
-    ]);
+    ])) as RevenueByDateResult[];
 
-    return result.map(
-      (item: {
-        _id: string;
-        revenue: number;
-        tickets: number;
-        bookings: number;
-      }) => ({
-        date: item._id,
-        revenue: item.revenue,
-        tickets: item.tickets,
-        bookings: item.bookings,
-      }),
-    );
+    return result.map((item) => ({
+      date: item._id,
+      revenue: item.revenue,
+      tickets: item.tickets,
+      bookings: item.bookings,
+    }));
   }
 
   private async getTopMovies(matchStage: MatchStage) {
-    return Booking.aggregate([
+    const result = (await Booking.aggregate([
       { $match: matchStage },
       {
         $project: {
           movieName: { $ifNull: ['$movieName', 'Không xác định'] },
           totalAmount: { $ifNull: ['$totalAmount', 0] },
-          ticketCount: { $size: { $ifNull: ['$seatCodes', []] } },
+          ticketCount: {
+            $size: { $ifNull: ['$seatCodes', []] },
+          },
         },
       },
       {
@@ -147,7 +175,7 @@ class AnalyticsOverviewService {
           bookings: { $sum: 1 },
         },
       },
-      { $sort: { revenue: -1 } },
+      { $sort: { revenue: -1, tickets: -1 } },
       { $limit: 5 },
       {
         $project: {
@@ -158,17 +186,21 @@ class AnalyticsOverviewService {
           bookings: 1,
         },
       },
-    ]);
+    ])) as TopMovieResult[];
+
+    return result;
   }
 
   private async getTopCinemas(matchStage: MatchStage) {
-    return Booking.aggregate([
+    const result = (await Booking.aggregate([
       { $match: matchStage },
       {
         $project: {
           theaterName: { $ifNull: ['$theaterName', 'Không xác định'] },
           totalAmount: { $ifNull: ['$totalAmount', 0] },
-          ticketCount: { $size: { $ifNull: ['$seatCodes', []] } },
+          ticketCount: {
+            $size: { $ifNull: ['$seatCodes', []] },
+          },
         },
       },
       {
@@ -179,7 +211,7 @@ class AnalyticsOverviewService {
           bookings: { $sum: 1 },
         },
       },
-      { $sort: { revenue: -1 } },
+      { $sort: { revenue: -1, tickets: -1 } },
       { $limit: 5 },
       {
         $project: {
@@ -190,7 +222,9 @@ class AnalyticsOverviewService {
           bookings: 1,
         },
       },
-    ]);
+    ])) as TopCinemaResult[];
+
+    return result;
   }
 }
 

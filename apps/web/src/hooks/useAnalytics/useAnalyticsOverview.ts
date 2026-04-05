@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 
 type OverviewSummary = {
@@ -43,42 +43,108 @@ type UseAnalyticsOverviewParams = {
   endDate?: string;
 };
 
+type SummaryCard = {
+  key: string;
+  label: string;
+  value: string;
+  rawValue: number;
+};
+
+const defaultOverviewData: OverviewData = {
+  summary: {
+    totalRevenue: 0,
+    totalTickets: 0,
+    totalBookings: 0,
+    avgRevenuePerBooking: 0,
+  },
+  charts: {
+    revenueByDate: [],
+  },
+  topMovies: [],
+  topCinemas: [],
+};
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+  }).format(value || 0);
+
+const formatNumber = (value: number) =>
+  new Intl.NumberFormat('vi-VN').format(value || 0);
+
 export const useAnalyticsOverview = ({
   startDate,
   endDate,
 }: UseAnalyticsOverviewParams) => {
-  const [data, setData] = useState<OverviewData | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<OverviewData>(defaultOverviewData);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchOverview = async () => {
+  const fetchOverview = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const res = await axios.get('/analytics/overview', {
+      const response = await axios.get('/analytics/overview', {
         params: {
           startDate,
           endDate,
         },
       });
 
-      setData(res.data.data);
+      setData(response?.data?.data || defaultOverviewData);
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Lỗi khi lấy dữ liệu overview');
+      setError(
+        err?.response?.data?.message || 'Không thể tải dữ liệu tổng quan',
+      );
+      setData(defaultOverviewData);
     } finally {
       setLoading(false);
     }
-  };
+  }, [startDate, endDate]);
 
   useEffect(() => {
     fetchOverview();
-  }, [startDate, endDate]);
+  }, [fetchOverview]);
+
+  const summaryCards = useMemo<SummaryCard[]>(() => {
+    return [
+      {
+        key: 'revenue',
+        label: 'Tổng doanh thu',
+        value: formatCurrency(data.summary.totalRevenue),
+        rawValue: data.summary.totalRevenue,
+      },
+      {
+        key: 'tickets',
+        label: 'Tổng vé đã bán',
+        value: formatNumber(data.summary.totalTickets),
+        rawValue: data.summary.totalTickets,
+      },
+      {
+        key: 'bookings',
+        label: 'Tổng đơn đặt vé',
+        value: formatNumber(data.summary.totalBookings),
+        rawValue: data.summary.totalBookings,
+      },
+      {
+        key: 'avgRevenue',
+        label: 'Doanh thu / đơn',
+        value: formatCurrency(data.summary.avgRevenuePerBooking),
+        rawValue: data.summary.avgRevenuePerBooking,
+      },
+    ];
+  }, [data]);
 
   return {
     data,
     loading,
     error,
     refetch: fetchOverview,
+    summaryCards,
+    formatCurrency,
+    formatNumber,
   };
 };
