@@ -172,19 +172,19 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
 
   return (
     <Sider
-      trigger={null}
-      collapsible
-      collapsed={collapsed}
-      width={260}
-      theme={themeMode}
-      className="transition-all duration-200"
-      style={{
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        bottom: 0,
-        height: '100vh',
-      }}
+  trigger={null}
+  collapsible
+  collapsed={collapsed}
+  width={260}
+  theme={themeMode}
+  className="transition-all duration-200"
+  style={{
+    position: 'fixed',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    height: '100vh',
+  }}
     >
       <div className="flex h-full flex-col">
         {/* HEADER */}
