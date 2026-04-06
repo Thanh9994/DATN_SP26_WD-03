@@ -49,7 +49,39 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
           key: 'analytics',
           icon: <BarChart3 size={18} />,
           label: 'Analytics',
-          onClick: () => navigate('/admin/analytics'),
+          children: [
+            {
+              key: 'analytics-overview',
+              icon: <LayoutDashboard size={18} />,
+              label: 'Tổng quan',
+              onClick: () => navigate('/admin/analytics/overview'),
+            },
+            {
+              key: 'analytics-ticket',
+              icon: <BarChart3 size={18} />,
+              label: 'Phân tích vé',
+              onClick: () => navigate('/admin/analytics/ticket'),
+            },
+            // chuẩn bị scale sau này
+            {
+              key: 'analytics-revenue',
+              icon: <BarChart3 size={18} />,
+              label: 'Doanh thu',
+              onClick: () => navigate('/admin/analytics/revenue'),
+            },
+            {
+              key: 'analytics-cinema',
+              icon: <BarChart3 size={18} />,
+              label: 'Rạp chiếu',
+              onClick: () => navigate('/admin/analytics/cinema'),
+            },
+          ],
+        },
+        {
+          key: 'personnel',
+          icon: <Users size={18} />,
+          label: 'Nhân sự',
+          onClick: () => navigate('/admin/staff'),
         },
       ],
     },
@@ -63,7 +95,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
     {
       key: 'movies',
       icon: <Film size={18} />,
-      label: 'Phim',
+      label: 'Thư viện phim',
       onClick: () => navigate('/admin/movies'),
     },
     {
@@ -72,6 +104,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       label: 'Users',
       onClick: () => navigate('/admin/users'),
     },
+
     {
       key: 'cinemas',
       icon: <VideoCameraAddOutlined />,
@@ -86,7 +119,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
     },
     {
       key: 'showtime',
-      icon: <CalendarPlus size={18}/>,
+      icon: <CalendarPlus size={18} />,
       label: 'Suất Chiếu',
       onClick: () => navigate('/admin/showtime'),
     },
@@ -128,30 +161,30 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       onClick: () => navigate('/admin/settings'),
     },
     {
-      key:'chatbot',
+      key: 'chatbot',
       icon: <UserOutlined />,
       label: 'Chatbot',
       onClick: () => navigate('/admin/chatbot'),
-    }
+    },
   ];
 
   const textColor = themeMode === 'dark' ? '#fff' : '#000';
 
   return (
     <Sider
-      trigger={null}
-      collapsible
-      collapsed={collapsed}
-      width={260}
-      theme={themeMode}
-      className="transition-all duration-200"
-      style={{
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        bottom: 0,
-        height: '100vh',
-      }}
+  trigger={null}
+  collapsible
+  collapsed={collapsed}
+  width={260}
+  theme={themeMode}
+  className="transition-all duration-200"
+  style={{
+    position: 'fixed',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    height: '100vh',
+  }}
     >
       <div className="flex h-full flex-col">
         {/* HEADER */}

@@ -8,38 +8,27 @@ export type AnalyticsResponse = {
   };
   summary: {
     totalRevenue: number;
-    totalPaidBookings: number;
     totalTicketsSold: number;
     totalMovies: number;
     totalUsers: number;
     totalShowtimes: number;
-    averageRevenuePerBooking: number;
-    averageTicketsPerBooking: number;
   };
   charts: {
     revenueTrend: Array<{
       label: string;
-      year: number;
-      month: number;
       revenue: number;
-      bookings: number;
-      tickets: number;
     }>;
     bookingStatus: Array<{
-      status: string;
+      _id: string;
       count: number;
     }>;
     topMovies: Array<{
       movieName: string;
-      revenue: number;
-      bookings: number;
       ticketsSold: number;
     }>;
     topTheaters: Array<{
       theaterName: string;
       revenue: number;
-      bookings: number;
-      ticketsSold: number;
     }>;
   };
 };
@@ -56,7 +45,6 @@ const API_BASE_URL = "http://localhost:5000";
 export const useAnalytics = (params: UseAnalyticsParams) => {
   return useQuery<AnalyticsResponse>({
     queryKey: ["analytics", params],
-    retry: false,
     queryFn: async () => {
       const res = await axios.get(`${API_BASE_URL}/api/analytics`, {
         params: {

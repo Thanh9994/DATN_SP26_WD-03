@@ -92,13 +92,9 @@ export const ClientRoutes: RouteObject = {
     {
       path: 'payments',
       element: <PaymentsMethod />,
-      children: [
-       
-        { path: 'result', element: <PaymentResult /> },
-      ],
+      children: [{ path: 'payment-result', element: <PaymentResult /> }],
     },
 
-    { path: 'payment-result', element: <PaymentResult /> },
     { path: 'ticket', element: <Ticket /> },
     { path: 'contact', element: <Contact /> },
     { path: '*', element: <NotFound /> },
