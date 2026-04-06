@@ -19,6 +19,7 @@ import Analytics from '@web/pages/admin/Analytics';
 import Ticketlog from '@web/pages/admin/analytics/analyticsTicket/Ticketlog';
 import Overview from '@web/pages/admin/analytics/analyticsOverview/Overview';
 import StaffStatus from '@web/pages/admin/analytics/analyticsStaff/StaffStatus';
+import AnalyticsCinemas from '@web/pages/admin/analytics/analyticsCinemas/AnalyticsCinemas';
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
@@ -53,6 +54,7 @@ export const AdminRoutes: RouteObject = {
             { index: true, element: <Analytics /> }, 
             { path: "ticket", element: <Ticketlog /> }, 
             { path: "overview", element: <Overview /> },
+            { path: "cinema", element: <AnalyticsCinemas /> },
           ]
         }
       ],
