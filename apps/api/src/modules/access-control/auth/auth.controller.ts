@@ -15,11 +15,6 @@ export const Register = catchAsync(async (req: Request, res: Response) => {
 
 export const verifyOtp = catchAsync(async (req: Request, res: Response) => {
   const { email, otp } = req.body;
-
-  if (!email || !otp) {
-    throw new BadRequestError('Email và OTP không được để trống');
-  }
-
   await AuthService.verifyOtp(email, otp);
 
   res.status(200).json({
@@ -30,13 +25,8 @@ export const verifyOtp = catchAsync(async (req: Request, res: Response) => {
 
 export const resendOtp = catchAsync(async (req: Request, res: Response) => {
   const { email } = ResendOtp.parse(req.body);
-
   await AuthService.resendOtp(email);
-
-  res.status(200).json({
-    success: true,
-    message: 'Mã OTP mới đã được gửi.',
-  });
+  res.status(200).json({ success: true, message: 'Mã OTP mới đã được gửi.' });
 });
 
 export const Login = catchAsync(async (req: Request, res: Response) => {
@@ -51,36 +41,16 @@ export const Login = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const forgotPassword = catchAsync(async (req: Request, res: Response) => {
-  const { email } = req.body;
-
-  if (!email) {
-    throw new BadRequestError('Email không được để trống');
-  }
-
-  await AuthService.forgotPassword(email);
-
-  res.status(200).json({
-    success: true,
-    message: 'Nếu email tồn tại, link reset đã được gửi.',
-  });
+  await AuthService.forgotPassword(req.body.email);
+  res.status(200).json({ success: true, message: 'Nếu email tồn tại, link reset đã được gửi.' });
 });
 
 export const resetPassword = catchAsync(async (req: Request, res: Response) => {
-  const token = req.params.token;
+  const { token } = req.params;
   const { password } = req.body;
 
-  if (!token) {
-    throw new BadRequestError('Token không được để trống');
-  }
-
-  if (!password) {
-    throw new BadRequestError('Mật khẩu không được để trống');
-  }
+  if (!password) throw new BadRequestError('Mật khẩu không được để trống');
 
   await AuthService.resetPassword(token, password);
-
-  res.status(200).json({
-    success: true,
-    message: 'Đổi mật khẩu thành công.',
-  });
+  res.status(200).json({ success: true, message: 'Đổi mật khẩu thành công.' });
 });
