@@ -54,13 +54,3 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
   await AuthService.resetPassword(token, password);
   res.status(200).json({ success: true, message: 'Đổi mật khẩu thành công.' });
 });
-
-export const resetPassword = catchAsync(async (req: Request, res: Response) => {
-  const { token } = req.params;
-  const { password } = req.body;
-
-  if (!password) throw new BadRequestError('Mật khẩu không được để trống');
-
-  await AuthService.resetPassword(token, password);
-  res.status(200).json({ success: true, message: 'Đổi mật khẩu thành công.' });
-});
