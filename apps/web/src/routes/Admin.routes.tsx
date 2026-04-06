@@ -17,7 +17,8 @@ import { ShowTime } from '@web/pages/admin/order/Showtime';
 import { Personnel } from '@web/pages/admin/access-control/Personnel';
 import Analytics from '@web/pages/admin/Analytics';
 import Ticketlog from '@web/pages/admin/analytics/analyticsTicket/Ticketlog';
-import Overview from '@web/pages/admin/analytics/analyticsOverview/overview';
+import Overview from '@web/pages/admin/analytics/analyticsOverview/Overview';
+import StaffStatus from '@web/pages/admin/analytics/analyticsStaff/StaffStatus';
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
@@ -37,7 +38,7 @@ export const AdminRoutes: RouteObject = {
         { path: 'settings', element: <Settings /> },
         { path: 'showtime', element: <ShowTime /> },
         { path: 'personnel', element: <Personnel /> },
-        { path: "analytics", element: <Analytics /> },
+        { path: 'staff', element: <StaffStatus /> },
         {
           path: 'promotions',
           children: [
