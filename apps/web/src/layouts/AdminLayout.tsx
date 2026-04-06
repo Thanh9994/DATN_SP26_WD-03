@@ -46,7 +46,8 @@ export const AdminLayouts = () => {
         style={{
           marginLeft: collapsed ? 80 : 260,
           transition: 'all 0.2s',
-          minHeight: '100vh',
+          height: '100vh',
+          overflow: 'hidden',
         }}
       >
         <Sidebar
@@ -117,7 +118,9 @@ export const AdminLayouts = () => {
             style={{
               margin: 16,
               borderRadius: 8,
-              minHeight: 280,
+              height: 'calc(100vh - 64px)',
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
             }}
           >
             <Outlet context={{ search }} />
