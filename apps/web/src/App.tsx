@@ -2,6 +2,7 @@
 import { useLocation, useRoutes } from "react-router-dom";
 import { ClientRoutes } from "./routes/Client.routes";
 import { AdminRoutes } from "./routes/Admin.routes";
+import { StaffRoutes } from "./routes/Staff.router";
 import "./index.css";
 import "antd/dist/reset.css"; // Ant Design 5.x
 import { AppNotification } from "./components/AppNotification";
@@ -26,7 +27,7 @@ function App() {
     }
   }, [showSplash]);
 
-  const element = useRoutes([ClientRoutes, AdminRoutes]);
+  const element = useRoutes([ClientRoutes, AdminRoutes, StaffRoutes]);
   return (
     <>
       {showSplash && <Splash />}
