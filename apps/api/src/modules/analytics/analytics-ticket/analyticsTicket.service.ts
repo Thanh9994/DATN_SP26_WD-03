@@ -2,6 +2,7 @@ import { Booking } from "@api/modules/sales-operations/booking/booking.model";
 import { Movie } from "@api/modules/movie-content/movie/movie.model";
 import { ShowTimeM } from "@api/modules/cinema-catalog/showtime/showtime.model";
 import { User } from "@api/modules/access-control/user/user.model";
+import { Cinemas } from "@api/modules/cinema-catalog/cinema/cinema.model";
 
 type AnalyticsTicketQuery = {
   fromDate?: string;
@@ -11,7 +12,7 @@ type AnalyticsTicketQuery = {
 };
 
 const buildBookingMatch = (query: AnalyticsTicketQuery = {}) => {
-  const { fromDate, toDate, theaterName, status } = query;
+  const { fromDate, toDate, status } = query;
 
   const match: Record<string, any> = {};
 
@@ -19,16 +20,14 @@ const buildBookingMatch = (query: AnalyticsTicketQuery = {}) => {
     match.createdAt = {};
 
     if (fromDate) {
-      match.createdAt.$gte = new Date(`${fromDate}T00:00:00.000Z`);
+      match.createdAt.$gte = new Date(fromDate);
     }
 
     if (toDate) {
-      match.createdAt.$lte = new Date(`${toDate}T23:59:59.999Z`);
+      const end = new Date(toDate);
+      end.setHours(23, 59, 59, 999);
+      match.createdAt.$lte = end;
     }
-  }
-
-  if (theaterName && theaterName !== "all") {
-    match.theaterName = theaterName;
   }
 
   if (status && status !== "all") {
@@ -38,19 +37,315 @@ const buildBookingMatch = (query: AnalyticsTicketQuery = {}) => {
   return match;
 };
 
+const buildResolvedTheaterMatchStage = (theaterName?: string) => {
+  if (!theaterName || theaterName === "all") {
+    return [];
+  }
+
+  return [
+    {
+      $match: {
+        theaterNameResolved: theaterName,
+      },
+    },
+  ];
+};
+
+const bookingCinemaLookupStages = [
+  {
+    $lookup: {
+      from: "showtimes",
+      localField: "showTimeId",
+      foreignField: "_id",
+      as: "showTimeInfo",
+    },
+  },
+  {
+    $unwind: {
+      path: "$showTimeInfo",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $lookup: {
+      from: "rooms",
+      localField: "showTimeInfo.roomId",
+      foreignField: "_id",
+      as: "roomInfo",
+    },
+  },
+  {
+    $unwind: {
+      path: "$roomInfo",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $lookup: {
+      from: "cinemas",
+      localField: "roomInfo.cinema_id",
+      foreignField: "_id",
+      as: "cinemaInfo",
+    },
+  },
+  {
+    $unwind: {
+      path: "$cinemaInfo",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $addFields: {
+      theaterNameResolved: {
+        $cond: [
+          {
+            $gt: [
+              {
+                $strLenCP: {
+                  $trim: {
+                    input: { $ifNull: ["$theaterName", ""] },
+                  },
+                },
+              },
+              0,
+            ],
+          },
+          "$theaterName",
+          {
+            $ifNull: [
+              "$cinemaInfo.name",
+              {
+                $ifNull: ["$cinemaInfo.ten_rap", "Không rõ rạp"],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  },
+];
+
+const bookingMovieLookupStages = [
+  {
+    $lookup: {
+      from: "showtimes",
+      localField: "showTimeId",
+      foreignField: "_id",
+      as: "showTimeInfo",
+    },
+  },
+  {
+    $unwind: {
+      path: "$showTimeInfo",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $lookup: {
+      from: "movies",
+      localField: "showTimeInfo.movieId",
+      foreignField: "_id",
+      as: "movieInfo",
+    },
+  },
+  {
+    $unwind: {
+      path: "$movieInfo",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $addFields: {
+      movieNameResolved: {
+        $cond: [
+          {
+            $gt: [
+              {
+                $strLenCP: {
+                  $trim: {
+                    input: { $ifNull: ["$movieName", ""] },
+                  },
+                },
+              },
+              0,
+            ],
+          },
+          "$movieName",
+          {
+            $ifNull: [
+              "$movieInfo.ten_phim",
+              {
+                $ifNull: [
+                  "$movieInfo.name",
+                  {
+                    $ifNull: ["$movieInfo.title", "Không rõ phim"],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  },
+];
+
+const fullLookupStages = [
+  {
+    $lookup: {
+      from: "users",
+      localField: "userId",
+      foreignField: "_id",
+      as: "userInfo",
+    },
+  },
+  {
+    $unwind: {
+      path: "$userInfo",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $lookup: {
+      from: "showtimes",
+      localField: "showTimeId",
+      foreignField: "_id",
+      as: "showTimeInfo",
+    },
+  },
+  {
+    $unwind: {
+      path: "$showTimeInfo",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $lookup: {
+      from: "movies",
+      localField: "showTimeInfo.movieId",
+      foreignField: "_id",
+      as: "movieInfo",
+    },
+  },
+  {
+    $unwind: {
+      path: "$movieInfo",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $lookup: {
+      from: "rooms",
+      localField: "showTimeInfo.roomId",
+      foreignField: "_id",
+      as: "roomInfo",
+    },
+  },
+  {
+    $unwind: {
+      path: "$roomInfo",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $lookup: {
+      from: "cinemas",
+      localField: "roomInfo.cinema_id",
+      foreignField: "_id",
+      as: "cinemaInfo",
+    },
+  },
+  {
+    $unwind: {
+      path: "$cinemaInfo",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $addFields: {
+      movieNameResolved: {
+        $cond: [
+          {
+            $gt: [
+              {
+                $strLenCP: {
+                  $trim: {
+                    input: { $ifNull: ["$movieName", ""] },
+                  },
+                },
+              },
+              0,
+            ],
+          },
+          "$movieName",
+          {
+            $ifNull: [
+              "$movieInfo.ten_phim",
+              {
+                $ifNull: [
+                  "$movieInfo.name",
+                  {
+                    $ifNull: ["$movieInfo.title", "Không rõ phim"],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      theaterNameResolved: {
+        $cond: [
+          {
+            $gt: [
+              {
+                $strLenCP: {
+                  $trim: {
+                    input: { $ifNull: ["$theaterName", ""] },
+                  },
+                },
+              },
+              0,
+            ],
+          },
+          "$theaterName",
+          {
+            $ifNull: [
+              "$cinemaInfo.name",
+              {
+                $ifNull: ["$cinemaInfo.ten_rap", "Không rõ rạp"],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  },
+];
+
 export const analyticsTicketService = {
   async getFilterOptions() {
-    const [theaters, statuses] = await Promise.all([
+    const [bookingTheaters, cinemaOptions, statuses] = await Promise.all([
       Booking.distinct("theaterName", {
         theaterName: { $exists: true, $ne: "" },
       }),
+      Cinemas.find({})
+        .select("name ten_rap")
+        .lean(),
       Booking.distinct("status", {
         status: { $exists: true, $ne: "" },
       }),
     ]);
 
+    const cinemaNames = cinemaOptions.flatMap((item: any) =>
+      [item?.name, item?.ten_rap].filter(Boolean),
+    );
+
+    const theaters = [...bookingTheaters, ...cinemaNames]
+      .map((item) => String(item).trim())
+      .filter((item) => item && item !== "Không rõ rạp");
+
     return {
-      theaters: theaters.filter(Boolean).sort(),
+      theaters: [...new Set(theaters)].sort(),
       statuses: statuses.filter(Boolean).sort(),
     };
   },
@@ -61,6 +356,8 @@ export const analyticsTicketService = {
       ...baseMatch,
       status: "paid",
     };
+
+    const theaterMatchStages = buildResolvedTheaterMatchStage(query.theaterName);
 
     const [
       totalMovies,
@@ -81,14 +378,26 @@ export const analyticsTicketService = {
       User.countDocuments(),
       ShowTimeM.countDocuments(),
 
-      Booking.find(paidMatch)
-        .select("finalAmount totalAmount seatCodes seats items")
-        .lean(),
+      Booking.aggregate([
+        { $match: paidMatch },
+        ...bookingCinemaLookupStages,
+        ...theaterMatchStages,
+        {
+          $project: {
+            finalAmount: 1,
+            totalAmount: 1,
+            seats: 1,
+            items: 1,
+          },
+        },
+      ]),
 
       this.getFilterOptions(),
 
       Booking.aggregate([
         { $match: baseMatch },
+        ...bookingCinemaLookupStages,
+        ...theaterMatchStages,
         {
           $group: {
             _id: "$status",
@@ -106,6 +415,8 @@ export const analyticsTicketService = {
 
       Booking.aggregate([
         { $match: paidMatch },
+        ...bookingCinemaLookupStages,
+        ...theaterMatchStages,
         {
           $group: {
             _id: {
@@ -118,7 +429,7 @@ export const analyticsTicketService = {
             },
             ticketsSold: {
               $sum: {
-                $size: { $ifNull: ["$seatCodes", []] },
+                $size: { $ifNull: ["$seats", []] },
               },
             },
             bookings: { $sum: 1 },
@@ -142,57 +453,17 @@ export const analyticsTicketService = {
         },
       ]),
 
-      // TOP MOVIES
       Booking.aggregate([
         { $match: paidMatch },
-        {
-          $lookup: {
-            from: "showtimes",
-            localField: "showTimeId",
-            foreignField: "_id",
-            as: "showtime",
-          },
-        },
-        { $unwind: { path: "$showtime", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "movies",
-            localField: "showtime.movieId",
-            foreignField: "_id",
-            as: "movie",
-          },
-        },
-        { $unwind: { path: "$movie", preserveNullAndEmptyArrays: true } },
-        {
-          $addFields: {
-            movieNameResolved: {
-              $cond: [
-                {
-                  $gt: [
-                    {
-                      $strLenCP: {
-                        $trim: {
-                          input: { $ifNull: ["$movieName", ""] },
-                        },
-                      },
-                    },
-                    0,
-                  ],
-                },
-                "$movieName",
-                {
-                  $ifNull: ["$movie.ten_phim", "Không rõ phim"],
-                },
-              ],
-            },
-          },
-        },
+        ...bookingMovieLookupStages,
+        ...bookingCinemaLookupStages,
+        ...theaterMatchStages,
         {
           $group: {
             _id: "$movieNameResolved",
             ticketsSold: {
               $sum: {
-                $size: { $ifNull: ["$seatCodes", []] },
+                $size: { $ifNull: ["$seats", []] },
               },
             },
             revenue: {
@@ -214,60 +485,10 @@ export const analyticsTicketService = {
         },
       ]),
 
-      // TOP THEATERS
       Booking.aggregate([
         { $match: paidMatch },
-        {
-          $lookup: {
-            from: "showtimes",
-            localField: "showTimeId",
-            foreignField: "_id",
-            as: "showtime",
-          },
-        },
-        { $unwind: { path: "$showtime", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "rooms",
-            localField: "showtime.roomId",
-            foreignField: "_id",
-            as: "room",
-          },
-        },
-        { $unwind: { path: "$room", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "cinemas",
-            localField: "room.cinemaId",
-            foreignField: "_id",
-            as: "cinema",
-          },
-        },
-        { $unwind: { path: "$cinema", preserveNullAndEmptyArrays: true } },
-        {
-          $addFields: {
-            theaterNameResolved: {
-              $cond: [
-                {
-                  $gt: [
-                    {
-                      $strLenCP: {
-                        $trim: {
-                          input: { $ifNull: ["$theaterName", ""] },
-                        },
-                      },
-                    },
-                    0,
-                  ],
-                },
-                "$theaterName",
-                {
-                  $ifNull: ["$cinema.name", "Không rõ rạp"],
-                },
-              ],
-            },
-          },
-        },
+        ...bookingCinemaLookupStages,
+        ...theaterMatchStages,
         {
           $group: {
             _id: "$theaterNameResolved",
@@ -276,7 +497,7 @@ export const analyticsTicketService = {
             },
             ticketsSold: {
               $sum: {
-                $size: { $ifNull: ["$seatCodes", []] },
+                $size: { $ifNull: ["$seats", []] },
               },
             },
             bookings: { $sum: 1 },
@@ -295,104 +516,16 @@ export const analyticsTicketService = {
         },
       ]),
 
-      // RECENT BOOKINGS
       Booking.aggregate([
         { $match: baseMatch },
-        {
-          $lookup: {
-            from: "users",
-            localField: "userId",
-            foreignField: "_id",
-            as: "user",
-          },
-        },
-        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "showtimes",
-            localField: "showTimeId",
-            foreignField: "_id",
-            as: "showtime",
-          },
-        },
-        { $unwind: { path: "$showtime", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "movies",
-            localField: "showtime.movieId",
-            foreignField: "_id",
-            as: "movie",
-          },
-        },
-        { $unwind: { path: "$movie", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "rooms",
-            localField: "showtime.roomId",
-            foreignField: "_id",
-            as: "room",
-          },
-        },
-        { $unwind: { path: "$room", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "cinemas",
-            localField: "room.cinemaId",
-            foreignField: "_id",
-            as: "cinema",
-          },
-        },
-        { $unwind: { path: "$cinema", preserveNullAndEmptyArrays: true } },
-        {
-          $addFields: {
-            movieNameResolved: {
-              $cond: [
-                {
-                  $gt: [
-                    {
-                      $strLenCP: {
-                        $trim: {
-                          input: { $ifNull: ["$movieName", ""] },
-                        },
-                      },
-                    },
-                    0,
-                  ],
-                },
-                "$movieName",
-                {
-                  $ifNull: ["$movie.ten_phim", "Không rõ phim"],
-                },
-              ],
-            },
-            theaterNameResolved: {
-              $cond: [
-                {
-                  $gt: [
-                    {
-                      $strLenCP: {
-                        $trim: {
-                          input: { $ifNull: ["$theaterName", ""] },
-                        },
-                      },
-                    },
-                    0,
-                  ],
-                },
-                "$theaterName",
-                {
-                  $ifNull: ["$cinema.name", "Không rõ rạp"],
-                },
-              ],
-            },
-          },
-        },
+        ...fullLookupStages,
+        ...theaterMatchStages,
         { $sort: { createdAt: -1 } },
         { $limit: 8 },
         {
           $project: {
             userName: {
-              $ifNull: ["$user.ho_ten", "$user.name", "Ẩn danh"],
+              $ifNull: ["$userInfo.ho_ten", "$userInfo.name", "Ẩn danh"],
             },
             movieName: "$movieNameResolved",
             theaterName: "$theaterNameResolved",
@@ -400,7 +533,7 @@ export const analyticsTicketService = {
               $ifNull: ["$finalAmount", "$totalAmount", 0],
             },
             seatsCount: {
-              $size: { $ifNull: ["$seatCodes", []] },
+              $size: { $ifNull: ["$seats", []] },
             },
             status: {
               $ifNull: ["$status", "unknown"],
@@ -413,6 +546,8 @@ export const analyticsTicketService = {
 
       Booking.aggregate([
         { $match: paidMatch },
+        ...bookingCinemaLookupStages,
+        ...theaterMatchStages,
         {
           $group: {
             _id: { $dayOfWeek: "$createdAt" },
@@ -421,13 +556,13 @@ export const analyticsTicketService = {
             },
             ticketsSold: {
               $sum: {
-                $size: { $ifNull: ["$seatCodes", []] },
+                $size: { $ifNull: ["$seats", []] },
               },
             },
             bookings: { $sum: 1 },
           },
         },
-        { $sort: { "_id": 1 } },
+        { $sort: { _id: 1 } },
         {
           $project: {
             weekday: {
@@ -454,6 +589,8 @@ export const analyticsTicketService = {
 
       Booking.aggregate([
         { $match: paidMatch },
+        ...bookingCinemaLookupStages,
+        ...theaterMatchStages,
         {
           $project: {
             comboRevenue: {
@@ -489,6 +626,8 @@ export const analyticsTicketService = {
 
       Booking.aggregate([
         { $match: paidMatch },
+        ...bookingCinemaLookupStages,
+        ...theaterMatchStages,
         {
           $group: {
             _id: "$userId",
@@ -498,7 +637,7 @@ export const analyticsTicketService = {
             },
             totalTickets: {
               $sum: {
-                $size: { $ifNull: ["$seatCodes", []] },
+                $size: { $ifNull: ["$seats", []] },
               },
             },
           },
@@ -510,14 +649,19 @@ export const analyticsTicketService = {
             from: "users",
             localField: "_id",
             foreignField: "_id",
-            as: "user",
+            as: "userInfo",
           },
         },
-        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        {
+          $unwind: {
+            path: "$userInfo",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
         {
           $project: {
             userName: {
-              $ifNull: ["$user.ho_ten", "$user.name", "Ẩn danh"],
+              $ifNull: ["$userInfo.ho_ten", "$userInfo.name", "Ẩn danh"],
             },
             totalBookings: 1,
             totalRevenue: 1,
@@ -534,7 +678,7 @@ export const analyticsTicketService = {
     );
 
     const totalTicketsSold = paidBookings.reduce((sum, item: any) => {
-      return sum + (item.seatCodes?.length || 0);
+      return sum + (item.seats?.length || 0);
     }, 0);
 
     const totalBookings = paidBookings.length;
