@@ -20,7 +20,7 @@ import Ticketlog from '@web/pages/admin/analytics/analyticsTicket/Ticketlog';
 import Overview from '@web/pages/admin/analytics/analyticsOverview/Overview';
 import StaffStatus from '@web/pages/admin/analytics/analyticsStaff/StaffStatus';
 import AnalyticsCinemas from '@web/pages/admin/analytics/analyticsCinemas/AnalyticsCinemas';
-
+// import AnalyticMatch from '@web/pages/admin/analytics/analyticsDoanhthu/AnalyticMatch';
 export const AdminRoutes: RouteObject = {
   path: '/admin',
   element: <AdminGuard />,
