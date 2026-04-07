@@ -78,6 +78,9 @@ const bookingSchema = new Schema(
       unique: true,
       sparse: true,
     },
+    pickedUpAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
