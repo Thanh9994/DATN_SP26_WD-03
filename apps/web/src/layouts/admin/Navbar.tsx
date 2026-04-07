@@ -83,6 +83,12 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
           label: 'Nhân sự',
           onClick: () => navigate('/admin/staff'),
         },
+        {
+          key: 'personnel',
+          icon: <Users size={18} />,
+          label: 'Nhân sự',
+          onClick: () => navigate('/admin/users'),
+        },
       ],
     },
     { type: 'divider' },

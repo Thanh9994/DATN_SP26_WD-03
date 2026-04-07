@@ -226,11 +226,7 @@ export default function Ticketlog() {
 
         <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
           <Col xs={24} xl={16}>
-            <Card
-              title="Xu hướng doanh thu & vé bán"
-              bordered={false}
-              style={{ borderRadius: 16 }}
-            >
+            <Card title="Xu hướng doanh thu & vé bán" bordered={false} style={{ borderRadius: 16 }}>
               <ResponsiveContainer width="100%" height={320}>
                 <AreaChart data={charts.revenueTrend || []}>
                   <XAxis dataKey="label" />
