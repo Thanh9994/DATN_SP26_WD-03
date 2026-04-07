@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { SeatTime } from "../../cinema-catalog/showtime/showtimeSeat.model";
 import { Booking } from "./booking.model";
 import { randomUUID } from "crypto";
+import * as MailService from "@api/common/mail.service";
 
 import { AppError } from "@api/middlewares/error.middleware";
 
@@ -338,5 +339,52 @@ export const bookingService = {
     } finally {
       session.endSession();
     }
+  },
+
+  async checkinTicketByCode(ticketCode: string) {
+    const normalizedCode = ticketCode?.trim().toUpperCase();
+    if (!normalizedCode) {
+      throw new AppError("Ticket code khong hop le.", 400);
+    }
+
+    const booking = await Booking.findOne({ ticketCode: normalizedCode })
+      .populate("userId", "ho_ten email")
+      .populate({
+        path: "showTimeId",
+        populate: [{ path: "movieId", select: "ten_phim" }],
+      });
+
+    if (!booking) {
+      throw new AppError("Khong tim thay ve voi ticket code nay.", 404);
+    }
+
+    if (booking.status === "da_lay_ve" || booking.status === "picked_up") {
+      return booking;
+    }
+
+    if (booking.status !== "paid") {
+      throw new AppError("Ve chua o trang thai co the check-in.", 400);
+    }
+
+    booking.status = "da_lay_ve";
+    booking.pickedUpAt = new Date();
+    await booking.save();
+
+    const user = booking.userId as any;
+    const userEmail = user?.email;
+    if (userEmail) {
+      MailService.sendMail(
+        MailService.getTicketPickupTemplate({
+          email: userEmail,
+          customerName: user?.ho_ten || "Khach hang",
+          ticketCode: booking.ticketCode || normalizedCode,
+          pickedUpAt: booking.pickedUpAt,
+          movieName: (booking.showTimeId as any)?.movieId?.ten_phim,
+          seatCodes: booking.seatCodes || [],
+        }),
+      ).catch(console.error);
+    }
+
+    return booking;
   },
 };

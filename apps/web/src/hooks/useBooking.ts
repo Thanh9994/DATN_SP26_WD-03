@@ -100,6 +100,19 @@ export const useBooking = (showTimeId?: string) => {
     },
   });
 
+  const checkinTicket = useMutation({
+    mutationFn: async ({ ticketCode }: { ticketCode: string }) => {
+      const res = await axiosAuth.patch(`${API.BOOKING}/checkin-ticket`, {
+        ticketCode,
+      });
+      return res.data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-bookings'] });
+      queryClient.invalidateQueries({ queryKey: ['showtime-detail'] });
+    },
+  });
+
   return {
     pendingBooking,
     showTime: bookingData?.showTime,
@@ -118,6 +131,9 @@ export const useBooking = (showTimeId?: string) => {
 
     expireBooking: expireBooking.mutateAsync,
     isExpiring: expireBooking.isPending,
+
+    checkinTicket: checkinTicket.mutateAsync,
+    isCheckingInTicket: checkinTicket.isPending,
 
     refreshSeats: refetch,
   };
