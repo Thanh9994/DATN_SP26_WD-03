@@ -28,42 +28,40 @@ import {
 } from "@ant-design/icons";
 
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@web/hooks/useAuth";
+import { axiosAuth } from "@web/hooks/useAuth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
 const Settings: React.FC = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
 
-    const [name, setName] = useState("Nguyễn Văn Sơn");
-    const [email, setEmail] = useState("son@email.com");
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
 
-    // Load dữ liệu từ localStorage khi vào trang
     useEffect(() => {
-        const saved = localStorage.getItem("userProfile");
-
-        if (saved) {
-            const data = JSON.parse(saved);
-            setName(data.name);
-            setEmail(data.email);
+        if (user) {
+            setName(user.ho_ten ?? "");
+            setEmail(user.email ?? "");
+            setPhone(user.phone ?? "");
         }
-    }, []);
+    }, [user]);
 
-    // Lưu dữ liệu
-    const handleSave = () => {
-        const data = {
-            name,
-            email,
-        };
-
-        localStorage.setItem("userProfile", JSON.stringify(data));
-
-        setIsEditing(false);
-
-        message.success("Đã lưu thay đổi!");
+    const handleSave = async () => {
+        if (!user?._id) return;
+        try {
+            await axiosAuth.patch(`/api/users/${user._id}`, { ho_ten: name, email, phone });
+            setIsEditing(false);
+            message.success("Đã lưu thay đổi!");
+        } catch {
+            message.error("Lưu thất bại!");
+        }
     };
 
     return (
@@ -143,7 +141,7 @@ const Settings: React.FC = () => {
                                     <br />
 
                                     <Text strong style={{ color: "#fff" }}>
-                                        0987 654 321
+                                        {phone || "Chưa cập nhật"}
                                     </Text>
                                 </div>
 

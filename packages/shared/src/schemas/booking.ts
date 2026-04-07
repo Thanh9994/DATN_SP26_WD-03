@@ -41,4 +41,5 @@ export const Booking = Base.extend({
   holdToken: z.string(),
   holdExpiresAt: z.coerce.date(),
   ticketCode: z.string().optional(),
+  pickedUpAt: z.coerce.date().optional(),
 });
