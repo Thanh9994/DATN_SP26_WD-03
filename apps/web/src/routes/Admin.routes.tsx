@@ -40,6 +40,7 @@ export const AdminRoutes: RouteObject = {
         { path: 'showtime', element: <ShowTime /> },
         { path: 'personnel', element: <Personnel /> },
         { path: 'staff', element: <StaffStatus /> },
+        { path: 'analytics', element: <Analytics /> },
         {
           path: 'promotions',
           children: [
