@@ -3,6 +3,7 @@ import { Booking } from './booking.model';
 import { getBookingAnalytics } from '@api/utils/booking/booking.analytics';
 import { catchAsync } from '@api/utils/catchAsync';
 import { AppError } from '@api/middlewares/error.middleware';
+import QRCode from 'qrcode';
 
 export const bookingController = {
   holdSeats: catchAsync(async (req, res, next) => {
@@ -65,9 +66,26 @@ export const bookingController = {
 
     if (!booking) return next(new AppError('Không tìm thấy đơn hàng', 404));
 
+    let qrCodeDataUrl: string | null = null;
+    if (booking.status === 'paid') {
+      const qrPayload = JSON.stringify({
+        bookingId: booking._id?.toString(),
+        ticketCode: booking.ticketCode || '',
+        paymentId: booking.paymentId?.toString?.() || '',
+      });
+      qrCodeDataUrl = await QRCode.toDataURL(qrPayload, {
+        errorCorrectionLevel: 'M',
+        margin: 1,
+        width: 280,
+      });
+    }
+
     res.json({
       success: true,
-      data: booking,
+      data: {
+        ...booking.toObject(),
+        qrCodeDataUrl,
+      },
     });
   }),
 
