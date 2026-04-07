@@ -49,6 +49,21 @@ export const bookingController = {
     });
   }),
 
+  checkinTicket: catchAsync(async (req, res, next) => {
+    const { ticketCode } = req.body;
+    if (!ticketCode) {
+      return next(new AppError('Thieu ticketCode', 400));
+    }
+
+    const result = await bookingService.checkinTicketByCode(ticketCode);
+
+    res.json({
+      success: true,
+      message: 'Check-in ve thanh cong',
+      data: result,
+    });
+  }),
+
   getBookingDetail: catchAsync(async (req, res, next) => {
     const { id } = req.params;
     const booking = await Booking.findById(id)
@@ -67,7 +82,7 @@ export const bookingController = {
     if (!booking) return next(new AppError('Không tìm thấy đơn hàng', 404));
 
     let qrCodeDataUrl: string | null = null;
-    if (booking.status === 'paid') {
+    if (['paid', 'da_lay_ve', 'picked_up'].includes(booking.status)) {
       const qrPayload = JSON.stringify({
         bookingId: booking._id?.toString(),
         ticketCode: booking.ticketCode || '',
@@ -153,7 +168,10 @@ export const bookingController = {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    const bookings = await Booking.find({ userId, status })
+    const statusFilter =
+      status === 'paid' ? { $in: ['paid', 'da_lay_ve', 'picked_up'] } : status;
+
+    const bookings = await Booking.find({ userId, status: statusFilter })
       .populate({
         path: 'showTimeId',
         populate: [

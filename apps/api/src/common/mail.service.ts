@@ -104,6 +104,36 @@ export const getResetPasswordTemplate = (email: string, resetUrl: string) => ({
         </div>
       `,
 });
+
+export const getTicketPickupTemplate = (payload: {
+  email: string;
+  customerName: string;
+  ticketCode: string;
+  pickedUpAt: Date;
+  movieName?: string;
+  seatCodes?: string[];
+}) => {
+  const pickedUpTime = payload.pickedUpAt.toLocaleString('vi-VN');
+  return {
+    to: payload.email,
+    subject: 'Xac nhan da nhan ve thanh cong',
+    html: `
+      <div style="font-family: Arial, sans-serif; background:#0b1020; padding:24px;">
+        <div style="max-width:560px; margin:0 auto; background:#111827; border:1px solid #1f2937; border-radius:16px; padding:24px; color:#f3f4f6;">
+          <h2 style="margin:0 0 12px; color:#22c55e;">Ve da duoc lay thanh cong</h2>
+          <p style="margin:0 0 16px; color:#d1d5db;">Xin chao <b>${payload.customerName || 'Quy khach'}</b>, nhan vien rap da xac nhan ban da nhan ve.</p>
+          <div style="background:#0f172a; border:1px solid #334155; border-radius:12px; padding:14px;">
+            <p style="margin:0 0 8px;"><b>Ticket code:</b> ${payload.ticketCode}</p>
+            <p style="margin:0 0 8px;"><b>Thoi gian nhan ve:</b> ${pickedUpTime}</p>
+            <p style="margin:0 0 8px;"><b>Phim:</b> ${payload.movieName || '---'}</p>
+            <p style="margin:0;"><b>Ghe:</b> ${(payload.seatCodes || []).join(', ') || '---'}</p>
+          </div>
+          <p style="margin-top:16px; color:#9ca3af; font-size:12px;">Email tu dong tu he thong rap phim.</p>
+        </div>
+      </div>
+    `,
+  };
+};
 // export const sendTicketEmail = async (userEmail: string, bookingData: any) => {
 //   try {
 //     let transporter;
