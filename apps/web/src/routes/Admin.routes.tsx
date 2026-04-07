@@ -40,6 +40,7 @@ export const AdminRoutes: RouteObject = {
         { path: 'showtime', element: <ShowTime /> },
         { path: 'personnel', element: <Personnel /> },
         { path: 'staff', element: <StaffStatus /> },
+        { path: 'analytics', element: <Analytics /> },
         {
           path: 'promotions',
           children: [
@@ -49,15 +50,15 @@ export const AdminRoutes: RouteObject = {
           ],
         },
         {
-          path: "analytics",
+          path: 'analytics',
           children: [
-            { index: true, element: <Analytics /> }, 
-            { path: "ticket", element: <Ticketlog /> }, 
-            { path: "overview", element: <Overview /> },
-            { path: "cinema", element: <AnalyticsCinemas /> },
-            { path: "revenue", element: <AnalyticMatch /> },
-          ]
-        }
+            { index: true, element: <Analytics /> },
+            { path: 'ticket', element: <Ticketlog /> },
+            { path: 'overview', element: <Overview /> },
+            { path: 'cinema', element: <AnalyticsCinemas /> },
+            { path: 'revenue', element: <AnalyticMatch /> },
+          ],
+        },
       ],
     },
   ],

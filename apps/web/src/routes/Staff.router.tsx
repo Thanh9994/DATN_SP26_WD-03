@@ -6,7 +6,7 @@ export const StaffRoutes: RouteObject = {
   element: <StaffLayout />,
   children: [
     { index: true, element: <Navigate to="movielist" replace /> },
-    { path: 'movielist', element: < StaffMovieListPage/> },
+    { path: 'movielist', element: <StaffMovieListPage /> },
     {
       path: 'checkin',
       element: (

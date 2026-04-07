@@ -40,6 +40,14 @@ export const PaymentResult = () => {
     }
   }, [booking]);
 
+  const formatDate = (value: any) => {
+    if (!value) return '---';
+    if (typeof value === 'string') return new Date(value).toLocaleString();
+    if (typeof value === 'object' && value.$date) return new Date(value.$date).toLocaleString();
+    if (value instanceof Date) return value.toLocaleString();
+    return String(value);
+  };
+
   useEffect(() => {
     if (bookingId) {
       axios
@@ -117,6 +125,76 @@ export const PaymentResult = () => {
                 </p>
               </div>
             )}
+          </div>
+        )}
+
+        {isSuccess && booking && (
+          <div className="w-full max-w-3xl space-y-3 rounded-2xl border border-white/10 bg-white/5 p-6 text-left">
+            <h3 className="mb-4 text-lg font-bold">Order Code & Fields</h3>
+            <div className="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
+              <div className="flex justify-between">
+                <span className="font-mono">{formatId(booking._id)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-mono">{formatId(booking.userId)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-mono">{formatId(booking.showTimeId)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">seats</span>
+                <span className="font-mono">
+                  {(booking.seats || []).map(formatId).join(', ') || '---'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-mono">{booking.seatCodes?.join(', ') || '---'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">totalAmount</span>
+                <span className="font-mono">{booking.totalAmount ?? '---'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">discountAmount</span>
+                <span className="font-mono">{booking.discountAmount ?? '---'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">finalAmount</span>
+                <span className="font-mono">{booking.finalAmount ?? '---'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">status</span>
+                <span className="font-mono">{booking.status || '---'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">holdToken</span>
+                <span className="font-mono">{booking.holdToken || '---'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">holdExpiresAt</span>
+                <span className="font-mono">{formatDate(booking.holdExpiresAt)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">items</span>
+                <span className="font-mono">{(booking.items || []).length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">createdAt</span>
+                <span className="font-mono">{formatDate(booking.createdAt)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">updatedAt</span>
+                <span className="font-mono">{formatDate(booking.updatedAt)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">paymentId</span>
+                <span className="font-mono">{formatId(booking.paymentId)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">ticketCode</span>
+                <span className="font-mono">{booking.ticketCode || '---'}</span>
+              </div>
+            </div>
           </div>
         )}
 
