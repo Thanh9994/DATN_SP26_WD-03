@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { SeatTime } from "../../cinema-catalog/showtime/showtimeSeat.model";
 import { Booking } from "./booking.model";
 import { randomUUID } from "crypto";
+import * as MailService from "@api/common/mail.service";
 
 import { AppError } from "@api/middlewares/error.middleware";
 
@@ -150,69 +151,127 @@ export const bookingService = {
   //Xác nhận đặt vé và tạo hóa đơn
 
   async confirmBooking(bookingId: string, paymentId: string, userId: string) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-    try {
-      //1
-      const booking = await Booking.findOne({
-        _id: bookingId,
-        userId,
-      }).session(session);
-      // check điều kiện 2
-      if (!booking) {
-        throw new AppError("Booking không tồn tại.", 404);
-      }
-      //check timeout
-      const now = new Date();
-      if (booking.holdExpiresAt && booking.holdExpiresAt < now) {
-        throw new AppError("Booking đã hết thời gian thanh toán.", 400);
-      }
-      if (booking.status === "paid") {
-        await session.commitTransaction();
-        return booking;
-      }
+  try {
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      userId,
+    }).session(session);
 
-      if (booking.status !== "pending") {
-        await session.commitTransaction();
-        return booking;
-      }
+    if (!booking) {
+      throw new AppError("Booking không tồn tại.", 404);
+    }
 
-      // seat thuộc booking - seat đang hold - seat do user giữ
-      const seatUpdate = await SeatTime.updateMany(
-        {
-          _id: { $in: booking.seats },
-          bookingId: booking._id,
-          trang_thai: "hold",
-          heldBy: booking.userId,
-        },
-        {
-          $set: { trang_thai: "booked" },
-          $unset: { heldBy: "", holdExpiresAt: "" },
-        },
-        { session },
-      );
+    const now = new Date();
+    if (booking.holdExpiresAt && booking.holdExpiresAt < now) {
+      throw new AppError("Booking đã hết thời gian thanh toán.", 400);
+    }
 
-      if (seatUpdate.modifiedCount !== booking.seats.length) {
-        throw new AppError("Một số ghế không còn hợp lệ để xác nhận.", 400);
-      }
-
-      booking.status = "paid";
-      booking.paymentId = paymentId;
-      booking.transactionCode = paymentId;
-      booking.ticketCode =
-        "TIC-" + randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase();
-      await booking.save({ session });
-
+    if (booking.status === "paid") {
       await session.commitTransaction();
       return booking;
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
     }
-  },
+
+    if (booking.status !== "pending") {
+      await session.commitTransaction();
+      return booking;
+    }
+
+    const seatUpdate = await SeatTime.updateMany(
+      {
+        _id: { $in: booking.seats },
+        bookingId: booking._id,
+        trang_thai: "hold",
+        heldBy: booking.userId,
+      },
+      {
+        $set: { trang_thai: "booked" },
+        $unset: { heldBy: "", holdExpiresAt: "" },
+      },
+      { session },
+    );
+
+    if (seatUpdate.modifiedCount !== booking.seats.length) {
+      throw new AppError("Một số ghế không còn hợp lệ để xác nhận.", 400);
+    }
+
+    booking.status = "paid";
+    booking.paymentId = paymentId;
+    booking.transactionCode = paymentId;
+    booking.ticketCode =
+      "TIC-" + randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase();
+
+    await booking.save({ session });
+    await session.commitTransaction();
+
+    const fullBooking = await Booking.findById(booking._id)
+      .populate("userId", "ho_ten email")
+      .populate({
+        path: "showTimeId",
+        populate: [
+          { path: "movieId", select: "ten_phim" },
+          {
+            path: "roomId",
+            select: "ten_phong cinema_id",
+            populate: {
+              path: "cinema_id",
+              select: "name",
+            },
+          },
+        ],
+      });
+
+    if (fullBooking) {
+      const user = fullBooking.userId as any;
+      const showTime = fullBooking.showTimeId as any;
+      const movie = showTime?.movieId as any;
+      const room = showTime?.roomId as any;
+      const cinema = room?.cinema_id as any;
+
+      if (user?.email) {
+        MailService.sendMail(
+          MailService.getBookingSuccessTemplate({
+            email: user.email,
+            customerName: user?.ho_ten || "Khach hang",
+            ticketCode: fullBooking.ticketCode || "---",
+            movieName: movie?.ten_phim || "---",
+            seatCodes: fullBooking.seatCodes || [],
+            showDate: showTime?.startTime
+              ? new Date(showTime.startTime).toLocaleDateString("vi-VN", {
+                  weekday: "long",
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "---",
+            showTime: showTime?.startTime
+              ? new Date(showTime.startTime).toLocaleTimeString("vi-VN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "---",
+            cinemaName: cinema?.name || "---",
+            roomName: room?.ten_phong || "---",
+            totalAmount: fullBooking.finalAmount || fullBooking.totalAmount || 0,
+            paymentMethod: fullBooking.paymentMethod || "---",
+            bookedAt: fullBooking.createdAt ? new Date(fullBooking.createdAt) : undefined,
+          }),
+        ).catch((error) => {
+          console.error("Send booking success mail failed:", error);
+        });
+      }
+    }
+
+    return booking;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+},
 
   //Tự động giải phóng ghế hết hạn (Dùng cho Cron job)
   async releaseExpiredBookings() {
@@ -339,4 +398,86 @@ export const bookingService = {
       session.endSession();
     }
   },
+
+ async checkinTicketByCode(ticketCode: string) {
+  const normalizedCode = ticketCode?.trim().toUpperCase();
+
+  if (!normalizedCode) {
+    throw new AppError("Ticket code khong hop le.", 400);
+  }
+
+  const booking = await Booking.findOne({ ticketCode: normalizedCode })
+    .populate("userId", "ho_ten email")
+    .populate({
+      path: "showTimeId",
+      populate: [
+        { path: "movieId", select: "ten_phim" },
+        {
+          path: "roomId",
+          select: "ten_phong cinema_id",
+          populate: {
+            path: "cinema_id",
+            select: "name",
+          },
+        },
+      ],
+    });
+
+  if (!booking) {
+    throw new AppError("Khong tim thay ve voi ticket code nay.", 404);
+  }
+
+  if (booking.status === "da_lay_ve" || booking.status === "picked_up") {
+    return booking;
+  }
+
+  if (booking.status !== "paid") {
+    throw new AppError("Ve chua o trang thai co the check-in.", 400);
+  }
+
+  booking.status = "da_lay_ve";
+  booking.pickedUpAt = new Date();
+  await booking.save();
+
+  const user = booking.userId as any;
+  const showTime = booking.showTimeId as any;
+  const movie = showTime?.movieId as any;
+  const room = showTime?.roomId as any;
+  const cinema = room?.cinema_id as any;
+
+  const userEmail = user?.email;
+  if (userEmail) {
+    MailService.sendMail(
+      MailService.getTicketPickupTemplate({
+        email: userEmail,
+        customerName: user?.ho_ten || "Khach hang",
+        ticketCode: booking.ticketCode || normalizedCode,
+        pickedUpAt: booking.pickedUpAt,
+        movieName: movie?.ten_phim || "---",
+        seatCodes: booking.seatCodes || [],
+        showDate: showTime?.startTime
+          ? new Date(showTime.startTime).toLocaleDateString("vi-VN", {
+              weekday: "long",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
+          : "---",
+        showTime: showTime?.startTime
+          ? new Date(showTime.startTime).toLocaleTimeString("vi-VN", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "---",
+        cinemaName: cinema?.name || "---",
+        roomName: room?.ten_phong || "---",
+        status: "Da nhan ve",
+      }),
+    ).catch((error) => {
+      console.error("Send pickup mail failed:", error);
+    });
+  }
+
+  return booking;
+},
 };

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import dayjs, { Dayjs } from "dayjs";
+import { useState } from 'react';
+import dayjs, { Dayjs } from 'dayjs';
 import {
   Layout,
   Row,
@@ -14,7 +14,7 @@ import {
   Alert,
   Space,
   Empty,
-} from "antd";
+} from 'antd';
 import {
   AreaChart,
   Area,
@@ -27,14 +27,14 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-} from "recharts";
-import { useAnalytics } from "../../hooks/useAnalytics";
+} from 'recharts';
+import { useAnalytics } from '../../hooks/useAnalytics';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
-const COLORS = ["#1677ff", "#52c41a", "#faad14", "#ff4d4f", "#722ed1"];
+const COLORS = ['#1677ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1'];
 
 type FilterState = {
   range: [Dayjs | null, Dayjs | null] | null;
@@ -43,23 +43,21 @@ type FilterState = {
 };
 
 const DEFAULT_FILTERS: FilterState = {
-  range: [dayjs().startOf("month"), dayjs().endOf("month")],
-  theaterName: "all",
-  status: "all",
+  range: [dayjs().startOf('month'), dayjs().endOf('month')],
+  theaterName: 'all',
+  status: 'all',
 };
 
-const formatCurrency = (value: number) =>
-  `${(value ?? 0).toLocaleString("vi-VN")} đ`;
+const formatCurrency = (value: number) => `${(value ?? 0).toLocaleString('vi-VN')} đ`;
 
-const formatNumber = (value: number) =>
-  (value ?? 0).toLocaleString("vi-VN");
+const formatNumber = (value: number) => (value ?? 0).toLocaleString('vi-VN');
 
 function Analytics() {
   const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
 
-  const fromDate = appliedFilters.range?.[0]?.format("YYYY-MM-DD");
-  const toDate = appliedFilters.range?.[1]?.format("YYYY-MM-DD");
+  const fromDate = appliedFilters.range?.[0]?.format('YYYY-MM-DD');
+  const toDate = appliedFilters.range?.[1]?.format('YYYY-MM-DD');
 
   const { data, isLoading, error, isFetching } = useAnalytics({
     fromDate,
@@ -74,7 +72,7 @@ function Analytics() {
   const topTheatersData = data?.charts?.topTheaters || [];
 
   const theaterOptions = [
-    { label: "Tất cả rạp", value: "all" },
+    { label: 'Tất cả rạp', value: 'all' },
     ...(data?.filters?.theaters || []).map((t) => ({
       label: t,
       value: t,
@@ -82,7 +80,7 @@ function Analytics() {
   ];
 
   const statusOptions = [
-    { label: "Tất cả trạng thái", value: "all" },
+    { label: 'Tất cả trạng thái', value: 'all' },
     ...(data?.filters?.statuses || []).map((s) => ({
       label: s,
       value: s,
@@ -99,7 +97,7 @@ function Analytics() {
   };
 
   const renderEmpty = (text: string) => (
-    <div style={{ height: 300, display: "flex", justifyContent: "center", alignItems: "center" }}>
+    <div style={{ height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Empty description={text} />
     </div>
   );
@@ -118,38 +116,32 @@ function Analytics() {
           <Row gutter={16}>
             <Col span={8}>
               <RangePicker
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 value={draftFilters.range}
-                onChange={(val) =>
-                  setDraftFilters((prev) => ({ ...prev, range: val }))
-                }
+                onChange={(val) => setDraftFilters((prev) => ({ ...prev, range: val }))}
               />
             </Col>
 
             <Col span={6}>
               <Select
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 value={draftFilters.theaterName}
-                onChange={(val) =>
-                  setDraftFilters((prev) => ({ ...prev, theaterName: val }))
-                }
+                onChange={(val) => setDraftFilters((prev) => ({ ...prev, theaterName: val }))}
                 options={theaterOptions}
               />
             </Col>
 
             <Col span={5}>
               <Select
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 value={draftFilters.status}
-                onChange={(val) =>
-                  setDraftFilters((prev) => ({ ...prev, status: val }))
-                }
+                onChange={(val) => setDraftFilters((prev) => ({ ...prev, status: val }))}
                 options={statusOptions}
               />
             </Col>
 
             <Col span={5}>
-              <Space style={{ width: "100%" }}>
+              <Space style={{ width: '100%' }}>
                 <Button type="primary" onClick={handleApply} loading={isFetching}>
                   Lọc
                 </Button>
@@ -196,15 +188,13 @@ function Analytics() {
               <Col span={12}>
                 <Card title="Doanh thu">
                   {revenueData.length === 0 ? (
-                    renderEmpty("Không có dữ liệu")
+                    renderEmpty('Không có dữ liệu')
                   ) : (
                     <ResponsiveContainer height={300}>
                       <AreaChart data={revenueData}>
                         <XAxis dataKey="label" />
                         <YAxis />
-                        <Tooltip
-                          formatter={(v) => formatCurrency(Number(v || 0))}
-                        />
+                        <Tooltip formatter={(v) => formatCurrency(Number(v || 0))} />
                         <Area dataKey="revenue" />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -216,11 +206,7 @@ function Analytics() {
                 <Card title="Trạng thái">
                   <ResponsiveContainer height={300}>
                     <PieChart>
-                      <Pie
-                        data={bookingStatusData}
-                        dataKey="count"
-                        nameKey="_id"
-                      >
+                      <Pie data={bookingStatusData} dataKey="count" nameKey="_id">
                         {bookingStatusData.map((_, i) => (
                           <Cell key={i} fill={COLORS[i % COLORS.length]} />
                         ))}
@@ -254,9 +240,7 @@ function Analytics() {
                     <BarChart data={topTheatersData}>
                       <XAxis dataKey="theaterName" />
                       <YAxis />
-                      <Tooltip
-                        formatter={(v) => formatCurrency(Number(v || 0))}
-                      />
+                      <Tooltip formatter={(v) => formatCurrency(Number(v || 0))} />
                       <Bar dataKey="revenue" />
                     </BarChart>
                   </ResponsiveContainer>

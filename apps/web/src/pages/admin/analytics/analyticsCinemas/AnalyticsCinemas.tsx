@@ -1,47 +1,100 @@
+
 export default function AnalyticsCinemas() {
+  const {
+    data: listData,
+    loading: listLoading,
+    error: listError,
+    refetch: refetchList,
+  } = useAnalyticsCinemas();
+
+  const [selectedCinemaId, setSelectedCinemaId] = useState<string>("");
+
+  const resolvedSelectedCinemaId = useMemo(() => {
+    if (selectedCinemaId) return selectedCinemaId;
+    return listData?.items?.[0]?.cinemaId || "";
+  }, [selectedCinemaId, listData]);
+
+  const {
+    data: detailData,
+    loading: detailLoading,
+    error: detailError,
+    refetch: refetchDetail,
+  } = useAnalyticsCinemaDetail(resolvedSelectedCinemaId);
+
+  const chartData = useMemo(() => detailData?.hourlyTraffic || [], [detailData]);
+
+  const maxTickets = useMemo(() => {
+    if (!chartData.length) return 0;
+    return Math.max(...chartData.map((item) => item.tickets), 0);
+  }, [chartData]);
+
+  const activeBarIndex = useMemo(() => {
+    if (!chartData.length) return -1;
+
+    let maxIndex = 0;
+    let maxValue = chartData[0].tickets;
+
+    chartData.forEach((item, index) => {
+      if (item.tickets > maxValue) {
+        maxValue = item.tickets;
+        maxIndex = index;
+      }
+    });
+
+    return maxIndex;
+  }, [chartData]);
+
+  const peakHour = useMemo(() => {
+    if (!chartData.length || activeBarIndex < 0) return "--:--";
+    return chartData[activeBarIndex]?.hour || "--:--";
+  }, [chartData, activeBarIndex]);
+
+  const handleReloadAll = () => {
+    refetchList();
+    refetchDetail();
+  };
+
   return (
-    <div className="p-3 sm:p-4 md:p-6 bg-[#f5f7fb] min-h-screen">
+    <div className="p-4 md:p-6 bg-[#f5f7fb] min-h-screen">
       {/* HEADER */}
-      <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center mb-5">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
         <div>
-          <p className="text-xs sm:text-sm text-gray-400">
+          <p className="text-xs md:text-sm text-gray-400">
             PHÂN TÍCH • PVM GIẢI PHÓNG
           </p>
-          <h1 className="text-base sm:text-lg md:text-2xl font-semibold leading-tight">
+          <h1 className="text-lg md:text-2xl font-semibold">
             Phân Tích Rạp Chiếu: PVM Giải phóng
           </h1>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-          <select className="border px-3 py-2 rounded-lg w-full sm:w-auto text-sm">
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <select className="border px-4 py-2 rounded-lg w-full sm:w-auto">
             <option>PVM GP - Hà Nội</option>
           </select>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg w-full sm:w-auto text-sm">
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg w-full sm:w-auto">
             Xuất Báo Cáo
           </button>
         </div>
       </div>
 
       {/* KPI */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
         {[
           { title: "Tổng doanh thu", value: "158.420.000đ", sub: "+12.5%", color: "text-green-500" },
           { title: "Tỷ lệ lấp đầy", value: "76.4%", sub: "", bar: true },
           { title: "Vé đã bán hôm nay", value: "1,248", sub: "842 vé", color: "text-green-500" },
           { title: "Phim phổ biến nhất", value: "Mai (2024)", sub: "342 vé hôm nay" },
         ].map((item, i) => (
-          <div key={i} className="bg-white p-4 md:p-5 rounded-xl shadow-sm">
-            <p className="text-gray-400 text-xs sm:text-sm">{item.title}</p>
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold mt-1 md:mt-2">
-              {item.value}
-            </h2>
+          <div key={i} className="bg-white p-5 rounded-xl shadow-sm">
+            <p className="text-gray-400 text-sm">{item.title}</p>
+            <h2 className="text-xl md:text-2xl font-bold mt-2">{item.value}</h2>
 
             {item.bar ? (
-              <div className="h-2 bg-gray-200 rounded mt-2">
+              <div className="h-2 bg-gray-200 rounded mt-3">
                 <div className="h-2 bg-orange-400 rounded w-[76%]" />
               </div>
             ) : (
-              <p className={`text-xs sm:text-sm mt-1 ${item.color || "text-gray-400"}`}>
+              <p className={`text-sm mt-2 ${item.color || "text-gray-400"}`}>
                 {item.sub}
               </p>
             )}
@@ -50,18 +103,18 @@ export default function AnalyticsCinemas() {
       </div>
 
       {/* MAIN */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* CHART */}
-        <div className="lg:col-span-2 bg-white p-4 md:p-5 rounded-xl shadow-sm">
-          <h3 className="font-semibold mb-3 md:mb-4 text-sm md:text-base">
+        <div className="lg:col-span-2 bg-white p-5 rounded-xl shadow-sm">
+          <h3 className="font-semibold mb-4">
             Lưu lượng khách theo giờ
           </h3>
 
-          <div className="flex items-end justify-between gap-1 sm:gap-2 h-40 sm:h-48">
+          <div className="flex items-end justify-between gap-2 h-48">
             {[40, 50, 80, 60, 90, 120, 100, 70].map((h, i) => (
               <div
                 key={i}
-                className={`w-full ${
+                className={`flex-1 ${
                   i === 5 ? "bg-blue-500" : "bg-blue-200"
                 } rounded`}
                 style={{ height: `${h}px` }}
@@ -69,96 +122,106 @@ export default function AnalyticsCinemas() {
             ))}
           </div>
 
-          <p className="text-xs sm:text-sm text-gray-400 mt-3">
+          <p className="text-sm text-gray-400 mt-4">
             Cao điểm dự kiến: 19:30 - 21:00
           </p>
         </div>
 
         {/* ACTIVITY */}
-        <div className="bg-white p-4 md:p-5 rounded-xl shadow-sm">
-          <h3 className="font-semibold mb-3 md:mb-4 text-sm md:text-base">
-            Hoạt động bán vé
-          </h3>
+        <div className="bg-white p-5 rounded-xl shadow-sm">
+          <h3 className="font-semibold mb-4">Hoạt động bán vé</h3>
 
-          <div className="space-y-2 text-xs sm:text-sm">
+          <div className="space-y-3 text-sm">
             <p>🛒 Lê Văn Hùng - Mua vé phim Mai</p>
             <p>✅ Thanh toán hoàn tất</p>
             <p>👤 Nguyễn Thị Thu - Kung Fu Panda</p>
             <p>🎟️ Đặt chỗ trực tuyến</p>
           </div>
 
-          <button className="mt-3 w-full border py-2 rounded-lg text-sm">
+          <button className="mt-4 w-full border py-2 rounded-lg">
             Xem tất cả
           </button>
         </div>
       </div>
 
       {/* TABLE + SIDE */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* TABLE */}
-        <div className="lg:col-span-2 bg-white p-4 md:p-5 rounded-xl shadow-sm overflow-x-auto">
-          <h3 className="font-semibold mb-3 md:mb-4 text-sm md:text-base">
+        <div className="lg:col-span-2 bg-white p-5 rounded-xl shadow-sm overflow-x-auto">
+          <h3 className="font-semibold mb-4">
             Hiệu suất theo phòng chiếu
           </h3>
 
-          <table className="w-full min-w-[600px] text-xs sm:text-sm">
+          <table className="w-full min-w-[600px] text-sm">
             <thead className="text-gray-400">
               <tr>
-                <th className="text-left">PHÒNG</th>
-                <th className="text-left">PHIM</th>
-                <th>SLC</th>
-                <th>VÉ</th>
-                <th>TRẠNG THÁI</th>
+                <th className="text-left py-2">RẠP</th>
+                <th className="text-left py-2">THÀNH PHỐ</th>
+                <th className="text-left py-2">ĐỊA CHỈ</th>
+                <th className="text-right py-2">DOANH THU</th>
+                <th className="text-right py-2">VÉ BÁN</th>
+                <th className="text-right py-2">LƯỢT ĐẶT</th>
+                <th className="text-right py-2">SỐ PHÒNG</th>
+                <th className="text-right py-2">LẤP ĐẦY</th>
               </tr>
             </thead>
 
             <tbody>
-              <tr className="border-t">
-                <td>Hall 01</td>
-                <td>Mai</td>
-                <td>250</td>
-                <td>248/250</td>
-                <td className="text-red-500">Gần đầy</td>
-              </tr>
-
-              <tr className="border-t">
-                <td>Hall 02</td>
-                <td>Kung Fu Panda</td>
-                <td>180</td>
-                <td>142/180</td>
-                <td className="text-green-500">Ổn định</td>
-              </tr>
-
-              <tr className="border-t">
-                <td>Hall 03</td>
-                <td>Dune</td>
-                <td>420</td>
-                <td>385/420</td>
-                <td className="text-green-500">Tốt</td>
-              </tr>
-
-              <tr className="border-t">
-                <td>Hall 04</td>
-                <td>Quỷ Cẩu</td>
-                <td>120</td>
-                <td>45/120</td>
-                <td className="text-gray-400">Thấp</td>
-              </tr>
+              {listData?.items?.length ? (
+                listData.items.map((item: CinemaAnalyticsItem) => (
+                  <tr
+                    key={item.cinemaId}
+                    className={`border-t cursor-pointer hover:bg-blue-50 ${
+                      resolvedSelectedCinemaId === item.cinemaId ? "bg-blue-50" : ""
+                    }`}
+                    onClick={() => setSelectedCinemaId(item.cinemaId)}
+                  >
+                    <td className="py-3 font-medium">{item.cinemaName}</td>
+                    <td className="py-3">{item.city || "-"}</td>
+                    <td className="py-3">{item.address || "-"}</td>
+                    <td className="py-3 text-right">
+                      {formatCurrency(item.totalRevenue)}
+                    </td>
+                    <td className="py-3 text-right">
+                      {formatNumber(item.totalTickets)}
+                    </td>
+                    <td className="py-3 text-right">
+                      {formatNumber(item.totalBookings)}
+                    </td>
+                    <td className="py-3 text-right">
+                      {formatNumber(item.roomCount)}
+                    </td>
+                    <td
+                      className={`py-3 text-right font-medium ${getOccupancyColor(
+                        item.occupancyRate
+                      )}`}
+                    >
+                      {item.occupancyRate || 0}%
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr className="border-t">
+                  <td colSpan={8} className="py-6 text-center text-gray-400">
+                    Chưa có dữ liệu nhiều rạp
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
 
         {/* SIDE CARD */}
-        <div className="bg-blue-600 text-white p-4 md:p-5 rounded-xl shadow-sm">
-          <p className="text-xs sm:text-sm opacity-80">Vị trí hiện tại</p>
-          <h3 className="text-base sm:text-lg md:text-xl font-semibold mt-1 md:mt-2">
+        <div className="bg-blue-600 text-white p-5 rounded-xl shadow-sm">
+          <p className="text-sm opacity-80">Vị trí hiện tại</p>
+          <h3 className="text-lg md:text-xl font-semibold mt-2">
             PVM Giải phóng
           </h3>
-          <p className="text-xs sm:text-sm mt-2 opacity-80">
+          <p className="text-sm mt-2 opacity-80">
             235 Giải Phóng, Hà Nội
           </p>
 
-          <div className="mt-3 h-24 md:h-32 bg-blue-500 rounded-lg" />
+          <div className="mt-4 h-32 bg-blue-500 rounded-lg" />
         </div>
       </div>
     </div>
