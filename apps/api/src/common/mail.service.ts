@@ -37,7 +37,7 @@ export const getOtpTemplate = (email: string, otp: string) => ({
                   letter-spacing: 10px; 
                   color: #ffffff; 
                   text-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
-                  user-select: all; /* Hỗ trợ một số trình duyệt tự chọn toàn bộ khi chạm */
+                  user-select: all;
                   -webkit-user-select: all;
                 ">
                   <span style="font-family: monospace; cursor: pointer;">${otp}</span>
@@ -49,7 +49,7 @@ export const getOtpTemplate = (email: string, otp: string) => ({
               <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 0;">
                 Mã này sẽ hết hạn trong <strong style="color: #f1f5f9;">10 phút</strong>.<br>
                 Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này.
-</p>
+              </p>
               
             </td>
           </tr>
@@ -85,7 +85,8 @@ export const getResetPasswordTemplate = (email: string, resetUrl: string) => ({
                   font-weight:600;
                   display:inline-block;
                   font-size:15px;
-                ">
+                "
+              >
                 Reset Password
               </a>
             </div>
@@ -104,6 +105,172 @@ export const getResetPasswordTemplate = (email: string, resetUrl: string) => ({
         </div>
       `,
 });
+
+export const getBookingSuccessTemplate = (payload: {
+  email: string;
+  customerName: string;
+  ticketCode: string;
+  movieName?: string;
+  seatCodes?: string[];
+  showDate?: string;
+  showTime?: string;
+  cinemaName?: string;
+  roomName?: string;
+  totalAmount?: number;
+  paymentMethod?: string;
+  bookedAt?: Date;
+}) => {
+  const bookedTime = payload.bookedAt
+    ? new Date(payload.bookedAt).toLocaleString('vi-VN')
+    : new Date().toLocaleString('vi-VN');
+
+  return {
+    to: payload.email,
+    subject: 'Xac nhan dat ve thanh cong',
+    html: `
+      <div style="margin:0; padding:32px 16px; background:#f3f4f6; font-family:Arial, sans-serif; color:#111827;">
+        <div style="max-width:640px; margin:0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.06);">
+          
+          <div style="padding:28px 32px; background:linear-gradient(90deg, #dc2626 0%, #b91c1c 100%);">
+            <div style="font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#fee2e2;">
+              Booking Confirmation
+            </div>
+            <h2 style="margin:10px 0 0; font-size:30px; line-height:1.2; color:#ffffff;">
+              Dat ve thanh cong
+            </h2>
+            <p style="margin:12px 0 0; color:#fee2e2; font-size:15px; line-height:1.7;">
+              Xin chao <b>${payload.customerName || 'Quy khach'}</b>, don dat ve cua ban da duoc xac nhan thanh cong.
+            </p>
+          </div>
+
+          <div style="padding:28px 32px;">
+            <div style="margin-bottom:20px; padding:18px 20px; background:#fff5f5; border:1px solid #fecaca; border-radius:16px;">
+              <div style="font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#b91c1c; margin-bottom:8px;">
+                Ticket Code
+              </div>
+              <div style="font-size:28px; font-weight:800; font-family:monospace; color:#dc2626;">
+                ${payload.ticketCode || '---'}
+              </div>
+            </div>
+
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate; border-spacing:0 12px;">
+              <tr>
+                <td style="width:50%; vertical-align:top; padding-right:8px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
+                      Phim
+                    </div>
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
+                      ${payload.movieName || '---'}
+                    </div>
+                  </div>
+                </td>
+                <td style="width:50%; vertical-align:top; padding-left:8px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
+                      Ghe
+                    </div>
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
+                      ${(payload.seatCodes || []).join(', ') || '---'}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="width:50%; vertical-align:top; padding-right:8px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
+                      Ngay chieu
+                    </div>
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
+                      ${payload.showDate || '---'}
+                    </div>
+                  </div>
+                </td>
+                <td style="width:50%; vertical-align:top; padding-left:8px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
+                      Gio chieu
+                    </div>
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
+                      ${payload.showTime || '---'}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="width:50%; vertical-align:top; padding-right:8px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
+                      Rap
+                    </div>
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
+                      ${payload.cinemaName || '---'}
+                    </div>
+                  </div>
+                </td>
+                <td style="width:50%; vertical-align:top; padding-left:8px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
+                      Phong
+                    </div>
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
+                      ${payload.roomName || '---'}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="width:50%; vertical-align:top; padding-right:8px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
+                      Thanh toan
+                    </div>
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
+                      ${payload.paymentMethod || '---'}
+                    </div>
+                  </div>
+                </td>
+                <td style="width:50%; vertical-align:top; padding-left:8px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
+                      Tong tien
+                    </div>
+                    <div style="font-size:15px; color:#dc2626; font-weight:800;">
+                      ${Number(payload.totalAmount || 0).toLocaleString('vi-VN')} VND
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+            <div style="margin-top:20px; padding:16px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:14px;">
+              <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
+                Thoi gian dat ve
+              </div>
+              <div style="font-size:15px; color:#111827; font-weight:700;">
+                ${bookedTime}
+              </div>
+            </div>
+
+            <div style="margin-top:20px; padding:14px 16px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:14px;">
+              <p style="margin:0; color:#1e3a8a; font-size:13px; line-height:1.7;">
+                Vui long mang theo ma ve hoac mo email nay khi den rap. Ban co the dua ticket code cho nhan vien hoac su dung ma QR tren trang chi tiet ve trong tai khoan cua minh.
+              </p>
+            </div>
+
+            <p style="margin:18px 0 0; color:#9ca3af; font-size:12px; text-align:center;">
+              Email tu dong tu he thong rap phim.
+            </p>
+          </div>
+        </div>
+      </div>
+    `,
+  };
+};
 
 export const getTicketPickupTemplate = (payload: {
   email: string;
@@ -126,27 +293,27 @@ export const getTicketPickupTemplate = (payload: {
     to: payload.email,
     subject: 'Xac nhan da nhan ve thanh cong',
     html: `
-      <div style="margin:0; padding:24px; background:#070b14; font-family:Arial, sans-serif;">
-        <div style="max-width:620px; margin:0 auto; background:linear-gradient(180deg,#0f172a 0%, #111827 100%); border:1px solid #1f2937; border-radius:20px; overflow:hidden; color:#f3f4f6;">
+      <div style="margin:0; padding:32px 16px; background:#f3f4f6; font-family:Arial, sans-serif; color:#111827;">
+        <div style="max-width:640px; margin:0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.06);">
           
-          <div style="padding:28px 28px 18px; background:linear-gradient(90deg,#14532d 0%, #166534 100%);">
-            <div style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#dcfce7; font-weight:700;">
+          <div style="padding:28px 32px; background:linear-gradient(90deg, #166534 0%, #15803d 100%);">
+            <div style="font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#dcfce7;">
               Cinema Ticket Pickup
             </div>
-            <h2 style="margin:10px 0 0; font-size:28px; line-height:1.2; color:#ffffff;">
+            <h2 style="margin:10px 0 0; font-size:30px; line-height:1.2; color:#ffffff;">
               Ve da duoc nhan thanh cong
             </h2>
-            <p style="margin:10px 0 0; color:#dcfce7; font-size:14px; line-height:1.6;">
+            <p style="margin:12px 0 0; color:#dcfce7; font-size:15px; line-height:1.7;">
               Xin chao <b>${payload.customerName || 'Quy khach'}</b>, nhan vien rap da xac nhan ban da nhan ve thanh cong.
             </p>
           </div>
 
-          <div style="padding:24px 28px;">
-            <div style="margin-bottom:18px; padding:16px; border:1px solid #334155; border-radius:14px; background:#0b1220;">
-              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:2px; font-weight:700; margin-bottom:8px;">
+          <div style="padding:28px 32px;">
+            <div style="margin-bottom:20px; padding:18px 20px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:16px;">
+              <div style="font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#166534; margin-bottom:8px;">
                 Ticket Code
               </div>
-              <div style="font-size:24px; font-weight:800; color:#f87171; font-family:monospace; letter-spacing:1px;">
+              <div style="font-size:28px; font-weight:800; font-family:monospace; color:#15803d;">
                 ${payload.ticketCode || '---'}
               </div>
             </div>
@@ -154,21 +321,21 @@ export const getTicketPickupTemplate = (payload: {
             <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate; border-spacing:0 12px;">
               <tr>
                 <td style="width:50%; vertical-align:top; padding-right:8px;">
-                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
-                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
                       Phim
                     </div>
-                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.movieName || '---'}
                     </div>
                   </div>
                 </td>
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
-                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
-                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
                       Ghe
                     </div>
-                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${(payload.seatCodes || []).join(', ') || '---'}
                     </div>
                   </div>
@@ -177,21 +344,21 @@ export const getTicketPickupTemplate = (payload: {
 
               <tr>
                 <td style="width:50%; vertical-align:top; padding-right:8px;">
-                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
-                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
                       Ngay chieu
                     </div>
-                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.showDate || '---'}
                     </div>
                   </div>
                 </td>
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
-                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
-                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
                       Gio chieu
                     </div>
-                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.showTime || '---'}
                     </div>
                   </div>
@@ -200,21 +367,21 @@ export const getTicketPickupTemplate = (payload: {
 
               <tr>
                 <td style="width:50%; vertical-align:top; padding-right:8px;">
-                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
-                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
                       Rap
                     </div>
-                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.cinemaName || '---'}
                     </div>
                   </div>
                 </td>
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
-                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
-                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
                       Phong
                     </div>
-                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                    <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.roomName || '---'}
                     </div>
                   </div>
@@ -223,21 +390,21 @@ export const getTicketPickupTemplate = (payload: {
 
               <tr>
                 <td style="width:50%; vertical-align:top; padding-right:8px;">
-                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
-                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
                       Thoi gian nhan ve
                     </div>
-                    <div style="font-size:15px; color:#22c55e; font-weight:700;">
+                    <div style="font-size:15px; color:#15803d; font-weight:700;">
                       ${pickedUpTime}
                     </div>
                   </div>
                 </td>
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
-                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
-                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
                       Trang thai
                     </div>
-                    <div style="font-size:15px; color:#22c55e; font-weight:700;">
+                    <div style="font-size:15px; color:#15803d; font-weight:700;">
                       ${payload.status || 'Da nhan ve'}
                     </div>
                   </div>
@@ -245,13 +412,13 @@ export const getTicketPickupTemplate = (payload: {
               </tr>
             </table>
 
-            <div style="margin-top:20px; padding:14px 16px; background:#052e16; border:1px solid #166534; border-radius:14px;">
-              <p style="margin:0; color:#dcfce7; font-size:13px; line-height:1.6;">
+            <div style="margin-top:20px; padding:14px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:14px;">
+              <p style="margin:0; color:#166534; font-size:13px; line-height:1.7;">
                 Cam on ban da su dung dich vu cua he thong rap phim. Vui long luu lai email nay de doi chieu khi can.
               </p>
             </div>
 
-            <p style="margin:18px 0 0; color:#94a3b8; font-size:12px; text-align:center;">
+            <p style="margin:18px 0 0; color:#9ca3af; font-size:12px; text-align:center;">
               Email tu dong tu he thong rap phim.
             </p>
           </div>
@@ -260,67 +427,3 @@ export const getTicketPickupTemplate = (payload: {
     `,
   };
 };
-// export const sendTicketEmail = async (userEmail: string, bookingData: any) => {
-//   try {
-//     let transporter;
-
-//     // KIỂM TRA: Nếu không có cấu hình Gmail thì dùng Ethereal (Mock)
-//     if (!process.env.MAIL_USER || !process.env.MAIL_PASS) {
-//       console.log(
-//         "⚠️  Phát hiện thiếu cấu hình Gmail. Đang tạo tài khoản Mock (Ethereal)...",
-//       );
-//       const testAccount = await nodemailer.createTestAccount();
-//       transporter = nodemailer.createTransport({
-//         host: "smtp.ethereal.email",
-//         port: 587,
-//         secure: false,
-//         auth: {
-//           user: testAccount.user,
-//           pass: testAccount.pass,
-//         },
-//       });
-//     } else {
-//       // Dùng Gmail thật nếu đã cấu hình
-//       transporter = nodemailer.createTransport({
-//         service: "gmail",
-//         auth: {
-//           user: process.env.MAIL_USER,
-//           pass: process.env.MAIL_PASS,
-//         },
-//       });
-//     }
-
-//     const qrDataUrl = await QRCode.toDataURL(bookingData._id.toString());
-
-//     const htmlContent = `
-//       <div style="font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; max-width: 600px; margin: auto;">
-//         <h2 style="color: #e50914; text-align: center;">VÉ XEM PHIM GIẢ LẬP (MOCK)</h2>
-//         <p>Chào <b>${bookingData.ho_ten}</b>, đây là mail test!</p>
-//         <hr>
-//         <p>🎬 <b>Phim:</b> ${bookingData.movieName}</p>
-//         <p>💺 <b>Ghế:</b> ${bookingData.seatCodes.join(", ")}</p>
-//         <div style="text-align: center; margin-top: 20px;">
-//           <img src="${qrDataUrl}" alt="QR Code" width="200"/>
-//         </div>
-//       </div>
-//     `;
-
-//     const info = await transporter.sendMail({
-//       from: '"Cinema Mock" <project-cinema@example.com>',
-//       to: userEmail,
-//       subject: "Test vé xem phim",
-//       html: htmlContent,
-//     });
-
-//     console.log("-----------------------------------------");
-//     console.log("✅ Mail gửi thành công (Mock Mode)!");
-//     // ĐÂY LÀ DÒNG QUAN TRỌNG NHẤT:
-//     console.log(
-//       "🔗 Xem nội dung mail tại đây:",
-//       nodemailer.getTestMessageUrl(info),
-//     );
-//     console.log("-----------------------------------------");
-//   } catch (error) {
-//     console.error("❌ Lỗi Mock Mail:", error);
-//   }
-// };

@@ -83,7 +83,7 @@ export const ClientRoutes: RouteObject = {
 
     { path: 'about', element: <About /> },
     { path: 'event', element: <Event /> },
-
+    
     {
       path: 'news',
       children: [
