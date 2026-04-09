@@ -34,7 +34,13 @@ type CinemaRef = {
 };
 
 type RoomWithCinema = IPhong & {
-  cinema_id?: string | CinemaRef;
+  cinema_id?: string | CinemaRef | null;
+};
+
+type CinemaShowtimeButton = {
+  showtimeId: string;
+  movieId: string;
+  time: string;
 };
 
 type CinemaShowtimeItem = {
@@ -42,7 +48,7 @@ type CinemaShowtimeItem = {
   title: string;
   meta: string;
   poster?: string;
-  times: string[];
+  buttons: CinemaShowtimeButton[];
 };
 
 const getCinemaIdFromRoom = (room: RoomWithCinema) => {
@@ -75,11 +81,13 @@ const getMovieInfo = (
   movies: IMovie[],
 ): { id: string; title: string; duration: number; poster?: string } => {
   if (typeof movieId === 'object') {
+    const matchedMovie = movies.find((item) => item._id === movieId._id);
+
     return {
       id: movieId._id || '',
-      title: movieId.ten_phim || 'Không xác định',
-      duration: movieId.thoi_luong || 0,
-      poster: undefined,
+      title: movieId.ten_phim || matchedMovie?.ten_phim || 'Không xác định',
+      duration: movieId.thoi_luong || matchedMovie?.thoi_luong || 0,
+      poster: matchedMovie?.poster?.url,
     };
   }
 
@@ -118,8 +126,8 @@ export default function CinemaDetail() {
 
     cinemaRooms.forEach((room) => {
       if (room.loai_phong) roomTypes.add(room.loai_phong);
-      if (room.vip?.length) hasVipSeat = true;
-      if (room.couple?.length) hasCoupleSeat = true;
+      if ((room as any).vip?.length) hasVipSeat = true;
+      if ((room as any).couple?.length) hasCoupleSeat = true;
     });
 
     const items = [
@@ -175,6 +183,8 @@ export default function CinemaDetail() {
       const roomType =
         typeof showtime.roomId === 'object' ? showtime.roomId?.loai_phong : undefined;
       const timeText = dayjs(showtime.startTime).format('HH:mm');
+      const showtimeId = showtime._id || '';
+      const movieId = movieInfo.id;
       const key = movieInfo.id || `movie-${timeText}`;
 
       if (!grouped.has(key)) {
@@ -187,16 +197,26 @@ export default function CinemaDetail() {
           poster:
             movieInfo.poster ||
             'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=300&q=80',
-          times: [timeText],
+          buttons: [
+            {
+              showtimeId,
+              movieId,
+              time: timeText,
+            },
+          ],
         });
       } else {
-        grouped.get(key)?.times.push(timeText);
+        grouped.get(key)?.buttons.push({
+          showtimeId,
+          movieId,
+          time: timeText,
+        });
       }
     });
 
     return Array.from(grouped.values()).map((item) => ({
       ...item,
-      times: [...item.times].sort((a, b) => a.localeCompare(b)),
+      buttons: [...item.buttons].sort((a, b) => a.time.localeCompare(b.time)),
     }));
   }, [id, cinemaRooms, movies, showtimes]);
 
@@ -315,13 +335,18 @@ export default function CinemaDetail() {
                         </div>
 
                         <div className="mt-4 flex flex-wrap gap-2">
-                          {movie.times.map((time) => (
+                          {movie.buttons.map((item) => (
                             <button
-                              key={time}
+                              key={item.showtimeId}
                               type="button"
-                              className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs"
+                              onClick={() =>
+                                navigate(
+                                  `/booking/seats?showtimeId=${item.showtimeId}&movieId=${item.movieId}`,
+                                )
+                              }
+                              className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs transition hover:border-[#ff3b3b] hover:bg-[#ff3b3b] hover:text-white"
                             >
-                              {time}
+                              {item.time}
                             </button>
                           ))}
                         </div>
