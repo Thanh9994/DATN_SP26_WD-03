@@ -4,8 +4,12 @@ export default function StaffStatus() {
       {/* HEADER */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-400">SAPPHIRE ADMIN • NHÂN SỰ</p>
-          <h1 className="text-2xl font-semibold">Quản lý Nhân sự</h1>
+          <p className="text-xs md:text-sm text-gray-400">
+            SAPPHIRE ADMIN • NHÂN SỰ
+          </p>
+          <h1 className="text-lg md:text-2xl font-semibold">
+            Quản lý Nhân sự
+          </h1>
         </div>
 
         <button className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white">
@@ -51,7 +55,9 @@ export default function StaffStatus() {
           <option>Tất cả Rạp công tác</option>
         </select>
 
-        <button className="text-gray-500">Lọc thêm</button>
+        <button className="text-gray-500 text-left md:text-center">
+          Lọc thêm
+        </button>
       </div>
 
       {/* TABLE */}
