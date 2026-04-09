@@ -907,6 +907,37 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                     message={`1 ca chiếu = ${durationMinutes} phút phim + ${CLEANING_MINUTES} phút dọn dẹp.`}
                   />
 
+                  {/* ===== PREVIEW TABLE (UI ONLY) ===== */}
+<Card size="small" className="mb-4">
+  <Typography.Text strong>
+    Danh sách suất chiếu (Preview)
+  </Typography.Text>
+
+  <Table
+    size="small"
+    pagination={false}
+    columns={[
+      { title: 'Phim', dataIndex: 'movie' },
+      { title: 'Phòng', dataIndex: 'room' },
+      { title: 'Ngày', dataIndex: 'date' },
+      { title: 'Bắt đầu', dataIndex: 'start' },
+      { title: 'Kết thúc', dataIndex: 'end' },
+      { title: 'Giá', dataIndex: 'price' },
+    ]}
+    dataSource={
+      singleSlotOptions?.map((slot, index) => ({
+        key: index,
+        movie: activeSingleMovie?.ten_phim || '---',
+        room: 'IMAX',
+        date: singleDate?.format('DD/MM/YYYY'),
+        start: slot.value,
+        end: '---',
+        price: singleForm.getFieldValue('priceNormal') || 0,
+      })) || []
+    }
+  />
+</Card>
+
                   {singleDate && singleRoomIds?.length && (
                     <Card size="small" className="mb-4 bg-slate-50">
                       <Typography.Text strong>

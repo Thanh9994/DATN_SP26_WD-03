@@ -147,6 +147,30 @@ export default function Cinemas() {
     return Object.entries(grouped);
   };
 
+  const { cinemas = [], isLoading } = useCinemas();
+
+  const cities = useMemo(() => {
+    const cityMap = new Map<string, number>();
+
+    cinemas.forEach((cinema: ICinema) => {
+      const cityName = cinema.city?.trim() || 'Khac';
+      cityMap.set(cityName, (cityMap.get(cityName) || 0) + 1);
+    });
+
+    return Array.from(cityMap.entries()).map(([name, cinemaCount], index) => ({
+      id: index + 1,
+      name,
+      cinemas: cinemaCount,
+    }));
+  }, [cinemas]);
+
+  const activeCity = selectedCity || cities[0]?.name || '';
+
+  const filteredCinemas = useMemo(() => {
+    if (!activeCity) return cinemas;
+    return cinemas.filter((cinema: ICinema) => cinema.city === activeCity);
+  }, [cinemas, activeCity]);
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="mx-auto flex min-h-screen max-w-[1600px] flex-col lg:flex-row">
