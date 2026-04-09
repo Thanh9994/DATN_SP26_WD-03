@@ -112,23 +112,149 @@ export const getTicketPickupTemplate = (payload: {
   pickedUpAt: Date;
   movieName?: string;
   seatCodes?: string[];
+  showDate?: string;
+  showTime?: string;
+  cinemaName?: string;
+  roomName?: string;
+  status?: string;
 }) => {
-  const pickedUpTime = payload.pickedUpAt.toLocaleString('vi-VN');
+  const pickedUpTime = payload.pickedUpAt
+    ? new Date(payload.pickedUpAt).toLocaleString('vi-VN')
+    : '---';
+
   return {
     to: payload.email,
     subject: 'Xac nhan da nhan ve thanh cong',
     html: `
-      <div style="font-family: Arial, sans-serif; background:#0b1020; padding:24px;">
-        <div style="max-width:560px; margin:0 auto; background:#111827; border:1px solid #1f2937; border-radius:16px; padding:24px; color:#f3f4f6;">
-          <h2 style="margin:0 0 12px; color:#22c55e;">Ve da duoc lay thanh cong</h2>
-          <p style="margin:0 0 16px; color:#d1d5db;">Xin chao <b>${payload.customerName || 'Quy khach'}</b>, nhan vien rap da xac nhan ban da nhan ve.</p>
-          <div style="background:#0f172a; border:1px solid #334155; border-radius:12px; padding:14px;">
-            <p style="margin:0 0 8px;"><b>Ticket code:</b> ${payload.ticketCode}</p>
-            <p style="margin:0 0 8px;"><b>Thoi gian nhan ve:</b> ${pickedUpTime}</p>
-            <p style="margin:0 0 8px;"><b>Phim:</b> ${payload.movieName || '---'}</p>
-            <p style="margin:0;"><b>Ghe:</b> ${(payload.seatCodes || []).join(', ') || '---'}</p>
+      <div style="margin:0; padding:24px; background:#070b14; font-family:Arial, sans-serif;">
+        <div style="max-width:620px; margin:0 auto; background:linear-gradient(180deg,#0f172a 0%, #111827 100%); border:1px solid #1f2937; border-radius:20px; overflow:hidden; color:#f3f4f6;">
+          
+          <div style="padding:28px 28px 18px; background:linear-gradient(90deg,#14532d 0%, #166534 100%);">
+            <div style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#dcfce7; font-weight:700;">
+              Cinema Ticket Pickup
+            </div>
+            <h2 style="margin:10px 0 0; font-size:28px; line-height:1.2; color:#ffffff;">
+              Ve da duoc nhan thanh cong
+            </h2>
+            <p style="margin:10px 0 0; color:#dcfce7; font-size:14px; line-height:1.6;">
+              Xin chao <b>${payload.customerName || 'Quy khach'}</b>, nhan vien rap da xac nhan ban da nhan ve thanh cong.
+            </p>
           </div>
-          <p style="margin-top:16px; color:#9ca3af; font-size:12px;">Email tu dong tu he thong rap phim.</p>
+
+          <div style="padding:24px 28px;">
+            <div style="margin-bottom:18px; padding:16px; border:1px solid #334155; border-radius:14px; background:#0b1220;">
+              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:2px; font-weight:700; margin-bottom:8px;">
+                Ticket Code
+              </div>
+              <div style="font-size:24px; font-weight:800; color:#f87171; font-family:monospace; letter-spacing:1px;">
+                ${payload.ticketCode || '---'}
+              </div>
+            </div>
+
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate; border-spacing:0 12px;">
+              <tr>
+                <td style="width:50%; vertical-align:top; padding-right:8px;">
+                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                      Phim
+                    </div>
+                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                      ${payload.movieName || '---'}
+                    </div>
+                  </div>
+                </td>
+                <td style="width:50%; vertical-align:top; padding-left:8px;">
+                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                      Ghe
+                    </div>
+                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                      ${(payload.seatCodes || []).join(', ') || '---'}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="width:50%; vertical-align:top; padding-right:8px;">
+                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                      Ngay chieu
+                    </div>
+                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                      ${payload.showDate || '---'}
+                    </div>
+                  </div>
+                </td>
+                <td style="width:50%; vertical-align:top; padding-left:8px;">
+                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                      Gio chieu
+                    </div>
+                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                      ${payload.showTime || '---'}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="width:50%; vertical-align:top; padding-right:8px;">
+                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                      Rap
+                    </div>
+                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                      ${payload.cinemaName || '---'}
+                    </div>
+                  </div>
+                </td>
+                <td style="width:50%; vertical-align:top; padding-left:8px;">
+                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                      Phong
+                    </div>
+                    <div style="font-size:15px; color:#ffffff; font-weight:700;">
+                      ${payload.roomName || '---'}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="width:50%; vertical-align:top; padding-right:8px;">
+                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                      Thoi gian nhan ve
+                    </div>
+                    <div style="font-size:15px; color:#22c55e; font-weight:700;">
+                      ${pickedUpTime}
+                    </div>
+                  </div>
+                </td>
+                <td style="width:50%; vertical-align:top; padding-left:8px;">
+                  <div style="background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px;">
+                    <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:6px;">
+                      Trang thai
+                    </div>
+                    <div style="font-size:15px; color:#22c55e; font-weight:700;">
+                      ${payload.status || 'Da nhan ve'}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+            <div style="margin-top:20px; padding:14px 16px; background:#052e16; border:1px solid #166534; border-radius:14px;">
+              <p style="margin:0; color:#dcfce7; font-size:13px; line-height:1.6;">
+                Cam on ban da su dung dich vu cua he thong rap phim. Vui long luu lai email nay de doi chieu khi can.
+              </p>
+            </div>
+
+            <p style="margin:18px 0 0; color:#94a3b8; font-size:12px; text-align:center;">
+              Email tu dong tu he thong rap phim.
+            </p>
+          </div>
         </div>
       </div>
     `,
