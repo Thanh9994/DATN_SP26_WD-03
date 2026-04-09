@@ -341,50 +341,78 @@ export const bookingService = {
     }
   },
 
-  async checkinTicketByCode(ticketCode: string) {
-    const normalizedCode = ticketCode?.trim().toUpperCase();
-    if (!normalizedCode) {
-      throw new AppError("Ticket code khong hop le.", 400);
-    }
+ async checkinTicketByCode(ticketCode: string) {
+  const normalizedCode = ticketCode?.trim().toUpperCase();
 
-    const booking = await Booking.findOne({ ticketCode: normalizedCode })
-      .populate("userId", "ho_ten email")
-      .populate({
-        path: "showTimeId",
-        populate: [{ path: "movieId", select: "ten_phim" }],
-      });
+  if (!normalizedCode) {
+    throw new AppError("Ticket code khong hop le.", 400);
+  }
 
-    if (!booking) {
-      throw new AppError("Khong tim thay ve voi ticket code nay.", 404);
-    }
+  const booking = await Booking.findOne({ ticketCode: normalizedCode })
+    .populate("userId", "ho_ten email")
+    .populate({
+      path: "showTimeId",
+      populate: [
+        { path: "movieId", select: "ten_phim" },
+        {
+          path: "roomId",
+          select: "ten_phong cinema_id",
+          populate: {
+            path: "cinema_id",
+            select: "name",
+          },
+        },
+      ],
+    });
 
-    if (booking.status === "da_lay_ve" || booking.status === "picked_up") {
-      return booking;
-    }
+  if (!booking) {
+    throw new AppError("Khong tim thay ve voi ticket code nay.", 404);
+  }
 
-    if (booking.status !== "paid") {
-      throw new AppError("Ve chua o trang thai co the check-in.", 400);
-    }
-
-    booking.status = "da_lay_ve";
-    booking.pickedUpAt = new Date();
-    await booking.save();
-
-    const user = booking.userId as any;
-    const userEmail = user?.email;
-    if (userEmail) {
-      MailService.sendMail(
-        MailService.getTicketPickupTemplate({
-          email: userEmail,
-          customerName: user?.ho_ten || "Khach hang",
-          ticketCode: booking.ticketCode || normalizedCode,
-          pickedUpAt: booking.pickedUpAt,
-          movieName: (booking.showTimeId as any)?.movieId?.ten_phim,
-          seatCodes: booking.seatCodes || [],
-        }),
-      ).catch(console.error);
-    }
-
+  if (booking.status === "da_lay_ve" || booking.status === "picked_up") {
     return booking;
-  },
+  }
+
+  if (booking.status !== "paid") {
+    throw new AppError("Ve chua o trang thai co the check-in.", 400);
+  }
+
+  booking.status = "da_lay_ve";
+  booking.pickedUpAt = new Date();
+  await booking.save();
+
+  const user = booking.userId as any;
+  const showTime = booking.showTimeId as any;
+  const movie = showTime?.movieId as any;
+  const room = showTime?.roomId as any;
+  const cinema = room?.cinema_id as any;
+
+  const userEmail = user?.email;
+  if (userEmail) {
+    MailService.sendMail(
+      MailService.getTicketPickupTemplate({
+        email: userEmail,
+        customerName: user?.ho_ten || "Khach hang",
+        ticketCode: booking.ticketCode || normalizedCode,
+        pickedUpAt: booking.pickedUpAt,
+        movieName: movie?.ten_phim || "---",
+        seatCodes: booking.seatCodes || [],
+        showDate: showTime?.showDate || "---",
+        showTime: showTime?.startTime
+          ? new Date(showTime.startTime).toLocaleTimeString("vi-VN", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "---",
+        cinemaName: cinema?.name || "---",
+        roomName: room?.ten_phong || "---",
+        status: "Da nhan ve",
+      }),
+    ).catch((error) => {
+      console.error("Send pickup mail failed:", error);
+    });
+  }
+
+  return booking;
+},
 };
