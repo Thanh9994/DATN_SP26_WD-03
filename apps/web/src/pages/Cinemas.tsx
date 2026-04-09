@@ -358,10 +358,10 @@ export default function Cinemas() {
 
                     {/* Action Button */}
                     <button
+                      type="button"
                       onClick={() => {
-                        if (cinema._id) {
-                          navigate(`/cinemadetail/${cinema._id}`);
-                        }
+                        if (!cinema._id) return;
+                        navigate(`/cinemadetail/${cinema._id}`);
                       }}
                       className="mt-5 md:mt-0 w-full md:w-auto rounded-lg bg-red-700 px-6 py-3 font-bold text-white transition-all duration-200 hover:bg-red-600 hover:scale-105 flex items-center justify-center gap-2"
                     >
