@@ -47,22 +47,22 @@ export const Contact = (): JSX.Element => {
     {
       id: 'access',
       icon: '∞',
-      title: 'Infinite Access',
+      title: 'Truy cập không giới hạn',
       description:
-        'Unlimited access to the largest collection of films from around the world, anytime.',
+        'Tiếp cận kho phim phong phú từ khắp nơi trên thế giới mọi lúc, mọi nơi.',
     },
     {
       id: 'experience',
       icon: '★',
-      title: 'Premium Experience',
+      title: 'Trải nghiệm cao cấp',
       description:
-        'Immerse yourself in crystal-clear quality with cutting-edge streaming technology.',
+        'Đắm chìm trong chất lượng hình ảnh sắc nét với công nghệ xem phim hiện đại.',
     },
     {
       id: 'community',
       icon: '🌐',
-      title: 'Global Community',
-      description: 'Join millions of film enthusiasts and connect with cinema lovers worldwide.',
+      title: 'Cộng đồng toàn cầu',
+      description: 'Kết nối với hàng triệu khán giả yêu điện ảnh trên toàn thế giới.',
     },
   ];
 
@@ -70,18 +70,18 @@ export const Contact = (): JSX.Element => {
     () => [
       {
         icon: '📍',
-        title: 'Our Headquarters',
+        title: 'Trụ sở chính',
         details: ['888 Cinematic Plaza, Hollywood North', 'Los Angeles, CA 90028'],
       },
       {
         icon: '✉️',
-        title: 'Customer Support',
+        title: 'Hỗ trợ khách hàng',
         details: ['support@cinestream.com', 'partners@cinestream.com'],
       },
       {
         icon: '📞',
-        title: 'Phone Support',
-        details: ['+1 (800) CINE-FILM', 'Mon-Sun, 24/7 Service'],
+        title: 'Hỗ trợ qua điện thoại',
+        details: ['+1 (800) CINE-FILM', 'Phục vụ 24/7, từ Thứ Hai đến Chủ Nhật'],
       },
     ],
     [],
@@ -117,23 +117,23 @@ export const Contact = (): JSX.Element => {
     const newErrors: FormErrors = {};
 
     if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Please enter your full name';
+      newErrors.fullName = 'Vui lòng nhập họ và tên';
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Please enter your email address';
+      newErrors.email = 'Vui lòng nhập địa chỉ email';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Email format is invalid';
+      newErrors.email = 'Định dạng email không hợp lệ';
     }
 
     if (!formData.subject.trim()) {
-      newErrors.subject = 'Please enter a subject';
+      newErrors.subject = 'Vui lòng nhập tiêu đề';
     }
 
     if (!formData.message.trim()) {
-      newErrors.message = 'Please enter your message';
+      newErrors.message = 'Vui lòng nhập nội dung liên hệ';
     } else if (formData.message.trim().length < 10) {
-      newErrors.message = 'Message must be at least 10 characters';
+      newErrors.message = 'Nội dung phải có ít nhất 10 ký tự';
     }
 
     setErrors(newErrors);
@@ -206,21 +206,21 @@ export const Contact = (): JSX.Element => {
     <div className="contact-page">
       <section className="hero-section">
         <div className="hero-content">
-          <h1 className="hero-title">The Future of Cinema is Here.</h1>
-          <p className="hero-subtitle">Your gateway to cinematic magic, anywhere, anytime.</p>
+          <h1 className="hero-title">Tương lai của điện ảnh bắt đầu từ đây.</h1>
+          <p className="hero-subtitle">Cánh cổng đưa bạn đến thế giới điện ảnh mọi lúc, mọi nơi.</p>
         </div>
       </section>
 
       <section className="history-section">
         <div className="history-container">
           <div className="history-content">
-            <span className="section-label">OUR HISTORY</span>
-            <h2 className="section-title">Crafting the Silver Screen Experience</h2>
+            <span className="section-label">CÂU CHUYỆN CỦA CHÚNG TÔI</span>
+            <h2 className="section-title">Kiến tạo trải nghiệm điện ảnh đỉnh cao</h2>
             <p className="history-description">
-              Founded in 2001 by a team of film enthusiasts and tech visionaries, CineStream began
-              with a simple goal: to make the world of cinema more accessible. What started as a
-              small startup endeavor has now grown into a global platform serving millions of
-              viewers.
+              Được thành lập vào năm 2001 bởi những người yêu điện ảnh và công nghệ, CineStream ra
+              đời với mục tiêu đơn giản: đưa thế giới phim ảnh đến gần hơn với mọi người. Từ một
+              dự án khởi nghiệp nhỏ, chúng tôi đã phát triển thành nền tảng toàn cầu phục vụ hàng
+              triệu khán giả.
             </p>
           </div>
 
@@ -232,7 +232,7 @@ export const Contact = (): JSX.Element => {
 
       <section className="mission-section">
         <div className="mission-container">
-          <h2 className="section-title">Our Mission</h2>
+          <h2 className="section-title">Sứ mệnh của chúng tôi</h2>
           <div className="mission-grid">{missionCards.map((card) => renderMissionCard(card))}</div>
         </div>
       </section>
@@ -240,13 +240,13 @@ export const Contact = (): JSX.Element => {
       <section className="contact-form-section">
         <div className="contact-form-wrapper">
           <div className="contact-form-header">
-            <span className="section-label">CONTACT US</span>
+            <span className="section-label">LIÊN HỆ VỚI CHÚNG TÔI</span>
             <h2 className="section-title">
-              Get in <span className="contact-highlight">Touch</span>
+              Kết nối <span className="contact-highlight">ngay hôm nay</span>
             </h2>
             <p className="contact-section-subtitle">
-              Have a question about your booking or want to partner with us? Our team is here to
-              help you 24/7.
+              Bạn có câu hỏi về vé đã đặt hoặc muốn hợp tác cùng chúng tôi? Đội ngũ hỗ trợ luôn sẵn
+              sàng đồng hành cùng bạn 24/7.
             </p>
           </div>
 
@@ -284,33 +284,33 @@ export const Contact = (): JSX.Element => {
                   <div className="contact-form-row">
                     {renderFormInput(
                       'fullName',
-                      'FULL NAME',
+                      'HỌ VÀ TÊN',
                       'text',
-                      'John Wick',
+                      'Nguyễn Văn A',
                       formData.fullName,
                     )}
                     {renderFormInput(
                       'email',
-                      'EMAIL ADDRESS',
+                      'ĐỊA CHỈ EMAIL',
                       'email',
-                      'john@continental.com',
+                      'nguyenvana@gmail.com',
                       formData.email,
                     )}
                   </div>
 
                   {renderFormInput(
                     'subject',
-                    'SUBJECT',
+                    'TIÊU ĐỀ',
                     'text',
-                    'Inquiry about private screening',
+                    'Liên hệ về đặt suất chiếu riêng',
                     formData.subject,
                   )}
 
                   {renderFormInput(
                     'message',
-                    'MESSAGE',
+                    'NỘI DUNG',
                     'text',
-                    'Tell us how we can help you...',
+                    'Hãy cho chúng tôi biết bạn cần hỗ trợ điều gì...',
                     formData.message,
                     true,
                   )}
@@ -321,11 +321,12 @@ export const Contact = (): JSX.Element => {
                     disabled={isSubmitting}
                   >
                     <span className="btn-icon">{isSubmitting ? '◌' : '▷'}</span>
-                    {isSubmitting ? 'Sending Message...' : 'Send Cinematic Message'}
+                    {isSubmitting ? 'Đang gửi liên hệ...' : 'Gửi tin nhắn'}
                   </button>
 
                   <p className="form-policy-text">
-                    By submitting this form, you agree to our <span>Privacy Policy</span>.
+                    Khi gửi biểu mẫu này, bạn đồng ý với <span>Chính sách bảo mật</span> của chúng
+                    tôi.
                   </p>
                 </form>
               ) : (
@@ -334,16 +335,18 @@ export const Contact = (): JSX.Element => {
                     <div className="success-icon">✓</div>
                   </div>
 
-                  <h2 className="success-title">MESSAGE RECEIVED!</h2>
+                  <h2 className="success-title">ĐÃ NHẬN ĐƯỢC LIÊN HỆ!</h2>
 
-                  <p className="success-message">Our team of experts will be in touch shortly.</p>
+                  <p className="success-message">
+                    Đội ngũ hỗ trợ của chúng tôi sẽ phản hồi bạn trong thời gian sớm nhất.
+                  </p>
 
                   <button
                     className="return-home-button"
                     onClick={() => setIsSubmitted(false)}
                     type="button"
                   >
-                    Send Another Message
+                    Gửi liên hệ khác
                   </button>
                 </div>
               )}
@@ -354,35 +357,35 @@ export const Contact = (): JSX.Element => {
 
       <section className="community-section">
         <div className="community-card">
-          <h2 className="community-title">Join our Community</h2>
+          <h2 className="community-title">Tham gia cộng đồng của chúng tôi</h2>
 
           <p className="community-description">
-            Stay updated on our latest releases, exclusive screenings, and behind-the-scenes
-            content.
+            Cập nhật những bộ phim mới nhất, các suất chiếu đặc biệt và nhiều nội dung hậu trường
+            hấp dẫn.
           </p>
 
           <div className="community-socials">
-            {renderSocialIcon('👤', 'Profile')}
+            {renderSocialIcon('👤', 'Hồ sơ')}
             {renderSocialIcon('✉️', 'Email')}
             {renderSocialIcon('📷', 'Instagram')}
           </div>
 
-          <button className="btn-signup">Sign Up Now</button>
+          <button className="btn-signup">Đăng ký ngay</button>
         </div>
       </section>
 
       <footer className="contact-footer">
-        <p className="footer-copyright">© 2026 CineStream Global. All rights reserved.</p>
+        <p className="footer-copyright">© 2026 CineStream Global. Bảo lưu mọi quyền.</p>
 
         <div className="footer-links">
           <a href="#" className="footer-link">
-            Privacy Policy
+            Chính sách bảo mật
           </a>
 
           <span className="link-separator">•</span>
 
           <a href="#" className="footer-link">
-            Terms of Service
+            Điều khoản dịch vụ
           </a>
         </div>
       </footer>
