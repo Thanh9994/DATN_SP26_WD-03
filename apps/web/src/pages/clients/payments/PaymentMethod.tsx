@@ -5,6 +5,7 @@ import { message } from 'antd';
 import { API } from '@web/api/api.service';
 import { axiosAuth } from '@web/hooks/useAuth';
 import dayjs from 'dayjs';
+import { Info, ShieldCheck } from 'lucide-react';
 
 interface BookingDetail {
   seatCodes: string[];
@@ -171,15 +172,15 @@ const PaymentsMethod = () => {
               <>{outlet}</>
             ) : (
               <>
-                <div className="text-3xl font-extrabold uppercase">Payments</div>
+                <div className="text-3xl font-extrabold uppercase">Cổng Thanh toán</div>
 
                 <div className="mt-8">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full border border-red-500/30 bg-red-600/15 text-xs text-red-300">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-xl border border-red-500/30 bg-red-600/15 text-xs text-red-300">
                       1
                     </span>
-                    <div className="text-xs font-semibold tracking-[0.25em] text-zinc-300">
-                      PAYMENT METHOD
+                    <div className="text-sm font-semibold tracking-[0.20em] text-zinc-300">
+                      Phương thức Thanh toán
                     </div>
                   </div>
 
@@ -187,31 +188,27 @@ const PaymentsMethod = () => {
                     <button
                       type="button"
                       onClick={() => setMethod('vnpay')}
-                      className={`rounded-2xl border p-4 transition-all ${method === 'vnpay' ? 'border-red-500 bg-red-500/10' : 'border-white/10 bg-white/5'}`}
+                      className={`rounded-xl border p-4 transition-all ${method === 'vnpay' ? 'border-red-500 bg-red-500/10' : 'border-white/10 bg-white/5'}`}
                     >
-                      <div className="text-[11px] font-semibold uppercase tracking-widest">
-                        VNPay
-                      </div>
+                      <div className="text-sm font-semibold uppercase tracking-widest">VNPay</div>
                       <div className="mt-1 text-[9px] text-zinc-500">Noi dia & Quoc te</div>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setMethod('momo')}
-                      className={`rounded-2xl border p-4 transition-all ${method === 'momo' ? 'border-pink-500 bg-pink-500/10' : 'border-white/10 bg-white/5'}`}
+                      className={`rounded-xl border p-4 transition-all ${method === 'momo' ? 'border-pink-500 bg-pink-500/10' : 'border-white/10 bg-white/5'}`}
                     >
-                      <div className="text-[11px] font-semibold uppercase tracking-widest">
-                        MoMo
-                      </div>
+                      <div className="text-sm font-semibold uppercase tracking-widest">MoMo</div>
                       <div className="mt-1 text-[9px] text-zinc-500">Vi dien tu MoMo</div>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setMethod('atm')}
-                      className={`rounded-2xl border p-4 transition-all ${method === 'atm' ? 'border-amber-500 bg-amber-500/10' : 'border-white/10 bg-white/5'}`}
+                      className={`rounded-xl border p-4 transition-all ${method === 'atm' ? 'border-amber-500 bg-amber-500/10' : 'border-white/10 bg-white/5'}`}
                     >
-                      <div className="text-[11px] font-semibold uppercase tracking-widest">ATM</div>
+                      <div className="text-sm font-semibold uppercase tracking-widest">ATM</div>
                       <div className="mt-1 text-[9px] text-zinc-500">The ATM noi dia</div>
                     </button>
                   </div>
@@ -222,17 +219,51 @@ const PaymentsMethod = () => {
                     <span className="flex h-6 w-6 items-center justify-center rounded-full border border-red-500/30 bg-red-600/15 text-xs text-red-300">
                       2
                     </span>
-                    <div className="text-xs font-semibold tracking-[0.25em] text-zinc-300">
-                      ORDER CONFIRMATION
+                    <div className="text-sm font-semibold tracking-[0.20em] text-zinc-300">
+                      Thông tin thanh toán
                     </div>
                   </div>
 
-                  <div className="mt-4 rounded-[26px] border border-white/10 bg-white/5 p-6">
-                    <p className="text-sm text-zinc-400">
-                      Ban dang thanh toan qua cong <strong>{method.toUpperCase()}</strong>. Sau khi
-                      nhan "Confirm Payment", he thong se chuyen huong an toan den trang thanh toan
-                      chinh thuc.
-                    </p>
+                  <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 transition-all">
+                    <div className="flex items-start gap-4">
+                      {/* Icon bảo mật làm điểm nhấn */}
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/10 text-green-400">
+                        <ShieldCheck size={24} />
+                      </div>
+
+                      <div className="space-y-3">
+                        <p className="text-sm leading-relaxed text-zinc-300">
+                          Bạn đang thực hiện thanh toán an toàn qua cổng
+                          <span className="mx-1.5 font-bold text-white underline decoration-red-500/50 underline-offset-4">
+                            {method.toUpperCase()}
+                          </span>
+                          .
+                        </p>
+
+                        <p className="text-xs leading-relaxed text-zinc-400">
+                          Sau khi nhấn{' '}
+                          <strong className="text-zinc-200">"Xác nhận thanh toán"</strong>, hệ thống
+                          sẽ tự động chuyển hướng bạn đến trang xác thực chính thức của đối tác để
+                          hoàn tất giao dịch.
+                        </p>
+
+                        {/* Dòng ghi chú nhỏ bên dưới */}
+                        <div className="flex items-center gap-2 pt-2 text-[11px] font-medium text-amber-400/80">
+                          <Info size={14} />
+                          <span>
+                            Vui lòng không làm mới (F5) trình duyệt trong quá trình xử lý.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Hiệu ứng trang trí nhẹ ở góc */}
+                    <div className="mt-4 flex items-center justify-end border-t border-white/5 pt-4">
+                      <div className="flex items-center gap-2 text-[10px] uppercase tracking-tighter text-zinc-500">
+                        <span>Mã hóa bảo mật SSL</span>
+                        <div className="h-1 w-1 rounded-full bg-green-500"></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </>
@@ -261,7 +292,7 @@ const PaymentsMethod = () => {
                   <div className="flex items-start gap-3">
                     <div className="h-8 w-8 rounded-lg border border-emerald-500/20 bg-emerald-600/15" />
                     <div>
-                      <div className="font-semibold">Combo Snack</div>
+                      <div className="font-semibold">Đồ uống & Combo</div>
                       <div className="text-xs text-zinc-500">
                         {snackItems.length
                           ? snackItems.map((item) => `${item.name} x${item.quantity}`).join(', ')
@@ -292,13 +323,13 @@ const PaymentsMethod = () => {
                     onClick={openConfirmModal}
                     className={`mt-3 w-full rounded-2xl bg-red-600 py-3 font-semibold shadow-[0_0_40px_rgba(239,68,68,0.22)] transition hover:bg-red-500 ${loading ? 'cursor-wait opacity-50' : ''}`}
                   >
-                    {loading ? 'Processing...' : 'Confirm Payment'}
+                    {loading ? 'Processing...' : 'Xác nhận thanh toán'}
                   </button>
                 )}
 
                 <div className="text-center text-[10px] leading-relaxed text-zinc-500">
                   Bằng cách hoàn tất, bạn đã đồng ý với{' '}
-                  <span className="text-zinc-400 underline">Dieu khoan dich vu</span>
+                  <span className="text-zinc-400 underline">Điều khoản dịch vụ</span>
                 </div>
               </div>
             </div>

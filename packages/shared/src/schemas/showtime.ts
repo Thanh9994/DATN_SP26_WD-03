@@ -13,7 +13,7 @@ export const ShowTime = Base.extend({
   priceCouple: z.number().nonnegative(),
   status: ShowTimeStatus.default('upcoming'),
 }).refine((data) => data.endTime > data.startTime, {
-  message: ' endTime l?n hon startTime',
+  message: ' endTime lớn hon startTime',
   path: ['endTime'],
 });
 
