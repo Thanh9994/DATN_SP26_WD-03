@@ -43,28 +43,31 @@ export const Contact = (): JSX.Element => {
 
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const missionCards: MissionCard[] = [
-    {
-      id: 'access',
-      icon: '∞',
-      title: 'Truy cập không giới hạn',
-      description:
-        'Tiếp cận kho phim phong phú từ khắp nơi trên thế giới mọi lúc, mọi nơi.',
-    },
-    {
-      id: 'experience',
-      icon: '★',
-      title: 'Trải nghiệm cao cấp',
-      description:
-        'Đắm chìm trong chất lượng hình ảnh sắc nét với công nghệ xem phim hiện đại.',
-    },
-    {
-      id: 'community',
-      icon: '🌐',
-      title: 'Cộng đồng toàn cầu',
-      description: 'Kết nối với hàng triệu khán giả yêu điện ảnh trên toàn thế giới.',
-    },
-  ];
+  const missionCards: MissionCard[] = useMemo(
+    () => [
+      {
+        id: 'access',
+        icon: '∞',
+        title: 'Truy cập không giới hạn',
+        description:
+          'Tiếp cận kho phim phong phú từ khắp nơi trên thế giới mọi lúc, mọi nơi.',
+      },
+      {
+        id: 'experience',
+        icon: '★',
+        title: 'Trải nghiệm cao cấp',
+        description:
+          'Đắm chìm trong chất lượng hình ảnh sắc nét với công nghệ xem phim hiện đại.',
+      },
+      {
+        id: 'community',
+        icon: '🌐',
+        title: 'Cộng đồng toàn cầu',
+        description: 'Kết nối với hàng triệu khán giả yêu điện ảnh trên toàn thế giới.',
+      },
+    ],
+    [],
+  );
 
   const contactInfo: ContactInfo[] = useMemo(
     () => [
@@ -107,10 +110,12 @@ export const Contact = (): JSX.Element => {
       [field]: value,
     }));
 
-    setErrors((prev) => ({
-      ...prev,
-      [field]: '',
-    }));
+    if (errors[field]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: '',
+      }));
+    }
   };
 
   const validateForm = () => {
@@ -140,7 +145,17 @@ export const Contact = (): JSX.Element => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const resetForm = () => {
+    setFormData({
+      fullName: '',
+      email: '',
+      subject: '',
+      message: '',
+    });
+    setErrors({});
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateForm()) return;
@@ -149,20 +164,14 @@ export const Contact = (): JSX.Element => {
       setIsSubmitting(true);
 
       await axios.post(API.CONTACT, {
-        fullName: formData.fullName,
-        email: formData.email,
-        subject: formData.subject,
-        message: formData.message,
+        fullName: formData.fullName.trim(),
+        email: formData.email.trim(),
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
       });
 
       setIsSubmitted(true);
-      setFormData({
-        fullName: '',
-        email: '',
-        subject: '',
-        message: '',
-      });
-      setErrors({});
+      resetForm();
     } catch (error: any) {
       alert(error?.response?.data?.message || 'Gửi liên hệ thất bại');
     } finally {
@@ -207,7 +216,9 @@ export const Contact = (): JSX.Element => {
       <section className="hero-section">
         <div className="hero-content">
           <h1 className="hero-title">Tương lai của điện ảnh bắt đầu từ đây.</h1>
-          <p className="hero-subtitle">Cánh cổng đưa bạn đến thế giới điện ảnh mọi lúc, mọi nơi.</p>
+          <p className="hero-subtitle">
+            Cánh cổng đưa bạn đến thế giới điện ảnh mọi lúc, mọi nơi.
+          </p>
         </div>
       </section>
 
@@ -289,6 +300,7 @@ export const Contact = (): JSX.Element => {
                       'Nguyễn Văn A',
                       formData.fullName,
                     )}
+
                     {renderFormInput(
                       'email',
                       'ĐỊA CHỈ EMAIL',
