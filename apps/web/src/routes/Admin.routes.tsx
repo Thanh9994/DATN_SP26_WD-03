@@ -21,6 +21,8 @@ import Overview from '@web/pages/admin/analytics/analyticsOverview/Overview';
 import StaffStatus from '@web/pages/admin/analytics/analyticsStaff/StaffStatus';
 import AnalyticsCinemas from '@web/pages/admin/analytics/analyticsCinemas/AnalyticsCinemas';
 import AnalyticMatch from '@web/pages/admin/analytics/analyticsDoanhthu/AnalyticMatch';
+import AdminTicket from '@web/pages/admin/order/AdminTicket';
+
 export const AdminRoutes: RouteObject = {
   path: '/admin',
   element: <AdminGuard />,
@@ -38,6 +40,7 @@ export const AdminRoutes: RouteObject = {
         { path: 'rooms', element: <Rooms /> },
         { path: 'settings', element: <Settings /> },
         { path: 'showtime', element: <ShowTime /> },
+        { path: 'tickets', element: <AdminTicket /> },
         { path: 'personnel', element: <Personnel /> },
         { path: 'staff', element: <StaffStatus /> },
         { path: 'analytics', element: <Analytics /> },
