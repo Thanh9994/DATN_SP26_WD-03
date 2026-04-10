@@ -16,5 +16,6 @@ export const API = {
   BOOKING: `${API_URL}/order/booking`,
   PRODUCTS: `${API_URL}/order/product`,
   CONTACT: `${API_URL}/contact`,
+  TICKETS: `${API_URL}/ticket`,
   PAYMENT_GATEWAY: `http://localhost:5000/payments`,
 };
