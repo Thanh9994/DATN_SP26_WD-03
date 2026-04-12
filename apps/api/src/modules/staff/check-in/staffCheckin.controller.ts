@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import { catchAsync } from '@api/utils/catchAsync';
-import { staffService } from './staff.service';
+import { staffCheckinService } from './staffCheckin.service';
 
-export const staffController = {
+export const staffCheckinController = {
   checkinTicketWithWarning: catchAsync(async (req: Request, res: Response) => {
     const { ticketCode } = req.body;
 
-    const result = await staffService.checkinTicketWithWarning(ticketCode);
+    const result = await staffCheckinService.checkinTicketWithWarning(ticketCode);
 
     res.status(200).json({
       success: true,
@@ -16,7 +16,7 @@ export const staffController = {
   }),
 
   getShowtimeAlerts: catchAsync(async (_req: Request, res: Response) => {
-    const alerts = await staffService.getUpcomingShowtimeAlerts();
+    const alerts = await staffCheckinService.getUpcomingShowtimeAlerts();
 
     res.status(200).json({
       success: true,

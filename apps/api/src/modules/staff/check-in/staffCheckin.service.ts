@@ -1,9 +1,9 @@
-import { Booking } from '@api/modules/sales-operations/booking/booking.model';
-import { ShowTimeM } from '@api/modules/cinema-catalog/showtime/showtime.model';
+import { Booking } from '../../sales-operations/booking/booking.model';
+import { ShowTimeM } from '../../cinema-catalog/showtime/showtime.model';
 import * as MailService from '@api/common/mail.service';
 import { AppError } from '@api/middlewares/error.middleware';
 
-export const staffService = {
+export const staffCheckinService = {
   buildCheckinLateMeta(booking: any) {
     const showTime = booking?.showTimeId as any;
     const movie = showTime?.movieId as any;
