@@ -15,6 +15,7 @@ import {
   Image,
   LayoutDashboard,
   MonitorPlay,
+  Ticket,
   Users,
 } from 'lucide-react';
 
@@ -32,7 +33,45 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
   const navigate = useNavigate();
   const location = useLocation();
 
-  const selectedKey = location.pathname.split('/')[2] || 'admin';
+  const path = location.pathname;
+  const selectedKey =
+    path.startsWith('/admin/analytics/overview')
+      ? 'analytics-overview'
+      : path.startsWith('/admin/analytics/ticket')
+        ? 'analytics-ticket'
+        : path.startsWith('/admin/analytics/revenue')
+          ? 'analytics-revenue'
+          : path.startsWith('/admin/analytics/cinema')
+            ? 'analytics-cinema'
+            : path.startsWith('/admin/tickets')
+              ? 'tickets'
+              : path.startsWith('/admin/showtime')
+                ? 'showtime'
+                : path.startsWith('/admin/rooms')
+                  ? 'rooms'
+                  : path.startsWith('/admin/cinemas')
+                    ? 'cinemas'
+                    : path.startsWith('/admin/movies')
+                      ? 'movies'
+                      : path.startsWith('/admin/genres')
+                        ? 'genres'
+                        : path.startsWith('/admin/product')
+                          ? 'product'
+                          : path.startsWith('/admin/media')
+                            ? 'media'
+                            : path.startsWith('/admin/promotions')
+                              ? 'promotions'
+                              : path.startsWith('/admin/users')
+                                ? 'users'
+                                : path.startsWith('/admin/staff')
+                                  ? 'staff'
+                                  : path.startsWith('/admin/personnel')
+                                    ? 'personnel'
+                                    : path.startsWith('/admin/settings')
+                                      ? 'settings'
+                                      : 'dashboard';
+
+  const openKeys = path.includes('/analytics/') ? ['analytics'] : [];
 
   const items: MenuProps['items'] = [
     {
@@ -62,7 +101,6 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
               label: 'Phân tích vé',
               onClick: () => navigate('/admin/analytics/ticket'),
             },
-            // chuẩn bị scale sau này
             {
               key: 'analytics-revenue',
               icon: <BarChart3 size={18} />,
@@ -78,10 +116,16 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
           ],
         },
         {
-          key: 'personnel',
+          key: 'staff',
           icon: <Users size={18} />,
           label: 'Nhân sự',
           onClick: () => navigate('/admin/staff'),
+        },
+        {
+          key: 'users',
+          icon: <Users size={18} />,
+          label: 'Người dùng',
+          onClick: () => navigate('/admin/users'),
         },
       ],
     },
@@ -89,7 +133,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
     {
       key: 'genres',
       icon: <FolderOpen size={18} />,
-      label: 'Thể Loại',
+      label: 'Thể loại',
       onClick: () => navigate('/admin/genres'),
     },
     {
@@ -99,34 +143,33 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       onClick: () => navigate('/admin/movies'),
     },
     {
-      key: 'users',
-      icon: <Users size={18} />,
-      label: 'Users',
-      onClick: () => navigate('/admin/users'),
-    },
-
-    {
       key: 'cinemas',
       icon: <VideoCameraAddOutlined />,
-      label: 'Cinemas',
+      label: 'Rạp chiếu',
       onClick: () => navigate('/admin/cinemas'),
     },
     {
       key: 'rooms',
       icon: <MonitorPlay size={18} />,
-      label: 'Phòng Chiếu',
+      label: 'Phòng chiếu',
       onClick: () => navigate('/admin/rooms'),
     },
     {
       key: 'showtime',
       icon: <CalendarPlus size={18} />,
-      label: 'Suất Chiếu',
+      label: 'Suất chiếu',
       onClick: () => navigate('/admin/showtime'),
+    },
+    {
+      key: 'tickets',
+      icon: <Ticket size={18} />,
+      label: 'Quản lý vé',
+      onClick: () => navigate('/admin/tickets'),
     },
     {
       key: 'promotions',
       icon: <VideoCameraAddOutlined />,
-      label: 'Bài Viết',
+      label: 'Bài viết',
       onClick: () => navigate('/admin/promotions'),
     },
     {
@@ -136,7 +179,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
         {
           key: 'product',
           icon: <ProductOutlined />,
-          label: 'Product',
+          label: 'Sản phẩm',
           onClick: () => navigate('/admin/product'),
         },
         {
@@ -149,22 +192,10 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
     },
     { type: 'divider' },
     {
-      key: 'setting',
+      key: 'settings',
       icon: <SettingFilled />,
       label: 'Cài đặt',
-      onClick: () => navigate('/admim/setting'),
-    },
-    {
-      key: 'settings',
-      icon: <UserOutlined />,
-      label: 'Settings',
       onClick: () => navigate('/admin/settings'),
-    },
-    {
-      key: 'chatbot',
-      icon: <UserOutlined />,
-      label: 'Chatbot',
-      onClick: () => navigate('/admin/chatbot'),
     },
   ];
 
@@ -187,7 +218,6 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       }}
     >
       <div className="flex h-full flex-col">
-        {/* HEADER */}
         <div
           className="mb-2 flex h-16 items-center gap-3 border-b px-6 text-lg font-bold"
           style={{ color: textColor }}
@@ -201,17 +231,21 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
           )}
         </div>
 
-        {/* MENU (SCROLLABLE) */}
         <div
           style={{
             flex: 1,
             overflowY: 'auto',
           }}
         >
-          <Menu theme={themeMode} mode="inline" selectedKeys={[selectedKey]} items={items} />
+          <Menu
+            theme={themeMode}
+            mode="inline"
+            selectedKeys={[selectedKey]}
+            defaultOpenKeys={openKeys}
+            items={items}
+          />
         </div>
 
-        {/* FOOTER */}
         <div
           style={{
             padding: 16,

@@ -59,6 +59,28 @@ const DEFAULT_PRICES = {
   priceCouple: 150000,
 };
 
+type PreviewStatus = 'available' | 'conflict';
+
+type ConflictShowtimeInfo = {
+  movieName: string;
+  startText: string;
+  endText: string;
+  status: string;
+};
+
+type ShowtimePreviewItem = {
+  key: string;
+  roomId: string;
+  roomName: string;
+  cinemaName: string;
+  dateText: string;
+  startText: string;
+  endText: string;
+  status: PreviewStatus;
+  conflicts: ConflictShowtimeInfo[];
+  payload?: ICreateShowTimePl;
+};
+
 const getMovieId = (showtime: AdminShowtimeRow) =>
   typeof showtime.movieId === 'string' ? showtime.movieId : showtime.movieId?._id;
 
@@ -99,10 +121,23 @@ const getMovieOption = (
   return movies.find((item) => item._id === movieId);
 };
 
-//  Sinh danh sách slot chiếu liên tiếp trong ngày
-// - Bắt đầu từ 07:00
-// - Mỗi slot = duration phim + 30 phút dọn dẹp
-// - Disable slot nếu bị trùng lịch
+const getMovieDisplayName = (movie?: IMovie | MovieOption) => {
+  if (!movie) return 'Khong xac dinh';
+  return `${movie.ten_phim} • ${movie.thoi_luong} phut`;
+};
+
+const getShowtimeStatusLabel = (status?: string) => {
+  switch (status) {
+    case 'upcoming':
+      return 'Sap chieu';
+    case 'showing':
+      return 'Dang chieu';
+    case 'finished':
+      return 'Da ket thuc';
+    default:
+      return status || 'Khong ro';
+  }
+};
 
 const buildSequentialSlotOptions = (
   baseDate: Dayjs | undefined,
@@ -142,10 +177,6 @@ const buildSequentialSlotOptions = (
   return options;
 };
 
-// Tạo payload gửi lên API để tạo suất chiếu
-// - Ghép date + time thành startTime
-// - Tự tính endTime theo duration
-
 const createPayload = (
   movieId: string,
   roomId: string,
@@ -170,6 +201,101 @@ const createPayload = (
     priceVip,
     priceCouple,
   }) as ICreateShowTimePl;
+};
+
+const buildShowtimePreview = ({
+  roomIds,
+  dates,
+  timeSlots,
+  durationMinutes,
+  showtimes,
+  rooms,
+  movieId,
+  priceNormal,
+  priceVip,
+  priceCouple,
+}: {
+  roomIds: string[];
+  dates: Dayjs[];
+  timeSlots: string[];
+  durationMinutes: number;
+  showtimes: AdminShowtimeRow[];
+  rooms: IPhong[];
+  movieId: string;
+  priceNormal: number;
+  priceVip: number;
+  priceCouple: number;
+}): ShowtimePreviewItem[] => {
+  if (!roomIds.length || !dates.length || !timeSlots.length || durationMinutes <= 0) return [];
+
+  const previewItems: ShowtimePreviewItem[] = [];
+
+  roomIds.forEach((roomId) => {
+    const room = rooms.find((item) => item._id === roomId);
+    const { cinemaName } = getCinemaInfo(room);
+
+    dates.forEach((dateItem) => {
+      const roomShowtimesInDay = showtimes.filter((showtime) => {
+        const currentRoomId = getRoomId(showtime);
+        return currentRoomId === roomId && dayjs(showtime.startTime).isSame(dateItem, 'day');
+      });
+
+      timeSlots.forEach((timeValue) => {
+        const [hour, minute] = timeValue.split(':').map(Number);
+        const start = dateItem.hour(hour).minute(minute).second(0).millisecond(0);
+        const end = start.add(durationMinutes, 'minute');
+        const cleaningEnd = end.add(CLEANING_MINUTES, 'minute');
+
+        const conflicts = roomShowtimesInDay.filter((showtime) => {
+          const existingStart = dayjs(showtime.startTime);
+          const existingEnd = dayjs(showtime.endTime);
+          const existingCleaningEnd = existingEnd.add(CLEANING_MINUTES, 'minute');
+
+          return start.isBefore(existingCleaningEnd) && cleaningEnd.isAfter(existingStart);
+        });
+
+        const conflictItems: ConflictShowtimeInfo[] = conflicts.map((item) => ({
+          movieName: getMovieName(item),
+          startText: dayjs(item.startTime).format('HH:mm'),
+          endText: dayjs(item.endTime).format('HH:mm'),
+          status: getShowtimeStatusLabel(item.status),
+        }));
+
+        const payload = createPayload(
+          movieId,
+          roomId,
+          dateItem,
+          timeValue,
+          durationMinutes,
+          priceNormal,
+          priceVip,
+          priceCouple,
+        );
+
+        previewItems.push({
+          key: `${roomId}-${dateItem.format('YYYY-MM-DD')}-${timeValue}`,
+          roomId,
+          roomName: room?.ten_phong || '---',
+          cinemaName,
+          dateText: dateItem.format('DD/MM/YYYY'),
+          startText: start.format('HH:mm'),
+          endText: end.format('HH:mm'),
+          status: conflictItems.length > 0 ? 'conflict' : 'available',
+          conflicts: conflictItems,
+          payload,
+        });
+      });
+    });
+  });
+
+  return previewItems.sort((a, b) => {
+    const dateCompare =
+      dayjs(a.dateText, 'DD/MM/YYYY').valueOf() - dayjs(b.dateText, 'DD/MM/YYYY').valueOf();
+    if (dateCompare !== 0) return dateCompare;
+    if (a.cinemaName !== b.cinemaName) return a.cinemaName.localeCompare(b.cinemaName);
+    if (a.roomName !== b.roomName) return a.roomName.localeCompare(b.roomName);
+    return a.startText.localeCompare(b.startText);
+  });
 };
 
 export const ShowTime = ({ movieId }: { movieId?: string }) => {
@@ -202,11 +328,20 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
   const singleMovieId = Form.useWatch('movieId', singleForm) || movieId;
   const singleRoomIds = Form.useWatch('roomIds', singleForm);
   const singleDate = Form.useWatch('date', singleForm);
+  const singleTimeSlots = Form.useWatch('timeSlots', singleForm) || [];
+  const singlePriceNormal = Form.useWatch('priceNormal', singleForm) || DEFAULT_PRICES.priceNormal;
+  const singlePriceVip = Form.useWatch('priceVip', singleForm) || DEFAULT_PRICES.priceVip;
+  const singlePriceCouple =
+    Form.useWatch('priceCouple', singleForm) || DEFAULT_PRICES.priceCouple;
 
   const rangeMovieId = Form.useWatch('movieId', rangeForm) || movieId;
   const rangeRoomIds = Form.useWatch('roomIds', rangeForm);
   const rangeStartDate = Form.useWatch('startDate', rangeForm);
   const rangeEndDate = Form.useWatch('endDate', rangeForm);
+  const rangeTimeSlots = Form.useWatch('timeSlots', rangeForm) || [];
+  const rangePriceNormal = Form.useWatch('priceNormal', rangeForm) || DEFAULT_PRICES.priceNormal;
+  const rangePriceVip = Form.useWatch('priceVip', rangeForm) || DEFAULT_PRICES.priceVip;
+  const rangePriceCouple = Form.useWatch('priceCouple', rangeForm) || DEFAULT_PRICES.priceCouple;
 
   const movieList = movies as MovieOption[];
   const fixedMovieOption = fixedMovie as IMovie | undefined;
@@ -279,6 +414,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
   );
 
   const showtimeStats = useMemo(() => calculateShowtimeStats(showtimes), [showtimes]);
+
   const roomTreeData = useMemo(() => {
     const cinemaMap = new Map<
       string,
@@ -363,6 +499,64 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     return dates;
   }, [rangeEndDate, rangeStartDate]);
 
+  const singlePreviewItems = useMemo(() => {
+    if (!singleDate || !singleRoomIds?.length || !singleTimeSlots.length || !singleMovieId)
+      return [];
+
+    return buildShowtimePreview({
+      roomIds: singleRoomIds,
+      dates: [singleDate],
+      timeSlots: singleTimeSlots,
+      durationMinutes,
+      showtimes,
+      rooms,
+      movieId: singleMovieId,
+      priceNormal: singlePriceNormal,
+      priceVip: singlePriceVip,
+      priceCouple: singlePriceCouple,
+    });
+  }, [
+    singleDate,
+    singleRoomIds,
+    singleTimeSlots,
+    singleMovieId,
+    durationMinutes,
+    showtimes,
+    rooms,
+    singlePriceNormal,
+    singlePriceVip,
+    singlePriceCouple,
+  ]);
+
+  const rangePreviewItems = useMemo(() => {
+    if (!rangeRoomIds?.length || !rangePreviewDates.length || !rangeTimeSlots.length || !rangeMovieId)
+      return [];
+
+    return buildShowtimePreview({
+      roomIds: rangeRoomIds,
+      dates: rangePreviewDates,
+      timeSlots: rangeTimeSlots,
+      durationMinutes,
+      showtimes,
+      rooms,
+      movieId: rangeMovieId,
+      priceNormal: rangePriceNormal,
+      priceVip: rangePriceVip,
+      priceCouple: rangePriceCouple,
+    });
+  }, [
+    rangeRoomIds,
+    rangePreviewDates,
+    rangeTimeSlots,
+    rangeMovieId,
+    durationMinutes,
+    showtimes,
+    rooms,
+    rangePriceNormal,
+    rangePriceVip,
+    rangePriceCouple,
+  ]);
+
   const disabledDateByMovie = (date: Dayjs, activeMovieId?: string) => {
     const activeMovie = getMovieOption(activeMovieId, movieList, fixedMovieOption);
     const today = dayjs().startOf('day');
@@ -376,23 +570,19 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     return date.isBefore(start) || date.isAfter(end);
   };
 
-  // Tạo nhiều suất chiếu (loop API)
-  // - Thành công bao nhiêu -> báo
-  // - Fail bao nhiêu -> báo
-  // - Có invalidate cache
-
   const handleCreateMany = async (payloads: ICreateShowTimePl[], successMessage: string) => {
     if (!payloads.length) {
       setCreateSummary({
         type: 'warning',
-        title: 'Chưa có suất chiếu nào để tạo.',
+        title: 'Khong co suat hop le de tao.',
+        detail: 'Tat ca cac ca preview hien tai deu bi trung lich hoac khong hop le.',
       });
       return;
     }
 
     setCreateSummary({
       type: 'info',
-      title: 'Đang tạo suất chiếu...',
+      title: 'Dang tao suat chieu...',
     });
 
     let successCount = 0;
@@ -414,7 +604,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     if (failedCount === 0) {
       setCreateSummary({
         type: 'success',
-        title: `${successMessage}: ${successCount} suất`,
+        title: `${successMessage}: ${successCount} suat`,
       });
       return;
     }
@@ -422,16 +612,16 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     if (successCount === 0) {
       setCreateSummary({
         type: 'error',
-        title: 'Không tạo được suất chiếu nào.',
-        detail: 'Kiểm tra trùng lịch, phòng hoặc khoảng ngày.',
+        title: 'Khong tao duoc suat chieu nao.',
+        detail: 'Kiem tra lai trung lich, phong chieu hoac khoang ngay.',
       });
       return;
     }
 
     setCreateSummary({
       type: 'warning',
-      title: `Đã tạo ${successCount} suất, ${failedCount} suất không tạo được.`,
-      detail: 'Một số suất bị bỏ qua do trùng lịch hoặc không hợp lệ.',
+      title: `Da tao ${successCount} suat, ${failedCount} suat khong tao duoc.`,
+      detail: 'Mot so suat bi bo qua do trung lich hoac khong hop le.',
     });
   };
 
@@ -440,15 +630,16 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     if (!activeMovieId) {
       setCreateSummary({
         type: 'error',
-        title: 'Vui lòng chọn phim trước khi tạo suất chiếu.',
+        title: 'Vui long chon phim truoc khi tao suat chieu.',
       });
       return;
     }
+
     const activeMovie = getMovieOption(activeMovieId, movieList, fixedMovieOption);
     if (activeMovie?.trang_thai !== 'dang_chieu') {
       setCreateSummary({
         type: 'error',
-        title: 'Chỉ được tạo suất cho phim đang chiếu.',
+        title: 'Chi duoc tao suat cho phim dang chieu.',
       });
       return;
     }
@@ -456,22 +647,11 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     setSubmittingMode('single');
 
     try {
-      const payloads = values.roomIds.flatMap((roomId) =>
-        values.timeSlots.map((timeValue) =>
-          createPayload(
-            activeMovieId,
-            roomId,
-            values.date,
-            timeValue,
-            durationMinutes,
-            values.priceNormal,
-            values.priceVip,
-            values.priceCouple,
-          ),
-        ),
-      );
+      const validPayloads = singlePreviewItems
+        .filter((item) => item.status === 'available' && item.payload)
+        .map((item) => item.payload as ICreateShowTimePl);
 
-      await handleCreateMany(payloads, 'Tạo suất chiếu theo ngày thành công');
+      await handleCreateMany(validPayloads, 'Tao suat chieu theo ngay thanh cong');
       setIsModalOpen(false);
       singleForm.resetFields();
     } finally {
@@ -484,15 +664,16 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     if (!activeMovieId) {
       setCreateSummary({
         type: 'error',
-        title: 'Vui lòng chọn phim trước khi tạo theo khoảng ngày.',
+        title: 'Vui long chon phim truoc khi tao theo khoang ngay.',
       });
       return;
     }
+
     const activeMovie = getMovieOption(activeMovieId, movieList, fixedMovieOption);
     if (activeMovie?.trang_thai !== 'dang_chieu') {
       setCreateSummary({
         type: 'error',
-        title: 'Chỉ được tạo suất cho phim đang chiếu.',
+        title: 'Chi duoc tao suat cho phim dang chieu.',
       });
       return;
     }
@@ -500,24 +681,11 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     setSubmittingMode('range');
 
     try {
-      const payloads = values.roomIds.flatMap((roomId) =>
-        rangePreviewDates.flatMap((dateItem) =>
-          values.timeSlots.map((timeValue) =>
-            createPayload(
-              activeMovieId,
-              roomId,
-              dateItem,
-              timeValue,
-              durationMinutes,
-              values.priceNormal,
-              values.priceVip,
-              values.priceCouple,
-            ),
-          ),
-        ),
-      );
+      const validPayloads = rangePreviewItems
+        .filter((item) => item.status === 'available' && item.payload)
+        .map((item) => item.payload as ICreateShowTimePl);
 
-      await handleCreateMany(payloads, 'Tạo suất chiếu theo khoảng ngày thành công');
+      await handleCreateMany(validPayloads, 'Tao suat chieu theo khoang ngay thanh cong');
       setIsModalOpen(false);
       rangeForm.resetFields();
     } finally {
@@ -530,6 +698,54 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     setIsSeatMapOpen(true);
   };
 
+  const previewColumns = [
+    {
+      title: 'Rap / Phong',
+      key: 'room',
+      render: (_: unknown, record: ShowtimePreviewItem) => (
+        <Space direction="vertical" size={0}>
+          <Typography.Text>{record.cinemaName}</Typography.Text>
+          <Typography.Text strong>{record.roomName}</Typography.Text>
+        </Space>
+      ),
+    },
+    {
+      title: 'Ngay',
+      dataIndex: 'dateText',
+    },
+    {
+      title: 'Khung gio',
+      key: 'time',
+      render: (_: unknown, record: ShowtimePreviewItem) => `${record.startText} - ${record.endText}`,
+    },
+    {
+      title: 'Ket qua',
+      key: 'status',
+      render: (_: unknown, record: ShowtimePreviewItem) =>
+        record.status === 'available' ? (
+          <Tag color="success">Khong trung</Tag>
+        ) : (
+          <Tag color="error">Bi trung</Tag>
+        ),
+    },
+    {
+      title: 'Chi tiet',
+      key: 'reason',
+      render: (_: unknown, record: ShowtimePreviewItem) =>
+        record.status === 'available' ? (
+          <Typography.Text type="success">Co the tao</Typography.Text>
+        ) : (
+          <div className="space-y-1">
+            {record.conflicts.map((item, index) => (
+              <div key={`${record.key}-${index}`} className="text-sm text-rose-500">
+                {item.movieName} ({item.startText} - {item.endText}) • {item.status}
+              </div>
+            ))}
+          </div>
+        ),
+    },
+  ];
+
   const columns = [
     {
       title: 'Phim',
@@ -537,7 +753,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       render: (_: unknown, record: AdminShowtimeRow) => <strong>{getMovieName(record)}</strong>,
     },
     {
-      title: 'Rạp / Phòng',
+      title: 'Rap / Phong',
       key: 'room',
       render: (_: unknown, record: AdminShowtimeRow) => {
         const room = getRoomData(record, rooms);
@@ -555,62 +771,62 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       },
     },
     {
-      title: 'Ngày chiếu',
+      title: 'Ngay chieu',
       dataIndex: 'startTime',
       render: (value: Date | string) => dayjs(value).format('DD/MM/YYYY'),
     },
     {
-      title: 'Bắt đầu',
+      title: 'Bat dau',
       dataIndex: 'startTime',
       render: (value: Date | string) => dayjs(value).format('HH:mm'),
     },
     {
-      title: 'Kết thúc',
+      title: 'Ket thuc',
       dataIndex: 'endTime',
       render: (value: Date | string) => dayjs(value).format('HH:mm'),
     },
     {
-      title: 'Giá thường',
+      title: 'Gia thuong',
       dataIndex: 'priceNormal',
       render: (value: number) => `${value.toLocaleString()}đ`,
     },
     {
-      title: 'Giá VIP',
+      title: 'Gia VIP',
       dataIndex: 'priceVip',
       render: (value: number) => `${value.toLocaleString()}đ`,
     },
     {
-      title: 'Giá đôi',
+      title: 'Gia doi',
       dataIndex: 'priceCouple',
       render: (value: number) => `${value.toLocaleString()}đ`,
     },
     {
-      title: 'Trạng thái ghế',
+      title: 'Trang thai ghe',
       key: 'seats',
       width: 220,
       render: (_: unknown, record: AdminShowtimeRow) => {
         const seatInfo = record.seatInfo;
 
         if (!seatInfo) {
-          return <span className="text-xs text-slate-400">Chưa có thống kê ghế</span>;
+          return <span className="text-xs text-slate-400">Chua co thong ke ghe</span>;
         }
 
         return (
           <div className="space-y-1 text-sm">
             <div className="flex items-center gap-2 text-emerald-600">
               <InboxOutlined />
-              <span>Còn trống: {seatInfo.available}</span>
+              <span>Con trong: {seatInfo.available}</span>
             </div>
             <div className="flex items-center gap-2 text-rose-500">
               <CheckCircleOutlined />
-              <span>Đã đặt: {seatInfo.booked}</span>
+              <span>Da dat: {seatInfo.booked}</span>
             </div>
           </div>
         );
       },
     },
     {
-      title: 'Trạng thái',
+      title: 'Trang thai',
       dataIndex: 'status',
       render: (_: unknown, record: AdminShowtimeRow) => {
         const display = record.display || { label: 'N/A', color: 'default' };
@@ -618,7 +834,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       },
     },
     {
-      title: 'Thao tác',
+      title: 'Thao tac',
       key: 'action',
       render: (_: unknown, record: AdminShowtimeRow) => {
         const hasBookedSeats =
@@ -631,14 +847,14 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
               icon={<EyeOutlined />}
               onClick={() => handleViewSeatMap(record._id || '')}
             >
-              Chi tiết
+              Chi tiet
             </Button>
             <Popconfirm
-              title="Xóa suất chiếu này?"
-              description="Suất đã có người đặt hoặc giữ ghế sẽ không được xóa."
+              title="Xoa suat chieu nay?"
+              description="Suat da co nguoi dat hoac giu ghe se khong duoc xoa."
               onConfirm={() => record._id && deleteShowTime(record._id)}
-              okText="Xóa"
-              cancelText="Hủy"
+              okText="Xoa"
+              cancelText="Huy"
               okButtonProps={{ danger: true }}
               disabled={
                 hasBookedSeats || record.canDelete === false || record.status === 'finished'
@@ -664,12 +880,13 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       <div className="mb-4 flex justify-between">
         <span className="flex items-center gap-2 text-xl font-bold">
           <PlayCircleOutlined className="text-blue-500" />
-          Quản lý suất chiếu
+          Quan ly suat chieu
         </span>
         <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
-          Tạo suất chiếu
+          Tao suat chieu
         </Button>
       </div>
+
       {createSummary && (
         <Alert
           type={createSummary.type}
@@ -680,12 +897,13 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
           onClose={() => setCreateSummary(null)}
         />
       )}
+
       <div className="my-3 grid grid-cols-4 gap-4">
         <Card>
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-slate-600">
               <CalendarOutlined className="text-blue-500" />
-              <span>Tổng suất chiếu (Năm)</span>
+              <span>Tong suat chieu (Nam)</span>
             </div>
             <div className="text-2xl font-semibold">{showtimeStats.totalYear}</div>
           </div>
@@ -694,7 +912,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-slate-600">
               <CalendarOutlined className="text-purple-500" />
-              <span>Tổng suất chiếu (Tháng)</span>
+              <span>Tong suat chieu (Thang)</span>
             </div>
             <div className="text-2xl font-semibold">{showtimeStats.totalMonth}</div>
           </div>
@@ -703,7 +921,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-slate-600">
               <PlayCircleOutlined className="text-emerald-500" />
-              <span>Suất chiếu Hôm nay</span>
+              <span>Suat chieu Hom nay</span>
             </div>
             <div className="text-2xl font-semibold">{showtimeStats.today}</div>
           </div>
@@ -712,18 +930,19 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-slate-600">
               <CheckCircleOutlined className="text-rose-500" />
-              <span>Suất chiếu đã hết vé</span>
+              <span>Suat chieu da het ve</span>
             </div>
             <div className="text-2xl font-semibold">{showtimeStats.soldOut}</div>
           </div>
         </Card>
       </div>
+
       <Card>
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-5">
           {!movieId && (
             <Select
               allowClear
-              placeholder="Lọc theo phim"
+              placeholder="Loc theo phim"
               options={movieOptions}
               value={selectedMovieFilter}
               onChange={(value) => setSelectedMovieFilter(value)}
@@ -733,7 +952,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
           <Select
             allowClear
-            placeholder="Lọc theo rạp"
+            placeholder="Loc theo rap"
             options={cinemaOptions}
             value={selectedCinemaFilter}
             onChange={(value) => {
@@ -745,7 +964,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
           <TreeSelect
             allowClear
-            placeholder="Lọc theo phòng"
+            placeholder="Loc theo phong"
             value={selectedRoomFilter}
             onChange={(value) =>
               setSelectedRoomFilter((value as string[])?.length ? (value as string[]) : undefined)
@@ -759,7 +978,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
           <DatePicker
             className="w-full"
             format="DD/MM/YYYY"
-            placeholder="Lọc theo ngày chiếu"
+            placeholder="Loc theo ngay chieu"
             value={selectedDateFilter}
             onChange={(value) => setSelectedDateFilter(value)}
             suffixIcon={<CalendarOutlined className="text-slate-400" />}
@@ -774,7 +993,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
               setSelectedDateFilter(null);
             }}
           >
-            Xóa bộ lọc
+            Xoa bo loc
           </Button>
         </div>
 
@@ -789,12 +1008,12 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       </Card>
 
       <Modal
-        title="Tạo suất chiếu"
+        title="Tao suat chieu"
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         footer={null}
         destroyOnHidden
-        width={980}
+        width={1100}
       >
         <Tabs
           items={[
@@ -803,7 +1022,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
               label: (
                 <span className="flex items-center gap-2">
                   <CalendarOutlined />
-                  Theo ngày
+                  Theo ngay
                 </span>
               ),
               children: (
@@ -821,10 +1040,10 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                       <Form.Item
                         name="movieId"
                         label="Phim"
-                        rules={[{ required: true, message: 'Chọn phim' }]}
+                        rules={[{ required: true, message: 'Chon phim' }]}
                       >
                         <Select
-                          placeholder="Chọn phim"
+                          placeholder="Chon phim"
                           options={movieOptions}
                           showSearch
                           optionFilterProp="label"
@@ -834,12 +1053,12 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="roomIds"
-                      label="Phòng chiếu"
-                      rules={[{ required: true, message: 'Chọn phòng chiếu' }]}
+                      label="Phong chieu"
+                      rules={[{ required: true, message: 'Chon phong chieu' }]}
                     >
                       <TreeSelect
                         treeData={roomTreeSelectData}
-                        placeholder="Chọn phòng"
+                        placeholder="Chon phong"
                         treeCheckable
                         showCheckedStrategy={TreeSelect.SHOW_CHILD}
                         multiple
@@ -851,8 +1070,8 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="date"
-                      label="Ngày chiếu"
-                      rules={[{ required: true, message: 'Chọn ngày chiếu' }]}
+                      label="Ngay chieu"
+                      rules={[{ required: true, message: 'Chon ngay chieu' }]}
                     >
                       <DatePicker
                         className="w-full"
@@ -863,13 +1082,13 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="timeSlots"
-                      label="Ca chiếu trong ngày"
-                      rules={[{ required: true, message: 'Chọn ít nhất một ca chiếu' }]}
-                      extra="Hệ thống sinh ca liên tiếp từ 07:00, mỗi ca = thời lượng phim + 30 phút dọn dẹp."
+                      label="Ca chieu trong ngay"
+                      rules={[{ required: true, message: 'Chon it nhat mot ca chieu' }]}
+                      extra="He thong sinh ca lien tiep tu 07:00, moi ca = thoi luong phim + 30 phut don dep."
                     >
                       <Select
                         mode="multiple"
-                        placeholder="Chọn một hoặc nhiều ca chiếu"
+                        placeholder="Chon mot hoac nhieu ca chieu"
                         options={singleSlotOptions}
                         disabled={!singleDate || !singleRoomIds?.length || !singleMovieId}
                       />
@@ -877,24 +1096,24 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="priceNormal"
-                      label="Giá thường"
-                      rules={[{ required: true, message: 'Nhập giá vé thường' }]}
+                      label="Gia thuong"
+                      rules={[{ required: true, message: 'Nhap gia ve thuong' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
 
                     <Form.Item
                       name="priceVip"
-                      label="Giá VIP"
-                      rules={[{ required: true, message: 'Nhập giá VIP' }]}
+                      label="Gia VIP"
+                      rules={[{ required: true, message: 'Nhap gia VIP' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
 
                     <Form.Item
                       name="priceCouple"
-                      label="Giá đôi"
-                      rules={[{ required: true, message: 'Nhập giá đôi' }]}
+                      label="Gia doi"
+                      rules={[{ required: true, message: 'Nhap gia doi' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
@@ -904,7 +1123,13 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                     className="mb-4"
                     type="info"
                     showIcon
-                    message={`1 ca chiếu = ${durationMinutes} phút phim + ${CLEANING_MINUTES} phút dọn dẹp.`}
+                    message={`1 ca chieu = ${durationMinutes} phut phim + ${CLEANING_MINUTES} phut don dep.`}
+                    description={
+                      <div className="mt-1">
+                        Phim dang chon:{' '}
+                        <strong>{getMovieDisplayName(activeSingleMovie || fixedMovieOption)}</strong>
+                      </div>
+                    }
                   />
 
                   {singleDate && singleRoomIds?.length && (
@@ -912,20 +1137,48 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                       <Typography.Text strong>
                         <span className="flex items-center gap-2">
                           <CalendarOutlined className="text-blue-500" />
-                          Thông tin trong ngày
+                          Thong tin trong ngay
                         </span>
                       </Typography.Text>
                       <div className="mt-2 text-sm text-slate-600">
-                        Đã có {existingSingleDayShowtimes.length} suất trong phòng này vào ngày{' '}
-                        {singleDate.format('DD/MM/YYYY')}.
+                        Da co {existingSingleDayShowtimes.length} suat trong cac phong da chon vao
+                        ngay {singleDate.format('DD/MM/YYYY')}.
                       </div>
                     </Card>
                   )}
 
+                  {singlePreviewItems.length > 0 && (
+                    <Card size="small" className="mb-4">
+                      <div className="mb-3 flex items-center justify-between gap-2">
+                        <Typography.Text strong>Preview ca chieu theo ngay</Typography.Text>
+                        <Space wrap>
+                          <Tag color="blue">Tong: {singlePreviewItems.length}</Tag>
+                          <Tag color="success">
+                            Hop le:{' '}
+                            {singlePreviewItems.filter((item) => item.status === 'available').length}
+                          </Tag>
+                          <Tag color="error">
+                            Trung:{' '}
+                            {singlePreviewItems.filter((item) => item.status === 'conflict').length}
+                          </Tag>
+                        </Space>
+                      </div>
+
+                      <Table
+                        rowKey="key"
+                        columns={previewColumns}
+                        dataSource={singlePreviewItems}
+                        pagination={false}
+                        size="small"
+                        scroll={{ x: 900 }}
+                      />
+                    </Card>
+                  )}
+
                   <div className="flex justify-end gap-2">
-                    <Button onClick={() => setIsModalOpen(false)}>Đóng</Button>
+                    <Button onClick={() => setIsModalOpen(false)}>Dong</Button>
                     <Button type="primary" htmlType="submit" loading={submittingMode === 'single'}>
-                      Tạo suất theo ngày
+                      Tao suat theo ngay
                     </Button>
                   </div>
                 </Form>
@@ -936,7 +1189,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
               label: (
                 <span className="flex items-center gap-2">
                   <CalendarOutlined />
-                  Theo khoảng ngày
+                  Theo khoang ngay
                 </span>
               ),
               children: (
@@ -953,7 +1206,10 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                     className="mb-4"
                     type="warning"
                     showIcon
-                    message="Chọn khoảng ngày và các ca chiếu mẫu. Hệ thống sẽ tạo suất cho từng ngày trong khoảng đã chọn và ngày nào trùng lịch sẽ tự động bỏ qua."
+                    message="Chon khoang ngay va cac ca chieu mau. He thong se preview chi tiet va chi tao cac ca hop le."
+                    description={`Phim dang chon: ${getMovieDisplayName(
+                      activeRangeMovie || fixedMovieOption,
+                    )}`}
                   />
 
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -961,10 +1217,10 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                       <Form.Item
                         name="movieId"
                         label="Phim"
-                        rules={[{ required: true, message: 'Chọn phim' }]}
+                        rules={[{ required: true, message: 'Chon phim' }]}
                       >
                         <Select
-                          placeholder="Chọn phim"
+                          placeholder="Chon phim"
                           options={movieOptions}
                           showSearch
                           optionFilterProp="label"
@@ -974,15 +1230,15 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="roomIds"
-                      label="Phòng chiếu"
-                      rules={[{ required: true, message: 'Chọn phòng chiếu' }]}
+                      label="Phong chieu"
+                      rules={[{ required: true, message: 'Chon phong chieu' }]}
                     >
                       <TreeSelect
                         treeData={roomTreeSelectData}
                         treeCheckable
                         multiple
                         showCheckedStrategy={TreeSelect.SHOW_CHILD}
-                        placeholder="Chọn phòng"
+                        placeholder="Chon phong"
                         treeDefaultExpandAll
                         maxTagCount="responsive"
                       />
@@ -990,8 +1246,8 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="startDate"
-                      label="Từ ngày"
-                      rules={[{ required: true, message: 'Chọn ngày bắt đầu' }]}
+                      label="Tu ngay"
+                      rules={[{ required: true, message: 'Chon ngay bat dau' }]}
                     >
                       <DatePicker
                         className="w-full"
@@ -1002,10 +1258,10 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="endDate"
-                      label="Đến ngày"
+                      label="Den ngay"
                       dependencies={['startDate']}
                       rules={[
-                        { required: true, message: 'Chọn ngày kết thúc' },
+                        { required: true, message: 'Chon ngay ket thuc' },
                         ({ getFieldValue }) => ({
                           validator(_, value: Dayjs | undefined) {
                             const startDate = getFieldValue('startDate') as Dayjs | undefined;
@@ -1013,7 +1269,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                               return Promise.resolve();
                             }
                             return Promise.reject(
-                              new Error('Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu'),
+                              new Error('Ngay ket thuc phai lon hon hoac bang ngay bat dau'),
                             );
                           },
                         }),
@@ -1028,13 +1284,13 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="timeSlots"
-                      label="Các ca chiếu áp dụng"
-                      rules={[{ required: true, message: 'Chọn ít nhất một ca chiếu' }]}
-                      extra="Mỗi ngày trong preview bên dưới sẽ được tạo theo các giờ này."
+                      label="Cac ca chieu ap dung"
+                      rules={[{ required: true, message: 'Chon it nhat mot ca chieu' }]}
+                      extra="Moi ngay trong preview se duoc tao theo cac gio nay."
                     >
                       <Select
                         mode="multiple"
-                        placeholder="Chọn các ca chiếu"
+                        placeholder="Chon cac ca chieu"
                         options={rangeSlotOptions}
                         disabled={!rangeStartDate || !rangeRoomIds?.length || !rangeMovieId}
                       />
@@ -1042,24 +1298,24 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="priceNormal"
-                      label="Giá thường"
-                      rules={[{ required: true, message: 'Nhập giá vé thường' }]}
+                      label="Gia thuong"
+                      rules={[{ required: true, message: 'Nhap gia ve thuong' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
 
                     <Form.Item
                       name="priceVip"
-                      label="Giá VIP"
-                      rules={[{ required: true, message: 'Nhập giá VIP' }]}
+                      label="Gia VIP"
+                      rules={[{ required: true, message: 'Nhap gia VIP' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
 
                     <Form.Item
                       name="priceCouple"
-                      label="Giá đôi"
-                      rules={[{ required: true, message: 'Nhập giá đôi' }]}
+                      label="Gia doi"
+                      rules={[{ required: true, message: 'Nhap gia doi' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
@@ -1071,11 +1327,11 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                         <Typography.Text strong>
                           <span className="flex items-center gap-2">
                             <CalendarOutlined className="text-blue-500" />
-                            Preview ngày sẽ tạo
+                            Preview ngay se tao
                           </span>
                         </Typography.Text>
                         <Typography.Text type="secondary">
-                          Tổng {rangePreviewDates.length} ngày
+                          Tong {rangePreviewDates.length} ngay
                         </Typography.Text>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -1085,16 +1341,44 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                           </Tag>
                         ))}
                         {rangePreviewDates.length > 24 && (
-                          <Tag color="default">+{rangePreviewDates.length - 24} ngày nữa</Tag>
+                          <Tag color="default">+{rangePreviewDates.length - 24} ngay nua</Tag>
                         )}
                       </div>
                     </Card>
                   )}
 
+                  {rangePreviewItems.length > 0 && (
+                    <Card size="small" className="mb-4">
+                      <div className="mb-3 flex items-center justify-between gap-2">
+                        <Typography.Text strong>Preview ca chieu theo khoang ngay</Typography.Text>
+                        <Space wrap>
+                          <Tag color="blue">Tong: {rangePreviewItems.length}</Tag>
+                          <Tag color="success">
+                            Hop le:{' '}
+                            {rangePreviewItems.filter((item) => item.status === 'available').length}
+                          </Tag>
+                          <Tag color="error">
+                            Trung:{' '}
+                            {rangePreviewItems.filter((item) => item.status === 'conflict').length}
+                          </Tag>
+                        </Space>
+                      </div>
+
+                      <Table
+                        rowKey="key"
+                        columns={previewColumns}
+                        dataSource={rangePreviewItems}
+                        pagination={{ pageSize: 8 }}
+                        size="small"
+                        scroll={{ x: 900 }}
+                      />
+                    </Card>
+                  )}
+
                   <div className="flex justify-end gap-2">
-                    <Button onClick={() => setIsModalOpen(false)}>Đóng</Button>
+                    <Button onClick={() => setIsModalOpen(false)}>Dong</Button>
                     <Button type="primary" htmlType="submit" loading={submittingMode === 'range'}>
-                      Tạo theo khoảng ngày
+                      Tao theo khoang ngay
                     </Button>
                   </div>
                 </Form>
@@ -1105,7 +1389,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       </Modal>
 
       <Modal
-        title="Sơ đồ ghế"
+        title="So do ghe"
         open={isSeatMapOpen}
         onCancel={() => setIsSeatMapOpen(false)}
         footer={null}

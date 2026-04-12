@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api";
+const API_URL = 'http://localhost:5000/api';
 
 export const API = {
   AUTH: `${API_URL}/access/auth`,
@@ -16,5 +16,11 @@ export const API = {
   BOOKING: `${API_URL}/order/booking`,
   PRODUCTS: `${API_URL}/order/product`,
   CONTACT: `${API_URL}/contact`,
+  TICKETS: `${API_URL}/ticket`,
+
+  STAFF: `${API_URL}/staff`,
+  CHECKIN_TICKET_WARNING: `${API_URL}/staff/checkin-ticket-warning`,
+  STAFF_SHOWTIME_ALERTS: `${API_URL}/staff/showtime-alerts`,
+
   PAYMENT_GATEWAY: `http://localhost:5000/payments`,
 };

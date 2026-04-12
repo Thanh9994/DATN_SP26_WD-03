@@ -1,4 +1,6 @@
-import { useParams } from "react-router-dom";
+import { useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 import {
   Armchair,
   Camera,
@@ -9,62 +11,233 @@ import {
   Phone,
   UtensilsCrossed,
   Volume2,
-} from "lucide-react";
+} from 'lucide-react';
+import { useCinemas, useRooms } from '@web/hooks/useCinema';
+import { useMovies } from '@web/hooks/useMovie';
+import { useShowTime, type AdminShowtimeRow } from '@web/hooks/useShowTime';
+import type { ICinema, IMovie, IPhong } from '@shared/src/schemas';
 
-/* MOCK DATA */
-const cinemas = [
-  {
-    id: 1,
-    name: "CineStream Grand Plaza",
-    address: "452 Cinema Blvd, New York",
-    phone: "+1 (555) 123-4567",
-    email: "grandplaza@cinestream.com",
-    hero:
-      "https://images.unsplash.com/photo-1595769816263-9b910be24d5f?auto=format&fit=crop&w=1600&q=80",
-  },
-  {
-    id: 2,
-    name: "CineStream Northside Hub",
-    address: "456 Skyline Blvd, Metropolis North",
-    phone: "+1 (555) 222-8888",
-    email: "northside@cinestream.com",
-    hero:
-      "https://images.unsplash.com/photo-1595769816263-9b910be24d5f?auto=format&fit=crop&w=1600&q=80",
-  },
+const fallbackHero =
+  'https://images.unsplash.com/photo-1595769816263-9b910be24d5f?auto=format&fit=crop&w=1600&q=80';
+
+const galleryImages = [
+  'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1513106580091-1d82408b8cd6?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1505685296765-3a2736de412f?auto=format&fit=crop&w=900&q=80',
 ];
 
-const gallery = [
-  "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1513106580091-1d82408b8cd6?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1513106580091-1d82408b8cd6?auto=format&fit=crop&w=900&q=80",
-];
+type CinemaRef = {
+  _id?: string;
+  name?: string;
+  city?: string;
+  address?: string;
+};
 
-const amenities = [
-  { icon: <Clapperboard size={18} />, label: "IMAX LASER" },
-  { icon: <Armchair size={18} />, label: "FULL RECLINERS" },
-  { icon: <Volume2 size={18} />, label: "DOLBY ATMOS" },
-  { icon: <UtensilsCrossed size={18} />, label: "IN-SEAT DINING" },
-];
+type RoomWithCinema = IPhong & {
+  cinema_id?: string | CinemaRef | null;
+};
 
-const showtimes = [
-  {
-    title: "Neon Horizon: Origins",
-    meta: "Action, Sci-Fi • 2h 15m • Rated PG-13",
-    poster:
-      "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c",
-    times: ["10:30 AM", "01:45 PM", "04:30 PM", "07:15 PM", "10:00 PM"],
-  },
-];
+type CinemaShowtimeButton = {
+  showtimeId: string;
+  movieId: string;
+  time: string;
+};
+
+type CinemaShowtimeItem = {
+  movieId: string;
+  title: string;
+  meta: string;
+  poster?: string;
+  buttons: CinemaShowtimeButton[];
+};
+
+const getCinemaIdFromRoom = (room: RoomWithCinema) => {
+  const cinemaValue = room?.cinema_id;
+
+  if (!cinemaValue) return undefined;
+
+  if (typeof cinemaValue === 'string') {
+    return cinemaValue;
+  }
+
+  return (cinemaValue as CinemaRef)._id;
+};
+
+const getRoomTypeLabel = (type?: string) => {
+  if (!type) return 'Phòng tiêu chuẩn';
+
+  const normalized = type.toUpperCase();
+
+  if (normalized === 'IMAX') return 'IMAX';
+  if (normalized === '4DX') return '4DX';
+  if (normalized === 'VIP') return 'VIP';
+  if (normalized === 'COUPLE') return 'Ghế đôi';
+
+  return type;
+};
+
+const getMovieInfo = (
+  movieId: AdminShowtimeRow['movieId'],
+  movies: IMovie[],
+): { id: string; title: string; duration: number; poster?: string } => {
+  if (typeof movieId === 'object') {
+    const matchedMovie = movies.find((item) => item._id === movieId._id);
+
+    return {
+      id: movieId._id || '',
+      title: movieId.ten_phim || matchedMovie?.ten_phim || 'Không xác định',
+      duration: movieId.thoi_luong || matchedMovie?.thoi_luong || 0,
+      poster: matchedMovie?.poster?.url,
+    };
+  }
+
+  const movie = movies.find((item) => item._id === movieId);
+
+  return {
+    id: movie?._id || movieId,
+    title: movie?.ten_phim || 'Không xác định',
+    duration: movie?.thoi_luong || 0,
+    poster: movie?.poster?.url,
+  };
+};
 
 export default function CinemaDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
-  const cinema = cinemas.find((c) => c.id === Number(id));
+  const { cinemas = [], isLoading: isCinemaLoading } = useCinemas();
+  const { rooms = [], isLoading: isRoomLoading } = useRooms();
+  const { movies = [], isLoading: isMovieLoading } = useMovies();
+  const { showtimes = [], isLoading: isShowtimeLoading } = useShowTime();
+
+  const cinema = useMemo(() => {
+    return cinemas.find((item: ICinema) => item._id === id);
+  }, [cinemas, id]);
+
+  const cinemaRooms = useMemo(() => {
+    if (!id) return [];
+    return (rooms as RoomWithCinema[]).filter((room) => getCinemaIdFromRoom(room) === id);
+  }, [rooms, id]);
+
+  const amenityItems = useMemo(() => {
+    const roomTypes = new Set<string>();
+    let hasVipSeat = false;
+    let hasCoupleSeat = false;
+
+    cinemaRooms.forEach((room) => {
+      if (room.loai_phong) roomTypes.add(room.loai_phong);
+      if ((room as any).vip?.length) hasVipSeat = true;
+      if ((room as any).couple?.length) hasCoupleSeat = true;
+    });
+
+    const items = [
+      {
+        icon: <Clapperboard size={18} />,
+        label: `${cinemaRooms.length} PHÒNG CHIẾU`,
+      },
+      ...Array.from(roomTypes).map((type) => ({
+        icon: <Camera size={18} />,
+        label: getRoomTypeLabel(type).toUpperCase(),
+      })),
+    ];
+
+    if (hasVipSeat) {
+      items.push({
+        icon: <Armchair size={18} />,
+        label: 'GHẾ VIP',
+      });
+    }
+
+    if (hasCoupleSeat) {
+      items.push({
+        icon: <Volume2 size={18} />,
+        label: 'GHẾ ĐÔI',
+      });
+    }
+
+    items.push({
+      icon: <UtensilsCrossed size={18} />,
+      label: 'BẮP NƯỚC',
+    });
+
+    return items.slice(0, 6);
+  }, [cinemaRooms]);
+
+  const todayShowtimes = useMemo(() => {
+    if (!id) return [] as CinemaShowtimeItem[];
+
+    const filtered = showtimes.filter((showtime) => {
+      const showtimeRoomId =
+        typeof showtime.roomId === 'string' ? showtime.roomId : showtime.roomId?._id;
+
+      const room = cinemaRooms.find((item) => item._id === showtimeRoomId);
+      if (!room) return false;
+
+      return dayjs(showtime.startTime).isSame(dayjs(), 'day');
+    });
+
+    const grouped = new Map<string, CinemaShowtimeItem>();
+
+    filtered.forEach((showtime) => {
+      const movieInfo = getMovieInfo(showtime.movieId, movies as IMovie[]);
+      const roomType =
+        typeof showtime.roomId === 'object' ? showtime.roomId?.loai_phong : undefined;
+      const timeText = dayjs(showtime.startTime).format('HH:mm');
+      const showtimeId = showtime._id || '';
+      const movieId = movieInfo.id;
+      const key = movieInfo.id || `movie-${timeText}`;
+
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          movieId: movieInfo.id,
+          title: movieInfo.title,
+          meta: `${movieInfo.duration ? `${movieInfo.duration} phút` : 'Đang cập nhật'} • ${
+            roomType ? getRoomTypeLabel(roomType) : 'Suất chiếu'
+          }`,
+          poster:
+            movieInfo.poster ||
+            'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=300&q=80',
+          buttons: [
+            {
+              showtimeId,
+              movieId,
+              time: timeText,
+            },
+          ],
+        });
+      } else {
+        grouped.get(key)?.buttons.push({
+          showtimeId,
+          movieId,
+          time: timeText,
+        });
+      }
+    });
+
+    return Array.from(grouped.values()).map((item) => ({
+      ...item,
+      buttons: [...item.buttons].sort((a, b) => a.time.localeCompare(b.time)),
+    }));
+  }, [id, cinemaRooms, movies, showtimes]);
+
+  const specialRoomCount = useMemo(() => {
+    return cinemaRooms.filter((room) =>
+      ['IMAX', '4DX', 'VIP', 'COUPLE'].includes((room.loai_phong || '').toUpperCase()),
+    ).length;
+  }, [cinemaRooms]);
+
+  if (isCinemaLoading || isRoomLoading || isMovieLoading || isShowtimeLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black text-white">
+        Đang tải thông tin rạp...
+      </div>
+    );
+  }
 
   if (!cinema) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        Cinema not found
+      <div className="flex min-h-screen items-center justify-center bg-black text-white">
+        Không tìm thấy rạp phim.
       </div>
     );
   }
@@ -72,196 +245,184 @@ export default function CinemaDetail() {
   return (
     <div className="min-h-screen bg-[#0b0002] text-white">
       <div className="mx-auto max-w-[1600px]">
-
-        {/* HEADER */}
-        {/* <header className="flex items-center justify-between border-b border-white/10 px-4 md:px-8 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#ff3b3b]">
-              <Ticket size={16} />
-            </div>
-          </div>
-
-          <nav className="hidden md:flex items-center gap-10">
-            <a href="#" className="text-sm text-white/65 hover:text-white">
-              Home
-            </a>
-            <a href="#" className="text-sm font-semibold text-[#ff3b3b]">
-              Cinemas
-            </a>
-            <a href="#" className="text-sm text-white/65 hover:text-white">
-              Movies
-            </a>
-            <a href="#" className="text-sm text-white/65 hover:text-white">
-              Offers
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-2 md:gap-3">
-            <button className="h-10 w-10 flex items-center justify-center rounded-full border border-white/10 bg-white/5">
-              <Heart size={18} />
-            </button>
-            <button className="h-10 w-10 flex items-center justify-center rounded-full border border-white/10 bg-white/5">
-              <Share2 size={18} />
-            </button>
-          </div>
-        </header> */}
-
-        <main className="px-4 md:px-8 pb-16 pt-4">
-
-          {/* HERO */}
-          <section className="relative overflow-hidden rounded-[26px] md:rounded-[34px] border border-white/10">
+        <main className="px-4 pb-16 pt-4 md:px-8">
+          <section className="relative overflow-hidden rounded-[26px] border border-white/10 md:rounded-[34px]">
             <img
-              src="https://images.unsplash.com/photo-1595769816263-9b910be24d5f?auto=format&fit=crop&w=1600&q=80"
-              className="h-[260px] md:h-[520px] w-full object-cover"
+              src={fallbackHero}
+              alt={cinema.name}
+              className="h-[260px] w-full object-cover md:h-[520px]"
             />
 
             <div className="absolute inset-0 bg-gradient-to-t from-[#0b0002] via-[#0b0002]/35 to-transparent" />
 
             <div className="absolute bottom-0 p-5 md:p-10">
-              <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] text-[#ff3b3b]">
-                Luxury • Premium Sound • 4K Projection
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#ff3b3b] md:text-xs">
+                {cinema.city} • Hệ thống rạp hiện đại • Trải nghiệm điện ảnh
               </p>
 
-              <h1 className="text-3xl md:text-7xl font-black mt-2">
-                CineStream Grand Plaza
-              </h1>
+              <h1 className="mt-2 text-3xl font-black md:text-7xl">{cinema.name}</h1>
 
-              <p className="text-sm md:text-xl text-white/75 mt-2 max-w-[600px]">
-                Experience the future of cinema with ultra-comfortable reclining seats.
+              <p className="mt-2 max-w-[700px] text-sm text-white/75 md:text-xl">
+                {cinema.address}. Khám phá hệ thống phòng chiếu hiện đại, lịch chiếu đa dạng và
+                trải nghiệm xem phim chất lượng cao ngay hôm nay.
               </p>
             </div>
           </section>
 
-          {/* MAIN GRID */}
-          <section className="mt-8 grid grid-cols-1 xl:grid-cols-[1fr_420px] gap-8">
-
-            {/* LEFT */}
+          <section className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-[1fr_420px]">
             <div>
-
-              {/* GALLERY */}
               <div>
-                <div className="flex items-center gap-2 mb-4">
+                <div className="mb-4 flex items-center gap-2">
                   <Camera size={18} className="text-[#ff3b3b]" />
-                  <h2 className="text-lg md:text-[22px] font-extrabold uppercase">
-                    Cinema Gallery
+                  <h2 className="text-lg font-extrabold uppercase md:text-[22px]">
+                    Hình ảnh rạp
                   </h2>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {gallery.map((img, i) => (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  {galleryImages.map((img, i) => (
                     <img
                       key={i}
                       src={img}
-                      className="h-[180px] md:h-[250px] w-full object-cover rounded-2xl"
+                      alt={`gallery-${i}`}
+                      className="h-[180px] w-full rounded-2xl object-cover md:h-[250px]"
                     />
                   ))}
                 </div>
               </div>
 
-              {/* AMENITIES */}
               <div className="mt-10">
-                <h2 className="text-lg md:text-[22px] font-extrabold uppercase mb-4">
-                  Premium Amenities
+                <h2 className="mb-4 text-lg font-extrabold uppercase md:text-[22px]">
+                  Tiện ích nổi bật
                 </h2>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {amenities.map((a) => (
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                  {amenityItems.map((item) => (
                     <div
-                      key={a.label}
+                      key={item.label}
                       className="rounded-xl border border-white/10 bg-white/5 px-4 py-5"
                     >
-                      <div className="text-[#ff3b3b] mb-2">{a.icon}</div>
-                      <div className="text-xs font-bold uppercase">
-                        {a.label}
-                      </div>
+                      <div className="mb-2 text-[#ff3b3b]">{item.icon}</div>
+                      <div className="text-xs font-bold uppercase">{item.label}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* SHOWTIMES */}
               <div className="mt-10">
-                <h2 className="text-lg md:text-[22px] font-extrabold uppercase mb-5">
-                  Today's Showtimes
+                <h2 className="mb-5 text-lg font-extrabold uppercase md:text-[22px]">
+                  Suất chiếu hôm nay
                 </h2>
 
                 <div className="space-y-5">
-                  {showtimes.map((movie) => (
-                    <div
-                      key={movie.title}
-                      className="rounded-2xl border border-white/10 bg-white/5 p-4"
-                    >
-                      <div className="flex gap-4 items-center">
-                        <img
-                          src={movie.poster}
-                          className="h-20 w-14 rounded-lg object-cover"
-                        />
+                  {todayShowtimes.length > 0 ? (
+                    todayShowtimes.map((movie) => (
+                      <div
+                        key={movie.movieId}
+                        className="rounded-2xl border border-white/10 bg-white/5 p-4"
+                      >
+                        <div className="flex items-center gap-4">
+                          <img
+                            src={movie.poster}
+                            alt={movie.title}
+                            className="h-20 w-14 rounded-lg object-cover"
+                          />
 
-                        <div>
-                          <h3 className="font-bold text-lg">{movie.title}</h3>
-                          <p className="text-xs text-white/60">{movie.meta}</p>
+                          <div>
+                            <h3 className="text-lg font-bold">{movie.title}</h3>
+                            <p className="text-xs text-white/60">{movie.meta}</p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {movie.buttons.map((item) => (
+                            <button
+                              key={item.showtimeId}
+                              type="button"
+                              onClick={() =>
+                                navigate(
+                                  `/booking/seats?showtimeId=${item.showtimeId}&movieId=${item.movieId}`,
+                                )
+                              }
+                              className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs transition hover:border-[#ff3b3b] hover:bg-[#ff3b3b] hover:text-white"
+                            >
+                              {item.time}
+                            </button>
+                          ))}
                         </div>
                       </div>
-
-                      <div className="flex flex-wrap gap-2 mt-4">
-                        {movie.times.map((t) => (
-                          <button
-                            key={t}
-                            className="text-xs border border-white/10 rounded-full px-3 py-1 bg-white/5"
-                          >
-                            {t}
-                          </button>
-                        ))}
-                      </div>
+                    ))
+                  ) : (
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-white/60">
+                      Hôm nay chưa có suất chiếu nào tại rạp này.
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
-
             </div>
 
-            {/* SIDEBAR */}
             <aside className="space-y-5">
-
               <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-                <h3 className="font-bold text-lg mb-4">Location & Contact</h3>
+                <h3 className="mb-4 text-lg font-bold">Địa điểm & Liên hệ</h3>
 
                 <div className="space-y-3 text-sm text-white/80">
                   <div className="flex gap-3">
                     <MapPin size={16} />
-                    <p>452 Cinema Blvd, New York</p>
+                    <p>{cinema.address}</p>
                   </div>
 
                   <div className="flex gap-3">
                     <Phone size={16} />
-                    <p>+1 (555) 123-4567</p>
+                    <p>1900 6017</p>
                   </div>
 
                   <div className="flex gap-3">
                     <Mail size={16} />
-                    <p>grandplaza@cinestream.com</p>
+                    <p>support@pvmcinema.vn</p>
                   </div>
 
                   <div className="flex gap-3">
                     <Clock3 size={16} />
-                    <p>10:00 AM - 12:00 AM</p>
+                    <p>08:00 - 23:30</p>
                   </div>
                 </div>
 
-                <button className="mt-5 w-full bg-[#ff3b3b] rounded-full py-3 font-bold">
-                  GET DIRECTIONS
+                <button
+                  type="button"
+                  onClick={() => navigate('/contact')}
+                  className="mt-5 w-full rounded-full bg-[#ff3b3b] py-3 font-bold transition hover:bg-[#ff5252]"
+                >
+                  Liên hệ ngay
                 </button>
               </div>
 
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                <h3 className="mb-4 text-lg font-bold">Thông tin nhanh</h3>
+
+                <div className="space-y-3 text-sm text-white/80">
+                  <div className="flex items-center justify-between">
+                    <span>Thành phố</span>
+                    <span className="font-semibold text-white">{cinema.city}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span>Số phòng</span>
+                    <span className="font-semibold text-white">{cinemaRooms.length} phòng</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span>Phòng đặc biệt</span>
+                    <span className="font-semibold text-white">{specialRoomCount}</span>
+                  </div>
+                </div>
+              </div>
             </aside>
           </section>
         </main>
 
-        {/* FOOTER */}
-        <footer className="border-t border-white/10 px-4 md:px-8 py-8 text-center text-xs text-white/40">
-          © 2023 Cinestream Global Cinemas
+        <footer className="border-t border-white/10 px-4 py-8 text-center text-xs text-white/40 md:px-8">
+          © 2026 PVM Cinemas. Bảo lưu mọi quyền.
         </footer>
-
       </div>
     </div>
   );

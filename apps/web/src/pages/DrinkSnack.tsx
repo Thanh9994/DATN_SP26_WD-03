@@ -81,7 +81,7 @@ export const DrinkSnack = ({ open, onClose, onSkip, onContinue }: DrinkSnackProp
             : 'border-white/10 bg-white/5 hover:border-white/20'
         }`}
       >
-        <div className="relative aspect-[12/10] overflow-hidden rounded-md">
+        <div className="relative aspect-[16/10] overflow-hidden">
           <img
             src={product.image || DEFAULT_IMAGE}
             alt={product.name}
@@ -165,7 +165,7 @@ export const DrinkSnack = ({ open, onClose, onSkip, onContinue }: DrinkSnackProp
         </button>
 
         {/* Header Cố định */}
-        <div className="flex-shrink-0 px-5 pb-2 pt-4 text-center">
+        <div className="flex-shrink-0 px-10 pb-5 pt-10 text-center">
           <span className="block text-[11px] font-bold uppercase tracking-[3px] text-red-600">
             Danh sách Sản phẩm
           </span>
@@ -175,7 +175,7 @@ export const DrinkSnack = ({ open, onClose, onSkip, onContinue }: DrinkSnackProp
         </div>
 
         {/* Thân Modal - Cuộn nội dung */}
-        <div className="no-scrollbar flex-1 overflow-y-auto px-10 pb-8">
+        <div className="scrollbar-thin scrollbar-thumb-white/10 flex-1 overflow-y-auto px-10 pb-8">
           {isLoading ? (
             <div className="flex min-h-[300px] items-center justify-center rounded-xl border border-dashed border-white/10 text-zinc-500">
               Đang tải danh sách sản phẩm...
@@ -196,7 +196,7 @@ export const DrinkSnack = ({ open, onClose, onSkip, onContinue }: DrinkSnackProp
         </div>
 
         {/* Footer Cố định */}
-        <div className="flex flex-shrink-0 flex-col items-center justify-between border-t border-white/10 bg-[#1e1e1e] px-5 py-4 sm:flex-row">
+        <div className="flex flex-shrink-0 flex-col items-center justify-between border-t border-white/10 bg-[#1e1e1e] px-10 py-5 sm:flex-row">
           <button
             className="mb-4 text-xs text-zinc-500 underline transition-colors hover:text-white sm:mb-0"
             onClick={handleSkip}
@@ -207,7 +207,7 @@ export const DrinkSnack = ({ open, onClose, onSkip, onContinue }: DrinkSnackProp
           <div className="flex flex-col items-center gap-6 sm:flex-row">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-zinc-400">
-                Tổng ( {getCartCount()} món ):
+                Tổng ({getCartCount()} món):
               </span>
               <span className="text-xl font-black text-red-600">
                 {getCartTotal().toLocaleString('vi-VN')}đ
