@@ -30,12 +30,10 @@ if (process.env.NODE_ENV === "development") {
     )
   );
 }
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const api = express.Router();
-
 api.use("/access", accessRouter);
 api.use("/catalog", catalogRouter);
 api.use("/content", contentRouter);
@@ -52,5 +50,4 @@ app.use("/api/uploads", uploadRouter);
 app.use("/payments", paymentRouter);
 app.use("/api/chatbot", chatbotRoute);
 app.use(globalErrorHandler);
-
 export default app;
