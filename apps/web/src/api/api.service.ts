@@ -17,5 +17,7 @@ export const API = {
   PRODUCTS: `${API_URL}/order/product`,
   CONTACT: `${API_URL}/contact`,
   TICKETS: `${API_URL}/ticket`,
+  CHECKIN_TICKET_WARNING: '/staff/checkin-ticket-warning',
+  STAFF_SHOWTIME_ALERTS: '/staff/showtime-alerts',
   PAYMENT_GATEWAY: `http://localhost:5000/payments`,
 };
