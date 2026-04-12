@@ -36,7 +36,6 @@ export const StaffHeader = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { checkinTicket, isCheckingInTicket } = useStaff();
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [checkinOpen, setCheckinOpen] = useState(false);
   const [ticketCode, setTicketCode] = useState('');

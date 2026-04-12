@@ -122,14 +122,23 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
           onClick: () => navigate('/admin/staff'),
         },
         {
+          key: 'tickets',
+          icon: <Ticket size={18} />,
+          label: 'Quản lý vé',
+          onClick: () => navigate('/admin/tickets'),
+        },
+        
+      ],
+      
+    },
+    
+    { type: 'divider'},
+    {
           key: 'users',
           icon: <Users size={18} />,
           label: 'Người dùng',
           onClick: () => navigate('/admin/users'),
         },
-      ],
-    },
-    { type: 'divider' },
     {
       key: 'genres',
       icon: <FolderOpen size={18} />,
@@ -159,12 +168,6 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       icon: <CalendarPlus size={18} />,
       label: 'Suất chiếu',
       onClick: () => navigate('/admin/showtime'),
-    },
-    {
-      key: 'tickets',
-      icon: <Ticket size={18} />,
-      label: 'Quản lý vé',
-      onClick: () => navigate('/admin/tickets'),
     },
     {
       key: 'promotions',
