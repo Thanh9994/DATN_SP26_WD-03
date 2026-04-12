@@ -1,16 +1,20 @@
-import {PlayCircleOutlined, ClockCircleOutlined, StopOutlined } from '@ant-design/icons';
-import { Card, Tabs, Tag, Empty } from 'antd';
+import { PlayCircleOutlined, ClockCircleOutlined, StopOutlined } from '@ant-design/icons';
+import { Card, Tabs, Tag, Empty, Alert } from 'antd';
 import PhimCard from '@web/components/skeleton/PhimCard';
 import MovieCardSkeleton from '@web/components/skeleton/MovieCardSkeleton';
 import { useMovies } from '@web/hooks/useMovie';
-
+import { useStaff } from '@web/hooks/useStaff';
 
 export const StaffMovieListPage = () => {
   const { movies, isLoading } = useMovies();
+  const { showtimeAlerts } = useStaff();
 
   const nowShowing = movies.filter((movie) => movie.trang_thai === 'dang_chieu');
   const comingSoon = movies.filter((movie) => movie.trang_thai === 'sap_chieu');
   const stoppedShowing = movies.filter((movie) => movie.trang_thai === 'ngung_chieu');
+
+  const upcomingAlerts = showtimeAlerts.filter((item) => item.type === 'sap_bat_dau');
+  const startedAlerts = showtimeAlerts.filter((item) => item.type === 'da_bat_dau');
 
   const renderMovieGrid = (movieList: typeof movies) => {
     if (!movieList.length) {
@@ -78,7 +82,41 @@ export const StaffMovieListPage = () => {
 
   return (
     <div className="mx-auto max-w-7xl px-3 py-6 md:px-5 md:py-8">
-    
+      <div className="mb-6 space-y-3">
+        {upcomingAlerts.map((alert) => (
+          <Alert
+            key={alert.showTimeId}
+            showIcon
+            type="warning"
+            message={<span className="font-semibold text-yellow-300">Suat chieu sap bat dau</span>}
+            description={
+              <div className="text-sm text-yellow-200">
+                <span className="font-semibold">{alert.roomName}</span> con{' '}
+                <span className="font-bold">{alert.diffMinutes} phut</span> nua chieu phim{' '}
+                <span className="font-semibold">{alert.movieName}</span>
+              </div>
+            }
+            className="rounded-xl border-yellow-700/40 bg-yellow-950/20"
+          />
+        ))}
+
+        {startedAlerts.map((alert) => (
+          <Alert
+            key={alert.showTimeId}
+            showIcon
+            type="error"
+            message={<span className="font-semibold text-red-300">Suat chieu da bat dau</span>}
+            description={
+              <div className="text-sm text-red-200">
+                <span className="font-semibold">{alert.roomName}</span> da chieu duoc{' '}
+                <span className="font-bold">{Math.abs(alert.diffMinutes)} phut</span> voi phim{' '}
+                <span className="font-semibold">{alert.movieName}</span>
+              </div>
+            }
+            className="rounded-xl border-red-700/40 bg-red-950/20"
+          />
+        ))}
+      </div>
 
       <Card
         bordered={false}

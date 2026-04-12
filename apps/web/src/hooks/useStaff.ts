@@ -1,6 +1,6 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { API } from '@web/api/api.service';
+import { axiosAuth } from './useAuth';
 
 export interface IStaffCheckinResponse {
   success: boolean;
@@ -28,28 +28,46 @@ export interface IStaffShowtimeAlert {
   message: string;
 }
 
-export const useStaffCheckin = () => {
-  const { mutateAsync: checkinTicket, isPending: isCheckingInTicket } = useMutation({
+export const useStaff = () => {
+  const queryClient = useQueryClient();
+
+  const checkinTicket = useMutation({
     mutationFn: async ({ ticketCode }: { ticketCode: string }) => {
-      const { data } = await axios.patch(API.CHECKIN_TICKET_WARNING, { ticketCode });
-      return data.data as IStaffCheckinResponse;
+      const res = await axiosAuth.patch(`${API.STAFF}/checkin-ticket-warning`, {
+        ticketCode,
+      });
+      return res.data.data as IStaffCheckinResponse;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-bookings'] });
+      queryClient.invalidateQueries({ queryKey: ['showtime-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['staff-showtime-alerts'] });
     },
   });
 
-  return {
-    checkinTicket,
-    isCheckingInTicket,
-  };
-};
-
-export const useStaffShowtimeAlerts = () => {
-  return useQuery<IStaffShowtimeAlert[]>({
+  const {
+    data: showtimeAlerts = [],
+    isLoading: isLoadingShowtimeAlerts,
+    isError: isShowtimeAlertsError,
+    refetch: refetchShowtimeAlerts,
+  } = useQuery<IStaffShowtimeAlert[]>({
     queryKey: ['staff-showtime-alerts'],
     queryFn: async () => {
-      const { data } = await axios.get(API.STAFF_SHOWTIME_ALERTS);
-      return data?.data || [];
+      const res = await axiosAuth.get(`${API.STAFF}/showtime-alerts`);
+      return res.data?.data || [];
     },
     refetchInterval: 60 * 1000,
     staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
   });
+
+  return {
+    checkinTicket: checkinTicket.mutateAsync,
+    isCheckingInTicket: checkinTicket.isPending,
+
+    showtimeAlerts,
+    isLoadingShowtimeAlerts,
+    isShowtimeAlertsError,
+    refetchShowtimeAlerts,
+  };
 };
