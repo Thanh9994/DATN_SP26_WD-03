@@ -5,6 +5,7 @@ import {
   VideoCameraAddOutlined,
   ArrowLeftOutlined,
   SettingFilled,
+  SettingOutlined 
 } from '@ant-design/icons';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -192,11 +193,18 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
     },
     { type: 'divider' },
     {
+      key: 'general',
+      icon: <SettingOutlined  />,
+      label: 'Cấu hình',
+      onClick: () => navigate('/admin/settings/general'),
+    },
+    {
       key: 'settings',
       icon: <SettingFilled />,
       label: 'Cài đặt',
       onClick: () => navigate('/admin/settings'),
     },
+    
   ];
 
   const textColor = themeMode === 'dark' ? '#fff' : '#000';
