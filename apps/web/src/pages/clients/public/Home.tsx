@@ -446,89 +446,136 @@ export const Home = () => {
           </div>
         </section>
 
-        {/* EVENTS */}
+                {/* EVENTS */}
         <section className="py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl overflow-hidden">
-            <div className="mb-10 flex flex-col justify-between gap-6 px-4 sm:mb-12 sm:px-6 lg:flex-row lg:items-end lg:px-8">
+          <div className="mx-auto max-w-7xl overflow-hidden px-4 sm:px-6 lg:px-8">
+            <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
               <div>
-                <h2 className="text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">
-                  Events
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-red-300/70">
+                  Cộng đồng • Đặc quyền riêng
+                </p>
+                <h2 className="text-3xl font-black uppercase tracking-tight text-white sm:text-4xl">
+                  Sự kiện nổi bật
                 </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-red-100/65 sm:text-base">
+                  Tham gia những buổi chiếu đặc biệt, công chiếu sớm và gặp gỡ cộng đồng yêu điện
+                  ảnh trong không gian mang phong cách cao cấp, đồng bộ với toàn bộ giao diện trang.
+                </p>
               </div>
 
               <button
                 onClick={() => navigate('/event')}
-                className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-white/10 sm:px-6 sm:py-3 sm:text-sm"
+                className="inline-flex items-center justify-center rounded-full border border-red-300/15 bg-gradient-to-r from-[#5c0f1b] to-[#7a1627] px-5 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all duration-300 hover:scale-[1.02] hover:from-[#6d1321] hover:to-[#8f1c2f] hover:shadow-[0_10px_30px_rgba(127,29,29,0.28)] sm:px-6 sm:text-sm"
               >
-                All Events
+                Xem tất cả sự kiện
               </button>
             </div>
 
-            <div className="bg-black px-4 py-10 lg:px-8">
-              <div className="mb-8">
-                <div className="text-2xl font-extrabold text-white">EXCLUSIVE EVENTS</div>
-                <div className="mt-2 text-sm text-white/60">
-                  Join the community for special screenings, premieres, and meetups you won’t find
-                  anywhere else.
-                </div>
+            <div className="relative overflow-hidden rounded-[32px] border border-red-400/10 bg-gradient-to-br from-[#140507] via-[#22070c] to-[#120406] shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
+              <div className="pointer-events-none absolute inset-0">
+                <div className="absolute -left-20 top-0 h-72 w-72 rounded-full bg-red-900/20 blur-3xl" />
+                <div className="absolute right-0 top-10 h-72 w-72 rounded-full bg-rose-800/10 blur-3xl" />
+                <div className="absolute bottom-0 left-1/3 h-52 w-52 rounded-full bg-red-700/10 blur-3xl" />
               </div>
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {promotionsLoading ? (
-                  <div className="col-span-full text-sm text-white/60">Đang tải sự kiện...</div>
-                ) : eventItems.length > 0 ? (
-                  eventItems.map((event) => {
-                    const badge = getEventBadgeStyle(event);
-                    const soldOut = event.status?.toLowerCase().includes('sold');
+              <div className="relative px-5 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+                <div className="mb-8 flex flex-col gap-3">
+                  <div className="inline-flex w-fit items-center rounded-full border border-red-300/10 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.3em] text-red-200/75">
+                    Sự kiện chọn lọc
+                  </div>
 
-                    return (
-                      <div
-                        key={event._id}
-                        className="overflow-hidden rounded-xl border border-white/10 bg-white/5 transition hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/10"
-                      >
-                        <div className="relative h-48 overflow-hidden">
-                          <img
-                            src={getPromotionImage(event)}
-                            alt={event.title}
-                            className="h-full w-full object-cover transition duration-700 hover:scale-110"
-                          />
+                  <div>
+                    <h3 className="text-2xl font-extrabold uppercase tracking-tight text-white sm:text-3xl">
+                      Trải nghiệm điện ảnh theo phong cách đỏ rượu vang
+                    </h3>
+                    <p className="mt-2 max-w-3xl text-sm leading-6 text-red-100/60">
+                      Không gian sự kiện được nhấn mạnh bằng tông đỏ burgundy, hiệu ứng ánh sáng
+                      mềm và cảm giác sang trọng để đồng bộ với tổng thể giao diện.
+                    </p>
+                  </div>
+                </div>
 
-                          <div
-                            className={`absolute left-3 top-3 rounded px-2 py-1 text-xs font-bold text-white ${badge.className}`}
-                          >
-                            {badge.label}
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                  {promotionsLoading ? (
+                    <div className="col-span-full rounded-2xl border border-red-200/10 bg-white/[0.04] px-5 py-6 text-sm text-red-100/60">
+                      Đang tải sự kiện...
+                    </div>
+                  ) : eventItems.length > 0 ? (
+                    eventItems.map((event) => {
+                      const badge = getEventBadgeStyle(event);
+                      const soldOut = event.status?.toLowerCase().includes('sold');
+
+                      return (
+                        <div
+                          key={event._id}
+                          className="group overflow-hidden rounded-[24px] border border-red-200/10 bg-white/[0.04] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-red-400/30 hover:bg-white/[0.06] hover:shadow-[0_20px_45px_rgba(127,29,29,0.22)]"
+                        >
+                          <div className="relative h-56 overflow-hidden">
+                            <img
+                              src={getPromotionImage(event)}
+                              alt={event.title}
+                              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                              referrerPolicy="no-referrer"
+                            />
+
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#120406] via-[#120406]/25 to-transparent" />
+
+                            <div className="absolute left-4 top-4">
+                              <span className="rounded-full border border-white/10 bg-[#a61d2d]/90 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-lg">
+                                {badge.label}
+                              </span>
+                            </div>
                           </div>
 
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                          <div className="space-y-4 p-5 sm:p-6">
+                            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-red-300/85">
+                              <span className="material-symbols-outlined text-sm">
+                                calendar_month
+                              </span>
+                              <span>{formatEventDate(event.startDate, event.endDate)}</span>
+                            </div>
+
+                            <div>
+                              <h4 className="line-clamp-2 text-xl font-bold text-white">
+                                {event.title}
+                              </h4>
+                              <p className="mt-2 line-clamp-3 text-sm leading-6 text-red-100/60">
+                                {getPromotionText(event)}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2">
+                              <button
+                                onClick={() => !soldOut && navigate('/event')}
+                                disabled={soldOut}
+                                className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                                  soldOut
+                                    ? 'cursor-not-allowed bg-white/5 text-white/40'
+                                    : 'bg-gradient-to-r from-[#7a1627] to-[#a61d2d] text-white hover:shadow-[0_10px_25px_rgba(166,29,45,0.35)]'
+                                }`}
+                              >
+                                {soldOut ? 'Đã hết chỗ' : badge.action.replace('→', '')}
+                                {!soldOut && (
+                                  <span className="material-symbols-outlined text-base">
+                                    arrow_forward
+                                  </span>
+                                )}
+                              </button>
+
+                              <span className="text-xs font-medium uppercase tracking-[0.2em] text-red-200/45">
+                                Sự kiện cao cấp
+                              </span>
+                            </div>
+                          </div>
                         </div>
-
-                        <div className="p-5">
-                          <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-red-400">
-                            <span className="material-symbols-outlined text-sm">
-                              calendar_month
-                            </span>
-                            {formatEventDate(event.startDate, event.endDate)}
-                          </div>
-
-                          <div className="mb-3 text-lg font-bold text-white">{event.title}</div>
-
-                          <div
-                            onClick={() => !soldOut && navigate('/event')}
-                            className={`text-sm font-semibold text-red-400 ${
-                              soldOut
-                                ? 'cursor-not-allowed opacity-60'
-                                : 'cursor-pointer hover:underline'
-                            }`}
-                          >
-                            {soldOut ? 'Sold Out' : badge.action}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="col-span-full text-sm text-white/60">Chưa có sự kiện.</div>
-                )}
+                      );
+                    })
+                  ) : (
+                    <div className="col-span-full rounded-2xl border border-red-200/10 bg-white/[0.04] px-5 py-6 text-sm text-red-100/60">
+                      Chưa có sự kiện.
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
