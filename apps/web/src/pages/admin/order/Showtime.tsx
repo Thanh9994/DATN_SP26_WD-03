@@ -289,11 +289,26 @@ const buildShowtimePreview = ({
   });
 
   return previewItems.sort((a, b) => {
+    const statusPriority: Record<PreviewStatus, number> = {
+      conflict: 0,
+      available: 1,
+    };
+
+    const statusCompare = statusPriority[a.status] - statusPriority[b.status];
+    if (statusCompare !== 0) return statusCompare;
+
     const dateCompare =
       dayjs(a.dateText, 'DD/MM/YYYY').valueOf() - dayjs(b.dateText, 'DD/MM/YYYY').valueOf();
     if (dateCompare !== 0) return dateCompare;
-    if (a.cinemaName !== b.cinemaName) return a.cinemaName.localeCompare(b.cinemaName);
-    if (a.roomName !== b.roomName) return a.roomName.localeCompare(b.roomName);
+
+    if (a.cinemaName !== b.cinemaName) {
+      return a.cinemaName.localeCompare(b.cinemaName);
+    }
+
+    if (a.roomName !== b.roomName) {
+      return a.roomName.localeCompare(b.roomName);
+    }
+
     return a.startText.localeCompare(b.startText);
   });
 };
