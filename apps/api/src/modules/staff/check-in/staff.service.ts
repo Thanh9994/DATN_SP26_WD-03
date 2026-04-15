@@ -1,5 +1,5 @@
-import { Booking } from '@api/modules/sales-operations/booking/booking.model';
-import { ShowTimeM } from '@api/modules/cinema-catalog/showtime/showtime.model';
+import { Booking } from '../../sales-operations/booking/booking.model';
+import { ShowTimeM } from '../../cinema-catalog/showtime/showtime.model';
 import * as MailService from '@api/common/mail.service';
 import { AppError } from '@api/middlewares/error.middleware';
 
@@ -21,7 +21,7 @@ export const staffService = {
       isLateCheckin,
       lateMinutes,
       warningMessage: isLateCheckin
-        ? `Khach da check-in tre ${lateMinutes} phut sau gio chieu.`
+        ? `Khách đã check-in trễ ${lateMinutes} phút sau giờ chiếu.`
         : null,
       movieName: movie?.ten_phim || '---',
       roomName: room?.ten_phong || '---',
@@ -34,7 +34,7 @@ export const staffService = {
     const normalizedCode = ticketCode?.trim().toUpperCase();
 
     if (!normalizedCode) {
-      throw new AppError('Ticket code khong hop le.', 400);
+      throw new AppError('Ticket code không hợp lệ.', 400);
     }
 
     const booking = await Booking.findOne({ ticketCode: normalizedCode })
@@ -55,24 +55,30 @@ export const staffService = {
       });
 
     if (!booking) {
-      throw new AppError('Khong tim thay ve voi ticket code nay.', 404);
+      throw new AppError('Không tìm thấy vé với ticket code này.', 404);
     }
 
     const meta = this.buildCheckinLateMeta(booking);
 
-    if (booking.status === 'da_lay_ve' || booking.status === 'picked_up') {
-      return {
-        success: true,
-        message: 'Ve da duoc check-in truoc do.',
-        status: booking.status,
-        ticketCode: booking.ticketCode,
-        pickedUpAt: booking.pickedUpAt,
-        ...meta,
-      };
+    // Chặn check-in lại nếu vé đã được lấy trước đó
+    if (
+      booking.status === 'da_lay_ve' ||
+      booking.status === 'picked_up' ||
+      booking.pickedUpAt
+    ) {
+      throw new AppError(
+        `Vé này đã được nhận trước đó vào ${
+          booking.pickedUpAt
+            ? new Date(booking.pickedUpAt).toLocaleString('vi-VN')
+            : 'thời điểm trước đó'
+        }.`,
+        400,
+      );
     }
 
+    // Chỉ cho phép check-in khi vé đã thanh toán
     if (booking.status !== 'paid') {
-      throw new AppError('Ve chua o trang thai co the check-in.', 400);
+      throw new AppError('Vé chưa ở trạng thái có thể check-in.', 400);
     }
 
     booking.status = 'da_lay_ve';
@@ -86,11 +92,12 @@ export const staffService = {
     const cinema = room?.cinema_id as any;
 
     const userEmail = user?.email;
+
     if (userEmail) {
       MailService.sendMail(
         MailService.getTicketPickupTemplate({
           email: userEmail,
-          customerName: user?.ho_ten || 'Khach hang',
+          customerName: user?.ho_ten || 'Khách hàng',
           ticketCode: booking.ticketCode || normalizedCode,
           pickedUpAt: booking.pickedUpAt,
           movieName: movie?.ten_phim || '---',
@@ -111,7 +118,7 @@ export const staffService = {
             : '---',
           cinemaName: cinema?.name || '---',
           roomName: room?.ten_phong || '---',
-          status: 'Da nhan ve',
+          status: 'Đã nhận vé',
         }),
       ).catch((error) => {
         console.error('Send pickup mail failed:', error);
@@ -121,8 +128,8 @@ export const staffService = {
     return {
       success: true,
       message: meta.isLateCheckin
-        ? `Check-in thanh cong, nhung khach da den tre ${meta.lateMinutes} phut.`
-        : 'Check-in ve thanh cong.',
+        ? `Check-in thành công, nhưng khách đã đến trễ ${meta.lateMinutes} phút.`
+        : 'Check-in vé thành công.',
       status: booking.status,
       ticketCode: booking.ticketCode,
       pickedUpAt: booking.pickedUpAt,
@@ -162,7 +169,7 @@ export const staffService = {
           startTime: showtime.startTime,
           diffMinutes,
           type: 'sap_bat_dau',
-          message: `${showtime.roomId?.ten_phong || 'Phong'} con ${diffMinutes} phut nua chieu`,
+          message: `${showtime.roomId?.ten_phong || 'Phòng'} còn ${diffMinutes} phút nữa chiếu`,
         };
       }
 
@@ -174,7 +181,7 @@ export const staffService = {
         startTime: showtime.startTime,
         diffMinutes,
         type: 'da_bat_dau',
-        message: `${showtime.roomId?.ten_phong || 'Phong'} da chieu ${Math.abs(diffMinutes)} phut`,
+        message: `${showtime.roomId?.ten_phong || 'Phòng'} đã chiếu ${Math.abs(diffMinutes)} phút`,
       };
     });
   },

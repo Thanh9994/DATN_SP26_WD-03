@@ -1,12 +1,14 @@
 import { StaffLayout } from '@web/layouts/StaffLayout';
 import { RouteObject, Navigate } from 'react-router-dom';
 import { StaffMovieListPage } from '../pages/staff/StaffMovieListPage';
+import { StaffDashboard } from '../pages/staff/StaffDashboard';
 
 export const StaffRoutes: RouteObject = {
   path: '/staff',
   element: <StaffLayout />,
   children: [
-    { index: true, element: <Navigate to="movielist" replace /> },
+    { index: true, element: <Navigate to="dashboard" replace /> },
+    { path: 'dashboard', element: <StaffDashboard /> },
     { path: 'movielist', element: <StaffMovieListPage /> },
     {
       path: 'checkin',
