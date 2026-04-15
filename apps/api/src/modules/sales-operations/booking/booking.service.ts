@@ -150,6 +150,79 @@ export const bookingService = {
 
   //Xác nhận đặt vé và tạo hóa đơn
 
+  async updateBookingItems(
+    bookingId: string,
+    holdToken: string,
+    userId: string,
+    items: Array<{
+      snackDrinkId: string;
+      name: string;
+      quantity: number;
+      price: number;
+    }>,
+  ) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const booking = await Booking.findOne({
+        _id: bookingId,
+        userId,
+      }).session(session);
+
+      if (!booking) {
+        throw new AppError("Booking khong ton tai.", 404);
+      }
+
+      if (booking.status !== "pending") {
+        throw new AppError("Chi cap nhat combo khi booking dang pending.", 400);
+      }
+
+      if (booking.holdToken !== holdToken) {
+        throw new AppError("Phien giu ghe khong hop le.", 400);
+      }
+
+      if (booking.holdExpiresAt && booking.holdExpiresAt < new Date()) {
+        throw new AppError("Phien giu ghe da het han.", 400);
+      }
+
+      const normalizedItems = (items || [])
+        .filter((item) => item && item.snackDrinkId && Number(item.quantity) > 0)
+        .map((item) => ({
+          snackDrinkId: item.snackDrinkId,
+          name: item.name,
+          quantity: Number(item.quantity),
+          price: Math.max(Number(item.price || 0), 0),
+        }));
+
+      const seats = await SeatTime.find({
+        _id: { $in: booking.seats },
+      })
+        .select("price")
+        .session(session);
+
+      const ticketTotal = seats.reduce((sum, seat) => sum + Number(seat.price || 0), 0);
+      const comboTotal = normalizedItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+
+      booking.items = normalizedItems as any;
+      booking.totalAmount = ticketTotal + comboTotal;
+      booking.finalAmount = Math.max(booking.totalAmount - Number(booking.discountAmount || 0), 0);
+
+      await booking.save({ session });
+      await session.commitTransaction();
+
+      return booking;
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  },
+
   async confirmBooking(bookingId: string, paymentId: string, userId: string) {
   const session = await mongoose.startSession();
   session.startTransaction();

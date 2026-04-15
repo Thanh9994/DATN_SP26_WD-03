@@ -49,6 +49,32 @@ export const bookingController = {
     });
   }),
 
+  updateBookingItems: catchAsync(async (req, res, next) => {
+    const userId = req.user?._id;
+    const { bookingId, holdToken, items = [] } = req.body;
+
+    if (!userId) {
+      return next(new AppError('Ban can dang nhap de thuc hien hanh dong nay', 401));
+    }
+
+    if (!bookingId || !holdToken) {
+      return next(new AppError('Thieu bookingId hoac holdToken', 400));
+    }
+
+    const booking = await bookingService.updateBookingItems(bookingId, holdToken, userId, items);
+
+    res.json({
+      success: true,
+      message: 'Cap nhat combo thanh cong',
+      data: {
+        bookingId: booking._id,
+        totalAmount: booking.totalAmount,
+        finalAmount: booking.finalAmount,
+        items: booking.items,
+      },
+    });
+  }),
+
   checkinTicket: catchAsync(async (req, res, next) => {
     const { ticketCode } = req.body;
     if (!ticketCode) {

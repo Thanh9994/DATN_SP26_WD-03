@@ -34,6 +34,30 @@ export const useBooking = (showTimeId?: string) => {
     },
   });
 
+  const updateBookingItems = useMutation({
+    mutationFn: async ({
+      bookingId,
+      holdToken,
+      items,
+    }: {
+      bookingId: string;
+      holdToken: string;
+      items: Array<{
+        snackDrinkId: string;
+        name: string;
+        quantity: number;
+        price: number;
+      }>;
+    }) => {
+      const { data } = await axiosAuth.patch(`${API.BOOKING}/items`, {
+        bookingId,
+        holdToken,
+        items,
+      });
+      return data.data;
+    },
+  });
+
   const createPaymentUrl = useMutation({
     mutationFn: async ({
       bookingId,
@@ -125,6 +149,9 @@ export const useBooking = (showTimeId?: string) => {
 
     createPaymentUrl: createPaymentUrl.mutateAsync,
     isCreatingPayment: createPaymentUrl.isPending,
+
+    updateBookingItems: updateBookingItems.mutateAsync,
+    isUpdatingBookingItems: updateBookingItems.isPending,
 
     cancelBooking: cancelBooking.mutateAsync,
     isCancelling: cancelBooking.isPending,
