@@ -60,18 +60,18 @@ export const getOtpTemplate = (email: string, otp: string) => ({
 
 export const getResetPasswordTemplate = (email: string, resetUrl: string) => ({
   to: email,
-  subject: 'Reset Password',
+  subject: 'Đặt lại mật khẩu',
   html: `
         <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:40px 0;">
           <div style="max-width:520px;margin:auto;background:#ffffff;border-radius:12px;padding:40px 30px;box-shadow:0 10px 25px rgba(0,0,0,0.05);">
 
             <h2 style="margin:0 0 20px;color:#111;font-size:24px;">
-              Reset Your Password
+              Đặt lại mật khẩu
             </h2>
 
             <p style="color:#555;font-size:15px;line-height:1.6;">
-              We received a request to reset the password for your account.
-              Click the button below to create a new password.
+              Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.
+              Hãy nhấn vào nút bên dưới để tạo mật khẩu mới.
             </p>
 
             <div style="text-align:center;margin:30px 0;">
@@ -87,18 +87,18 @@ export const getResetPasswordTemplate = (email: string, resetUrl: string) => ({
                   font-size:15px;
                 "
               >
-                Reset Password
+                Đặt lại mật khẩu
               </a>
             </div>
 
             <p style="color:#777;font-size:14px;line-height:1.6;">
-              If you did not request a password reset, you can safely ignore this email.
+              Nếu bạn không yêu cầu đặt lại mật khẩu, bạn có thể bỏ qua email này.
             </p>
 
             <hr style="border:none;border-top:1px solid #eee;margin:30px 0;" />
 
             <p style="color:#999;font-size:12px;text-align:center;">
-              This link will expire in 10 minutes for security reasons.
+              Liên kết này sẽ hết hạn sau 10 phút để đảm bảo an toàn.
             </p>
 
           </div>
@@ -126,27 +126,27 @@ export const getBookingSuccessTemplate = (payload: {
 
   return {
     to: payload.email,
-    subject: 'Xac nhan dat ve thanh cong',
+    subject: 'Xác nhận đặt vé thành công',
     html: `
       <div style="margin:0; padding:32px 16px; background:#f3f4f6; font-family:Arial, sans-serif; color:#111827;">
         <div style="max-width:640px; margin:0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.06);">
           
           <div style="padding:28px 32px; background:linear-gradient(90deg, #dc2626 0%, #b91c1c 100%);">
             <div style="font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#fee2e2;">
-              Booking Confirmation
+              Xác nhận đặt vé
             </div>
             <h2 style="margin:10px 0 0; font-size:30px; line-height:1.2; color:#ffffff;">
-              Dat ve thanh cong
+              Đặt vé thành công
             </h2>
             <p style="margin:12px 0 0; color:#fee2e2; font-size:15px; line-height:1.7;">
-              Xin chao <b>${payload.customerName || 'Quy khach'}</b>, don dat ve cua ban da duoc xac nhan thanh cong.
+              Xin chào <b>${payload.customerName || 'Quý khách'}</b>, đơn đặt vé của bạn đã được xác nhận thành công.
             </p>
           </div>
 
           <div style="padding:28px 32px;">
             <div style="margin-bottom:20px; padding:18px 20px; background:#fff5f5; border:1px solid #fecaca; border-radius:16px;">
               <div style="font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#b91c1c; margin-bottom:8px;">
-                Ticket Code
+                Mã vé
               </div>
               <div style="font-size:28px; font-weight:800; font-family:monospace; color:#dc2626;">
                 ${payload.ticketCode || '---'}
@@ -168,7 +168,7 @@ export const getBookingSuccessTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Ghe
+                      Ghế
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${(payload.seatCodes || []).join(', ') || '---'}
@@ -181,7 +181,7 @@ export const getBookingSuccessTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-right:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Ngay chieu
+                      Ngày chiếu
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.showDate || '---'}
@@ -191,7 +191,7 @@ export const getBookingSuccessTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Gio chieu
+                      Giờ chiếu
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.showTime || '---'}
@@ -204,7 +204,7 @@ export const getBookingSuccessTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-right:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Rap
+                      Rạp
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.cinemaName || '---'}
@@ -214,7 +214,7 @@ export const getBookingSuccessTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Phong
+                      Phòng
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.roomName || '---'}
@@ -227,7 +227,7 @@ export const getBookingSuccessTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-right:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Thanh toan
+                      Phương thức thanh toán
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.paymentMethod || '---'}
@@ -237,10 +237,10 @@ export const getBookingSuccessTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Tong tien
+                      Tổng tiền
                     </div>
                     <div style="font-size:15px; color:#dc2626; font-weight:800;">
-                      ${Number(payload.totalAmount || 0).toLocaleString('vi-VN')} VND
+                      ${Number(payload.totalAmount || 0).toLocaleString('vi-VN')} VNĐ
                     </div>
                   </div>
                 </td>
@@ -249,7 +249,7 @@ export const getBookingSuccessTemplate = (payload: {
 
             <div style="margin-top:20px; padding:16px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:14px;">
               <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                Thoi gian dat ve
+                Thời gian đặt vé
               </div>
               <div style="font-size:15px; color:#111827; font-weight:700;">
                 ${bookedTime}
@@ -258,12 +258,12 @@ export const getBookingSuccessTemplate = (payload: {
 
             <div style="margin-top:20px; padding:14px 16px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:14px;">
               <p style="margin:0; color:#1e3a8a; font-size:13px; line-height:1.7;">
-                Vui long mang theo ma ve hoac mo email nay khi den rap. Ban co the dua ticket code cho nhan vien hoac su dung ma QR tren trang chi tiet ve trong tai khoan cua minh.
+                Vui lòng mang theo mã vé hoặc mở email này khi đến rạp. Bạn có thể đưa mã vé cho nhân viên hoặc sử dụng mã QR trên trang chi tiết vé trong tài khoản của mình.
               </p>
             </div>
 
             <p style="margin:18px 0 0; color:#9ca3af; font-size:12px; text-align:center;">
-              Email tu dong tu he thong rap phim.
+              Email tự động từ hệ thống rạp phim.
             </p>
           </div>
         </div>
@@ -291,27 +291,27 @@ export const getTicketPickupTemplate = (payload: {
 
   return {
     to: payload.email,
-    subject: 'Xac nhan da nhan ve thanh cong',
+    subject: 'Xác nhận đã nhận vé thành công',
     html: `
       <div style="margin:0; padding:32px 16px; background:#f3f4f6; font-family:Arial, sans-serif; color:#111827;">
         <div style="max-width:640px; margin:0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.06);">
           
           <div style="padding:28px 32px; background:linear-gradient(90deg, #166534 0%, #15803d 100%);">
             <div style="font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#dcfce7;">
-              Cinema Ticket Pickup
+              Xác nhận nhận vé
             </div>
             <h2 style="margin:10px 0 0; font-size:30px; line-height:1.2; color:#ffffff;">
-              Ve da duoc nhan thanh cong
+              Vé đã được nhận thành công
             </h2>
             <p style="margin:12px 0 0; color:#dcfce7; font-size:15px; line-height:1.7;">
-              Xin chao <b>${payload.customerName || 'Quy khach'}</b>, nhan vien rap da xac nhan ban da nhan ve thanh cong.
+              Xin chào <b>${payload.customerName || 'Quý khách'}</b>, nhân viên rạp đã xác nhận bạn đã nhận vé thành công.
             </p>
           </div>
 
           <div style="padding:28px 32px;">
             <div style="margin-bottom:20px; padding:18px 20px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:16px;">
               <div style="font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#166534; margin-bottom:8px;">
-                Ticket Code
+                Mã vé
               </div>
               <div style="font-size:28px; font-weight:800; font-family:monospace; color:#15803d;">
                 ${payload.ticketCode || '---'}
@@ -333,7 +333,7 @@ export const getTicketPickupTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Ghe
+                      Ghế
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${(payload.seatCodes || []).join(', ') || '---'}
@@ -346,7 +346,7 @@ export const getTicketPickupTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-right:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Ngay chieu
+                      Ngày chiếu
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.showDate || '---'}
@@ -356,7 +356,7 @@ export const getTicketPickupTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Gio chieu
+                      Giờ chiếu
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.showTime || '---'}
@@ -369,7 +369,7 @@ export const getTicketPickupTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-right:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Rap
+                      Rạp
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.cinemaName || '---'}
@@ -379,7 +379,7 @@ export const getTicketPickupTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Phong
+                      Phòng
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.roomName || '---'}
@@ -392,7 +392,7 @@ export const getTicketPickupTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-right:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Thoi gian nhan ve
+                      Thời gian nhận vé
                     </div>
                     <div style="font-size:15px; color:#15803d; font-weight:700;">
                       ${pickedUpTime}
@@ -402,10 +402,10 @@ export const getTicketPickupTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-left:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Trang thai
+                      Trạng thái
                     </div>
                     <div style="font-size:15px; color:#15803d; font-weight:700;">
-                      ${payload.status || 'Da nhan ve'}
+                      ${payload.status || 'Đã nhận vé'}
                     </div>
                   </div>
                 </td>
@@ -414,12 +414,12 @@ export const getTicketPickupTemplate = (payload: {
 
             <div style="margin-top:20px; padding:14px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:14px;">
               <p style="margin:0; color:#166534; font-size:13px; line-height:1.7;">
-                Cam on ban da su dung dich vu cua he thong rap phim. Vui long luu lai email nay de doi chieu khi can.
+                Cảm ơn bạn đã sử dụng dịch vụ của hệ thống rạp phim. Vui lòng lưu lại email này để đối chiếu khi cần.
               </p>
             </div>
 
             <p style="margin:18px 0 0; color:#9ca3af; font-size:12px; text-align:center;">
-              Email tu dong tu he thong rap phim.
+              Email tự động từ hệ thống rạp phim.
             </p>
           </div>
         </div>
@@ -427,6 +427,7 @@ export const getTicketPickupTemplate = (payload: {
     `,
   };
 };
+
 export const getContactTemplate = (payload: {
   fullName: string;
   email: string;
@@ -435,20 +436,20 @@ export const getContactTemplate = (payload: {
 }) => {
   return {
     to: process.env.EMAIL_USER || '',
-    subject: `[Contact] ${payload.subject}`,
+    subject: `[Liên hệ] ${payload.subject}`,
     html: `
       <div style="margin:0; padding:32px 16px; background:#f3f4f6; font-family:Arial, sans-serif; color:#111827;">
         <div style="max-width:640px; margin:0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.06);">
           
           <div style="padding:28px 32px; background:linear-gradient(90deg, #dc2626 0%, #b91c1c 100%);">
             <div style="font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#fee2e2;">
-              Website Contact
+              Liên hệ từ website
             </div>
             <h2 style="margin:10px 0 0; font-size:30px; line-height:1.2; color:#ffffff;">
-              Lien he moi tu website
+              Liên hệ mới từ website
             </h2>
             <p style="margin:12px 0 0; color:#fee2e2; font-size:15px; line-height:1.7;">
-              Ban vua nhan duoc mot yeu cau lien he moi tu khach hang.
+              Bạn vừa nhận được một yêu cầu liên hệ mới từ khách hàng.
             </p>
           </div>
 
@@ -458,7 +459,7 @@ export const getContactTemplate = (payload: {
                 <td style="width:50%; vertical-align:top; padding-right:8px;">
                   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                      Ho ten
+                      Họ tên
                     </div>
                     <div style="font-size:15px; color:#111827; font-weight:700;">
                       ${payload.fullName}
@@ -480,7 +481,7 @@ export const getContactTemplate = (payload: {
 
             <div style="margin-top:4px; background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
               <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">
-                Tieu de
+                Tiêu đề
               </div>
               <div style="font-size:15px; color:#111827; font-weight:700;">
                 ${payload.subject}
@@ -489,7 +490,7 @@ export const getContactTemplate = (payload: {
 
             <div style="margin-top:12px; background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:14px;">
               <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:10px;">
-                Noi dung
+                Nội dung
               </div>
               <div style="font-size:14px; line-height:1.8; color:#111827; white-space:pre-line; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px;">
                 ${payload.message}
@@ -498,12 +499,12 @@ export const getContactTemplate = (payload: {
 
             <div style="margin-top:20px; padding:14px 16px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:14px;">
               <p style="margin:0; color:#1e3a8a; font-size:13px; line-height:1.7;">
-                Ban co the tra loi truc tiep vao email nay de phan hoi khach hang.
+                Bạn có thể trả lời trực tiếp vào email này để phản hồi khách hàng.
               </p>
             </div>
 
             <p style="margin:18px 0 0; color:#9ca3af; font-size:12px; text-align:center;">
-              Email tu dong tu form Contact cua website.
+              Email tự động từ form Liên hệ của website.
             </p>
           </div>
         </div>
@@ -526,7 +527,7 @@ export const sendContactMailToAdmin = async (payload: {
     from: `"${payload.fullName}" <${process.env.EMAIL_USER}>`,
     to: process.env.EMAIL_USER,
     replyTo: payload.email,
-    subject: `[Contact] ${payload.subject}`,
+    subject: `[Liên hệ] ${payload.subject}`,
     html: getContactTemplate(payload).html,
   });
 };
