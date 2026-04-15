@@ -2,20 +2,20 @@ import { Router } from 'express';
 import { authenticate, authorize } from '@api/middlewares/auth.middleware';
 import { staffController } from './staff.controller';
 
-const staffRouter = Router();
+const staffCheckinRouter = Router();
 
-staffRouter.patch(
+staffCheckinRouter.patch(
   '/checkin-ticket-warning',
   authenticate,
   authorize(['staff', 'manager', 'admin']),
   staffController.checkinTicketWithWarning,
 );
 
-staffRouter.get(
+staffCheckinRouter.get(
   '/showtime-alerts',
   authenticate,
   authorize(['staff', 'manager', 'admin']),
   staffController.getShowtimeAlerts,
 );
 
-export default staffRouter;
+export default staffCheckinRouter;

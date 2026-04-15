@@ -14,7 +14,7 @@ import chatbotRoute from "./modules/chatbot/chatbot.route";
 import contactRoute from "./modules/contact/contact.route";
 import analyticsRouter from "./modules/analytics";
 import ticketRouter from "./modules/ticket/ticket.route";
-import staffRouter from "./modules/staff/check-in/staff.route"; 
+import staffRouter from "./modules/staff";
 import { globalErrorHandler } from "./middlewares/error.middleware";
 
 const app = express();
@@ -30,6 +30,7 @@ if (process.env.NODE_ENV === "development") {
     )
   );
 }
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -50,4 +51,5 @@ app.use("/api/uploads", uploadRouter);
 app.use("/payments", paymentRouter);
 app.use("/api/chatbot", chatbotRoute);
 app.use(globalErrorHandler);
+
 export default app;
