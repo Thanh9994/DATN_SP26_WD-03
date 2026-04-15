@@ -26,66 +26,71 @@ export const StaffDashboard = () => {
 
   const cards = [
     {
-      title: 'Ve hom nay',
+      title: 'Vé hôm nay',
       value: dashboardOverview?.todayPaidTickets || 0,
       icon: Ticket,
-      border: 'border-blue-700/40',
-      bg: 'from-blue-950/40 to-slate-900/40',
-      text: 'text-blue-300',
+      border: 'border-blue-800/40',
+      iconColor: 'text-blue-300',
+      valueColor: 'text-blue-300',
     },
     {
-      title: 'Da check-in',
+      title: 'Đã check-in',
       value: dashboardOverview?.todayCheckedInTickets || 0,
       icon: BadgeCheck,
-      border: 'border-green-700/40',
-      bg: 'from-green-950/40 to-slate-900/40',
-      text: 'text-green-300',
+      border: 'border-green-800/40',
+      iconColor: 'text-green-300',
+      valueColor: 'text-green-300',
     },
     {
-      title: 'Suat sap chieu',
+      title: 'Suất sắp chiếu',
       value: dashboardOverview?.upcomingShowtimes || 0,
       icon: Clock3,
-      border: 'border-yellow-700/40',
-      bg: 'from-yellow-950/40 to-slate-900/40',
-      text: 'text-yellow-300',
+      border: 'border-yellow-800/40',
+      iconColor: 'text-yellow-300',
+      valueColor: 'text-yellow-300',
     },
     {
-      title: 'Check-in tre',
+      title: 'Check-in trễ',
       value: dashboardOverview?.todayLateCheckins || 0,
       icon: Siren,
-      border: 'border-red-700/40',
-      bg: 'from-red-950/40 to-slate-900/40',
-      text: 'text-red-300',
+      border: 'border-red-800/40',
+      iconColor: 'text-red-300',
+      valueColor: 'text-red-300',
     },
   ];
 
   return (
     <div className="mx-auto max-w-7xl px-3 py-6 md:px-5 md:py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white md:text-3xl">Tong quan nhan vien</h1>
-        <p className="mt-2 text-sm text-gray-400">
-          Theo doi ve, check-in va suat chieu sap dien ra trong ngay.
+        <h1 className="text-2xl font-bold text-white md:text-3xl">
+          Tổng quan nhân viên
+        </h1>
+        <p className="mt-2 text-sm text-gray-300">
+          Theo dõi vé, check-in và suất chiếu sắp diễn ra trong ngày.
         </p>
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {cards.map((item) => {
           const Icon = item.icon;
+
           return (
             <Card
               key={item.title}
               bordered={false}
-              className={`rounded-2xl border ${item.border} bg-gradient-to-br ${item.bg} shadow-xl`}
+              className={`rounded-2xl border ${item.border} bg-gradient-to-br from-gray-900 via-red-950 to-gray-950 shadow-xl`}
               bodyStyle={{ padding: 20 }}
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-400">{item.title}</p>
-                  <p className={`mt-3 text-3xl font-bold ${item.text}`}>{item.value}</p>
+                  <p className="text-sm font-semibold text-gray-200">{item.title}</p>
+                  <p className={`mt-3 text-3xl font-bold ${item.valueColor}`}>
+                    {item.value}
+                  </p>
                 </div>
 
                 <div
-                  className={`rounded-2xl border border-white/10 bg-black/20 p-3 ${item.text}`}
+                  className={`rounded-2xl border border-white/10 bg-white/5 p-3 shadow-md ${item.iconColor}`}
                 >
                   <Icon size={22} />
                 </div>
@@ -102,12 +107,12 @@ export const StaffDashboard = () => {
           bodyStyle={{ padding: 20 }}
         >
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-white">Suat chieu sap toi</h2>
+            <h2 className="text-lg font-bold text-white">Suất chiếu sắp tới</h2>
             <Tag color="gold">{upcomingShows.length}</Tag>
           </div>
 
           {!upcomingShows.length ? (
-            <Empty description="Khong co suat chieu sap toi" />
+            <Empty description="Không có suất chiếu sắp tới" />
           ) : (
             <div className="space-y-3">
               {upcomingShows.map((show) => (
@@ -118,15 +123,15 @@ export const StaffDashboard = () => {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-semibold text-white">{show.movieName}</p>
-                      <p className="mt-1 text-sm text-gray-400">
+                      <p className="mt-1 text-sm text-gray-300">
                         {show.roomName} • {show.cinemaName}
                       </p>
-                      <p className="mt-2 text-sm text-gray-300">
+                      <p className="mt-2 text-sm text-gray-200">
                         {dayjs(show.startTime).format('HH:mm • DD/MM/YYYY')}
                       </p>
                     </div>
 
-                    <Tag color="orange">{show.diffMinutes} phut</Tag>
+                    <Tag color="orange">{show.diffMinutes} phút</Tag>
                   </div>
                 </div>
               ))}
@@ -140,12 +145,18 @@ export const StaffDashboard = () => {
           bodyStyle={{ padding: 20 }}
         >
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-white">Check-in gan day</h2>
+            <h2 className="text-lg font-bold text-white">Check-in gần đây</h2>
             <Tag color="blue">{recentCheckins.length}</Tag>
           </div>
 
           {!recentCheckins.length ? (
-            <Empty description="Chua co check-in nao hom nay" />
+            <Empty
+  description={
+    <span className="text-white">
+      Chưa có check-in nào hôm nay
+    </span>
+  }
+/>
           ) : (
             <div className="space-y-3">
               {recentCheckins.map((item) => (
@@ -156,13 +167,13 @@ export const StaffDashboard = () => {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-semibold text-white">{item.movieName}</p>
-                      <p className="mt-1 text-sm text-gray-400">
+                      <p className="mt-1 text-sm text-gray-300">
                         {item.roomName} • {item.cinemaName}
                       </p>
-                      <p className="mt-2 text-sm text-gray-300">
-                        Ma ve: {item.ticketCode || '---'}
+                      <p className="mt-2 text-sm text-gray-200">
+                        Mã vé: {item.ticketCode || '---'}
                       </p>
-                      <p className="mt-1 text-sm text-gray-300">
+                      <p className="mt-1 text-sm text-gray-200">
                         {item.pickedUpAt
                           ? dayjs(item.pickedUpAt).format('HH:mm • DD/MM/YYYY')
                           : '---'}
@@ -170,9 +181,9 @@ export const StaffDashboard = () => {
                     </div>
 
                     {item.isLateCheckin ? (
-                      <Tag color="red">Tre {item.lateMinutes} phut</Tag>
+                      <Tag color="red">Trễ {item.lateMinutes} phút</Tag>
                     ) : (
-                      <Tag color="green">Dung gio</Tag>
+                      <Tag color="green">Đúng giờ</Tag>
                     )}
                   </div>
                 </div>
