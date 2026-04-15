@@ -36,7 +36,6 @@ export const StaffHeader = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { checkinTicket, isCheckingInTicket } = useStaff();
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [checkinOpen, setCheckinOpen] = useState(false);
   const [ticketCode, setTicketCode] = useState('');
@@ -294,40 +293,6 @@ export const StaffHeader = () => {
             backgroundColor: '#1a1a1a',
             borderColor: '#7f1d1d',
           },
-          // title: {
-          //   color: '#ffffff',
-          // },
-        }}
-        width={500}
-      >
-        <div className="space-y-6">
-          <div className="rounded-lg border border-red-900/50 bg-gradient-to-r from-red-950/50 to-red-900/30 p-4">
-            <Typography.Text className="text-sm leading-relaxed !text-gray-300">
-              <span className="font-semibold text-red-400">Hướng dẫn:</span> Nhập mã vé từ email
-              booking hoặc từ ứng dụng để xác nhận khách hàng đã nhận vé.
-            </Typography.Text>
-          </div>
-        title={
-          <div className="flex items-center gap-2">
-            <ScanLine size={20} className="text-red-500" />
-            <span className="font-bold text-white">Check-in Ve</span>
-          </div>
-        }
-        open={checkinOpen}
-        onCancel={() => setCheckinOpen(false)}
-        footer={null}
-        destroyOnHidden
-        className="rounded-2xl"
-        styles={{
-          content: {
-            backgroundColor: '#1a1a1a',
-            borderColor: '#7f1d1d',
-            boxShadow: '0 20px 60px rgba(127, 29, 29, 0.3)',
-          },
-          header: {
-            backgroundColor: '#1a1a1a',
-            borderColor: '#7f1d1d',
-          },
         }}
         width={500}
       >
@@ -339,24 +304,6 @@ export const StaffHeader = () => {
             </Typography.Text>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-widest text-red-400">
-              Mã vé
-            </label>
-            <Input
-              placeholder="Ví dụ: TIC-ABC12345"
-              value={ticketCode}
-              onChange={(e) => setTicketCode(e.target.value.toUpperCase())}
-              onPressEnter={handleSubmitCheckin}
-              size="large"
-              className="rounded-lg border-red-900/50 bg-gray-900 text-white placeholder-gray-600"
-              style={{
-                backgroundColor: '#1f1f1f',
-                borderColor: '#7f1d1d',
-              }}
-              prefix={<ScanLine size={16} className="text-red-500" />}
-            />
-          </div>
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-widest text-red-400">
               Ma ve
@@ -407,25 +354,6 @@ export const StaffHeader = () => {
               showIcon
               type="success"
               icon={<BadgeCheck size={20} className="text-green-500" />}
-              message={<span className="font-semibold text-green-300">Xác nhận thành công</span>}
-              description={
-                <div className="mt-3 space-y-2">
-                  <div className="flex items-center gap-3 rounded-lg border border-green-700/50 bg-green-950/40 px-3 py-2.5">
-                    <Ticket size={16} className="flex-shrink-0 text-green-400" />
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold uppercase tracking-widest text-green-400/70">
-                        Ticket Code
-                      </p>
-                      <p className="text-sm font-bold text-green-300">
-                        {checkinResult.ticketCode || '---'}
-                      </p>
-                    </div>
-                  </div>
-          {checkinResult && (
-            <Alert
-              showIcon
-              type="success"
-              icon={<BadgeCheck size={20} className="text-green-500" />}
               message={<span className="font-semibold text-green-300">Xac nhan thanh cong</span>}
               description={
                 <div className="mt-3 space-y-2">
@@ -441,24 +369,6 @@ export const StaffHeader = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 rounded-lg border border-green-700/50 bg-green-950/40 px-3 py-2.5">
-                    <CalendarClock size={16} className="flex-shrink-0 text-green-400" />
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold uppercase tracking-widest text-green-400/70">
-                        Thời gian nhận vé
-                      </p>
-                      <p className="text-sm font-bold text-green-300">
-                        {checkinResult.pickedUpAt
-                          ? dayjs(checkinResult.pickedUpAt).format('HH:mm • DD/MM/YYYY')
-                          : dayjs().format('HH:mm • DD/MM/YYYY')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              }
-              className="rounded-lg border-green-700/50 bg-green-950/20"
-            />
-          )}
                   <div className="flex items-center gap-3 rounded-lg border border-green-700/50 bg-green-950/40 px-3 py-2.5">
                     <CalendarClock size={16} className="flex-shrink-0 text-green-400" />
                     <div className="flex-1">
@@ -483,23 +393,6 @@ export const StaffHeader = () => {
               onClick={() => setCheckinOpen(false)}
               className="flex-1 rounded-lg border-gray-700 bg-gray-800/40 font-semibold text-gray-300 hover:border-gray-600 hover:bg-gray-800/60 hover:text-white"
             >
-              Đóng
-            </Button>
-            <Button
-              type="primary"
-              loading={isCheckingInTicket}
-              onClick={handleSubmitCheckin}
-              className="flex-1 rounded-lg border-0 bg-gradient-to-r from-red-700 to-red-600 font-semibold shadow-lg shadow-red-600/50 hover:shadow-red-500/70"
-              icon={<BadgeCheck size={16} />}
-            >
-              {isCheckingInTicket ? 'Đang xử lý...' : 'Xác nhận nhận vé'}
-            </Button>
-          </div>
-          <div className="flex gap-3 pt-2">
-            <Button
-              onClick={() => setCheckinOpen(false)}
-              className="flex-1 rounded-lg border-gray-700 bg-gray-800/40 font-semibold text-gray-300 hover:border-gray-600 hover:bg-gray-800/60 hover:text-white"
-            >
               Dong
             </Button>
             <Button
@@ -513,14 +406,6 @@ export const StaffHeader = () => {
             </Button>
           </div>
 
-          <div className="rounded-lg border border-red-900/30 bg-red-950/20 p-3">
-            <Typography.Text className="text-xs !text-gray-400">
-              <span className="font-semibold text-red-400">Lưu ý:</span> Vé sẽ được gửi qua email
-              cho khách hàng sau khi xác nhận thành công.
-            </Typography.Text>
-          </div>
-        </div>
-      </Modal>
           <div className="rounded-lg border border-red-900/30 bg-red-950/20 p-3">
             <Typography.Text className="text-xs !text-gray-400">
               <span className="font-semibold text-red-400">Luu y:</span> Ve se duoc gui qua email
