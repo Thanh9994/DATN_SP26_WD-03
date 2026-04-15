@@ -22,6 +22,7 @@ import StaffStatus from '@web/pages/admin/analytics/analyticsStaff/StaffStatus';
 import AnalyticsCinemas from '@web/pages/admin/analytics/analyticsCinemas/AnalyticsCinemas';
 import AnalyticMatch from '@web/pages/admin/analytics/analyticsDoanhthu/AnalyticMatch';
 import AdminTicket from '@web/pages/admin/order/AdminTicket';
+import SystemSettings from '@web/pages/admin/SystemSettings';
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
@@ -31,6 +32,7 @@ export const AdminRoutes: RouteObject = {
       element: <AdminLayouts />,
       children: [
         { index: true, element: <Dashboard /> },
+
         { path: 'movies', element: <Movie /> },
         { path: 'genres', element: <Genre /> },
         { path: 'media', element: <Upload /> },
@@ -38,12 +40,18 @@ export const AdminRoutes: RouteObject = {
         { path: 'cinemas', element: <Cinemas /> },
         { path: 'product', element: <Product /> },
         { path: 'rooms', element: <Rooms /> },
-        { path: 'settings', element: <Settings /> },
         { path: 'showtime', element: <ShowTime /> },
         { path: 'tickets', element: <AdminTicket /> },
         { path: 'personnel', element: <Personnel /> },
         { path: 'staff', element: <StaffStatus /> },
+
+        { path: 'settings', element: <Settings /> },
+        { path: 'settings/general', element: <SystemSettings /> },
+        { path: 'settings/payment', element: <SystemSettings /> },
+        { path: 'settings/notification', element: <SystemSettings /> },
+
         { path: 'analytics', element: <Analytics /> },
+
         {
           path: 'promotions',
           children: [
@@ -52,6 +60,7 @@ export const AdminRoutes: RouteObject = {
             { path: 'edit/:id', element: <PromotionForm /> },
           ],
         },
+
         {
           path: 'analytics',
           children: [
