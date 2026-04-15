@@ -20,7 +20,7 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error("❌ Không thể khởi động server:", error);
-    process.exit(1); // Dừng nếu lỗi nghiêm trọng
+    process.exit(1); 
   }
 };
 startServer();

@@ -1,62 +1,67 @@
-
 export default function StaffStatus() {
   return (
-    <div className="p-6 bg-[#f5f7fb] min-h-screen">
+    <div className="min-h-screen bg-[#f5f7fb] p-6">
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-400">SAPPHIRE ADMIN • NHÂN SỰ</p>
-          <h1 className="text-2xl font-semibold">Quản lý Nhân sự</h1>
+          <p className="text-xs md:text-sm text-gray-400">
+            SAPPHIRE ADMIN • NHÂN SỰ
+          </p>
+          <h1 className="text-lg md:text-2xl font-semibold">
+            Quản lý Nhân sự
+          </h1>
         </div>
 
-        <button className="bg-blue-600 text-white px-5 py-2 rounded-lg font-medium">
+        <button className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white">
           + Thêm nhân viên mới
         </button>
       </div>
 
       {/* CARDS */}
-      <div className="grid grid-cols-4 gap-5 mb-6">
-        <div className="bg-white p-5 rounded-xl shadow-sm">
-          <p className="text-gray-400 text-sm">Tổng nhân sự</p>
-          <h2 className="text-3xl font-bold mt-2">48</h2>
+      <div className="mb-6 grid grid-cols-4 gap-5">
+        <div className="rounded-xl bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-400">Tổng nhân sự</p>
+          <h2 className="mt-2 text-3xl font-bold">48</h2>
         </div>
 
-        <div className="bg-white p-5 rounded-xl shadow-sm">
-          <p className="text-gray-400 text-sm">Đang làm việc</p>
-          <h2 className="text-3xl font-bold mt-2">12</h2>
+        <div className="rounded-xl bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-400">Đang làm việc</p>
+          <h2 className="mt-2 text-3xl font-bold">12</h2>
         </div>
 
-        <div className="bg-white p-5 rounded-xl shadow-sm">
-          <p className="text-gray-400 text-sm">Nghỉ phép</p>
-          <h2 className="text-3xl font-bold mt-2 text-yellow-500">2</h2>
+        <div className="rounded-xl bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-400">Nghỉ phép</p>
+          <h2 className="mt-2 text-3xl font-bold text-yellow-500">2</h2>
         </div>
 
-        <div className="bg-white p-5 rounded-xl shadow-sm">
-          <p className="text-gray-400 text-sm">Tuyển dụng mới</p>
-          <h2 className="text-3xl font-bold mt-2 text-blue-500">3</h2>
+        <div className="rounded-xl bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-400">Tuyển dụng mới</p>
+          <h2 className="mt-2 text-3xl font-bold text-blue-500">3</h2>
         </div>
       </div>
 
       {/* FILTER */}
-      <div className="bg-white p-4 rounded-xl shadow-sm mb-6 flex gap-4 items-center">
+      <div className="mb-6 flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm">
         <input
-          className="flex-1 border rounded-lg px-4 py-2 outline-none"
+          className="flex-1 rounded-lg border px-4 py-2 outline-none"
           placeholder="Tìm theo Tên hoặc Mã NV..."
         />
 
-        <select className="border px-4 py-2 rounded-lg">
+        <select className="rounded-lg border px-4 py-2">
           <option>Tất cả vị trí</option>
         </select>
 
-        <select className="border px-4 py-2 rounded-lg">
+        <select className="rounded-lg border px-4 py-2">
           <option>Tất cả Rạp công tác</option>
         </select>
 
-        <button className="text-gray-500">Lọc thêm</button>
+        <button className="text-gray-500 text-left md:text-center">
+          Lọc thêm
+        </button>
       </div>
 
       {/* TABLE */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="overflow-hidden rounded-xl bg-white shadow-sm">
         <table className="w-full text-sm">
           <thead className="bg-gray-100 text-gray-500">
             <tr>
@@ -72,16 +77,14 @@ export default function StaffStatus() {
 
           <tbody>
             <tr className="border-t">
-              <td className="p-4 text-blue-600 font-medium">#NV0842</td>
+              <td className="p-4 font-medium text-blue-600">#NV0842</td>
               <td>Nguyễn Lâm</td>
               <td>
-                <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                  QUẢN LÝ
-                </span>
+                <span className="rounded bg-gray-100 px-2 py-1 text-xs">QUẢN LÝ</span>
               </td>
               <td>Sapphire CGV District 1</td>
               <td>
-                <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full">
+                <span className="rounded-full bg-green-100 px-3 py-1 text-green-600">
                   Đang làm việc
                 </span>
               </td>
@@ -90,16 +93,14 @@ export default function StaffStatus() {
             </tr>
 
             <tr className="border-t">
-              <td className="p-4 text-blue-600 font-medium">#NV1025</td>
+              <td className="p-4 font-medium text-blue-600">#NV1025</td>
               <td>Trần Minh Thư</td>
               <td>
-                <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                  QUẦY VÉ
-                </span>
+                <span className="rounded bg-gray-100 px-2 py-1 text-xs">QUẦY VÉ</span>
               </td>
               <td>Sapphire CGV District 7</td>
               <td>
-                <span className="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full">
+                <span className="rounded-full bg-yellow-100 px-3 py-1 text-yellow-600">
                   Nghỉ phép
                 </span>
               </td>
@@ -108,16 +109,14 @@ export default function StaffStatus() {
             </tr>
 
             <tr className="border-t">
-              <td className="p-4 text-blue-600 font-medium">#NV0991</td>
+              <td className="p-4 font-medium text-blue-600">#NV0991</td>
               <td>Hoàng Văn Vinh</td>
               <td>
-                <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                  KỸ THUẬT
-                </span>
+                <span className="rounded bg-gray-100 px-2 py-1 text-xs">KỸ THUẬT</span>
               </td>
               <td>Sapphire Cine Landmark</td>
               <td>
-                <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full">
+                <span className="rounded-full bg-green-100 px-3 py-1 text-green-600">
                   Đang làm việc
                 </span>
               </td>
@@ -126,18 +125,14 @@ export default function StaffStatus() {
             </tr>
 
             <tr className="border-t">
-              <td className="p-4 text-blue-600 font-medium">#NV0723</td>
+              <td className="p-4 font-medium text-blue-600">#NV0723</td>
               <td>Phạm Thanh Bình</td>
               <td>
-                <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                  SẢNH
-                </span>
+                <span className="rounded bg-gray-100 px-2 py-1 text-xs">SẢNH</span>
               </td>
               <td>Sapphire CGV District 1</td>
               <td>
-                <span className="bg-gray-200 text-gray-500 px-3 py-1 rounded-full">
-                  Đã nghỉ
-                </span>
+                <span className="rounded-full bg-gray-200 px-3 py-1 text-gray-500">Đã nghỉ</span>
               </td>
               <td>10/11/2020</td>
               <td>✏️ 🗑️</td>
@@ -146,12 +141,10 @@ export default function StaffStatus() {
         </table>
 
         {/* PAGINATION */}
-        <div className="flex justify-end items-center gap-2 p-4">
-          <button className="px-3 py-1 bg-blue-600 text-white rounded">
-            1
-          </button>
-          <button className="px-3 py-1 border rounded">2</button>
-          <button className="px-3 py-1 border rounded">3</button>
+        <div className="flex items-center justify-end gap-2 p-4">
+          <button className="rounded bg-blue-600 px-3 py-1 text-white">1</button>
+          <button className="rounded border px-3 py-1">2</button>
+          <button className="rounded border px-3 py-1">3</button>
         </div>
       </div>
     </div>
