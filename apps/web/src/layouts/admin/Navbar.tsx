@@ -5,7 +5,7 @@ import {
   VideoCameraAddOutlined,
   ArrowLeftOutlined,
   SettingFilled,
-  SettingOutlined 
+  SettingOutlined,
 } from '@ant-design/icons';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -35,42 +35,41 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
   const location = useLocation();
 
   const path = location.pathname;
-  const selectedKey =
-    path.startsWith('/admin/analytics/overview')
-      ? 'analytics-overview'
-      : path.startsWith('/admin/analytics/ticket')
-        ? 'analytics-ticket'
-        : path.startsWith('/admin/analytics/revenue')
-          ? 'analytics-revenue'
-          : path.startsWith('/admin/analytics/cinema')
-            ? 'analytics-cinema'
-            : path.startsWith('/admin/tickets')
-              ? 'tickets'
-              : path.startsWith('/admin/showtime')
-                ? 'showtime'
-                : path.startsWith('/admin/rooms')
-                  ? 'rooms'
-                  : path.startsWith('/admin/cinemas')
-                    ? 'cinemas'
-                    : path.startsWith('/admin/movies')
-                      ? 'movies'
-                      : path.startsWith('/admin/genres')
-                        ? 'genres'
-                        : path.startsWith('/admin/product')
-                          ? 'product'
-                          : path.startsWith('/admin/media')
-                            ? 'media'
-                            : path.startsWith('/admin/promotions')
-                              ? 'promotions'
-                              : path.startsWith('/admin/users')
-                                ? 'users'
-                                : path.startsWith('/admin/staff')
-                                  ? 'staff'
-                                  : path.startsWith('/admin/personnel')
-                                    ? 'personnel'
-                                    : path.startsWith('/admin/settings')
-                                      ? 'settings'
-                                      : 'dashboard';
+  const selectedKey = path.startsWith('/admin/analytics/overview')
+    ? 'analytics-overview'
+    : path.startsWith('/admin/analytics/ticket')
+      ? 'analytics-ticket'
+      : path.startsWith('/admin/analytics/revenue')
+        ? 'analytics-revenue'
+        : path.startsWith('/admin/analytics/cinema')
+          ? 'analytics-cinema'
+          : path.startsWith('/admin/tickets')
+            ? 'tickets'
+            : path.startsWith('/admin/showtime')
+              ? 'showtime'
+              : path.startsWith('/admin/rooms')
+                ? 'rooms'
+                : path.startsWith('/admin/cinemas')
+                  ? 'cinemas'
+                  : path.startsWith('/admin/movies')
+                    ? 'movies'
+                    : path.startsWith('/admin/genres')
+                      ? 'genres'
+                      : path.startsWith('/admin/product')
+                        ? 'product'
+                        : path.startsWith('/admin/media')
+                          ? 'media'
+                          : path.startsWith('/admin/promotions')
+                            ? 'promotions'
+                            : path.startsWith('/admin/users')
+                              ? 'users'
+                              : path.startsWith('/admin/staff')
+                                ? 'staff'
+                                : path.startsWith('/admin/personnel')
+                                  ? 'personnel'
+                                  : path.startsWith('/admin/settings')
+                                    ? 'settings'
+                                    : 'dashboard';
 
   const openKeys = path.includes('/analytics/') ? ['analytics'] : [];
 
@@ -117,10 +116,10 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
           ],
         },
         {
-          key: 'staff',
+          key: 'personnel',
           icon: <Users size={18} />,
           label: 'Nhân sự',
-          onClick: () => navigate('/admin/staff'),
+          onClick: () => navigate('/admin/personnel'),
         },
         {
           key: 'users',
@@ -194,7 +193,7 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
     { type: 'divider' },
     {
       key: 'general',
-      icon: <SettingOutlined  />,
+      icon: <SettingOutlined />,
       label: 'Cấu hình',
       onClick: () => navigate('/admin/settings/general'),
     },
@@ -204,7 +203,6 @@ export const Sidebar = ({ collapsed, themeMode, toggleTheme, user, logout }: Sid
       label: 'Cài đặt',
       onClick: () => navigate('/admin/settings'),
     },
-    
   ];
 
   const textColor = themeMode === 'dark' ? '#fff' : '#000';
