@@ -94,7 +94,7 @@ const TicketInfoField = ({
   icon: any;
 }) => (
   <div className="space-y-1">
-    <p className="md:text-sx text-[8px] font-black uppercase tracking-[0.25em] text-zinc-400">
+    <p className="md:text-sx text-[8px] text-left font-black uppercase tracking-[0.25em] text-zinc-400">
       {label}
     </p>
     <div className="flex items-center gap-1.5">
