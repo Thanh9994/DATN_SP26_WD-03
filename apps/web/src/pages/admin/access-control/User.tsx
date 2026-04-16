@@ -23,6 +23,7 @@ export const User = () => {
   const [editingUser, setEditingUser] = useState<IUser | null>(null);
   const [form] = Form.useForm();
   type IUserWithBookingCount = IUser & { bookingCount?: number };
+  const customerUsers = (users || []).filter((item) => item.role === 'khach_hang');
 
   const handleEdit = (record: IUser) => {
     setEditingUser(record);
@@ -122,7 +123,7 @@ export const User = () => {
       <Title level={4} style={{ marginBottom: 16 }}>
         Quản lý người dùng
       </Title>
-      <Table dataSource={users} columns={columns} loading={isLoadingUsers} rowKey="_id" />
+      <Table dataSource={customerUsers} columns={columns} loading={isLoadingUsers} rowKey="_id" />
 
       <Modal
         title="Cập nhật quyền & trạng thái"
@@ -155,3 +156,4 @@ export const User = () => {
     </div>
   );
 };
+
