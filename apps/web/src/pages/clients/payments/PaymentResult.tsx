@@ -27,6 +27,11 @@ export const PaymentResult = () => {
   };
 
   const bookingIdValue = formatId(booking?._id || bookingId);
+  const ticketCodeValue = formatId(booking?.ticketCode);
+  const displayTicketCode =
+    ticketCodeValue && ticketCodeValue !== '---'
+      ? ticketCodeValue.toUpperCase()
+      : `#${bookingIdValue.slice(-8).toUpperCase()}`;
   const userDisplayName =
     typeof booking?.userId === 'object'
       ? booking?.userId?.ho_ten || '---'
@@ -83,27 +88,10 @@ export const PaymentResult = () => {
           </p>
         </div>
         {isSuccess && booking && ticketData && (
-          <div className="w-full max-w-4xl space-y-4">
+          <div className="w-full max-w-4xl space-y-6">
             <BookingTicket ticket={ticketData}>
-              <div className="flex w-full items-center justify-between gap-3">
-                <div className="text-left">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                    Người đặt
-                  </p>
-                  <p className="text-sm font-bold text-white">{userDisplayName}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                    Tổng thanh toán
-                  </p>
-                  <p className="text-sm font-bold text-primary">
-                    {formatCurrency(booking.finalAmount)}
-                  </p>
-                </div>
-              </div>
-
-              {/* QR code nằm trong BookingTicket */}
-              <div className="mt-6 flex flex-col items-center rounded-2xl border border-white/10 bg-black/20 p-4">
+              {/* QR code ở đầu */}
+              <div className="flex flex-col items-center rounded-2xl border border-white/10 bg-black/20 p-4">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
                   Ticket QR
                 </p>
@@ -111,7 +99,7 @@ export const PaymentResult = () => {
                   <img
                     src={booking.qrCodeDataUrl}
                     alt="Ticket QR"
-                    className="h-56 w-56 rounded-lg bg-white p-2"
+                    className="h-44 w-44 rounded-lg bg-white p-2 shadow-lg"
                   />
                 ) : (
                   <QRCodeCanvas
@@ -121,12 +109,28 @@ export const PaymentResult = () => {
                     fgColor="#000000"
                     level="H"
                     includeMargin={true}
-                    className="rounded-lg bg-white p-2"
+                    className="rounded-lg bg-white p-2 shadow-lg"
                   />
                 )}
-                <p className="mt-3 text-xs text-white/50">
-                  TicketCode: #{bookingIdValue.slice(-8).toUpperCase()}
-                </p>
+                <p className="mt-3 text-xs text-white/50">TicketCode: {displayTicketCode}</p>
+              </div>
+
+              {/* Thông tin người đặt và tổng thanh toán dạng flex dọc */}
+              <div className="mt-6 mx-auto flex flex-col text-center gap-4">
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                    Người đặt
+                  </p>
+                  <p className="text-sm font-bold text-white">{userDisplayName}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                    Tổng thanh toán
+                  </p>
+                  <p className="text-sm font-bold text-primary">
+                    {formatCurrency(booking.finalAmount)}
+                  </p>
+                </div>
               </div>
             </BookingTicket>
           </div>
