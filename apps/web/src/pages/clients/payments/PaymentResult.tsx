@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { API } from '@web/api/api.service';
+import { QRCodeCanvas } from 'qrcode.react';
 import BookingTicket from '@web/components/BookingTicket';
 import { ITicketCl, mapToTicketCl } from '@shared/src/schemas/ticket';
 
@@ -100,23 +101,34 @@ export const PaymentResult = () => {
                   </p>
                 </div>
               </div>
-            </BookingTicket>
 
-            {booking.qrCodeDataUrl && (
-              <div className="flex flex-col items-center rounded-2xl border border-white/10 bg-black/20 p-4">
+              {/* QR code nằm trong BookingTicket */}
+              <div className="mt-6 flex flex-col items-center rounded-2xl border border-white/10 bg-black/20 p-4">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
                   Ticket QR
                 </p>
-                <img
-                  src={booking.qrCodeDataUrl}
-                  alt="Ticket QR"
-                  className="h-56 w-56 rounded-lg bg-white p-2"
-                />
+                {booking.qrCodeDataUrl ? (
+                  <img
+                    src={booking.qrCodeDataUrl}
+                    alt="Ticket QR"
+                    className="h-56 w-56 rounded-lg bg-white p-2"
+                  />
+                ) : (
+                  <QRCodeCanvas
+                    value={bookingIdValue}
+                    size={220}
+                    bgColor="#ffffff"
+                    fgColor="#000000"
+                    level="H"
+                    includeMargin={true}
+                    className="rounded-lg bg-white p-2"
+                  />
+                )}
                 <p className="mt-3 text-xs text-white/50">
-                  Booking ID: #{bookingIdValue.slice(-8).toUpperCase()}
+                  TicketCode: #{bookingIdValue.slice(-8).toUpperCase()}
                 </p>
               </div>
-            )}
+            </BookingTicket>
           </div>
         )}
 
