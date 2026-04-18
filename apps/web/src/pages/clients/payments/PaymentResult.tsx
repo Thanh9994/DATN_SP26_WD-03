@@ -79,57 +79,56 @@ export const PaymentResult = () => {
 
         <div className="space-y-3">
           <h1 className="text-5xl font-black tracking-tight">
-            {isSuccess ? 'Payment Successful!' : 'Payment Failed'}
+            {isSuccess ? 'Thanh toán thành công!' : 'thanh toán thất bại'}
           </h1>
           <p className="text-xl text-white/60">
             {isSuccess
-              ? `Your booking has been confirmed.`
+              ? `Vé của bạn đã được thanh toán thành công check vé trong lịch sử đặt vé.`
               : 'There was an issue processing your payment.'}
           </p>
         </div>
         {isSuccess && booking && ticketData && (
-          <div className="w-full max-w-4xl space-y-6">
+          <div className="w-full max-w-4xl space-y-5">
             <BookingTicket ticket={ticketData}>
-              {/* QR code ở đầu */}
-              <div className="flex flex-col items-center rounded-2xl border border-white/10 bg-black/20 p-4">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
-                  Ticket QR
-                </p>
-                {booking.qrCodeDataUrl ? (
-                  <img
-                    src={booking.qrCodeDataUrl}
-                    alt="Ticket QR"
-                    className="h-44 w-44 rounded-lg bg-white p-2 shadow-lg"
-                  />
-                ) : (
-                  <QRCodeCanvas
-                    value={bookingIdValue}
-                    size={220}
-                    bgColor="#ffffff"
-                    fgColor="#000000"
-                    level="H"
-                    includeMargin={true}
-                    className="rounded-lg bg-white p-2 shadow-lg"
-                  />
-                )}
-                <p className="mt-3 text-xs text-white/50">TicketCode: {displayTicketCode}</p>
-              </div>
-
-              {/* Thông tin người đặt và tổng thanh toán dạng flex dọc */}
-              <div className="mt-6 mx-auto flex flex-col text-center gap-4">
-                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                    Người đặt
-                  </p>
-                  <p className="text-sm font-bold text-white">{userDisplayName}</p>
+              <div className="flex flex-row items-start gap-6">
+                {/* QR code bên trái */}
+                <div className="flex flex-col items-center">
+                  {booking.qrCodeDataUrl ? (
+                    <img
+                      src={booking.qrCodeDataUrl}
+                      alt="Ticket QR"
+                      className="h-44 w-44 rounded-lg bg-white p-2 shadow-lg"
+                    />
+                  ) : (
+                    <QRCodeCanvas
+                      value={bookingIdValue}
+                      size={220}
+                      bgColor="#ffffff"
+                      fgColor="#000000"
+                      level="H"
+                      includeMargin={true}
+                      className="rounded-lg bg-white p-2 shadow-lg"
+                    />
+                  )}
+                  <p className="mt-3 text-xs text-white/50">TicketCode: {displayTicketCode}</p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                    Tổng thanh toán
-                  </p>
-                  <p className="text-sm font-bold text-primary">
-                    {formatCurrency(booking.finalAmount)}
-                  </p>
+                <div className="h-44 w-px bg-white/20"></div>
+                {/* Thông tin người đặt và tổng thanh toán bên phải */}
+                <div className="flex flex-col justify-center gap-4 text-left p-3">
+                  <div className="flex flex-row items-center gap-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                      Người đặt:
+                    </p>
+                    <p className="text-sm font-bold text-white">{userDisplayName}</p>
+                  </div>
+                  <div className="flex flex-row items-center gap-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                      Tổng thanh toán
+                    </p>
+                    <p className="text-sm font-bold text-primary">
+                      {formatCurrency(booking.finalAmount)}
+                    </p>
+                  </div>
                 </div>
               </div>
             </BookingTicket>

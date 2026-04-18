@@ -43,7 +43,7 @@ import MyBooking from '@web/components/authProfile/MyBooking';
 import BookingDetail from '@web/components/authProfile/BookingDetail';
 
 // Guards
-import RequireAuth from '@web/services/RequieAuth';
+import RequireAuth from '@web/pages/services/RequieAuth';
 
 export const ClientRoutes: RouteObject = {
   path: '/',
