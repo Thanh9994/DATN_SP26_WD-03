@@ -369,7 +369,7 @@ const PaymentsMethod = () => {
             <h3 className="text-lg font-bold text-white">Xác nhận thanh toán</h3>
             <p className="mt-2 text-sm text-zinc-400">
               Bạn sắp thanh toán qua <strong>{method.toUpperCase()}</strong> với số tiền{' '}
-              <strong>{finalAmount.toLocaleString('vi-VN')} �</strong>.
+              <strong>{finalAmount.toLocaleString('vi-VN')} VND</strong>.
             </p>
             <p className="mt-1 text-xs text-zinc-500">
               Sau khi xác nhận, hệ thống sẽ chuyển sang cổng thanh toán.
