@@ -34,6 +34,30 @@ export const useBooking = (showTimeId?: string) => {
     },
   });
 
+  const updateBookingItems = useMutation({
+    mutationFn: async ({
+      bookingId,
+      holdToken,
+      items,
+    }: {
+      bookingId: string;
+      holdToken: string;
+      items: Array<{
+        snackDrinkId: string;
+        name: string;
+        quantity: number;
+        price: number;
+      }>;
+    }) => {
+      const { data } = await axiosAuth.patch(`${API.BOOKING}/items`, {
+        bookingId,
+        holdToken,
+        items,
+      });
+      return data.data;
+    },
+  });
+
   const createPaymentUrl = useMutation({
     mutationFn: async ({
       bookingId,
@@ -126,6 +150,9 @@ export const useBooking = (showTimeId?: string) => {
     createPaymentUrl: createPaymentUrl.mutateAsync,
     isCreatingPayment: createPaymentUrl.isPending,
 
+    updateBookingItems: updateBookingItems.mutateAsync,
+    isUpdatingBookingItems: updateBookingItems.isPending,
+
     cancelBooking: cancelBooking.mutateAsync,
     isCancelling: cancelBooking.isPending,
 
@@ -150,5 +177,58 @@ export const useMyBookings = (status: string = 'paid') => {
     },
     staleTime: 1000 * 60,
     refetchOnWindowFocus: true,
+  });
+};
+// ================= ADMIN TICKET =================
+
+export const useAdminTickets = ({
+  keyword = '',
+  status = '',
+  cinemaId = '',
+  date = '',
+  page = 1,
+  limit = 10,
+}: {
+  keyword?: string;
+  status?: string;
+  cinemaId?: string;
+  date?: string;
+  page?: number;
+  limit?: number;
+}) => {
+  return useQuery({
+    queryKey: ['admin-tickets', keyword, status, cinemaId, date, page, limit],
+    queryFn: async () => {
+      const res = await axiosAuth.get(`${API.TICKETS}/admin`, {
+        params: {
+          keyword: keyword || undefined,
+          status: status || undefined,
+          cinemaId: cinemaId || undefined,
+          date: date || undefined,
+          page,
+          limit,
+        },
+      });
+
+      return {
+        tickets: res.data?.data || [],
+        pagination: res.data?.pagination || {},
+      };
+    },
+    staleTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminTicketDetail = (id?: string) => {
+  return useQuery({
+    queryKey: ['admin-ticket-detail', id],
+    queryFn: async () => {
+      if (!id) return null;
+      const res = await axiosAuth.get(`${API.TICKETS}/admin/${id}`);
+      return res.data?.data || null;
+    },
+    enabled: !!id,
+    staleTime: 1000 * 60 * 2,
   });
 };

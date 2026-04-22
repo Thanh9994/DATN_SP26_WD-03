@@ -14,12 +14,17 @@ interface PaymentNavigationState {
   holdToken: string;
   totalAmount: number;
   seats: string[];
+  items?: Array<{
+    snackDrinkId: string;
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
   movieInfo: {
     title?: string;
     poster?: string;
     showtime: string;
   };
-  snackSelection?: DrinkSnackSelection;
 }
 
 const BookingLayout = () => {
@@ -48,6 +53,7 @@ const BookingLayout = () => {
     pendingBooking,
     cancelBooking,
     expireBooking,
+    updateBookingItems,
   } = useBooking(activeShowtimeId);
 
   useEffect(() => {
@@ -151,13 +157,36 @@ const BookingLayout = () => {
     navigate(`/booking?movieId=${movieId}`);
   };
 
-  const handleGoToPayments = (snackSelection?: DrinkSnackSelection) => {
+  const handleGoToPayments = async (snackSelection?: DrinkSnackSelection) => {
     if (!paymentState) return;
+
+    let nextPaymentState: PaymentNavigationState = { ...paymentState };
+
+    if (snackSelection) {
+      const updatedTotalAmount = paymentState.totalAmount + snackSelection.totalAmount;
+
+      try {
+        await updateBookingItems({
+          bookingId: paymentState.bookingId,
+          holdToken: paymentState.holdToken,
+          items: snackSelection.items,
+        });
+
+        nextPaymentState = {
+          ...paymentState,
+          totalAmount: updatedTotalAmount,
+          items: snackSelection.items,
+        };
+      } catch (error: any) {
+        message.error(error?.response?.data?.message || 'Khong the cap nhat combo cho don hang');
+        return;
+      }
+    }
 
     navigate('/payments', {
       state: {
-        ...paymentState,
-        snackSelection,
+        ...nextPaymentState,
+        finalAmount: nextPaymentState.totalAmount,
       },
     });
 

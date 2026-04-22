@@ -7,8 +7,15 @@ export interface SnackCartItem {
   quantity: number;
 }
 
+export interface SnackBookingItem {
+  snackDrinkId: string;
+  name: string;
+  quantity: number;
+  price: number;
+}
+
 export interface DrinkSnackSelection {
-  items: SnackCartItem[];
+  items: SnackBookingItem[];
   totalAmount: number;
 }
 
@@ -44,7 +51,21 @@ export const DrinkSnack = ({ open, onClose, onSkip, onContinue }: DrinkSnackProp
   };
 
   const handleContinue = () => {
-    onContinue?.({ items: cart, totalAmount: getCartTotal() });
+    const mappedItems: SnackBookingItem[] = cart
+      .map((item) => {
+        const product = activeProducts.find((p) => p._id === item.productId);
+        if (!product?._id) return null;
+
+        return {
+          snackDrinkId: product._id,
+          name: product.name,
+          quantity: item.quantity,
+          price: Number(product.price || 0),
+        };
+      })
+      .filter((item): item is SnackBookingItem => !!item);
+
+    onContinue?.({ items: mappedItems, totalAmount: getCartTotal() });
     if (!onContinue) closeModal();
   };
 

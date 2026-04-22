@@ -7,6 +7,7 @@ const bookingRouter = Router();
 bookingRouter.get('/detail/:id', bookingController.getBookingDetail);
 
 bookingRouter.post('/hold', authenticate, bookingController.holdSeats);
+bookingRouter.patch('/items', authenticate, bookingController.updateBookingItems);
 bookingRouter.post('/confirm', authenticate, bookingController.confirmBooking);
 bookingRouter.patch(
   '/checkin-ticket',

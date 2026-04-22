@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { API } from '@web/api/api.service';
+import { QRCodeCanvas } from 'qrcode.react';
 import BookingTicket from '@web/components/BookingTicket';
 import { ITicketCl, mapToTicketCl } from '@shared/src/schemas/ticket';
 
@@ -26,6 +27,11 @@ export const PaymentResult = () => {
   };
 
   const bookingIdValue = formatId(booking?._id || bookingId);
+  const ticketCodeValue = formatId(booking?.ticketCode);
+  const displayTicketCode =
+    ticketCodeValue && ticketCodeValue !== '---'
+      ? ticketCodeValue.toUpperCase()
+      : `#${bookingIdValue.slice(-8).toUpperCase()}`;
   const userDisplayName =
     typeof booking?.userId === 'object'
       ? booking?.userId?.ho_ten || '---'
@@ -39,14 +45,6 @@ export const PaymentResult = () => {
       return null;
     }
   }, [booking]);
-
-  const formatDate = (value: any) => {
-    if (!value) return '---';
-    if (typeof value === 'string') return new Date(value).toLocaleString();
-    if (typeof value === 'object' && value.$date) return new Date(value.$date).toLocaleString();
-    if (value instanceof Date) return value.toLocaleString();
-    return String(value);
-  };
 
   useEffect(() => {
     if (bookingId) {
@@ -81,120 +79,59 @@ export const PaymentResult = () => {
 
         <div className="space-y-3">
           <h1 className="text-5xl font-black tracking-tight">
-            {isSuccess ? 'Payment Successful!' : 'Payment Failed'}
+            {isSuccess ? 'Thanh toán thành công!' : 'thanh toán thất bại'}
           </h1>
           <p className="text-xl text-white/60">
             {isSuccess
-              ? `Your booking has been confirmed.`
+              ? `Vé của bạn đã được thanh toán thành công check vé trong lịch sử đặt vé.`
               : 'There was an issue processing your payment.'}
           </p>
         </div>
         {isSuccess && booking && ticketData && (
-          <div className="w-full max-w-4xl space-y-4">
+          <div className="w-full max-w-4xl space-y-5">
             <BookingTicket ticket={ticketData}>
-              <div className="flex w-full items-center justify-between gap-3">
-                <div className="text-left">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                    Người đặt
-                  </p>
-                  <p className="text-sm font-bold text-white">{userDisplayName}</p>
+              <div className="flex flex-row items-start gap-6">
+                {/* QR code bên trái */}
+                <div className="flex flex-col items-center">
+                  {booking.qrCodeDataUrl ? (
+                    <img
+                      src={booking.qrCodeDataUrl}
+                      alt="Ticket QR"
+                      className="h-44 w-44 rounded-lg bg-white p-2 shadow-lg"
+                    />
+                  ) : (
+                    <QRCodeCanvas
+                      value={bookingIdValue}
+                      size={220}
+                      bgColor="#ffffff"
+                      fgColor="#000000"
+                      level="H"
+                      includeMargin={true}
+                      className="rounded-lg bg-white p-2 shadow-lg"
+                    />
+                  )}
+                  <p className="mt-3 text-xs text-white/50">TicketCode: {displayTicketCode}</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                    Tổng thanh toán
-                  </p>
-                  <p className="text-sm font-bold text-primary">
-                    {formatCurrency(booking.finalAmount)}
-                  </p>
+                <div className="h-44 w-px bg-white/20"></div>
+                {/* Thông tin người đặt và tổng thanh toán bên phải */}
+                <div className="flex flex-col justify-center gap-4 text-left p-3">
+                  <div className="flex flex-row items-center gap-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                      Người đặt:
+                    </p>
+                    <p className="text-sm font-bold text-white">{userDisplayName}</p>
+                  </div>
+                  <div className="flex flex-row items-center gap-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                      Tổng thanh toán
+                    </p>
+                    <p className="text-sm font-bold text-primary">
+                      {formatCurrency(booking.finalAmount)}
+                    </p>
+                  </div>
                 </div>
               </div>
             </BookingTicket>
-
-            {booking.qrCodeDataUrl && (
-              <div className="flex flex-col items-center rounded-2xl border border-white/10 bg-black/20 p-4">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
-                  Ticket QR
-                </p>
-                <img
-                  src={booking.qrCodeDataUrl}
-                  alt="Ticket QR"
-                  className="h-56 w-56 rounded-lg bg-white p-2"
-                />
-                <p className="mt-3 text-xs text-white/50">
-                  Booking ID: #{bookingIdValue.slice(-8).toUpperCase()}
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {isSuccess && booking && (
-          <div className="w-full max-w-3xl space-y-3 rounded-2xl border border-white/10 bg-white/5 p-6 text-left">
-            <h3 className="mb-4 text-lg font-bold">Order Code & Fields</h3>
-            <div className="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
-              <div className="flex justify-between">
-                <span className="font-mono">{formatId(booking._id)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-mono">{formatId(booking.userId)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-mono">{formatId(booking.showTimeId)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">seats</span>
-                <span className="font-mono">
-                  {(booking.seats || []).map(formatId).join(', ') || '---'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-mono">{booking.seatCodes?.join(', ') || '---'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">totalAmount</span>
-                <span className="font-mono">{booking.totalAmount ?? '---'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">discountAmount</span>
-                <span className="font-mono">{booking.discountAmount ?? '---'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">finalAmount</span>
-                <span className="font-mono">{booking.finalAmount ?? '---'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">status</span>
-                <span className="font-mono">{booking.status || '---'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">holdToken</span>
-                <span className="font-mono">{booking.holdToken || '---'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">holdExpiresAt</span>
-                <span className="font-mono">{formatDate(booking.holdExpiresAt)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">items</span>
-                <span className="font-mono">{(booking.items || []).length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">createdAt</span>
-                <span className="font-mono">{formatDate(booking.createdAt)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">updatedAt</span>
-                <span className="font-mono">{formatDate(booking.updatedAt)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">paymentId</span>
-                <span className="font-mono">{formatId(booking.paymentId)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">ticketCode</span>
-                <span className="font-mono">{booking.ticketCode || '---'}</span>
-              </div>
-            </div>
           </div>
         )}
 
