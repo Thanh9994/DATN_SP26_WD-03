@@ -21,27 +21,27 @@ interface PartnerLogo {
 
 export const About = (): JSX.Element => {
   const timelineItems: TimelineItem[] = [
-    { year: "2012", title: "Foundation", description: "Our journey started with a vision to revolutionize cinema." },
-    { year: "2015", title: "Expansion", description: "Expanded across continents and reached millions of viewers." },
-    { year: "2019", title: "Streaming Launch", description: "Launched streaming platform bringing movies to homes globally." },
-    { year: "2024", title: "The Future", description: "Pioneering the next generation of cinematic experiences." },
+    { year: "2012", title: "Thành lập", description: "Hành trình của chúng tôi bắt đầu với tầm nhìn cách mạng hóa điện ảnh." },
+    { year: "2015", title: "Mở rộng", description: "Mở rộng trên nhiều châu lục và tiếp cận hàng triệu người xem." },
+    { year: "2019", title: "Ra mắt nền tảng phát trực tuyến", description: "Khởi động nền tảng phát trực tuyến mang phim đến nhà người dùng trên toàn cầu." },
+    { year: "2024", title: "Tương lai", description: "Dẫn đầu thế hệ tiếp theo của những trải nghiệm điện ảnh." },
   ];
 
   const featureCards: FeatureCard[] = [
     {
       icon: "⭐",
-      title: "Curated Excellence",
-      description: "Hand-picked content selected for its artistic merit and cultural impact.",
+      title: "Sự xuất sắc được lựa chọn",
+      description: "Nội dung được lựa chọn thủ công dựa trên giá trị nghệ thuật và tác động văn hóa.",
     },
     {
       icon: "🎬",
-      title: "Purest Fidelity",
-      description: "Crystal-clear quality with uncompressed audio and pristine video delivery.",
+      title: "Độ trung thực hoàn hảo",
+      description: "Chất lượng tinh sáng với âm thanh không nén và video được cung cấp một cách hoàn hảo.",
     },
     {
       icon: "🌐",
-      title: "Seamless Access",
-      description: "Watch anywhere, anytime. Sync across devices and never lose your place.",
+      title: "Truy cập liền mạch",
+      description: "Xem bất cứ nơi đâu, bất cứ lúc nào. Đồng bộ hóa trên các thiết bị và không bao giờ mất vị trí của bạn.",
     },
   ];
 
@@ -93,17 +93,17 @@ export const About = (): JSX.Element => {
       <section className="hero-section">
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <span className="hero-label">ESTABLISHED 2012</span>
+          <span className="hero-label">THÀNH LẬP NĂM 2012</span>
           <h1 className="hero-title">
-            OUR PASSION
-            <span className="hero-accent"> FOR FILM</span>
+            NIỀM ĐAM MÊ CỦA CHÚNG TÔI
+            <span className="hero-accent"> VỚI PHIM</span>
           </h1>
           <p className="hero-description">
-            Redefining the boundaries between the silver screen and your digital world through cutting-edge technology
-            and a love for storytelling.
+            Định nghĩa lại ranh giới giữa màn bạc và thế giới kỹ thuật số của bạn thông qua công nghệ tiên tiến
+            và tình yêu với nghệ thuật kể chuyện.
           </p>
           <button className="hero-cta">
-            EXPLORE NOW
+            KHÁM PHÁ NGAY
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
@@ -128,21 +128,21 @@ export const About = (): JSX.Element => {
           </div>
 
           <div className="featured-content">
-            <span className="featured-label">OUR LATEST MISSION</span>
-            <h2 className="featured-title">Bringing the Cinema to the Next Generation.</h2>
+            <span className="featured-label">NHIỆM VỤ MỚI NHẤT CỦA CHÚNG TÔI</span>
+            <h2 className="featured-title">Mang rạp chiếu phim đến thế hệ tiếp theo.</h2>
             <p className="featured-description">
-              We believe that movies are more than just entertainment. They create culture and spark dialogue. Our
-              mission is to make premium films accessible to everyone, whether you're watching in our theaters or at
-              home. We are committed to preserving the cinematic experience of your imagination.
+              Chúng tôi tin rằng phim ảnh không chỉ là giải trí. Chúng tạo ra văn hóa và khơi dậy đối thoại. Nhiệm vụ của chúng tôi
+              là làm cho phim bình dân có thể tiếp cận được với tất cả mọi người, dù bạn đang xem trong các rạp chiếu của chúng tôi hay ở
+              nhà. Chúng tôi cam kết bảo vệ trải nghiệm điện ảnh của trí tưởng tượng bạn.
             </p>
             <div className="featured-stats">
               <div className="stat">
                 <span className="stat-number">50M+</span>
-                <span className="stat-label">Users</span>
+                <span className="stat-label">Người dùng</span>
               </div>
               <div className="stat">
                 <span className="stat-number">12K+</span>
-                <span className="stat-label">Movies</span>
+                <span className="stat-label">Phim</span>
               </div>
             </div>
           </div>
@@ -151,8 +151,8 @@ export const About = (): JSX.Element => {
 
       <section className="timeline-section">
         <div className="section-header">
-          <h2 className="section-title">THE JOURNEY</h2>
-          <p className="section-subtitle">CineStream's odyssey across the global cinematic landscape.</p>
+          <h2 className="section-title">HÀNH TRÌNH</h2>
+          <p className="section-subtitle">Cuộc phiêu lưu của CineStream trên bộ phim toàn cầu.</p>
         </div>
 
         <div className="timeline-container">
@@ -168,8 +168,8 @@ export const About = (): JSX.Element => {
 
       <section className="partners-section">
         <div className="section-header">
-          <span className="partners-label">OUR ECOSYSTEM</span>
-          <h2 className="section-title">Meet our Studio Partners</h2>
+          <span className="partners-label">HỆ SINH THÁI CỦA CHÚNG TÔI</span>
+          <h2 className="section-title">Gặp các đối tác studio của chúng tôi</h2>
         </div>
 
         <div className="partners-grid">
@@ -179,13 +179,13 @@ export const About = (): JSX.Element => {
 
       <section className="cta-section">
         <div className="cta-content">
-          <h2 className="cta-title">READY TO DIVE IN?</h2>
+          <h2 className="cta-title">SẴN SÀNG BƯỚC VÀO?</h2>
           <p className="cta-description">
-            Join millions of movie lovers and start your premium cinematic journey today.
+            Tham gia hàng triệu người yêu phim và bắt đầu hành trình điện ảnh bình dân của bạn hôm nay.
           </p>
           <div className="cta-buttons">
-            {renderButton("Create Account", "primary")}
-            {renderButton("Our Pricing", "secondary")}
+            {renderButton("Tạo tài khoản", "primary")}
+            {renderButton("Bảng giá của chúng tôi", "secondary")}
           </div>
         </div>
       </section>
