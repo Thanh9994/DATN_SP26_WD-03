@@ -224,40 +224,6 @@ export const StaffHeader = () => {
             backgroundColor: '#1a1a1a',
             borderColor: '#7f1d1d',
           },
-          // title: {
-          //   color: '#ffffff',
-          // },
-        }}
-        width={500}
-      >
-        <div className="space-y-6">
-          <div className="rounded-lg border border-red-900/50 bg-gradient-to-r from-red-950/50 to-red-900/30 p-4">
-            <Typography.Text className="text-sm leading-relaxed !text-gray-300">
-              <span className="font-semibold text-red-400">Hướng dẫn:</span> Nhập mã vé từ email
-              booking hoặc từ ứng dụng để xác nhận khách hàng đã nhận vé.
-            </Typography.Text>
-          </div>
-        title={
-          <div className="flex items-center gap-2">
-            <ScanLine size={20} className="text-red-500" />
-            <span className="font-bold text-white">Check-in Ve</span>
-          </div>
-        }
-        open={checkinOpen}
-        onCancel={() => setCheckinOpen(false)}
-        footer={null}
-        destroyOnHidden
-        className="rounded-2xl"
-        styles={{
-          content: {
-            backgroundColor: '#1a1a1a',
-            borderColor: '#7f1d1d',
-            boxShadow: '0 20px 60px rgba(127, 29, 29, 0.3)',
-          },
-          header: {
-            backgroundColor: '#1a1a1a',
-            borderColor: '#7f1d1d',
-          },
         }}
         width={500}
       >
@@ -363,6 +329,11 @@ export const StaffHeader = () => {
               message={<span className="font-semibold text-green-300">Xac nhan thanh cong</span>}
 =======
 >>>>>>> f17de1a6cc6a4b5c2b038f108dbf97413c1eea4d
+              message={
+                <span className="font-semibold text-green-300">
+                  Xác nhận thành công
+                </span>
+              }
               description={
                 <div className="mt-3 space-y-2">
                   <div className="flex items-center gap-3 rounded-lg border border-green-700/50 bg-green-950/40 px-3 py-2.5">
@@ -477,3 +448,4 @@ export const StaffHeader = () => {
     </>
   );
 };
+
