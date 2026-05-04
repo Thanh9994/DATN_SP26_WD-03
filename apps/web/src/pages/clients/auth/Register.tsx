@@ -16,6 +16,7 @@ const Register = () => {
   // --- STATE QUẢN LÝ GIAO DIỆN ---
   const [isOtpStep, setIsOtpStep] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
+  const [otpValue, setOtpValue] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [termsError, setTermsError] = useState(false);
@@ -295,7 +296,10 @@ const Register = () => {
                 gap: '10px',
               }}
               formatter={(str) => str.toUpperCase()}
-              onChange={(v) => v.length === 6 && handleVerifyOtp(v)}
+              onChange={(v) => {
+                setOtpValue(v);
+                if (v.length === 6) handleVerifyOtp(v);
+              }}
               disabled={isVerifying}
             />
           </div>
@@ -312,7 +316,10 @@ const Register = () => {
             </p>
           </div>
           <div className="flex flex-col gap-3">
-            <Button onClick={() => {}} disabled={isVerifying}>
+            <Button
+              onClick={() => otpValue.length === 6 && handleVerifyOtp(otpValue)}
+              disabled={isVerifying || otpValue.length < 6}
+            >
               {isVerifying ? <RefreshCw className="animate-spin" /> : 'Xác thực tài khoản'}
             </Button>
             <button

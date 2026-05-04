@@ -71,9 +71,8 @@ export const useAuth = () => {
       queryClient.setQueryData(['me'], data.user);
       showNotify('success', 'Đăng Nhập Thành Công', `Chào mừng ${data.user.ho_ten}!`);
     },
-    onError: (err) => {
-      // showNotify("success", "Đăng nhập thất bại");
-      console.error(err.message || 'Đăng nhập thất bại');
+    onError: (err: any) => {
+      showNotify('error', err?.response?.data?.message || 'Đăng nhập thất bại');
     },
   });
 
@@ -84,9 +83,6 @@ export const useAuth = () => {
     },
     onSuccess: () => {
       showNotify('success', 'Đăng ký bước 1 thành công', 'Mã OTP đã được gửi vào email của bạn');
-    },
-    onError: (err: any) => {
-      showNotify('error', err?.response?.data?.message || 'Đăng ký thất bại');
     },
   });
 
@@ -172,8 +168,8 @@ export const useAuth = () => {
     onSuccess: (data) => {
       showNotify('success', data.message || 'Đã gửi email reset password');
     },
-    onError: (err) => {
-      showNotify('error', err.message || 'Gửi email thất bại');
+    onError: (err: any) => {
+      showNotify('error', err?.response?.data?.message || 'Gửi email thất bại');
     },
   });
 

@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Cinema',
       required: function () {
-        return this.role !== 'CUSTOMER' && this.role !== 'ADMIN';
+        return this.role !== 'khach_hang' && this.role !== 'admin';
       },
     },
     resetPasswordToken: String,
