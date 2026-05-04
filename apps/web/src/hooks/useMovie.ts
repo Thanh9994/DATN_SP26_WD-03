@@ -3,6 +3,7 @@ import axios from 'axios';
 import type { ICreateMovie, IMovie, IUpdateMovie } from '@shared/src/schemas';
 import { message } from 'antd';
 import { API } from '@web/api/api.service';
+import { axiosAuth } from './useAuth';
 
 type MovieWithShowtimeCount = IMovie & { showtimeCount?: number; ticketsSold?: number };
 
@@ -26,7 +27,7 @@ export const useMovies = () => {
 
   const { mutate: createMovie, isPending: isAdding } = useMutation({
     mutationFn: async (movie: ICreateMovie) => {
-      const { data } = await axios.post(API.MOVIES, movie);
+      const { data } = await axiosAuth.post(API.MOVIES, movie);
       return data;
     },
     onSuccess: () => {
@@ -38,7 +39,7 @@ export const useMovies = () => {
 
   const { mutate: updateMovie, isPending: isUpdating } = useMutation({
     mutationFn: async ({ id, movie }: { id: string; movie: IUpdateMovie }) => {
-      const { data } = await axios.put(`${API.MOVIES}/${id}`, movie);
+      const { data } = await axiosAuth.put(`${API.MOVIES}/${id}`, movie);
       return data;
     },
     onSuccess: () => {
@@ -49,7 +50,7 @@ export const useMovies = () => {
 
   const { mutate: deleteMovie, isPending: isDeleting } = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`${API.MOVIES}/${id}`);
+      await axiosAuth.delete(`${API.MOVIES}/${id}`);
     },
     onSuccess: () => {
       message.success('Xóa phim thành công');
