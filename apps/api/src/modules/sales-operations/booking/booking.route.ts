@@ -9,6 +9,12 @@ bookingRouter.get('/detail/:id', bookingController.getBookingDetail);
 bookingRouter.post('/hold', authenticate, bookingController.holdSeats);
 bookingRouter.patch('/items', authenticate, bookingController.updateBookingItems);
 bookingRouter.post('/confirm', authenticate, bookingController.confirmBooking);
+bookingRouter.post(
+  '/staff/cash-confirm',
+  authenticate,
+  authorize(['staff', 'manager', 'admin']),
+  bookingController.confirmCashByStaff,
+);
 bookingRouter.patch(
   '/checkin-ticket',
   authenticate,

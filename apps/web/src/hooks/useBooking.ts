@@ -77,6 +77,30 @@ export const useBooking = (showTimeId?: string) => {
     },
   });
 
+  const cashConfirmByStaff = useMutation({
+    mutationFn: async ({
+      bookingId,
+      holdToken,
+      customerInfo,
+    }: {
+      bookingId: string;
+      holdToken: string;
+      customerInfo?: { name?: string; phone?: string; email?: string };
+    }) => {
+      const res = await axiosAuth.post(`${API.BOOKING}/staff/cash-confirm`, {
+        bookingId,
+        holdToken,
+        customerInfo,
+      });
+      return res.data?.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-bookings'] });
+      queryClient.invalidateQueries({ queryKey: ['showtime-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-booking', showTimeId] });
+    },
+  });
+
   const { data: pendingBooking } = useQuery({
     queryKey: ['pending-booking', showTimeId],
     queryFn: async () => {
@@ -149,6 +173,8 @@ export const useBooking = (showTimeId?: string) => {
 
     createPaymentUrl: createPaymentUrl.mutateAsync,
     isCreatingPayment: createPaymentUrl.isPending,
+    cashConfirmByStaff: cashConfirmByStaff.mutateAsync,
+    isCashConfirmingByStaff: cashConfirmByStaff.isPending,
 
     updateBookingItems: updateBookingItems.mutateAsync,
     isUpdatingBookingItems: updateBookingItems.isPending,

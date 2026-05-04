@@ -81,6 +81,15 @@ const bookingSchema = new Schema(
     pickedUpAt: {
       type: Date,
     },
+    customerName: {
+      type: String,
+    },
+    customerPhone: {
+      type: String,
+    },
+    customerEmail: {
+      type: String,
+    },
   },
   {
     timestamps: true,

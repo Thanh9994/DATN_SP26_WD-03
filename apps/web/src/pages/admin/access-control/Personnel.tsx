@@ -1,8 +1,9 @@
-﻿import { Table, Tag, Typography } from 'antd';
+import { Select, Table, Tag, Typography, message } from 'antd';
 import { useMemo, useState } from 'react';
 import { useAuth } from '@web/hooks/useAuth';
 import { IUser } from '@shared/src/schemas';
 import { ColumnsType } from 'antd/es/table';
+import { useCinemas } from '@web/hooks/useCinema';
 
 const { Title } = Typography;
 
@@ -33,7 +34,9 @@ const getCinemaLabel = (workAt: PersonnelRow['workAt']) => {
 };
 
 export const Personnel = () => {
-  const { users, isLoadingUsers } = useAuth();
+  const { users, isLoadingUsers, updateMutation } = useAuth();
+  const { cinemas = [] } = useCinemas();
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
   const [searchText, setSearchText] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedCinema, setSelectedCinema] = useState('');
@@ -128,7 +131,39 @@ export const Personnel = () => {
       title: 'Rạp công tác',
       dataIndex: 'workAt',
       key: 'workAt',
-      render: (workAt) => getCinemaLabel(workAt),
+      render: (workAt, record) => {
+        const canAssign = record.role === 'staff' || record.role === 'manager';
+        const selectedValue = typeof workAt === 'string' ? workAt : workAt?._id || undefined;
+
+        if (!canAssign) return getCinemaLabel(workAt);
+
+        return (
+          <Select
+            className="min-w-[220px]"
+            placeholder="Chọn rạp công tác"
+            value={selectedValue}
+            allowClear
+            loading={updatingUserId === record._id}
+            options={cinemas.map((cinema) => ({
+              value: cinema._id,
+              label: cinema.name,
+            }))}
+            onChange={async (value) => {
+              try {
+                setUpdatingUserId(record._id || null);
+                await updateMutation.mutateAsync({
+                  id: record._id!,
+                  datas: { workAt: value || null },
+                });
+              } catch (error: any) {
+                message.error(error?.response?.data?.message || 'Không thể gán rạp cho nhân sự');
+              } finally {
+                setUpdatingUserId(null);
+              }
+            }}
+          />
+        );
+      },
     },
     {
       title: 'Trạng thái',
@@ -234,6 +269,7 @@ export const Personnel = () => {
           dataSource={filteredUsers}
           columns={columns}
           rowKey="_id"
+          loading={isLoadingUsers}
           pagination={{ pageSize: 10 }}
         />
       </div>

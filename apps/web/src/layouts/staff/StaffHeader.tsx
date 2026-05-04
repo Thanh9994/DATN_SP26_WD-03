@@ -8,6 +8,7 @@ import { useStaff } from '@web/hooks/useStaff';
 import {
   LayoutDashboard,
   Clapperboard,
+  ReceiptText,
   ScanLine,
   UserCircle2,
   LogOut,
@@ -20,7 +21,7 @@ import {
 const navItems = [
   { to: '/staff/dashboard', label: 'Tổng quan', icon: LayoutDashboard },
   { to: '/staff/movielist', label: 'Danh sách phim', icon: Clapperboard },
-  
+  { to: '/staff/booking', label: 'đặt vé theo rạp', icon: ReceiptText },
 ];
 
 const getRoleLabel = (role?: string) => {
@@ -132,9 +133,7 @@ export const StaffHeader = () => {
               </div>
 
               <div>
-                <h1 className="text-xl font-bold text-white md:text-2xl">
-                  Nhân viên rạp
-                </h1>
+                <h1 className="text-xl font-bold text-white md:text-2xl">Nhân viên rạp</h1>
                 <p className="text-xs text-gray-300">Quản lý phim và vận hành</p>
               </div>
             </div>
@@ -173,12 +172,8 @@ export const StaffHeader = () => {
               {user ? (
                 <div className="flex items-center gap-4 border-l border-red-900/70 pl-4">
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-white">
-                      {user.email}
-                    </p>
-                    <p className="text-sm text-gray-300">
-                      {getRoleLabel(user.role)}
-                    </p>
+                    <p className="text-sm font-semibold text-white">{user.email}</p>
+                    <p className="text-sm text-gray-300">{getRoleLabel(user.role)}</p>
                   </div>
 
                   <Dropdown menu={{ items }} placement="bottomRight" arrow>
@@ -235,8 +230,8 @@ export const StaffHeader = () => {
         <div className="space-y-6">
           <div className="rounded-lg border border-red-900/50 bg-gradient-to-r from-red-950/50 to-red-900/30 p-4">
             <Typography.Text className="text-sm leading-relaxed !text-gray-300">
-              <span className="font-semibold text-red-400">Hướng dẫn:</span> Nhập mã vé từ email
-              đặt vé hoặc từ ứng dụng để xác nhận khách hàng đã nhận vé.
+              <span className="font-semibold text-red-400">Hướng dẫn:</span> Nhập mã vé từ email đặt
+              vé hoặc từ ứng dụng để xác nhận khách hàng đã nhận vé.
             </Typography.Text>
           </div>
 
@@ -263,11 +258,7 @@ export const StaffHeader = () => {
             <Alert
               showIcon
               type="warning"
-              message={
-                <span className="font-semibold text-yellow-300">
-                  Cảnh báo check-in trễ
-                </span>
-              }
+              message={<span className="font-semibold text-yellow-300">Cảnh báo check-in trễ</span>}
               description={
                 <div className="mt-3 space-y-2">
                   <p className="text-sm text-yellow-200">
@@ -294,11 +285,7 @@ export const StaffHeader = () => {
               showIcon
               type="success"
               icon={<BadgeCheck size={20} className="text-green-500" />}
-              message={
-                <span className="font-semibold text-green-300">
-                  Xác nhận thành công
-                </span>
-              }
+              message={<span className="font-semibold text-green-300">Xác nhận thành công</span>}
               description={
                 <div className="mt-3 space-y-2">
                   <div className="flex items-center gap-3 rounded-lg border border-green-700/50 bg-green-950/40 px-3 py-2.5">

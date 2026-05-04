@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useOutlet, useSearchParams } from 'react-rout
 import { message } from 'antd';
 import { API } from '@web/api/api.service';
 import { axiosAuth } from '@web/hooks/useAuth';
+import { useAuth } from '@web/hooks/useAuth';
 import dayjs from 'dayjs';
 import { Info, ShieldCheck } from 'lucide-react';
 
@@ -37,12 +38,18 @@ const PaymentsMethod = () => {
   const [method, setMethod] = useState('vnpay');
   const [loading, setLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [customerInfo, setCustomerInfo] = useState({
+    name: '',
+    phone: '',
+    email: '',
+  });
 
   const location = useLocation();
   const navigate = useNavigate();
   const outlet = useOutlet();
   const [searchParams] = useSearchParams();
-  const { createPaymentUrl } = useBooking();
+  const { user } = useAuth();
+  const { createPaymentUrl, cashConfirmByStaff } = useBooking();
   const [bookingDetail, setBookingDetail] = useState<BookingDetail | null>(null);
   const [bookingLoading, setBookingLoading] = useState(false);
   const holdTokenState = location.state?.holdToken;
@@ -115,6 +122,28 @@ const PaymentsMethod = () => {
 
     if (!holdToken) {
       message.error('Phien giu ghe khong hop le. Vui long dat lai.');
+      return;
+    }
+
+    if (method === 'cash') {
+      if (!['staff', 'manager', 'admin'].includes(user?.role || '')) {
+        message.info('Chi nhan vien moi duoc phep thanh toan tien mat.');
+        return;
+      }
+
+      if (!customerInfo.name.trim() || !customerInfo.phone.trim()) {
+        message.error('Vui long nhap ho ten va so dien thoai khach hang.');
+        return;
+      }
+
+      await cashConfirmByStaff({
+        bookingId: activeBookingId,
+        holdToken,
+        customerInfo,
+      });
+
+      message.success('Dat ve tien mat thanh cong. Ve da duoc xac nhan nhan.');
+      navigate(`/payments/payment-result?code=00&bookingId=${activeBookingId}`);
       return;
     }
 
@@ -203,14 +232,16 @@ const PaymentsMethod = () => {
                       <div className="mt-1 text-[9px] text-zinc-500">Vi dien tu MoMo</div>
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => setMethod('atm')}
-                      className={`rounded-xl border p-4 transition-all ${method === 'atm' ? 'border-amber-500 bg-amber-500/10' : 'border-white/10 bg-white/5'}`}
-                    >
-                      <div className="text-sm font-semibold uppercase tracking-widest">ATM</div>
-                      <div className="mt-1 text-[9px] text-zinc-500">The ATM noi dia</div>
-                    </button>
+                    {['staff', 'manager', 'admin'].includes(user?.role || '') && (
+                      <button
+                        type="button"
+                        onClick={() => setMethod('cash')}
+                        className={`rounded-xl border p-4 transition-all ${method === 'cash' ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/10 bg-white/5'}`}
+                      >
+                        <div className="text-sm font-semibold uppercase tracking-widest">Cash</div>
+                        <div className="mt-1 text-[9px] text-zinc-500">Thanh toan tai quay</div>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -266,6 +297,46 @@ const PaymentsMethod = () => {
                     </div>
                   </div>
                 </div>
+
+                {method === 'cash' && ['staff', 'manager', 'admin'].includes(user?.role || '') && (
+                  <div className="mt-8">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-600/15 text-xs text-emerald-300">
+                        3
+                      </span>
+                      <div className="text-sm font-semibold tracking-[0.20em] text-zinc-300">
+                        Thông tin khách hàng
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-1 gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:grid-cols-2">
+                      <input
+                        className="rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm text-white outline-none"
+                        placeholder="Họ tên khách hàng *"
+                        value={customerInfo.name}
+                        onChange={(e) =>
+                          setCustomerInfo((prev) => ({ ...prev, name: e.target.value }))
+                        }
+                      />
+                      <input
+                        className="rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm text-white outline-none"
+                        placeholder="Số điện thoại *"
+                        value={customerInfo.phone}
+                        onChange={(e) =>
+                          setCustomerInfo((prev) => ({ ...prev, phone: e.target.value }))
+                        }
+                      />
+                      <input
+                        className="rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm text-white outline-none sm:col-span-2"
+                        placeholder="Email nhận vé (không bắt buộc)"
+                        value={customerInfo.email}
+                        onChange={(e) =>
+                          setCustomerInfo((prev) => ({ ...prev, email: e.target.value }))
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>

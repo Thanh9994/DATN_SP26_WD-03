@@ -33,6 +33,7 @@ const BookingLayout = () => {
   const showtimeIdFromUrl = searchParams.get('showtimeId');
   const { user } = useAuth();
   const location = useLocation();
+  const isStaffFlow = location.pathname.startsWith('/staff/');
 
   const navigate = useNavigate();
   const prevPathRef = useRef(location.pathname);
@@ -154,7 +155,7 @@ const BookingLayout = () => {
 
     setSelectedSeats([]);
     setSelectedShowtime(null);
-    navigate(`/booking?movieId=${movieId}`);
+    navigate(`${isStaffFlow ? '/staff/booking' : '/booking'}?movieId=${movieId}`);
   };
 
   const handleGoToPayments = async (snackSelection?: DrinkSnackSelection) => {
@@ -183,7 +184,7 @@ const BookingLayout = () => {
       }
     }
 
-    navigate('/payments', {
+    navigate(isStaffFlow ? '/staff/payments' : '/payments', {
       state: {
         ...nextPaymentState,
         finalAmount: nextPaymentState.totalAmount,
@@ -223,6 +224,10 @@ const BookingLayout = () => {
         return;
       }
 
+      if (isStaffFlow) {
+        navigate(`/staff/booking/seats?movieId=${movieId}&showtimeId=${selectedShowtime._id}`);
+        return;
+      }
       navigate(`/booking/seats?movieId=${movieId}&showtimeId=${selectedShowtime._id}`);
       return;
     }
