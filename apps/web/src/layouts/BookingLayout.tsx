@@ -1,12 +1,12 @@
 import { Outlet, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { useMovie } from '@web/hooks/useMovie';
+import { useMovie, useMovies } from '@web/hooks/useMovie';
 import { Button, message, Spin } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { useBooking } from '@web/hooks/useBooking';
 import { IShowTime, IShowTimeSeat } from '@shared/src/schemas';
 import { useAuth } from '@web/hooks/useAuth';
-import { ArrowLeft, MapPin } from 'lucide-react';
+import { ArrowLeft, MapPin, Film } from 'lucide-react';
 import DrinkSnack, { type DrinkSnackSelection } from '@web/pages/DrinkSnack';
 
 interface PaymentNavigationState {
@@ -199,19 +199,68 @@ const BookingLayout = () => {
   // console.log('showtimeIdFromUrl', showtimeIdFromUrl);
   // console.log('activeShowtimeId', activeShowtimeId);
 
-  if (isMovieLoading)
+  const { movies: allMovies, isLoading: isMoviesLoading } = useMovies();
+  const nowShowingMovies = allMovies.filter((m) => m.trang_thai === 'dang_chieu');
+
+  if (isMovieLoading || (isStaffFlow && !movieId && isMoviesLoading))
     return (
       <div className="flex h-full items-center justify-center bg-[#120a0a]">
         <Spin size="large" tip="Đang tải dữ liệu..." fullscreen />
       </div>
     );
 
+  if (!movieId && isStaffFlow) {
+    return (
+      <div className="min-h-full bg-[#120a0a] py-8 text-white">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-8 flex items-center gap-3">
+            <Film size={22} className="text-primary" />
+            <h2 className="text-xl font-black uppercase tracking-widest text-[#b89d9f]">
+              Chọn Phim Để Đặt Vé
+            </h2>
+          </div>
+          {nowShowingMovies.length === 0 ? (
+            <p className="text-center text-[#b89d9f]">Không có phim đang chiếu.</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+              {nowShowingMovies.map((m) => (
+                <div
+                  key={m._id}
+                  onClick={() => navigate(`/staff/booking?movieId=${m._id}`)}
+                  className="group cursor-pointer"
+                >
+                  <div className="relative aspect-[2/3] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-xl transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-primary/20">
+                    <img
+                      src={m.poster.url}
+                      alt={m.ten_phim}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <div className="absolute bottom-0 left-0 right-0 translate-y-2 p-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                      <span className="block w-full rounded-lg bg-primary py-1.5 text-center text-xs font-bold text-white">
+                        Đặt vé
+                      </span>
+                    </div>
+                  </div>
+                  <p className="mt-2 line-clamp-2 text-xs font-semibold text-zinc-200">
+                    {m.ten_phim}
+                  </p>
+                  <p className="text-[10px] text-zinc-500">{m.thoi_luong} phút</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   if (!movie)
     return (
       <div className="h-full bg-[#120a0a] pt-40 text-center text-white">
         <p className="mb-4 text-[#b89d9f]">Không tìm thấy thông tin phim.</p>
-        <Button danger onClick={() => navigate('/')}>
-          Quay lại trang chủ
+        <Button danger onClick={() => navigate(isStaffFlow ? '/staff/booking' : '/')}>
+          {isStaffFlow ? 'Chọn phim khác' : 'Quay lại trang chủ'}
         </Button>
       </div>
     );

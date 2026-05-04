@@ -30,7 +30,7 @@ export const StaffMovieListPage = () => {
     return (
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {movieList.map((movie) => (
-          <PhimCard key={movie._id} movie={movie} />
+          <PhimCard key={movie._id} movie={movie} isStaffFlow />
         ))}
       </div>
     );

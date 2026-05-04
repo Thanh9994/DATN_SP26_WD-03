@@ -3,13 +3,14 @@ import { MOVIE_BADGE } from '@web/utils/movieStatus';
 
 import { useNavigate } from 'react-router-dom';
 
-const PhimCard = ({ movie }: { movie: IMovie }) => {
+const PhimCard = ({ movie, isStaffFlow }: { movie: IMovie; isStaffFlow?: boolean }) => {
   const navigate = useNavigate();
   const badge = MOVIE_BADGE[movie.trang_thai];
+  const bookingPath = isStaffFlow ? `/staff/booking?movieId=${movie._id}` : `/booking?movieId=${movie._id}`;
 
   return (
     <div
-      onClick={() => navigate(`/movie/${movie._id}`)}
+      onClick={() => navigate(isStaffFlow ? `/staff/booking?movieId=${movie._id}` : `/movie/${movie._id}`)}
       className="group relative w-full min-w-[235px] cursor-pointer snap-start transition hover:z-30"
     >
       {/* Poster */}
@@ -40,11 +41,7 @@ const PhimCard = ({ movie }: { movie: IMovie }) => {
             className="w-full rounded-lg bg-white py-2 text-sm font-bold text-black transition hover:bg-red-500 hover:text-white"
             onClick={(e) => {
               e.stopPropagation();
-              // const token = localStorage.getItem("token");
-
-              // if (!token) navigate("/login");
-              //else
-              navigate(`/booking?movieId=${movie._id}`);
+              navigate(bookingPath);
             }}
           >
             Đặt Vé Ngay

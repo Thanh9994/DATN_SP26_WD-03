@@ -49,6 +49,7 @@ const PaymentsMethod = () => {
   const outlet = useOutlet();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
+  const isStaffFlow = location.pathname.startsWith('/staff/');
   const { createPaymentUrl, cashConfirmByStaff } = useBooking();
   const [bookingDetail, setBookingDetail] = useState<BookingDetail | null>(null);
   const [bookingLoading, setBookingLoading] = useState(false);
@@ -143,7 +144,7 @@ const PaymentsMethod = () => {
       });
 
       message.success('Dat ve tien mat thanh cong. Ve da duoc xac nhan nhan.');
-      navigate(`/payments/payment-result?code=00&bookingId=${activeBookingId}`);
+      navigate(`${isStaffFlow ? '/staff/payments' : '/payments'}/payment-result?code=00&bookingId=${activeBookingId}`);
       return;
     }
 

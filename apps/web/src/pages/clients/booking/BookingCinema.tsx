@@ -207,8 +207,11 @@ export const BookingCinema = () => {
                                 pendingShowtimeId !== st._id
                               ) {
                                 try {
-                                  if (expireBooking) {
-                                    await expireBooking(pendingBooking._id);
+                                  if (expireBooking && pendingBooking.holdToken) {
+                                    await expireBooking({
+                                      bookingId: pendingBooking._id,
+                                      holdToken: pendingBooking.holdToken,
+                                    });
                                   } else {
                                     await cancelBooking({
                                       bookingId: pendingBooking._id,

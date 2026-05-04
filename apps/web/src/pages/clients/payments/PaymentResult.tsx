@@ -1,5 +1,5 @@
-import { CheckCircle2, XCircle, Home, Loader2, User2 } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { CheckCircle2, XCircle, Home, Loader2, User2, LayoutDashboard } from 'lucide-react';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { API } from '@web/api/api.service';
@@ -9,9 +9,11 @@ import { ITicketCl, mapToTicketCl } from '@shared/src/schemas/ticket';
 
 export const PaymentResult = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const isStaffFlow = location.pathname.startsWith('/staff/');
 
   const code = searchParams.get('code');
   const bookingId = searchParams.get('bookingId');
@@ -141,20 +143,41 @@ export const PaymentResult = () => {
         )}
 
         <div className="flex w-full max-w-2xl flex-col gap-4 sm:flex-row">
-          <button
-            onClick={() => navigate('/')}
-            className="flex flex-1 items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-[#ff3e47] to-[#ea2a33] py-4 font-black text-white shadow-xl shadow-primary/30 transition-all hover:scale-[1.02] hover:from-[#ff555d] hover:to-[#ff3e47] active:scale-[0.98]"
-          >
-            <Home className="h-5 w-5" />
-            Trang chủ
-          </button>
-          <button
-            onClick={() => navigate('/profile/tickets')}
-            className="flex flex-1 items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-[#ff3e47] to-[#ea2a33] py-4 font-black text-white shadow-xl shadow-primary/30 transition-all hover:scale-[1.02] hover:from-[#ff555d] hover:to-[#ff3e47] active:scale-[0.98]"
-          >
-            <User2 className="h-5 w-5" />
-            Xem vé của tôi
-          </button>
+          {isStaffFlow ? (
+            <>
+              <button
+                onClick={() => navigate('/staff/dashboard')}
+                className="flex flex-1 items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-[#ff3e47] to-[#ea2a33] py-4 font-black text-white shadow-xl shadow-primary/30 transition-all hover:scale-[1.02] hover:from-[#ff555d] hover:to-[#ff3e47] active:scale-[0.98]"
+              >
+                <LayoutDashboard className="h-5 w-5" />
+                Về Dashboard
+              </button>
+              <button
+                onClick={() => navigate('/staff/booking')}
+                className="flex flex-1 items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-[#ff3e47] to-[#ea2a33] py-4 font-black text-white shadow-xl shadow-primary/30 transition-all hover:scale-[1.02] hover:from-[#ff555d] hover:to-[#ff3e47] active:scale-[0.98]"
+              >
+                <Home className="h-5 w-5" />
+                Đặt vé mới
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => navigate('/')}
+                className="flex flex-1 items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-[#ff3e47] to-[#ea2a33] py-4 font-black text-white shadow-xl shadow-primary/30 transition-all hover:scale-[1.02] hover:from-[#ff555d] hover:to-[#ff3e47] active:scale-[0.98]"
+              >
+                <Home className="h-5 w-5" />
+                Trang chủ
+              </button>
+              <button
+                onClick={() => navigate('/profile/tickets')}
+                className="flex flex-1 items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-[#ff3e47] to-[#ea2a33] py-4 font-black text-white shadow-xl shadow-primary/30 transition-all hover:scale-[1.02] hover:from-[#ff555d] hover:to-[#ff3e47] active:scale-[0.98]"
+              >
+                <User2 className="h-5 w-5" />
+                Xem vé của tôi
+              </button>
+            </>
+          )}
         </div>
 
         {isSuccess && (
