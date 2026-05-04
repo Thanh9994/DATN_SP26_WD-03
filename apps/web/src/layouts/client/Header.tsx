@@ -2,16 +2,31 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Dropdown, MenuProps } from 'antd';
 import { useAuth } from '@web/hooks/useAuth';
 import { useMovies } from '@web/hooks/useMovie';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { IUserRole } from '@shared/src/schemas';
+import { useMyBookings } from '@web/hooks/useBooking';
+import { mapToTicketCl } from '@shared/src/schemas/ticket';
 
 export const Header = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { movies } = useMovies();
+  const { data: rawBookings = [] } = useMyBookings('paid');
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  const ticketBadgeCount = useMemo(() => {
+    return rawBookings
+      .map((booking: any) => {
+        try {
+          return mapToTicketCl(booking);
+        } catch {
+          return null;
+        }
+      })
+      .filter((ticket: any) => ticket && !ticket.isPast).length;
+  }, [rawBookings]);
 
   const searchResults = searchQuery.trim()
     ? movies.filter((m) => m.ten_phim.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 6)
@@ -184,13 +199,24 @@ export const Header = () => {
           {user ? (
             <div className="flex items-center gap-3">
               <Dropdown menu={{ items: menuItems }} placement="bottomRight" arrow>
-                <div className="size-10 cursor-pointer overflow-hidden rounded-full border-2 border-gray-400 shadow-sm transition-all hover:border-primary">
-                  <img
-                    alt={user?.ho_ten || 'User profile'}
-                    className="h-full w-full object-cover"
-                    src={user?.avatar?.url || `https://i.pravatar.cc/150`}
-                    referrerPolicy="no-referrer"
-                  />
+                {/* 1. SỬA TẠI ĐÂY: Thẻ div bọc ngoài KHÔNG được để overflow-hidden */}
+                <div className="relative cursor-pointer transition-all">
+                  {/* 2. HIỂN THỊ BADGE: Đưa ra ngoài div bọc ảnh nhưng vẫn trong relative cha */}
+                  {ticketBadgeCount > 0 && (
+                    <span className="absolute -right-1 -top-1 z-20 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-black leading-none text-white shadow-lg ring-2 ring-[#1a1a2e]">
+                      {ticketBadgeCount > 9 ? '9+' : ticketBadgeCount}
+                    </span>
+                  )}
+
+                  {/* 3. AVATAR: Chỉ thẻ div này mới được để overflow-hidden */}
+                  <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-gray-400 hover:border-primary">
+                    <img
+                      alt={user?.ho_ten || 'User profile'}
+                      className="h-full w-full object-cover"
+                      src={user?.avatar?.url || `https://i.pravatar.cc/150`}
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
                 </div>
               </Dropdown>
             </div>
