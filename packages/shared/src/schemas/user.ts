@@ -8,6 +8,15 @@ export const User = Base.extend({
   password: z.string().min(6, 'Mật khẩu phải ít nhất 6 kí tự'),
   phone: z.string().regex(/^(03|05|07|08|09)\d{8}$/, 'Số điện thoại không hợp lệ'),
   avatar: CloudinaryImage.optional(),
+  workAt: z
+    .union([
+      z.string(),
+      z.object({
+        _id: z.string().optional(),
+        name: z.string().optional(),
+      }),
+    ])
+    .optional(),
   role: UserRole.default('khach_hang'),
   trang_thai: UserStatus.default('active'),
   resetPasswordToken: z.string().optional(),
@@ -28,6 +37,7 @@ export const ResendOtp = z.object({
 export const UpdateUser = z.object({
   role: UserRole.optional(),
   trang_thai: UserStatus.optional(),
+  workAt: z.string().nullable().optional(),
 });
 
 export const UserLog = User.pick({

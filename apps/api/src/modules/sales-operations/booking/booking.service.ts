@@ -346,6 +346,139 @@ export const bookingService = {
   }
 },
 
+  async confirmCashBookingByStaff(
+    bookingId: string,
+    holdToken: string,
+    staffId: string,
+    customerInfo?: { name?: string; phone?: string; email?: string },
+  ) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const booking = await Booking.findOne({
+        _id: bookingId,
+        userId: staffId,
+      }).session(session);
+
+      if (!booking) {
+        throw new AppError('Booking không tồn tại.', 404);
+      }
+
+      if (booking.status !== 'pending') {
+        throw new AppError('Booking không thanh toán.', 400);
+      }
+
+      if (booking.holdToken !== holdToken) {
+        throw new AppError('Phiên giữ ghế không hợp lệ.', 400);
+      }
+
+      const now = new Date();
+      if (booking.holdExpiresAt && booking.holdExpiresAt < now) {
+        throw new AppError('hết thời gian giữ ghế.', 400);
+      }
+
+      const seatUpdate = await SeatTime.updateMany(
+        {
+          _id: { $in: booking.seats },
+          bookingId: booking._id,
+          trang_thai: 'hold',
+          heldBy: booking.userId,
+        },
+        {
+          $set: { trang_thai: 'booked' },
+          $unset: { heldBy: '', holdExpiresAt: '' },
+        },
+        { session },
+      );
+
+      if (seatUpdate.modifiedCount !== booking.seats.length) {
+        throw new AppError('Mot so ghe khong con hop le de xac nhan.', 400);
+      }
+
+      booking.paymentMethod = 'cash';
+      booking.status = 'da_lay_ve';
+      booking.pickedUpAt = now;
+      booking.customerName = customerInfo?.name?.trim() || booking.customerName;
+      booking.customerPhone = customerInfo?.phone?.trim() || booking.customerPhone;
+      booking.customerEmail = customerInfo?.email?.trim() || booking.customerEmail;
+      booking.transactionCode = `CASH-${Date.now()}`;
+      booking.ticketCode =
+        booking.ticketCode ||
+        'TIC-' + randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase();
+
+      await booking.save({ session });
+      await session.commitTransaction();
+
+      const fullBooking = await Booking.findById(booking._id)
+        .populate('userId', 'ho_ten email')
+        .populate({
+          path: 'showTimeId',
+          populate: [
+            { path: 'movieId', select: 'ten_phim' },
+            {
+              path: 'roomId',
+              select: 'ten_phong cinema_id',
+              populate: {
+                path: 'cinema_id',
+                select: 'name',
+              },
+            },
+          ],
+        });
+
+      if (fullBooking) {
+        const user = fullBooking.userId as any;
+        const showTime = fullBooking.showTimeId as any;
+        const movie = showTime?.movieId as any;
+        const room = showTime?.roomId as any;
+        const cinema = room?.cinema_id as any;
+
+        const customerEmail = fullBooking.customerEmail || user?.email;
+        const customerName = fullBooking.customerName || user?.ho_ten || 'Khach hang';
+        if (customerEmail) {
+          const pickedUpAt = fullBooking.pickedUpAt || new Date();
+          MailService.sendMail(
+            MailService.getTicketPickupTemplate({
+              email: customerEmail,
+              customerName,
+              ticketCode: fullBooking.ticketCode || '---',
+              pickedUpAt,
+              movieName: movie?.ten_phim || '---',
+              seatCodes: fullBooking.seatCodes || [],
+              showDate: showTime?.startTime
+                ? new Date(showTime.startTime).toLocaleDateString('vi-VN', {
+                    weekday: 'long',
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                  })
+                : '---',
+              showTime: showTime?.startTime
+                ? new Date(showTime.startTime).toLocaleTimeString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : '---',
+              cinemaName: cinema?.name || '---',
+              roomName: room?.ten_phong || '---',
+              status: 'Da nhan ve',
+            }),
+          ).catch((error) => {
+            console.error('Send pickup mail failed:', error);
+          });
+        }
+      }
+
+      return booking;
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  },
+
   //Tự động giải phóng ghế hết hạn (Dùng cho Cron job)
   async releaseExpiredBookings() {
     const session = await mongoose.startSession();
@@ -520,12 +653,13 @@ export const bookingService = {
 
   const userEmail = user?.email;
   if (userEmail) {
+    const pickedUpAt = booking.pickedUpAt || new Date();
     MailService.sendMail(
       MailService.getTicketPickupTemplate({
         email: userEmail,
         customerName: user?.ho_ten || "Khach hang",
         ticketCode: booking.ticketCode || normalizedCode,
-        pickedUpAt: booking.pickedUpAt,
+        pickedUpAt,
         movieName: movie?.ten_phim || "---",
         seatCodes: booking.seatCodes || [],
         showDate: showTime?.startTime

@@ -3,14 +3,16 @@ import { Spin, Empty, message } from 'antd';
 import dayjs from 'dayjs';
 import { ChevronDown, Ticket, CalendarDays, MapPin } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@web/hooks/useAuth';
 
 export const BookingCinema = () => {
   const [searchParams] = useSearchParams();
   const movieId = searchParams.get('movieId');
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+  const isStaffFlow = location.pathname.startsWith('/staff/');
 
   const { groupedByCinema, isLoading } = useShowTimesByMovie(movieId!);
 
@@ -186,7 +188,7 @@ export const BookingCinema = () => {
                                 message.warning('Vui lòng đăng nhập để tiếp tục!');
 
                                 const redirect = encodeURIComponent(
-                                  `/booking/seats?showtimeId=${st._id}&movieId=${movieId}`,
+                                  `${isStaffFlow ? '/staff/booking/seats' : '/booking/seats'}?showtimeId=${st._id}&movieId=${movieId}`,
                                 );
 
                                 navigate(`/login?redirect=${redirect}`);
@@ -221,7 +223,9 @@ export const BookingCinema = () => {
                               setSelectedShowtime(st);
                               setSelectedSeats([]);
 
-                              navigate(`/booking/seats?showtimeId=${st._id}&movieId=${movieId}`);
+                              navigate(
+                                `${isStaffFlow ? '/staff/booking/seats' : '/booking/seats'}?showtimeId=${st._id}&movieId=${movieId}`,
+                              );
                             }}
                             className={`flex flex-col items-center justify-center rounded-xl border py-2 transition-all active:scale-95 ${
                               selectedShowtime?._id === st._id

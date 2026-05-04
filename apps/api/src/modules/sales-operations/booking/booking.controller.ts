@@ -49,12 +49,34 @@ export const bookingController = {
     });
   }),
 
+  confirmCashByStaff: catchAsync(async (req, res, next) => {
+    const staffId = req.user!._id!.toString();
+    const { bookingId, holdToken, customerInfo } = req.body;
+
+    if (!bookingId || !holdToken) {
+      return next(new AppError('Thieu bookingId hoac holdToken', 400));
+    }
+
+    const result = await bookingService.confirmCashBookingByStaff(
+      bookingId,
+      holdToken,
+      staffId,
+      customerInfo,
+    );
+
+    res.json({
+      success: true,
+      message: 'Thanh toán tiền mặt và xác nhận lấy vé thành công.',
+      data: result,
+    });
+  }),
+
   updateBookingItems: catchAsync(async (req, res, next) => {
     const userId = req.user?._id;
     const { bookingId, holdToken, items = [] } = req.body;
 
     if (!userId) {
-      return next(new AppError('Ban can dang nhap de thuc hien hanh dong nay', 401));
+      return next(new AppError('Bạn cần đăng nhập thể thực hiện hành động này', 401));
     }
 
     if (!bookingId || !holdToken) {
