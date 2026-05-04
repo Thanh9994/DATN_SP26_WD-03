@@ -1,6 +1,6 @@
 import React from 'react';
 import { IShowTimeSeat } from '@shared/src/schemas'; // Đảm bảo interface này khớp với JSON của bạn
-import { UserCheck2 } from 'lucide-react';
+import { Sparkles, UserCheck2 } from 'lucide-react';
 
 interface SeatMapProps {
   seats: IShowTimeSeat[];
@@ -47,7 +47,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
     if (seat.trang_thai === 'hold' && seat.heldBy !== currentUserId)
       return 'bg-yellow-500 text-black border-yellow-400 cursor-not-allowed';
 
-    if (selectedSeatCodes.includes(seat.seatCode)) return 'bg-red-600 text-white border-red-400';
+    if (selectedSeatCodes.includes(seat.seatCode)) return 'bg-blue-600 text-white ';
 
     if (seat.trang_thai === 'hold' && seat.heldBy === currentUserId)
       return 'bg-yellow-500 text-black border-yellow-400';
@@ -87,6 +87,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
                   const isDisabled =
                     seat.trang_thai === 'booked' ||
                     (seat.trang_thai === 'hold' && seat.heldBy !== currentUserId);
+                  const isSelected = selectedSeatCodes.includes(seat.seatCode);
                   const isCouple = seat.seatType === 'couple';
                   const isStandard = seat.seatType === 'normal';
                   const isMedium = seat.seatType === 'vip';
@@ -102,6 +103,8 @@ const SeatMap: React.FC<SeatMapProps> = ({
                       {isSeatShell && <span className="foot" aria-hidden="true" />}
                       {seat.trang_thai === 'booked' ? (
                         <UserCheck2 className="h-4 w-4 text-zinc-400" />
+                      ) : isSelected ? (
+                        <Sparkles className="relative z-[3] h-4 w-4 text-white" />
                       ) : (
                         <span className={isSeatShell ? 'relative z-[3]' : undefined}>
                           {seat.number}
@@ -138,7 +141,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
           <span>Couple</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded bg-red-600" /> <span>Đang chọn</span>
+          <Sparkles className="h-4 w-4"/> <span>Đang chọn</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="h-4 w-4 rounded bg-yellow-500" />

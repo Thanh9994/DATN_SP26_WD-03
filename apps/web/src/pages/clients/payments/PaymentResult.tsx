@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle, Home, Loader2 } from 'lucide-react';
+import { CheckCircle2, XCircle, Home, Loader2, User2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
@@ -36,6 +36,11 @@ export const PaymentResult = () => {
     typeof booking?.userId === 'object'
       ? booking?.userId?.ho_ten || '---'
       : formatId(booking?.userId);
+
+  const comboTotal = (booking?.items || []).reduce(
+    (sum: number, item: any) => sum + Number(item?.price || 0) * Number(item?.quantity || 0),
+    0,
+  );
 
   const ticketData = useMemo<ITicketCl | null>(() => {
     if (!booking) return null;
@@ -147,15 +152,14 @@ export const PaymentResult = () => {
             onClick={() => navigate('/profile/tickets')}
             className="flex flex-1 items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-[#ff3e47] to-[#ea2a33] py-4 font-black text-white shadow-xl shadow-primary/30 transition-all hover:scale-[1.02] hover:from-[#ff555d] hover:to-[#ff3e47] active:scale-[0.98]"
           >
-            <Home className="h-5 w-5" />
+            <User2 className="h-5 w-5" />
             Xem vé của tôi
           </button>
         </div>
 
         {isSuccess && (
           <p className="max-w-sm text-sm text-white/40">
-            A confirmation email with your digital ticket has been sent to your registered email
-            address.
+            Một email xác nhận kèm vé điện tử đã được gửi đến địa chỉ email mà bạn đã đăng ký.
           </p>
         )}
       </div>

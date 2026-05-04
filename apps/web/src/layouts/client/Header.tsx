@@ -2,16 +2,31 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Dropdown, MenuProps } from 'antd';
 import { useAuth } from '@web/hooks/useAuth';
 import { useMovies } from '@web/hooks/useMovie';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { IUserRole } from '@shared/src/schemas';
+import { useMyBookings } from '@web/hooks/useBooking';
+import { mapToTicketCl } from '@shared/src/schemas/ticket';
 
 export const Header = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { movies } = useMovies();
+  const { data: rawBookings = [] } = useMyBookings('paid');
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  const ticketBadgeCount = useMemo(() => {
+    return rawBookings
+      .map((booking: any) => {
+        try {
+          return mapToTicketCl(booking);
+        } catch {
+          return null;
+        }
+      })
+      .filter((ticket: any) => ticket && !ticket.isPast).length;
+  }, [rawBookings]);
 
   const searchResults = searchQuery.trim()
     ? movies.filter((m) => m.ten_phim.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 6)

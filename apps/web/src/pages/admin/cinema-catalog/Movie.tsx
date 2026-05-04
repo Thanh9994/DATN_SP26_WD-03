@@ -117,10 +117,7 @@ export const Movie = () => {
         ngay_ket_thuc: values.ngay_ket_thuc?.toISOString() as unknown as Date,
         poster: posterData as ICloudinaryImage,
         banner: bannerData as ICloudinaryImage,
-        the_loai: (values.genre_id || []).map((id) => {
-          const genre = genres?.find((item) => item.name === id);
-          return { _id: id, name: genre?.name || '' };
-        }),
+        the_loai: values.genre_id || [],
         dien_vien: values.dien_vien || [],
         quoc_gia: values.quoc_gia || 'Global',
         phu_de: values.phu_de || ['Tieng Viet'],
@@ -573,7 +570,7 @@ export const Movie = () => {
                 allowClear
                 placeholder="Chọn thể loại"
                 options={genres?.map((genre) => ({
-                  value: genre.name,
+                  value: genre._id,
                   label: genre.name,
                 }))}
               />
