@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { API } from '@web/api/api.service';
 
 type OverviewSummary = {
   totalRevenue: number;
@@ -87,17 +88,13 @@ export const useAnalyticsOverview = ({
       setLoading(true);
       setError(null);
 
-      const response = await axios.get(
-        'http://localhost:5000/api/analytics/overview',
-        {
+      const response = await axios.get(`${API.ANALYTICS}/overview`, {
           params: {
             startDate,
             endDate,
           },
-        },
-      );
+        });
 
-      console.log('Overview API response:', response.data);
       setData(response?.data?.data || defaultOverviewData);
     } catch (err: any) {
       console.error('Overview API error:', err?.response || err);

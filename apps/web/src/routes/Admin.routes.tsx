@@ -1,4 +1,4 @@
-import { RouteObject } from 'react-router-dom';
+import { RouteObject, Navigate } from 'react-router-dom';
 
 import { Upload } from '@web/pages/admin/access-control/Upload';
 import { Genre } from '@web/pages/admin/cinema-catalog/Genre';
@@ -15,13 +15,12 @@ import Settings from '@web/pages/admin/Settings';
 import Dashboard from '@web/pages/admin/Dashboard';
 import { ShowTime } from '@web/pages/admin/order/Showtime';
 import { Personnel } from '@web/pages/admin/access-control/Personnel';
-import Analytics from '@web/pages/admin/Analytics';
+import AdminTicket from '@web/pages/admin/order/AdminTicket';
+import SystemSettings from '@web/pages/admin/SystemSettings';
 import Ticketlog from '@web/pages/admin/analytics/analyticsTicket/Ticketlog';
 import Overview from '@web/pages/admin/analytics/analyticsOverview/Overview';
 import AnalyticsCinemas from '@web/pages/admin/analytics/analyticsCinemas/AnalyticsCinemas';
 import AnalyticMatch from '@web/pages/admin/analytics/analyticsDoanhthu/AnalyticMatch';
-import AdminTicket from '@web/pages/admin/order/AdminTicket';
-import SystemSettings from '@web/pages/admin/SystemSettings';
 
 export const AdminRoutes: RouteObject = {
   path: '/admin',
@@ -48,8 +47,6 @@ export const AdminRoutes: RouteObject = {
         { path: 'settings/payment', element: <SystemSettings /> },
         { path: 'settings/notification', element: <SystemSettings /> },
 
-        { path: 'analytics', element: <Analytics /> },
-
         {
           path: 'promotions',
           children: [
@@ -62,9 +59,9 @@ export const AdminRoutes: RouteObject = {
         {
           path: 'analytics',
           children: [
-            { index: true, element: <Analytics /> },
-            { path: 'ticket', element: <Ticketlog /> },
+            { index: true, element: <Navigate to="overview" replace /> },
             { path: 'overview', element: <Overview /> },
+            { path: 'ticket', element: <Ticketlog /> },
             { path: 'cinema', element: <AnalyticsCinemas /> },
             { path: 'revenue', element: <AnalyticMatch /> },
           ],

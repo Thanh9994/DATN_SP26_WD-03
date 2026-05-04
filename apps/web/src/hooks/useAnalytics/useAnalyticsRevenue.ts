@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import { API } from "../../api/api.service";
 
 export type RevenueFilters = {
@@ -128,12 +129,6 @@ export type RevenueOverviewResponse = {
   };
 };
 
-type ApiResponse<T> = {
-  success: boolean;
-  message: string;
-  data: T;
-};
-
 /**
  * Build query string from filters.
  * Ignore empty values and "all".
@@ -166,16 +161,15 @@ export const useAnalyticsRevenue = (filters: RevenueFilters) => {
         ? `${API.ANALYTICS}/revenue?${queryString}`
         : `${API.ANALYTICS}/revenue`;
 
-      const response = await fetch(url);
-      const result: ApiResponse<RevenueOverviewResponse> = await response.json();
+      const response = await axios.get(url);
 
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || "Không thể tải analytics doanh thu");
+      if (!response.data?.success) {
+        throw new Error(response.data?.message || "Không thể tải analytics doanh thu");
       }
 
-      setData(result.data);
+      setData(response.data.data);
     } catch (err: any) {
-      setError(err?.message || "Đã có lỗi xảy ra khi tải analytics doanh thu");
+      setError(err?.response?.data?.message || err?.message || "Đã có lỗi xảy ra khi tải analytics doanh thu");
       setData(null);
     } finally {
       setLoading(false);

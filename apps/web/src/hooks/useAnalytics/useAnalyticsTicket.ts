@@ -9,9 +9,51 @@ export type AnalyticsTicketParams = {
   status?: string;
 };
 
+export type AnalyticsTicketData = {
+  filters: {
+    theaters: string[];
+    statuses: string[];
+  };
+  summary: {
+    totalRevenue: number;
+    totalTicketsSold: number;
+    averageOrderValue: number;
+    avgTicketsPerBooking: number;
+    conversionRate: number;
+    pendingRate: number;
+    cancelRate: number;
+    totalComboRevenue: number;
+    comboAttachRate: number;
+    totalShowtimes: number;
+  };
+  charts: {
+    revenueTrend: Array<{ label: string; revenue: number; ticketsSold: number }>;
+    bookingStatus: Array<{ name: string; value: number }>;
+    ticketByWeekday: Array<{ weekday: string; ticketsSold: number }>;
+    topMovies: Array<{ movieName: string; ticketsSold: number; revenue: number; bookings: number }>;
+    topTheaters: Array<{ theaterName: string; revenue: number; ticketsSold: number }>;
+  };
+  recentBookings: Array<{
+    userName: string;
+    movieName: string;
+    theaterName: string;
+    seatsCount: number;
+    amount: number;
+    status: string;
+  }>;
+  insights: {
+    topCustomers: Array<{
+      userName: string;
+      totalBookings: number;
+      totalTickets: number;
+      totalRevenue: number;
+    }>;
+  };
+};
+
 export const useAnalyticsTicket = () => {
   const [loading, setLoading] = useState(false);
-  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsTicketData | null>(null);
 
   const getAnalyticsTicket = useCallback(
     async (params?: AnalyticsTicketParams) => {
@@ -22,7 +64,7 @@ export const useAnalyticsTicket = () => {
           params,
         });
 
-        const data = res.data?.data || res.data;
+        const data: AnalyticsTicketData = res.data?.data || res.data;
 
         setAnalyticsData(data);
         return data;
