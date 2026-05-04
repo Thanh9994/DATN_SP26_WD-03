@@ -20,7 +20,7 @@ export const StaffMovieListPage = () => {
     if (!movieList.length) {
       return (
         <Empty
-          description="Khong co phim"
+          description="Không có phim"
           style={{ color: '#9ca3af', marginTop: 48, marginBottom: 48 }}
           imageStyle={{ height: 60 }}
         />
@@ -42,7 +42,7 @@ export const StaffMovieListPage = () => {
       label: (
         <span className="flex items-center gap-2 text-sm font-semibold">
           <PlayCircleOutlined style={{ fontSize: 16, color: 'rgb(49, 117, 243)' }} />
-          <span style={{ color: '#006983' }}>Dang chieu</span>
+          <span style={{ color: '#00d1ff' }}>Đang chiếu</span>
           <Tag color="green" className="ml-1 rounded-full font-semibold">
             {nowShowing.length}
           </Tag>
@@ -55,7 +55,7 @@ export const StaffMovieListPage = () => {
       label: (
         <span className="flex items-center gap-2 text-sm font-semibold">
           <ClockCircleOutlined style={{ fontSize: 16, color: '#3b82f6' }} />
-          <span style={{ color: '#ffffff' }}>Sap chieu</span>
+          <span style={{ color: '#ffffff' }}>Sắp chiếu</span>
           <Tag color="blue" className="ml-1 rounded-full font-semibold">
             {comingSoon.length}
           </Tag>
@@ -68,7 +68,7 @@ export const StaffMovieListPage = () => {
       label: (
         <span className="flex items-center gap-2 text-sm font-semibold">
           <StopOutlined style={{ fontSize: 16, color: '#6b7280' }} />
-          <span style={{ color: '#ffffff' }}>Ngung chieu</span>
+          <span style={{ color: '#ffffff' }}>Ngừng chiếu</span>
           <Tag color="default" className="ml-1 rounded-full font-semibold">
             {stoppedShowing.length}
           </Tag>
@@ -88,11 +88,15 @@ export const StaffMovieListPage = () => {
             key={alert.showTimeId}
             showIcon
             type="warning"
-            message={<span className="font-semibold text-yellow-300">Suat chieu sap bat dau</span>}
+            message={
+              <span className="font-semibold text-yellow-300">
+                Suất chiếu sắp bắt đầu
+              </span>
+            }
             description={
               <div className="text-sm text-yellow-200">
-                <span className="font-semibold">{alert.roomName}</span> con{' '}
-                <span className="font-bold">{alert.diffMinutes} phut</span> nua chieu phim{' '}
+                <span className="font-semibold">{alert.roomName}</span> còn{' '}
+                <span className="font-bold">{alert.diffMinutes} phút</span> nữa chiếu phim{' '}
                 <span className="font-semibold">{alert.movieName}</span>
               </div>
             }
@@ -105,11 +109,18 @@ export const StaffMovieListPage = () => {
             key={alert.showTimeId}
             showIcon
             type="error"
-            message={<span className="font-semibold text-red-300">Suat chieu da bat dau</span>}
+            message={
+              <span className="font-semibold text-red-300">
+                Suất chiếu đã bắt đầu
+              </span>
+            }
             description={
               <div className="text-sm text-red-200">
-                <span className="font-semibold">{alert.roomName}</span> da chieu duoc{' '}
-                <span className="font-bold">{Math.abs(alert.diffMinutes)} phut</span> voi phim{' '}
+                <span className="font-semibold">{alert.roomName}</span> đã chiếu được{' '}
+                <span className="font-bold">
+                  {Math.abs(alert.diffMinutes)} phút
+                </span>{' '}
+                với phim{' '}
                 <span className="font-semibold">{alert.movieName}</span>
               </div>
             }

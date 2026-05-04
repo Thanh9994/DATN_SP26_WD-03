@@ -49,6 +49,54 @@ export const bookingController = {
     });
   }),
 
+  confirmCashByStaff: catchAsync(async (req, res, next) => {
+    const staffId = req.user!._id!.toString();
+    const { bookingId, holdToken, customerInfo } = req.body;
+
+    if (!bookingId || !holdToken) {
+      return next(new AppError('Thieu bookingId hoac holdToken', 400));
+    }
+
+    const result = await bookingService.confirmCashBookingByStaff(
+      bookingId,
+      holdToken,
+      staffId,
+      customerInfo,
+    );
+
+    res.json({
+      success: true,
+      message: 'Thanh toán tiền mặt và xác nhận lấy vé thành công.',
+      data: result,
+    });
+  }),
+
+  updateBookingItems: catchAsync(async (req, res, next) => {
+    const userId = req.user?._id;
+    const { bookingId, holdToken, items = [] } = req.body;
+
+    if (!userId) {
+      return next(new AppError('Bạn cần đăng nhập thể thực hiện hành động này', 401));
+    }
+
+    if (!bookingId || !holdToken) {
+      return next(new AppError('Thieu bookingId hoac holdToken', 400));
+    }
+
+    const booking = await bookingService.updateBookingItems(bookingId, holdToken, userId, items);
+
+    res.json({
+      success: true,
+      message: 'Cap nhat combo thanh cong',
+      data: {
+        bookingId: booking._id,
+        totalAmount: booking.totalAmount,
+        finalAmount: booking.finalAmount,
+        items: booking.items,
+      },
+    });
+  }),
+
   checkinTicket: catchAsync(async (req, res, next) => {
     const { ticketCode } = req.body;
     if (!ticketCode) {

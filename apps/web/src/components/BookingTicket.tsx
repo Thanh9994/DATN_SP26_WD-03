@@ -13,7 +13,7 @@ const BookingTicket = ({ ticket, children }: Props) => {
     <div className="w-full rounded-2xl bg-gradient-to-b from-white/10 to-transparent transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)]">
       <div className="group relative flex flex-row gap-4 overflow-hidden rounded-2xl border border-white/5 bg-[#120f0f] p-3 md:gap-6 md:p-5">
         {/* Poster Section */}
-        <div className="relative h-auto w-28 shrink-0 overflow-hidden rounded-xl border border-white/10 shadow-2xl md:aspect-[2/3] md:h-auto md:w-[150px] md:rounded-xl">
+        <div className="relative h-auto w-28 shrink-0 overflow-hidden rounded-xl border border-white/10 shadow-2xl md:aspect-[2/3] md:h-auto md:w-48 md:rounded-xl">
           <img
             src={ticket.image}
             alt={ticket.title}
@@ -94,7 +94,7 @@ const TicketInfoField = ({
   icon: any;
 }) => (
   <div className="space-y-1">
-    <p className="md:text-sx text-[8px] font-black uppercase tracking-[0.25em] text-zinc-400">
+    <p className="md:text-sx text-[8px] text-left font-black uppercase tracking-[0.25em] text-zinc-400">
       {label}
     </p>
     <div className="flex items-center gap-1.5">

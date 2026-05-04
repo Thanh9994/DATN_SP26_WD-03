@@ -14,12 +14,17 @@ interface PaymentNavigationState {
   holdToken: string;
   totalAmount: number;
   seats: string[];
+  items?: Array<{
+    snackDrinkId: string;
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
   movieInfo: {
     title?: string;
     poster?: string;
     showtime: string;
   };
-  snackSelection?: DrinkSnackSelection;
 }
 
 const BookingLayout = () => {
@@ -28,6 +33,7 @@ const BookingLayout = () => {
   const showtimeIdFromUrl = searchParams.get('showtimeId');
   const { user } = useAuth();
   const location = useLocation();
+  const isStaffFlow = location.pathname.startsWith('/staff/');
 
   const navigate = useNavigate();
   const prevPathRef = useRef(location.pathname);
@@ -48,6 +54,7 @@ const BookingLayout = () => {
     pendingBooking,
     cancelBooking,
     expireBooking,
+    updateBookingItems,
   } = useBooking(activeShowtimeId);
 
   useEffect(() => {
@@ -148,16 +155,39 @@ const BookingLayout = () => {
 
     setSelectedSeats([]);
     setSelectedShowtime(null);
-    navigate(`/booking?movieId=${movieId}`);
+    navigate(`${isStaffFlow ? '/staff/booking' : '/booking'}?movieId=${movieId}`);
   };
 
-  const handleGoToPayments = (snackSelection?: DrinkSnackSelection) => {
+  const handleGoToPayments = async (snackSelection?: DrinkSnackSelection) => {
     if (!paymentState) return;
 
-    navigate('/payments', {
+    let nextPaymentState: PaymentNavigationState = { ...paymentState };
+
+    if (snackSelection) {
+      const updatedTotalAmount = paymentState.totalAmount + snackSelection.totalAmount;
+
+      try {
+        await updateBookingItems({
+          bookingId: paymentState.bookingId,
+          holdToken: paymentState.holdToken,
+          items: snackSelection.items,
+        });
+
+        nextPaymentState = {
+          ...paymentState,
+          totalAmount: updatedTotalAmount,
+          items: snackSelection.items,
+        };
+      } catch (error: any) {
+        message.error(error?.response?.data?.message || 'Khong the cap nhat combo cho don hang');
+        return;
+      }
+    }
+
+    navigate(isStaffFlow ? '/staff/payments' : '/payments', {
       state: {
-        ...paymentState,
-        snackSelection,
+        ...nextPaymentState,
+        finalAmount: nextPaymentState.totalAmount,
       },
     });
 
@@ -194,6 +224,10 @@ const BookingLayout = () => {
         return;
       }
 
+      if (isStaffFlow) {
+        navigate(`/staff/booking/seats?movieId=${movieId}&showtimeId=${selectedShowtime._id}`);
+        return;
+      }
       navigate(`/booking/seats?movieId=${movieId}&showtimeId=${selectedShowtime._id}`);
       return;
     }

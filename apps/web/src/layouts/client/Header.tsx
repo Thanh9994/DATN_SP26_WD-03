@@ -2,16 +2,31 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Dropdown, MenuProps } from 'antd';
 import { useAuth } from '@web/hooks/useAuth';
 import { useMovies } from '@web/hooks/useMovie';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { IUserRole } from '@shared/src/schemas';
+import { useMyBookings } from '@web/hooks/useBooking';
+import { mapToTicketCl } from '@shared/src/schemas/ticket';
 
 export const Header = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { movies } = useMovies();
+  const { data: rawBookings = [] } = useMyBookings('paid');
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  const ticketBadgeCount = useMemo(() => {
+    return rawBookings
+      .map((booking: any) => {
+        try {
+          return mapToTicketCl(booking);
+        } catch {
+          return null;
+        }
+      })
+      .filter((ticket: any) => ticket && !ticket.isPast).length;
+  }, [rawBookings]);
 
   const searchResults = searchQuery.trim()
     ? movies.filter((m) => m.ten_phim.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 6)
@@ -70,9 +85,11 @@ export const Header = () => {
       onClick: handleLogout,
     },
   ];
+
   const menuItems = items.filter(
     (item) => !('roles' in item) || (user && item.roles?.includes(user.role)),
   );
+
   return (
     <header className="glass-nav sticky top-0 z-50 w-full border-b border-white/10">
       <div className="mx-auto flex items-center justify-between gap-8 px-5 py-2.5 lg:px-10">
@@ -84,10 +101,10 @@ export const Header = () => {
             <img
               src="https://res.cloudinary.com/dcyzkqb1r/image/upload/cinema_app/1774244353682-pvm-logo"
               alt="Logo"
-              className="h-[40px] w-[40px] object-cover lg:h-[55px] lg:w-[55px]" // Giảm size trên mobile
+              className="h-[40px] w-[40px] object-cover lg:h-[55px] lg:w-[55px]"
             />
             <h2 className="m-auto hidden text-xl font-black uppercase text-white sm:block">
-              Cinema{' '}
+              Rạp phim
             </h2>
           </div>
 
@@ -96,41 +113,42 @@ export const Header = () => {
               to="/movielist"
               className="text-base font-bold text-white transition-colors hover:text-primary"
             >
-              Movie
+              Phim
             </Link>
             <Link
               to="/cinema"
               className="text-base font-bold text-white transition-colors hover:text-primary"
             >
-              Cinemas
+              Rạp chiếu
             </Link>
 
             <Link
               to="/news"
               className="text-base font-bold text-white transition-colors hover:text-primary"
             >
-              News
+              Tin tức
             </Link>
             <Link
               to="/about"
               className="text-base font-bold text-white transition-colors hover:text-primary"
             >
-              About
+              Giới thiệu
             </Link>
             <Link
               to="/event"
               className="text-base font-bold text-white transition-colors hover:text-primary"
             >
-              Events
+              Sự kiện
             </Link>
             <Link
               to="/contact"
               className="text-base font-bold text-white transition-colors hover:text-primary"
             >
-              Contact
+              Liên hệ
             </Link>
           </nav>
         </div>
+
         <div className="flex flex-1 items-center justify-end gap-6">
           <div ref={searchRef} className="relative hidden w-full max-w-sm lg:block">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/40">
@@ -138,7 +156,7 @@ export const Header = () => {
             </span>
             <input
               className="w-full rounded-full border border-white/10 bg-white/5 py-2.5 pl-12 pr-4 text-sm text-white transition-all placeholder:text-white/30 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
-              placeholder="Search movies, theaters..."
+              placeholder="Tìm kiếm phim, rạp chiếu..."
               type="text"
               value={searchQuery}
               onChange={(e) => {
@@ -181,12 +199,13 @@ export const Header = () => {
               </div>
             )}
           </div>
+
           {user ? (
             <div className="flex items-center gap-3">
               <Dropdown menu={{ items: menuItems }} placement="bottomRight" arrow>
                 <div className="size-10 cursor-pointer overflow-hidden rounded-full border-2 border-gray-400 shadow-sm transition-all hover:border-primary">
                   <img
-                    alt={user?.ho_ten || 'User profile'}
+                    alt={user?.ho_ten || 'Hồ sơ người dùng'}
                     className="h-full w-full object-cover"
                     src={user?.avatar?.url || `https://i.pravatar.cc/150`}
                     referrerPolicy="no-referrer"
@@ -200,13 +219,13 @@ export const Header = () => {
                 onClick={() => navigate('/login')}
                 className="text-[10px] uppercase tracking-widest text-white/80 transition-colors hover:text-white sm:text-sm sm:font-bold"
               >
-                Login
+                Đăng nhập
               </button>
               <button
                 onClick={() => navigate('/register')}
                 className="rounded-full bg-primary px-4 py-2 text-[10px] uppercase tracking-widest text-white transition-all sm:px-6 sm:py-2.5 sm:text-sm sm:font-bold"
               >
-                Sign Up
+                Đăng ký
               </button>
             </div>
           )}

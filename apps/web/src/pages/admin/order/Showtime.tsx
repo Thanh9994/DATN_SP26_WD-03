@@ -86,8 +86,8 @@ const getMovieId = (showtime: AdminShowtimeRow) =>
 
 const getMovieName = (showtime: AdminShowtimeRow) =>
   typeof showtime.movieId === 'string'
-    ? 'Khong xac dinh'
-    : showtime.movieId?.ten_phim || 'Khong xac dinh';
+    ? 'Không xác định'
+    : showtime.movieId?.ten_phim || 'Không xác định';
 
 const getRoomData = (showtime: AdminShowtimeRow, rooms: IPhong[]) => {
   if (typeof showtime.roomId === 'object') return showtime.roomId as AdminRoom;
@@ -102,13 +102,13 @@ const getCinemaInfo = (room?: IPhong | AdminRoom) => {
   if (cinema && typeof cinema === 'object') {
     return {
       cinemaId: cinema._id,
-      cinemaName: cinema.name || 'Cinema',
+      cinemaName: cinema.name || 'Rạp chiếu',
     };
   }
 
   return {
     cinemaId: undefined,
-    cinemaName: 'Cinema',
+    cinemaName: 'Rạp chiếu',
   };
 };
 
@@ -122,20 +122,20 @@ const getMovieOption = (
 };
 
 const getMovieDisplayName = (movie?: IMovie | MovieOption) => {
-  if (!movie) return 'Khong xac dinh';
-  return `${movie.ten_phim} • ${movie.thoi_luong} phut`;
+  if (!movie) return 'Không xác định';
+  return `${movie.ten_phim} • ${movie.thoi_luong} phút`;
 };
 
 const getShowtimeStatusLabel = (status?: string) => {
   switch (status) {
     case 'upcoming':
-      return 'Sap chieu';
+      return 'Sắp chiếu';
     case 'showing':
-      return 'Dang chieu';
+      return 'Đang chiếu';
     case 'finished':
-      return 'Da ket thuc';
+      return 'Đã kết thúc';
     default:
-      return status || 'Khong ro';
+      return status || 'Không rõ';
   }
 };
 
@@ -169,7 +169,7 @@ const buildSequentialSlotOptions = (
 
     options.push({
       value: start.format('HH:mm'),
-      label: `${start.format('HH:mm')} - ${end.format('HH:mm')}${isOverlap ? ' (trung lich)' : ''}`,
+      label: `${start.format('HH:mm')} - ${end.format('HH:mm')}${isOverlap ? ' (trùng lịch)' : ''}`,
       disabled: isOverlap,
     });
   }
@@ -289,11 +289,26 @@ const buildShowtimePreview = ({
   });
 
   return previewItems.sort((a, b) => {
+    const statusPriority: Record<PreviewStatus, number> = {
+      conflict: 0,
+      available: 1,
+    };
+
+    const statusCompare = statusPriority[a.status] - statusPriority[b.status];
+    if (statusCompare !== 0) return statusCompare;
+
     const dateCompare =
       dayjs(a.dateText, 'DD/MM/YYYY').valueOf() - dayjs(b.dateText, 'DD/MM/YYYY').valueOf();
     if (dateCompare !== 0) return dateCompare;
-    if (a.cinemaName !== b.cinemaName) return a.cinemaName.localeCompare(b.cinemaName);
-    if (a.roomName !== b.roomName) return a.roomName.localeCompare(b.roomName);
+
+    if (a.cinemaName !== b.cinemaName) {
+      return a.cinemaName.localeCompare(b.cinemaName);
+    }
+
+    if (a.roomName !== b.roomName) {
+      return a.roomName.localeCompare(b.roomName);
+    }
+
     return a.startText.localeCompare(b.startText);
   });
 };
@@ -574,15 +589,15 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     if (!payloads.length) {
       setCreateSummary({
         type: 'warning',
-        title: 'Khong co suat hop le de tao.',
-        detail: 'Tat ca cac ca preview hien tai deu bi trung lich hoac khong hop le.',
+        title: 'Không có suất hợp lệ để tạo.',
+        detail: 'Tất cả các ca preview hiện tại đều bị trùng lịch hoặc không hợp lệ.',
       });
       return;
     }
 
     setCreateSummary({
       type: 'info',
-      title: 'Dang tao suat chieu...',
+      title: 'Đang tạo suất chiếu...',
     });
 
     let successCount = 0;
@@ -604,7 +619,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     if (failedCount === 0) {
       setCreateSummary({
         type: 'success',
-        title: `${successMessage}: ${successCount} suat`,
+        title: `${successMessage}: ${successCount} suất`,
       });
       return;
     }
@@ -612,16 +627,16 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     if (successCount === 0) {
       setCreateSummary({
         type: 'error',
-        title: 'Khong tao duoc suat chieu nao.',
-        detail: 'Kiem tra lai trung lich, phong chieu hoac khoang ngay.',
+        title: 'Không tạo được suất chiếu nào.',
+        detail: 'Kiểm tra lại trùng lịch, phòng chiếu hoặc khoảng ngày.',
       });
       return;
     }
 
     setCreateSummary({
       type: 'warning',
-      title: `Da tao ${successCount} suat, ${failedCount} suat khong tao duoc.`,
-      detail: 'Mot so suat bi bo qua do trung lich hoac khong hop le.',
+      title: `Đã tạo ${successCount} suất, ${failedCount} suất không tạo được.`,
+      detail: 'Một số suất bị bỏ qua do trùng lịch hoặc không hợp lệ.',
     });
   };
 
@@ -630,7 +645,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     if (!activeMovieId) {
       setCreateSummary({
         type: 'error',
-        title: 'Vui long chon phim truoc khi tao suat chieu.',
+        title: 'Vui lòng chọn phim trước khi tạo suất chiếu.',
       });
       return;
     }
@@ -639,7 +654,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     if (activeMovie?.trang_thai !== 'dang_chieu') {
       setCreateSummary({
         type: 'error',
-        title: 'Chi duoc tao suat cho phim dang chieu.',
+        title: 'Chỉ được tạo suất cho phim đang chiếu.',
       });
       return;
     }
@@ -651,7 +666,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
         .filter((item) => item.status === 'available' && item.payload)
         .map((item) => item.payload as ICreateShowTimePl);
 
-      await handleCreateMany(validPayloads, 'Tao suat chieu theo ngay thanh cong');
+      await handleCreateMany(validPayloads, 'Tạo suất chiếu theo ngày thành công');
       setIsModalOpen(false);
       singleForm.resetFields();
     } finally {
@@ -664,7 +679,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     if (!activeMovieId) {
       setCreateSummary({
         type: 'error',
-        title: 'Vui long chon phim truoc khi tao theo khoang ngay.',
+        title: 'Vui lòng chọn phim trước khi tạo theo khoảng ngày.',
       });
       return;
     }
@@ -673,7 +688,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
     if (activeMovie?.trang_thai !== 'dang_chieu') {
       setCreateSummary({
         type: 'error',
-        title: 'Chi duoc tao suat cho phim dang chieu.',
+        title: 'Chỉ được tạo suất cho phim đang chiếu.',
       });
       return;
     }
@@ -685,7 +700,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
         .filter((item) => item.status === 'available' && item.payload)
         .map((item) => item.payload as ICreateShowTimePl);
 
-      await handleCreateMany(validPayloads, 'Tao suat chieu theo khoang ngay thanh cong');
+      await handleCreateMany(validPayloads, 'Tạo suất chiếu theo khoảng ngày thành công');
       setIsModalOpen(false);
       rangeForm.resetFields();
     } finally {
@@ -700,7 +715,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
   const previewColumns = [
     {
-      title: 'Rap / Phong',
+      title: 'Rạp / Phòng',
       key: 'room',
       render: (_: unknown, record: ShowtimePreviewItem) => (
         <Space direction="vertical" size={0}>
@@ -710,30 +725,30 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       ),
     },
     {
-      title: 'Ngay',
+      title: 'Ngày',
       dataIndex: 'dateText',
     },
     {
-      title: 'Khung gio',
+      title: 'Khung giờ',
       key: 'time',
       render: (_: unknown, record: ShowtimePreviewItem) => `${record.startText} - ${record.endText}`,
     },
     {
-      title: 'Ket qua',
+      title: 'Kết quả',
       key: 'status',
       render: (_: unknown, record: ShowtimePreviewItem) =>
         record.status === 'available' ? (
-          <Tag color="success">Khong trung</Tag>
+          <Tag color="success">Không trùng</Tag>
         ) : (
-          <Tag color="error">Bi trung</Tag>
+          <Tag color="error">Bị trùng</Tag>
         ),
     },
     {
-      title: 'Chi tiet',
+      title: 'Chi tiết',
       key: 'reason',
       render: (_: unknown, record: ShowtimePreviewItem) =>
         record.status === 'available' ? (
-          <Typography.Text type="success">Co the tao</Typography.Text>
+          <Typography.Text type="success">Có thể tạo</Typography.Text>
         ) : (
           <div className="space-y-1">
             {record.conflicts.map((item, index) => (
@@ -753,7 +768,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       render: (_: unknown, record: AdminShowtimeRow) => <strong>{getMovieName(record)}</strong>,
     },
     {
-      title: 'Rap / Phong',
+      title: 'Rạp / Phòng',
       key: 'room',
       render: (_: unknown, record: AdminShowtimeRow) => {
         const room = getRoomData(record, rooms);
@@ -771,62 +786,62 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       },
     },
     {
-      title: 'Ngay chieu',
+      title: 'Ngày chiếu',
       dataIndex: 'startTime',
       render: (value: Date | string) => dayjs(value).format('DD/MM/YYYY'),
     },
     {
-      title: 'Bat dau',
+      title: 'Bắt đầu',
       dataIndex: 'startTime',
       render: (value: Date | string) => dayjs(value).format('HH:mm'),
     },
     {
-      title: 'Ket thuc',
+      title: 'Kết thúc',
       dataIndex: 'endTime',
       render: (value: Date | string) => dayjs(value).format('HH:mm'),
     },
     {
-      title: 'Gia thuong',
+      title: 'Giá thường',
       dataIndex: 'priceNormal',
       render: (value: number) => `${value.toLocaleString()}đ`,
     },
     {
-      title: 'Gia VIP',
+      title: 'Giá VIP',
       dataIndex: 'priceVip',
       render: (value: number) => `${value.toLocaleString()}đ`,
     },
     {
-      title: 'Gia doi',
+      title: 'Giá đôi',
       dataIndex: 'priceCouple',
       render: (value: number) => `${value.toLocaleString()}đ`,
     },
     {
-      title: 'Trang thai ghe',
+      title: 'Trạng thái ghế',
       key: 'seats',
       width: 220,
       render: (_: unknown, record: AdminShowtimeRow) => {
         const seatInfo = record.seatInfo;
 
         if (!seatInfo) {
-          return <span className="text-xs text-slate-400">Chua co thong ke ghe</span>;
+          return <span className="text-xs text-slate-400">Chưa có thống kê ghế</span>;
         }
 
         return (
           <div className="space-y-1 text-sm">
             <div className="flex items-center gap-2 text-emerald-600">
               <InboxOutlined />
-              <span>Con trong: {seatInfo.available}</span>
+              <span>Còn trống: {seatInfo.available}</span>
             </div>
             <div className="flex items-center gap-2 text-rose-500">
               <CheckCircleOutlined />
-              <span>Da dat: {seatInfo.booked}</span>
+              <span>Đã đặt: {seatInfo.booked}</span>
             </div>
           </div>
         );
       },
     },
     {
-      title: 'Trang thai',
+      title: 'Trạng thái',
       dataIndex: 'status',
       render: (_: unknown, record: AdminShowtimeRow) => {
         const display = record.display || { label: 'N/A', color: 'default' };
@@ -834,7 +849,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       },
     },
     {
-      title: 'Thao tac',
+      title: 'Thao tác',
       key: 'action',
       render: (_: unknown, record: AdminShowtimeRow) => {
         const hasBookedSeats =
@@ -847,14 +862,14 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
               icon={<EyeOutlined />}
               onClick={() => handleViewSeatMap(record._id || '')}
             >
-              Chi tiet
+              Chi tiết
             </Button>
             <Popconfirm
-              title="Xoa suat chieu nay?"
-              description="Suat da co nguoi dat hoac giu ghe se khong duoc xoa."
+              title="Xóa suất chiếu này?"
+              description="Suất đã có người đặt hoặc giữ ghế sẽ không được xóa."
               onConfirm={() => record._id && deleteShowTime(record._id)}
-              okText="Xoa"
-              cancelText="Huy"
+              okText="Xóa"
+              cancelText="Hủy"
               okButtonProps={{ danger: true }}
               disabled={
                 hasBookedSeats || record.canDelete === false || record.status === 'finished'
@@ -880,10 +895,10 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       <div className="mb-4 flex justify-between">
         <span className="flex items-center gap-2 text-xl font-bold">
           <PlayCircleOutlined className="text-blue-500" />
-          Quan ly suat chieu
+          Quản lý suất chiếu
         </span>
         <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
-          Tao suat chieu
+          Tạo suất chiếu
         </Button>
       </div>
 
@@ -903,7 +918,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-slate-600">
               <CalendarOutlined className="text-blue-500" />
-              <span>Tong suat chieu (Nam)</span>
+              <span>Tổng Suất Chiếu (Năm)</span>
             </div>
             <div className="text-2xl font-semibold">{showtimeStats.totalYear}</div>
           </div>
@@ -912,7 +927,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-slate-600">
               <CalendarOutlined className="text-purple-500" />
-              <span>Tong suat chieu (Thang)</span>
+              <span>Tổng Suất Chiếu (Tháng)</span>
             </div>
             <div className="text-2xl font-semibold">{showtimeStats.totalMonth}</div>
           </div>
@@ -921,7 +936,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-slate-600">
               <PlayCircleOutlined className="text-emerald-500" />
-              <span>Suat chieu Hom nay</span>
+              <span>Suất Chiếu Hôm Nay</span>
             </div>
             <div className="text-2xl font-semibold">{showtimeStats.today}</div>
           </div>
@@ -930,7 +945,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-slate-600">
               <CheckCircleOutlined className="text-rose-500" />
-              <span>Suat chieu da het ve</span>
+              <span>Suất chiếu đã hết vé</span>
             </div>
             <div className="text-2xl font-semibold">{showtimeStats.soldOut}</div>
           </div>
@@ -942,7 +957,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
           {!movieId && (
             <Select
               allowClear
-              placeholder="Loc theo phim"
+              placeholder="Lọc Theo Phim"
               options={movieOptions}
               value={selectedMovieFilter}
               onChange={(value) => setSelectedMovieFilter(value)}
@@ -952,7 +967,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
           <Select
             allowClear
-            placeholder="Loc theo rap"
+            placeholder="Lọc Theo Rạp"
             options={cinemaOptions}
             value={selectedCinemaFilter}
             onChange={(value) => {
@@ -964,7 +979,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
           <TreeSelect
             allowClear
-            placeholder="Loc theo phong"
+            placeholder="Lọc Theo Phòng"
             value={selectedRoomFilter}
             onChange={(value) =>
               setSelectedRoomFilter((value as string[])?.length ? (value as string[]) : undefined)
@@ -978,7 +993,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
           <DatePicker
             className="w-full"
             format="DD/MM/YYYY"
-            placeholder="Loc theo ngay chieu"
+            placeholder="Lọc Theo Ngày Chiếu"
             value={selectedDateFilter}
             onChange={(value) => setSelectedDateFilter(value)}
             suffixIcon={<CalendarOutlined className="text-slate-400" />}
@@ -993,7 +1008,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
               setSelectedDateFilter(null);
             }}
           >
-            Xoa bo loc
+            Xóa bộ lọc
           </Button>
         </div>
 
@@ -1008,7 +1023,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       </Card>
 
       <Modal
-        title="Tao suat chieu"
+        title="Tạo suất chiếu"
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         footer={null}
@@ -1022,7 +1037,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
               label: (
                 <span className="flex items-center gap-2">
                   <CalendarOutlined />
-                  Theo ngay
+                  Theo ngày
                 </span>
               ),
               children: (
@@ -1040,10 +1055,10 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                       <Form.Item
                         name="movieId"
                         label="Phim"
-                        rules={[{ required: true, message: 'Chon phim' }]}
+                        rules={[{ required: true, message: 'Chọn phim' }]}
                       >
                         <Select
-                          placeholder="Chon phim"
+                          placeholder="Chọn phim"
                           options={movieOptions}
                           showSearch
                           optionFilterProp="label"
@@ -1053,12 +1068,12 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="roomIds"
-                      label="Phong chieu"
-                      rules={[{ required: true, message: 'Chon phong chieu' }]}
+                      label="Phòng chiếu"
+                      rules={[{ required: true, message: 'Chọn phòng chiếu' }]}
                     >
                       <TreeSelect
                         treeData={roomTreeSelectData}
-                        placeholder="Chon phong"
+                        placeholder="Chọn phòng"
                         treeCheckable
                         showCheckedStrategy={TreeSelect.SHOW_CHILD}
                         multiple
@@ -1070,8 +1085,8 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="date"
-                      label="Ngay chieu"
-                      rules={[{ required: true, message: 'Chon ngay chieu' }]}
+                      label="Ngày Chiếu"
+                      rules={[{ required: true, message: 'Chọn Ngày Chiếu' }]}
                     >
                       <DatePicker
                         className="w-full"
@@ -1082,13 +1097,13 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="timeSlots"
-                      label="Ca chieu trong ngay"
-                      rules={[{ required: true, message: 'Chon it nhat mot ca chieu' }]}
-                      extra="He thong sinh ca lien tiep tu 07:00, moi ca = thoi luong phim + 30 phut don dep."
+                      label="Ca chiếu trong ngày"
+                      rules={[{ required: true, message: 'Chọn ít nhất một ca chiếu' }]}
+                      extra="Hệ thống sinh ca liên tiếp từ 07:00, mỗi ca = thời lượng phim + 30 phút dọn dẹp."
                     >
                       <Select
                         mode="multiple"
-                        placeholder="Chon mot hoac nhieu ca chieu"
+                        placeholder="Chọn một hoặc nhiều ca chiếu"
                         options={singleSlotOptions}
                         disabled={!singleDate || !singleRoomIds?.length || !singleMovieId}
                       />
@@ -1096,24 +1111,24 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="priceNormal"
-                      label="Gia thuong"
-                      rules={[{ required: true, message: 'Nhap gia ve thuong' }]}
+                      label="Giá thường"
+                      rules={[{ required: true, message: 'Nhập giá vé thường' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
 
                     <Form.Item
                       name="priceVip"
-                      label="Gia VIP"
-                      rules={[{ required: true, message: 'Nhap gia VIP' }]}
+                      label="Giá VIP"
+                      rules={[{ required: true, message: 'Nhập giá VIP' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
 
                     <Form.Item
                       name="priceCouple"
-                      label="Gia doi"
-                      rules={[{ required: true, message: 'Nhap gia doi' }]}
+                      label="Giá đôi"
+                      rules={[{ required: true, message: 'Nhập giá đôi' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
@@ -1123,10 +1138,10 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                     className="mb-4"
                     type="info"
                     showIcon
-                    message={`1 ca chieu = ${durationMinutes} phut phim + ${CLEANING_MINUTES} phut don dep.`}
+                    message={`1 ca chiếu = ${durationMinutes} phút phim + ${CLEANING_MINUTES} phút dọn dẹp.`}
                     description={
                       <div className="mt-1">
-                        Phim dang chon:{' '}
+                        Phim đang chọn:{' '}
                         <strong>{getMovieDisplayName(activeSingleMovie || fixedMovieOption)}</strong>
                       </div>
                     }
@@ -1137,12 +1152,12 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                       <Typography.Text strong>
                         <span className="flex items-center gap-2">
                           <CalendarOutlined className="text-blue-500" />
-                          Thong tin trong ngay
+                          Thông tin trong ngày
                         </span>
                       </Typography.Text>
                       <div className="mt-2 text-sm text-slate-600">
-                        Da co {existingSingleDayShowtimes.length} suat trong cac phong da chon vao
-                        ngay {singleDate.format('DD/MM/YYYY')}.
+                        Đã có {existingSingleDayShowtimes.length} suất trong các phòng đã chọn vào
+                        ngày {singleDate.format('DD/MM/YYYY')}.
                       </div>
                     </Card>
                   )}
@@ -1150,15 +1165,15 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                   {singlePreviewItems.length > 0 && (
                     <Card size="small" className="mb-4">
                       <div className="mb-3 flex items-center justify-between gap-2">
-                        <Typography.Text strong>Preview ca chieu theo ngay</Typography.Text>
+                        <Typography.Text strong>Preview ca chiếu theo ngày</Typography.Text>
                         <Space wrap>
-                          <Tag color="blue">Tong: {singlePreviewItems.length}</Tag>
+                          <Tag color="blue">Tổng: {singlePreviewItems.length}</Tag>
                           <Tag color="success">
-                            Hop le:{' '}
+                            Hợp lệ:{' '}
                             {singlePreviewItems.filter((item) => item.status === 'available').length}
                           </Tag>
                           <Tag color="error">
-                            Trung:{' '}
+                            Trùng:{' '}
                             {singlePreviewItems.filter((item) => item.status === 'conflict').length}
                           </Tag>
                         </Space>
@@ -1176,9 +1191,9 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                   )}
 
                   <div className="flex justify-end gap-2">
-                    <Button onClick={() => setIsModalOpen(false)}>Dong</Button>
+                    <Button onClick={() => setIsModalOpen(false)}>Đóng</Button>
                     <Button type="primary" htmlType="submit" loading={submittingMode === 'single'}>
-                      Tao suat theo ngay
+                      Tạo suất theo ngày
                     </Button>
                   </div>
                 </Form>
@@ -1189,7 +1204,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
               label: (
                 <span className="flex items-center gap-2">
                   <CalendarOutlined />
-                  Theo khoang ngay
+                  Theo khoảng ngày
                 </span>
               ),
               children: (
@@ -1206,8 +1221,8 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                     className="mb-4"
                     type="warning"
                     showIcon
-                    message="Chon khoang ngay va cac ca chieu mau. He thong se preview chi tiet va chi tao cac ca hop le."
-                    description={`Phim dang chon: ${getMovieDisplayName(
+                    message="Chọn khoảng ngày và các ca chiếu mẫu. Hệ thống sẽ preview chi tiết và chỉ tạo các ca hợp lệ."
+                    description={`Phim đang chọn: ${getMovieDisplayName(
                       activeRangeMovie || fixedMovieOption,
                     )}`}
                   />
@@ -1217,10 +1232,10 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                       <Form.Item
                         name="movieId"
                         label="Phim"
-                        rules={[{ required: true, message: 'Chon phim' }]}
+                        rules={[{ required: true, message: 'Chọn phim' }]}
                       >
                         <Select
-                          placeholder="Chon phim"
+                          placeholder="Chọn phim"
                           options={movieOptions}
                           showSearch
                           optionFilterProp="label"
@@ -1230,15 +1245,15 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="roomIds"
-                      label="Phong chieu"
-                      rules={[{ required: true, message: 'Chon phong chieu' }]}
+                      label="Phòng chiếu"
+                      rules={[{ required: true, message: 'Chọn phòng chiếu' }]}
                     >
                       <TreeSelect
                         treeData={roomTreeSelectData}
                         treeCheckable
                         multiple
                         showCheckedStrategy={TreeSelect.SHOW_CHILD}
-                        placeholder="Chon phong"
+                        placeholder="Chọn phòng"
                         treeDefaultExpandAll
                         maxTagCount="responsive"
                       />
@@ -1246,8 +1261,8 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="startDate"
-                      label="Tu ngay"
-                      rules={[{ required: true, message: 'Chon ngay bat dau' }]}
+                      label="Từ ngày"
+                      rules={[{ required: true, message: 'Chọn ngày bắt đầu' }]}
                     >
                       <DatePicker
                         className="w-full"
@@ -1258,10 +1273,10 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="endDate"
-                      label="Den ngay"
+                      label="Đến ngày"
                       dependencies={['startDate']}
                       rules={[
-                        { required: true, message: 'Chon ngay ket thuc' },
+                        { required: true, message: 'Chọn ngày kết thúc' },
                         ({ getFieldValue }) => ({
                           validator(_, value: Dayjs | undefined) {
                             const startDate = getFieldValue('startDate') as Dayjs | undefined;
@@ -1269,7 +1284,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                               return Promise.resolve();
                             }
                             return Promise.reject(
-                              new Error('Ngay ket thuc phai lon hon hoac bang ngay bat dau'),
+                              new Error('Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu'),
                             );
                           },
                         }),
@@ -1284,13 +1299,13 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="timeSlots"
-                      label="Cac ca chieu ap dung"
-                      rules={[{ required: true, message: 'Chon it nhat mot ca chieu' }]}
-                      extra="Moi ngay trong preview se duoc tao theo cac gio nay."
+                      label="Các ca chiếu áp dụng"
+                      rules={[{ required: true, message: 'Chọn ít nhất một ca chiếu' }]}
+                      extra="Mỗi ngày trong preview sẽ được tạo theo các giờ này."
                     >
                       <Select
                         mode="multiple"
-                        placeholder="Chon cac ca chieu"
+                        placeholder="Chọn các ca chiếu"
                         options={rangeSlotOptions}
                         disabled={!rangeStartDate || !rangeRoomIds?.length || !rangeMovieId}
                       />
@@ -1298,24 +1313,24 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
 
                     <Form.Item
                       name="priceNormal"
-                      label="Gia thuong"
-                      rules={[{ required: true, message: 'Nhap gia ve thuong' }]}
+                      label="Giá thường"
+                      rules={[{ required: true, message: 'Nhập giá vé thường' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
 
                     <Form.Item
                       name="priceVip"
-                      label="Gia VIP"
-                      rules={[{ required: true, message: 'Nhap gia VIP' }]}
+                      label="Giá VIP"
+                      rules={[{ required: true, message: 'Nhập giá VIP' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
 
                     <Form.Item
                       name="priceCouple"
-                      label="Gia doi"
-                      rules={[{ required: true, message: 'Nhap gia doi' }]}
+                      label="Giá đôi"
+                      rules={[{ required: true, message: 'Nhập giá đôi' }]}
                     >
                       <InputNumber min={0} className="w-full" />
                     </Form.Item>
@@ -1327,11 +1342,11 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                         <Typography.Text strong>
                           <span className="flex items-center gap-2">
                             <CalendarOutlined className="text-blue-500" />
-                            Preview ngay se tao
+                            Preview ngày sẽ tạo
                           </span>
                         </Typography.Text>
                         <Typography.Text type="secondary">
-                          Tong {rangePreviewDates.length} ngay
+                          Tổng {rangePreviewDates.length} ngày
                         </Typography.Text>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -1341,7 +1356,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                           </Tag>
                         ))}
                         {rangePreviewDates.length > 24 && (
-                          <Tag color="default">+{rangePreviewDates.length - 24} ngay nua</Tag>
+                          <Tag color="default">+{rangePreviewDates.length - 24} ngày nữa</Tag>
                         )}
                       </div>
                     </Card>
@@ -1350,15 +1365,15 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                   {rangePreviewItems.length > 0 && (
                     <Card size="small" className="mb-4">
                       <div className="mb-3 flex items-center justify-between gap-2">
-                        <Typography.Text strong>Preview ca chieu theo khoang ngay</Typography.Text>
+                        <Typography.Text strong>Preview ca chiếu theo khoảng ngày</Typography.Text>
                         <Space wrap>
-                          <Tag color="blue">Tong: {rangePreviewItems.length}</Tag>
+                          <Tag color="blue">Tổng: {rangePreviewItems.length}</Tag>
                           <Tag color="success">
-                            Hop le:{' '}
+                            Hợp lệ:{' '}
                             {rangePreviewItems.filter((item) => item.status === 'available').length}
                           </Tag>
                           <Tag color="error">
-                            Trung:{' '}
+                            Trùng:{' '}
                             {rangePreviewItems.filter((item) => item.status === 'conflict').length}
                           </Tag>
                         </Space>
@@ -1376,9 +1391,9 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
                   )}
 
                   <div className="flex justify-end gap-2">
-                    <Button onClick={() => setIsModalOpen(false)}>Dong</Button>
+                    <Button onClick={() => setIsModalOpen(false)}>Đóng</Button>
                     <Button type="primary" htmlType="submit" loading={submittingMode === 'range'}>
-                      Tao theo khoang ngay
+                      Tạo theo khoảng ngày
                     </Button>
                   </div>
                 </Form>
@@ -1389,7 +1404,7 @@ export const ShowTime = ({ movieId }: { movieId?: string }) => {
       </Modal>
 
       <Modal
-        title="So do ghe"
+        title="Sơ đồ ghế"
         open={isSeatMapOpen}
         onCancel={() => setIsSeatMapOpen(false)}
         footer={null}

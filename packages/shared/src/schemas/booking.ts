@@ -42,4 +42,7 @@ export const Booking = Base.extend({
   holdExpiresAt: z.coerce.date(),
   ticketCode: z.string().optional(),
   pickedUpAt: z.coerce.date().optional(),
+  customerName: z.string().optional(),
+  customerPhone: z.string().optional(),
+  customerEmail: z.string().optional(),
 });

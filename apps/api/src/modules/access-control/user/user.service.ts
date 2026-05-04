@@ -7,6 +7,28 @@ export const findAllUsersWithStats = async () => {
   return await User.aggregate([
     {
       $lookup: {
+        from: 'cinemas',
+        localField: 'workAt',
+        foreignField: '_id',
+        as: 'workAtInfo',
+      },
+    },
+    {
+      $addFields: {
+        workAt: {
+          $cond: [
+            { $gt: [{ $size: '$workAtInfo' }, 0] },
+            {
+              _id: { $arrayElemAt: ['$workAtInfo._id', 0] },
+              name: { $arrayElemAt: ['$workAtInfo.name', 0] },
+            },
+            '$workAt',
+          ],
+        },
+      },
+    },
+    {
+      $lookup: {
         from: 'bookings',
         localField: '_id',
         foreignField: 'userId',
@@ -22,7 +44,7 @@ export const findAllUsersWithStats = async () => {
         bookingCount: { $size: '$paidBookings' },
       },
     },
-    { $project: { paidBookings: 0, password: 0 } }, // Ẩn password và mảng tạm
+    { $project: { paidBookings: 0, workAtInfo: 0, password: 0 } }, // Ẩn password và mảng tạm
     { $sort: { createdAt: -1 } },
   ]);
 };

@@ -4,24 +4,14 @@ import { IShowTimeStatus } from '@shared/src/schemas';
 
 export const calculateShowtimeStats = (showtimes: AdminShowtimeRow[]) => {
   const now = dayjs();
-  const todayKey = now.format('YYYY-MM-DD');
-  const todayKeyUtc = new Date().toISOString().slice(0, 10);
 
   const totalYear = showtimes.filter((item) => dayjs(item.startTime).isSame(now, 'year')).length;
 
   const totalMonth = showtimes.filter((item) => dayjs(item.startTime).isSame(now, 'month')).length;
 
   const today = showtimes.filter((item) => {
-    if (typeof item.showDate === 'string') {
-      const key = item.showDate.slice(0, 10);
-      return key === todayKey || key === todayKeyUtc;
-    }
-    if (item.showDate) {
-      const key = dayjs(item.showDate).format('YYYY-MM-DD');
-      return key === todayKey || key === todayKeyUtc;
-    }
-    const key = dayjs(item.startTime).format('YYYY-MM-DD');
-    return key === todayKey || key === todayKeyUtc;
+    if (item.showDate) return dayjs(item.showDate).isSame(now, 'day');
+    return dayjs(item.startTime).isSame(now, 'day');
   }).length;
 
   const soldOut = showtimes.filter((item) => {
