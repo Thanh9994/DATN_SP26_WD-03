@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../../styles/public/Event.css';
 import { API } from '@web/api/api.service';
 
@@ -25,12 +26,12 @@ interface FilterTab {
 }
 
 const filterTabs: FilterTab[] = [
-  { id: 'all', label: 'ALL EVENTS' },
-  { id: 'film-festival', label: 'FILM FESTIVALS' },
-  { id: 'live-premiere', label: 'LIVE PREMIERES' },
-  { id: 'film-meetup', label: 'FILM MEETUPS' },
-  { id: 'qa-session', label: 'Q&A SESSIONS' },
-  { id: 'special-screening', label: 'SPECIAL SCREENINGS' },
+  { id: 'all', label: 'TẤT CẢ SỰ KIỆN' },
+  { id: 'film-festival', label: 'LỄ HỘI PHIM' },
+  { id: 'live-premiere', label: 'RA MẮT TRỰC TIẾP' },
+  { id: 'film-meetup', label: 'GẶP GỠ PHIM' },
+  { id: 'qa-session', label: 'HỎI ĐÁP TRỰC TIẾP' },
+  { id: 'special-screening', label: 'CHIẾU ĐẶC BIỆT' },
 ];
 
 const FALLBACK_IMAGE = 'https://via.placeholder.com/400x250?text=Event';
@@ -38,6 +39,7 @@ const INITIAL_VISIBLE = 6;
 const LOAD_MORE_STEP = 3;
 
 export const Event = (): JSX.Element => {
+  const navigate = useNavigate();
   const [events, setEvents] = useState<EventData[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -189,7 +191,7 @@ export const Event = (): JSX.Element => {
               <span className="search-icon">🔍</span>
               <input
                 type="text"
-                placeholder="Find an event..."
+                placeholder="Tìm sự kiện..."
                 value={searchText}
                 onFocus={() => setOpenSearchPopup(Boolean(searchText.trim()))}
                 onChange={(e) => handleSearchChange(e.target.value)}
@@ -220,7 +222,7 @@ export const Event = (): JSX.Element => {
                     </button>
                   ))
                 ) : (
-                  <div className="search-empty">Không tìm thấy sự kiện</div>
+                  <div className="search-empty">Không tìm thấy sự kiện nào</div>
                 )}
               </div>
             )}
@@ -229,7 +231,7 @@ export const Event = (): JSX.Element => {
 
         <div className="events-grid">
           {loading ? (
-            <div className="event-empty">Đang tải dữ liệu...</div>
+            <div className="event-empty">Đang tải sự kiện...</div>
           ) : visibleList.length > 0 ? (
             visibleList.map((event) => (
               <div key={event._id} className="event-card">
@@ -260,14 +262,18 @@ export const Event = (): JSX.Element => {
                     </div>
                   </div>
 
-                  <button type="button" className="btn btn-primary">
-                    Get Tickets
+                  <button 
+                    type="button" 
+                    className="btn btn-primary"
+                    onClick={() => navigate('/booking')}
+                  >
+                    Mua vé
                   </button>
                 </div>
               </div>
             ))
           ) : (
-            <div className="event-empty">Không có sự kiện phù hợp</div>
+            <div className="event-empty">Không có sự kiện phù hợp với bộ lọc</div>
           )}
         </div>
 
@@ -278,7 +284,7 @@ export const Event = (): JSX.Element => {
               className="btn btn-secondary"
               onClick={() => setVisibleEvents((prev) => prev + LOAD_MORE_STEP)}
             >
-              LOAD MORE EVENTS
+              TẢI THÊM SỰ KIỆN
             </button>
           </div>
         )}

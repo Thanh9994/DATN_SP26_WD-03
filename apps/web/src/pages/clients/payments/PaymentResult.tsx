@@ -119,7 +119,7 @@ export const PaymentResult = () => {
                 </div>
                 <div className="h-44 w-px bg-white/20"></div>
                 {/* Thông tin người đặt và tổng thanh toán bên phải */}
-                <div className="flex flex-col justify-center gap-4 p-3 text-left">
+                <div className="flex flex-col justify-center gap-4 text-left p-3">
                   <div className="flex flex-row items-center gap-3">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
                       Người đặt:
@@ -128,19 +128,7 @@ export const PaymentResult = () => {
                   </div>
                   <div className="flex flex-row items-center gap-3">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                      Voucher giảm giá:
-                    </p>
-                    <p className="text-sm font-bold text-white">-0 VND</p>
-                  </div>
-                  <div className="flex flex-row items-center gap-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                      Tổng combo:
-                    </p>
-                    <p className="text-sm font-bold text-white">{formatCurrency(comboTotal)}</p>
-                  </div>
-                  <div className="flex flex-row items-center gap-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                      Tổng đã thanh toán:
+                      Tổng thanh toán
                     </p>
                     <p className="text-sm font-bold text-primary">
                       {formatCurrency(booking.finalAmount)}
